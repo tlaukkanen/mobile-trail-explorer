@@ -1,0 +1,123 @@
+/**
+ * BluetoothUtility.java
+ *
+ * Copyright (C) 2005-2006 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+package com.substanceofcode.bluetooth;
+
+import java.io.IOException;
+import java.util.Vector;
+import javax.bluetooth.BluetoothStateException;
+import javax.bluetooth.DeviceClass;
+import javax.bluetooth.DiscoveryAgent;
+import javax.bluetooth.DiscoveryListener;
+import javax.bluetooth.LocalDevice;
+import javax.bluetooth.RemoteDevice;
+import javax.bluetooth.ServiceRecord;
+
+/**
+ *
+ * @author Tommi
+ */
+public class BluetoothUtility implements DiscoveryListener {
+    
+    private LocalDevice m_localDevice; // local Bluetooth Manager
+    private DiscoveryAgent m_discoveryAgent; // discovery agent   
+    private boolean m_searchComplete;
+    
+    /** Collects the remote devices found during a search. */
+    private Vector /* BluetoothDevice */ devices = new Vector();
+
+    /** Collects the services found during a search. */
+    private Vector /* ServiceRecord */ records = new Vector();
+    
+    
+   
+    /** Creates a new instance of BluetoothUtility */
+    public BluetoothUtility() {
+        m_searchComplete = false;
+    }
+    
+    /** Check for search status */
+    public boolean searchComplete() {
+        return m_searchComplete;
+    }
+    
+    /** Get discovered devices */
+    public Vector getDevices() {
+        return devices;
+    }
+
+    /**
+     * Initialize bluetooth
+     */
+    public void initialize() throws BluetoothStateException {
+        m_localDevice = null;
+        m_discoveryAgent = null;
+        // Retrieve the local device to get to the Bluetooth Manager
+        m_localDevice = LocalDevice.getLocalDevice();
+        // Servers set the discoverable mode to GIAC
+        m_localDevice.setDiscoverable(DiscoveryAgent.GIAC);
+        // Clients retrieve the discovery agent
+        m_discoveryAgent = m_localDevice.getDiscoveryAgent();
+    }    
+    
+    /**
+     * Find devices
+     */
+    public void findDevices() {
+        try {
+            boolean complete = m_discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
+            m_searchComplete = false;
+        } catch (BluetoothStateException ex) {
+            System.err.println("Error in BluetoothUtility.findDevices: " + ex.toString());
+            ex.printStackTrace();
+        }
+    }
+
+    public void deviceDiscovered(RemoteDevice remoteDevice, DeviceClass deviceClass) {
+        try {
+            // same device may found several times during single search
+            if (devices.indexOf(deviceClass) == -1) {
+                String address = remoteDevice.getBluetoothAddress();
+                String name = remoteDevice.getFriendlyName(false);
+                BluetoothDevice dev = new BluetoothDevice(address, name);
+                devices.addElement(dev);
+            }            
+            System.out.println("Devide found:" + remoteDevice.getFriendlyName(false));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+        for (int i = 0; i < servRecord.length; i++) {
+            records.addElement(servRecord[i]);
+        }
+    }
+
+    public void serviceSearchCompleted(int transID, int respCode) {
+        System.out.println("Service search completed.");
+    }
+
+    public void inquiryCompleted(int i) {
+        m_searchComplete = true;
+    }
+    
+}
