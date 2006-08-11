@@ -118,13 +118,14 @@
         <DesignComponent id="$SelectCommandAction2" typeid="MIDP:SelectCommandAction" uid="28">
             <Property name="targetDisplayable"/>
             <Property name="targetForwardDisplayable"/>
-            <Property name="actionOrigin" value="list1"/>
+            <Property name="actionOrigin"/>
         </DesignComponent>
         <DesignComponent id="deviceList" typeid="MIDP:com.substanceofcode.tracker.view.DeviceList" uid="29">
             <Property name="%%1_1_controller" value="m_controller"/>
             <Property name="%%1_2_title" value="GPS Devices"/>
             <Property name="choiceType" value="IMPLICIT"/>
             <Property name="selectCommandAction" value="$SelectCommandAction3"/>
+            <Property name="selectCommand" value="deviceOkCommand"/>
             <Property name="indexBasedSwitch" value="true"/>
             <ContainerProperty name="commands">
                 <ContainerPropertyItem value="$CommandAction4"/>
@@ -136,6 +137,7 @@
             <Property name="targetDisplayable"/>
             <Property name="targetForwardDisplayable"/>
             <Property name="actionOrigin" value="deviceList"/>
+            <Property name="selectCommand" value="deviceOkCommand"/>
         </DesignComponent>
         <DesignComponent id="okCommand1" typeid="MIDP:javax.microedition.lcdui.Command" uid="31">
             <Property name="label" value="STRING:Ok"/>
@@ -163,17 +165,17 @@
     <FlowDocument version="1.1">
         <Node id="$MobileDevice" location="160,272" order=",$StartPoint,,,,,,,,,$ExitPoint,,,,,"/>
         <Node id="splashScreen" location="424,272" order="$InfoScreenAction1$ActionFlowPort$1,,,,,,,,,,$Default,,,,,"/>
-        <Node id="trailCanvas" location="656,272" order="$CommandAction2,$CommandAction3,$CommandAction6,$CommandAction7,,,,,,,$Default,,,,,"/>
-        <Node id="aboutForm" location="912,216" order="$CommandAction1,,,,,,,,,,$Default,,,,,"/>
-        <Node id="deviceList" location="896,416" order="$CommandAction4,$CommandAction5,,,,,,,,,$Default,,,,,"/>
+        <Node id="trailCanvas" location="648,272" order="$CommandAction2,$CommandAction3,$CommandAction6,$CommandAction7,,,,,,,$Default,,,,,"/>
+        <Node id="aboutForm" location="904,352" order="$CommandAction1,,,,,,,,,,$Default,,,,,"/>
+        <Node id="deviceList" location="904,192" order="$CommandAction4,$CommandAction5,,,,,,,,,$Default,,,,,"/>
         <Link id="$StartPoint$ActionLink" path="200,248,384,248"/>
-        <Link id="$InfoScreenAction1$ActionLink" path="464,264,547,264,547,248,616,248"/>
-        <Link id="$CommandAction2$ActionLink" path="696,264,843,264,843,192,872,192"/>
-        <Link id="$CommandAction3$ActionLink" path="696,248,815,248,815,392,856,392"/>
-        <Link id="$CommandAction6$ActionLink" path="696,232,822,232,822,192,47,192,47,248,120,248"/>
-        <Link id="$CommandAction7$ActionLink" path="696,216,805,216,805,180,547,180,547,248,616,248"/>
-        <Link id="$CommandAction1$ActionLink" path="952,208,1002,208,1002,136,547,136,547,248,616,248"/>
-        <Link id="$CommandAction4$ActionLink" path="936,408,997,408,997,322,547,322,547,248,616,248"/>
-        <Link id="$CommandAction5$ActionLink" path="936,392,997,392,997,322,547,322,547,248,616,248"/>
+        <Link id="$InfoScreenAction1$ActionLink" path="464,264,543,264,543,248,608,248"/>
+        <Link id="$CommandAction2$ActionLink" path="688,264,814,264,814,328,864,328"/>
+        <Link id="$CommandAction3$ActionLink" path="688,248,798,248,798,168,864,168"/>
+        <Link id="$CommandAction6$ActionLink" path="688,232,817,232,817,192,47,192,47,248,120,248"/>
+        <Link id="$CommandAction1$ActionLink" path="944,344,994,344,994,389,543,389,543,248,608,248"/>
+        <Link id="$CommandAction5$ActionLink" path="944,168,1005,168,1005,112,543,112,543,248,608,248"/>
+        <Link id="$CommandAction4$ActionLink" path="944,184,1005,184,1005,112,543,112,543,248,608,248"/>
+        <Link id="$CommandAction7$ActionLink" path="688,216,789,216,789,180,543,180,543,248,608,248"/>
     </FlowDocument>
 </MVDData>

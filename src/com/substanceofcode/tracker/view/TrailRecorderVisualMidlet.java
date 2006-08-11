@@ -6,7 +6,9 @@
 
 package com.substanceofcode.tracker.view;
 
+import com.substanceofcode.bluetooth.BluetoothDevice;
 import com.substanceofcode.tracker.controller.Controller;
+import java.util.Vector;
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 
@@ -62,6 +64,9 @@ public class TrailRecorderVisualMidlet extends MIDlet implements CommandListener
             } else if (command == startCommand) {//GEN-LINE:MVDCACase11
                 // Insert pre-action code here
                 getDisplay().setCurrent(get_trailCanvas());//GEN-LINE:MVDCAAction21
+                
+                m_controller.startStop();
+                
                 // Insert post-action code here
             } else if (command == deviceListCommand) {//GEN-LINE:MVDCACase21
                 // Insert pre-action code here
@@ -77,6 +82,24 @@ public class TrailRecorderVisualMidlet extends MIDlet implements CommandListener
         } else if (displayable == deviceList) {
             if (command == okCommand1) {//GEN-END:MVDCACase26
                 // Insert pre-action code here
+                
+                // Set selected device as GPS
+                int selectedIndex = deviceList.getSelectedIndex();
+                String selectedDeviceAlias = deviceList.getString( selectedIndex );
+                
+                Vector devices = m_controller.getDevices();
+                int deviceCount = devices.size();
+                int deviceIndex;
+                for(deviceIndex=0; deviceIndex<deviceCount; deviceIndex++) {
+                    BluetoothDevice dev = (BluetoothDevice)devices.elementAt(deviceIndex);
+                    String devAlias = dev.getAlias();
+                    if(selectedDeviceAlias.equals(devAlias)==true) {
+                        // We found the selected device
+                        // Set device as GPS device
+                        m_controller.setGpsDevice( dev );
+                    }
+                }
+                
                 getDisplay().setCurrent(get_trailCanvas());//GEN-LINE:MVDCAAction32
                 // Insert post-action code here
             } else if (command == cancelCommand1) {//GEN-LINE:MVDCACase32

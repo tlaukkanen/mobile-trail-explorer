@@ -34,6 +34,7 @@ public class Controller {
     private Vector m_devices;
     private int m_status;
     private RecorderSettings m_settings;
+    private BluetoothDevice m_gpsDevice;
     
     /** Screens and Forms */
     private TrailCanvas m_trailCanvas;
@@ -70,6 +71,12 @@ public class Controller {
     
     public Vector getDevices() {
         return m_devices;
+    }
+    
+    /** Set GPS device */
+    public void setGpsDevice(BluetoothDevice device) {
+        m_gpsDevice = device;
+        m_settings.setGpsDeviceConnectionString( m_gpsDevice.getAddress() );
     }
     
     /** Get splash image */
