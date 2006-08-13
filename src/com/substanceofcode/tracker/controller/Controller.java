@@ -11,10 +11,15 @@ package com.substanceofcode.tracker.controller;
 
 import com.substanceofcode.bluetooth.BluetoothDevice;
 import com.substanceofcode.bluetooth.BluetoothUtility;
+import com.substanceofcode.bluetooth.GpsDevice;
+import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
+import java.lang.Exception;
 import java.util.Vector;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Image;
@@ -34,13 +39,16 @@ public class Controller {
     private Vector m_devices;
     private int m_status;
     private RecorderSettings m_settings;
-    private BluetoothDevice m_gpsDevice;
+    private GpsDevice m_gpsDevice;
+    private GpsRecorder m_recorder;
     
     /** Screens and Forms */
     private TrailCanvas m_trailCanvas;
     private SplashCanvas m_splashCanvas;
     private DeviceList m_deviceList;    
     private MIDlet m_midlet;
+    
+    private String m_error;
     
     /**
      * Creates a new instance of Controller
@@ -49,6 +57,12 @@ public class Controller {
         m_midlet = midlet;
         m_status = STATUS_NOTCONNECTED;
         m_settings = new RecorderSettings(m_midlet);
+        String gpsAddress = m_settings.getGpsDeviceConnectionString();
+        if(gpsAddress.length()>0) {
+            BluetoothDevice dev = new BluetoothDevice(gpsAddress, "GPS");
+            m_gpsDevice = new GpsDevice(dev);
+        }
+        m_recorder = new GpsRecorder( this );
     }
     
     public void searchDevices() {
@@ -75,7 +89,7 @@ public class Controller {
     
     /** Set GPS device */
     public void setGpsDevice(BluetoothDevice device) {
-        m_gpsDevice = device;
+        m_gpsDevice = new GpsDevice(device);
         m_settings.setGpsDeviceConnectionString( m_gpsDevice.getAddress() );
     }
     
@@ -103,6 +117,14 @@ public class Controller {
     public int getStatusCode() {
         return m_status;
     }
+    
+    public void setError(String err) {
+        m_error = err;
+    }
+    
+    public String getError() {
+        return m_error;
+    }
 
     /** Get current status text */
     public String getStatus() {
@@ -126,40 +148,43 @@ public class Controller {
     /** Method for starting and stopping the recording */
     public void startStop() {
         
+        if(m_status!=STATUS_RECORDING) {
+
+            // Connect to GPS device
+            try {
+                m_gpsDevice.connect();
+                m_recorder.startRecording();
+                m_status = STATUS_RECORDING;
+            } catch(Exception ex) {
+                System.err.println("Error while connecting to GPS: " + ex.toString());
+                m_error = "startStop: " + ex.toString();
+            }
+        } else {
+            
+            // Disconnect from GPS
+            m_recorder.stopRecording();
+            Track recordedTrack = m_recorder.getTrack();
+            try{
+                recordedTrack.writeToFile("C:/track.txt");
+            }catch(Exception ex) {
+                setError(ex.toString());
+            }
+            
+        }
+        
+    }
+    
+    public synchronized GpsPosition getPosition() {
+        if(m_gpsDevice==null) {
+            return null;
+        }
+        GpsPosition pos = m_gpsDevice.getPosition();
+        return pos;
     }
 
     /** Exit application */
     public void exit() {
         m_midlet.notifyDestroyed();
-    }
-
-    /** Connect to GPS device */
-    public void connectGps() {
-        // Get GPS device connection string from settings
-        String connectionString = "";
-        try {
-            connectionString = m_settings.getGpsDeviceConnectionString();
-        } catch (Exception ex) {
-            System.err.println("Error while getting device connection string: " + 
-                    m_settings.toString());
-            ex.printStackTrace();
-        }
-        
-        // Check if string exists
-        if(connectionString.length()==0) {
-            
-            // Connection string doesn't yet exist ->
-            // Show device selection screen
-            return;
-        }
-        
-        // Connection string exits -> Connect to GPS device
-        //todo:add code
-    }
-
-    /** Disconnect from GPS device */
-    public void disconnectGps() {
-        //todo:add code
     }
     
     /** Get settings */
@@ -167,6 +192,14 @@ public class Controller {
         //todo:add code
         return null;
         
+    }
+
+    public String getGpsUrl() {
+        if(m_gpsDevice!=null) {
+            return m_gpsDevice.getAddress();
+        } else {
+            return "-";
+        }
     }
    
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MVDData version="1.2">
-    <DesignDocument designVersion="MIDP-2" uidCounter="35">
+    <DesignDocument designVersion="MIDP-2" uidCounter="40">
         <DesignComponent id="$MobileDevice" typeid="MIDP:$MobileDevice" uid="0"/>
         <DesignComponent id="$StartPoint" typeid="MIDP:$StartPoint" uid="1">
             <Property name="targetDisplayable" value="splashScreen"/>
@@ -27,6 +27,7 @@
                 <ContainerPropertyItem value="$CommandAction3"/>
                 <ContainerPropertyItem value="$CommandAction6"/>
                 <ContainerPropertyItem value="$CommandAction7"/>
+                <ContainerPropertyItem value="$CommandAction8"/>
             </ContainerProperty>
         </DesignComponent>
         <DesignComponent id="$SelectCommandAction1" typeid="MIDP:SelectCommandAction" uid="7">
@@ -161,21 +162,53 @@
             <Property name="actionSource" value="cancelCommand1"/>
             <Property name="actionOrigin" value="deviceList"/>
         </DesignComponent>
+        <DesignComponent id="errorTextBox" typeid="MIDP:javax.microedition.lcdui.TextBox" uid="35">
+            <Property name="title" value="STRING:Log"/>
+            <Property name="maxSize" value="120"/>
+            <ContainerProperty name="commands">
+                <ContainerPropertyItem value="$CommandAction9"/>
+            </ContainerProperty>
+        </DesignComponent>
+        <DesignComponent id="logCommand" typeid="MIDP:javax.microedition.lcdui.Command" uid="36">
+            <Property name="label" value="STRING:Log"/>
+            <Property name="priority" value="1"/>
+            <Property name="type" value="SCREEN"/>
+        </DesignComponent>
+        <DesignComponent id="$CommandAction8" typeid="MIDP:CommandAction" uid="37">
+            <Property name="targetDisplayable" value="errorTextBox"/>
+            <Property name="targetForwardDisplayable"/>
+            <Property name="actionSource" value="logCommand"/>
+            <Property name="actionOrigin" value="trailCanvas"/>
+        </DesignComponent>
+        <DesignComponent id="backCommand2" typeid="MIDP:javax.microedition.lcdui.Command" uid="38">
+            <Property name="label" value="STRING:Back"/>
+            <Property name="priority" value="1"/>
+            <Property name="type" value="BACK"/>
+        </DesignComponent>
+        <DesignComponent id="$CommandAction9" typeid="MIDP:CommandAction" uid="39">
+            <Property name="targetDisplayable" value="trailCanvas"/>
+            <Property name="targetForwardDisplayable"/>
+            <Property name="actionSource" value="backCommand2"/>
+            <Property name="actionOrigin" value="errorTextBox"/>
+        </DesignComponent>
     </DesignDocument>
     <FlowDocument version="1.1">
         <Node id="$MobileDevice" location="160,272" order=",$StartPoint,,,,,,,,,$ExitPoint,,,,,"/>
         <Node id="splashScreen" location="424,272" order="$InfoScreenAction1$ActionFlowPort$1,,,,,,,,,,$Default,,,,,"/>
-        <Node id="trailCanvas" location="648,272" order="$CommandAction2,$CommandAction3,$CommandAction6,$CommandAction7,,,,,,,$Default,,,,,"/>
         <Node id="aboutForm" location="904,352" order="$CommandAction1,,,,,,,,,,$Default,,,,,"/>
         <Node id="deviceList" location="904,192" order="$CommandAction4,$CommandAction5,,,,,,,,,$Default,,,,,"/>
+        <Node id="trailCanvas" location="648,272" order="$CommandAction2,$CommandAction3,$CommandAction6,$CommandAction7,$CommandAction8,,,,,,$Default,,,,,"/>
+        <Node id="errorTextBox" location="856,480" order="$CommandAction9,,,,,,,,,,$Default,,,,,"/>
         <Link id="$StartPoint$ActionLink" path="200,248,384,248"/>
         <Link id="$InfoScreenAction1$ActionLink" path="464,264,543,264,543,248,608,248"/>
         <Link id="$CommandAction2$ActionLink" path="688,264,814,264,814,328,864,328"/>
         <Link id="$CommandAction3$ActionLink" path="688,248,798,248,798,168,864,168"/>
-        <Link id="$CommandAction6$ActionLink" path="688,232,817,232,817,192,47,192,47,248,120,248"/>
-        <Link id="$CommandAction1$ActionLink" path="944,344,994,344,994,389,543,389,543,248,608,248"/>
-        <Link id="$CommandAction5$ActionLink" path="944,168,1005,168,1005,112,543,112,543,248,608,248"/>
-        <Link id="$CommandAction4$ActionLink" path="944,184,1005,184,1005,112,543,112,543,248,608,248"/>
-        <Link id="$CommandAction7$ActionLink" path="688,216,789,216,789,180,543,180,543,248,608,248"/>
+        <Link id="$CommandAction6$ActionLink" path="688,232,789,232,789,127,47,127,47,248,120,248"/>
+        <Link id="$CommandAction7$ActionLink" path="688,216,817,216,817,155,543,155,543,248,608,248"/>
+        <Link id="$CommandAction1$ActionLink" path="944,344,994,344,994,394,565,394,565,248,608,248"/>
+        <Link id="$CommandAction4$ActionLink" path="944,184,1005,184,1005,112,565,112,565,248,608,248"/>
+        <Link id="$CommandAction5$ActionLink" path="944,168,1005,168,1005,112,565,112,565,248,608,248"/>
+        <Link id="$CommandAction9$ActionLink" path="896,472,946,472,946,394,565,394,565,248,608,248"/>
+        <Link id="$CommandAction8$ActionLink" path="672,200,672,143,558,143,558,456,816,456"/>
     </FlowDocument>
 </MVDData>

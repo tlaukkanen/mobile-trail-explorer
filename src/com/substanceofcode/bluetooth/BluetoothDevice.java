@@ -21,6 +21,11 @@
 
 package com.substanceofcode.bluetooth;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import javax.microedition.io.Connector;
+import javax.microedition.io.StreamConnection;
+
 /**
  *
  * @author Tommi
@@ -37,7 +42,9 @@ public class BluetoothDevice {
     }
     
     public String getAddress() {
-        return m_address;
+        String url;
+        url =  m_address;
+        return url;
     }
     
     public String getAlias() {

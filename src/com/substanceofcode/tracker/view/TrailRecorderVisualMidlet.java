@@ -63,9 +63,10 @@ public class TrailRecorderVisualMidlet extends MIDlet implements CommandListener
                 // Insert post-action code here
             } else if (command == startCommand) {//GEN-LINE:MVDCACase11
                 // Insert pre-action code here
+                m_controller.startStop();
+               
                 getDisplay().setCurrent(get_trailCanvas());//GEN-LINE:MVDCAAction21
                 
-                m_controller.startStop();
                 
                 // Insert post-action code here
             } else if (command == deviceListCommand) {//GEN-LINE:MVDCACase21
