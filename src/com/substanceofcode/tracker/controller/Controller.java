@@ -16,6 +16,7 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.tracker.view.AboutForm;
 import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
@@ -46,14 +47,18 @@ public class Controller {
     private TrailCanvas m_trailCanvas;
     private SplashCanvas m_splashCanvas;
     private DeviceList m_deviceList;    
+    private AboutForm m_aboutForm;
     private MIDlet m_midlet;
+    
+    /** Display device */
+    private Display m_display;
     
     private String m_error;
     
     /**
      * Creates a new instance of Controller
      */
-    public Controller(MIDlet midlet) {
+    public Controller(MIDlet midlet, Display display) {
         m_midlet = midlet;
         m_status = STATUS_NOTCONNECTED;
         m_settings = new RecorderSettings(m_midlet);
@@ -63,6 +68,14 @@ public class Controller {
             m_gpsDevice = new GpsDevice(dev);
         }
         m_recorder = new GpsRecorder( this );
+        
+        /** Initialize forms */
+        m_trailCanvas = new TrailCanvas(this);
+        m_splashCanvas = new SplashCanvas(this);
+        m_deviceList = new DeviceList(this);
+        m_aboutForm = new AboutForm(this);
+        m_display = display;
+        
     }
     
     public void searchDevices() {
@@ -200,6 +213,10 @@ public class Controller {
         } else {
             return "-";
         }
+    }
+
+    public void showTrail() {
+        
     }
    
 }

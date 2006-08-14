@@ -42,10 +42,11 @@ public class DeviceList extends List implements Runnable{
     private final static int STATUS_SEARCHING = 2;
     private final static int STATUS_COMPLETE = 3;
     private Thread m_searchThread;
+    private final static String TITLE = "Devices";
     
     /** Creates a new instance of DeviceList */
-    public DeviceList(Controller controller, String title) {
-        super(title, List.IMPLICIT);
+    public DeviceList(Controller controller) {
+        super(TITLE, List.IMPLICIT);
 
         // Set controller
         m_controller = controller;
@@ -57,6 +58,34 @@ public class DeviceList extends List implements Runnable{
         m_searchThread = new Thread(this);
         m_searchThread.start();
         
+    }
+    
+    public void refresh() {
+        this.deleteAll();
+        m_status = STATUS_READY;
+        m_searchThread.start();
+    }
+    
+    /** Get selected bluetooth device */
+    public BluetoothDevice getSelectedDevice() {
+        // Set selected device as GPS
+        int selectedIndex = this.getSelectedIndex();
+        String selectedDeviceAlias = this.getString( selectedIndex );
+
+        Vector devices = m_controller.getDevices();
+        int deviceCount = devices.size();
+        int deviceIndex;
+        BluetoothDevice selectedDevice = null;
+        for(deviceIndex=0; deviceIndex<deviceCount; deviceIndex++) {
+            BluetoothDevice dev = (BluetoothDevice)devices.elementAt(deviceIndex);
+            String devAlias = dev.getAlias();
+            if(selectedDeviceAlias.equals(devAlias)==true) {
+                // We found the selected device
+                // Set device as GPS device
+                selectedDevice = dev;
+            }
+        }      
+        return selectedDevice;
     }
 
     public void run() {
