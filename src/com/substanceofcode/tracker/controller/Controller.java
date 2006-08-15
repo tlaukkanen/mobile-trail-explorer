@@ -18,6 +18,7 @@ import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.view.AboutForm;
 import com.substanceofcode.tracker.view.DeviceList;
+import com.substanceofcode.tracker.view.SettingsList;
 import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
 import java.lang.Exception;
@@ -48,6 +49,7 @@ public class Controller {
     private SplashCanvas m_splashCanvas;
     private DeviceList m_deviceList;    
     private AboutForm m_aboutForm;
+    private SettingsList m_settingsList;
     private MIDlet m_midlet;
     
     /** Display device */
@@ -70,8 +72,6 @@ public class Controller {
         m_recorder = new GpsRecorder( this );
         
         /** Initialize forms */
-        m_trailCanvas = new TrailCanvas(this);
-        m_splashCanvas = new SplashCanvas(this);
         m_deviceList = new DeviceList(this);
         m_aboutForm = new AboutForm(this);
         m_display = display;
@@ -215,8 +215,54 @@ public class Controller {
         }
     }
 
+    /** Show trail */
     public void showTrail() {
-        
+        m_display.setCurrent(getTrailCanvas());
+    }
+    
+    private TrailCanvas getTrailCanvas() {
+        if(m_trailCanvas==null) {
+            m_trailCanvas = new TrailCanvas(this);
+        }
+        return m_trailCanvas;
+    }
+
+    /** Show splash canvas */
+    public void showSplash() {
+        m_display.setCurrent( getSplashCanvas() );
+    }
+    
+    /** Get instance of splash screen */
+    private SplashCanvas getSplashCanvas() {
+        if( m_splashCanvas==null ) {
+            m_splashCanvas = new SplashCanvas(this);
+        }
+        return m_splashCanvas;
+    }
+
+    public void showSettings() {
+        m_display.setCurrent(getSettingsList());
+    }
+    
+    /** Get instance of settings list */
+    private SettingsList getSettingsList() {
+        if(m_settingsList==null) {
+            m_settingsList = new SettingsList(this);
+        }
+        return m_settingsList;
+    }
+
+    /** Show device list */
+    public void showDevices() {
+        m_display.setCurrent(getDeviceList());
+    }
+    
+    /** Get instance of device list */
+    private DeviceList getDeviceList() {
+        if(m_deviceList==null) {
+            m_deviceList = new DeviceList(this);
+        }
+        return m_deviceList;
     }
    
 }

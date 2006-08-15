@@ -1,10 +1,25 @@
 /*
  * TrailCanvas.java
  *
- * Created on 6. heinäkuuta 2006, 22:59
+ * Copyright (C) 2005-2006 Tommi Laukkanen
+ * http://www.substanceofcode.com
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * Created on August 14th 2006
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
 
 package com.substanceofcode.tracker.view;
@@ -22,7 +37,7 @@ import javax.microedition.lcdui.Graphics;
  *
  * @author Tommi
  */
-public class TrailCanvas extends Canvas implements Runnable{
+public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
     private Controller m_controller;
     private GpsPosition m_lastPosition;
@@ -32,6 +47,11 @@ public class TrailCanvas extends Canvas implements Runnable{
     private boolean m_refresh;
     private String m_error;
     
+    /** Commands */
+    private Command m_startStopCommand;
+    private Command m_settingsCommand;
+    private Command m_exitCommand;
+    
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller) {
         m_controller = controller;
@@ -40,6 +60,27 @@ public class TrailCanvas extends Canvas implements Runnable{
         m_thread = new Thread(this);
         m_thread.start();
         m_counter=0;
+        
+        initializeCommands();
+        setCommandListener(this);
+    }
+    
+    /** Initialize commands */
+    private void initializeCommands() {
+        
+        // Start/Stop command for toggling recording
+        m_startStopCommand = new Command("Start recording", Command.ITEM, 1);
+        addCommand(m_startStopCommand);
+        
+        // Settings command for showing settings list
+        m_settingsCommand = new Command("Settings", Command.SCREEN, 4);
+        addCommand(m_settingsCommand);
+        
+        // Exit command
+        m_exitCommand = new Command("Exit", Command.EXIT, 10);
+        addCommand(m_exitCommand);
+        
+        
     }
     
     /** Paint */
@@ -97,6 +138,19 @@ public class TrailCanvas extends Canvas implements Runnable{
             }            
         }
         
+    }
+
+    /** Handle commands */
+    public void commandAction(Command command, Displayable displayable) {
+        if(command==m_startStopCommand) {
+            m_controller.startStop();
+        }
+        if(command==m_settingsCommand) {
+            m_controller.showSettings();
+        }
+        if(command==m_exitCommand) {
+            m_controller.exit();
+        }
     }
     
 }

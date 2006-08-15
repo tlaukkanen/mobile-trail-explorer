@@ -1,22 +1,25 @@
-/**
+/*
  * DeviceList.java
  *
  * Copyright (C) 2005-2006 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or any later version.
+ * Created on August 14th 2006
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
 
 
@@ -34,7 +37,7 @@ import javax.microedition.lcdui.List;
  *
  * @author Tommi
  */
-public class DeviceList extends List implements Runnable{
+public class DeviceList extends List implements Runnable, CommandListener {
     
     private Controller m_controller;
     private int m_status;
@@ -43,6 +46,11 @@ public class DeviceList extends List implements Runnable{
     private final static int STATUS_COMPLETE = 3;
     private Thread m_searchThread;
     private final static String TITLE = "Devices";
+    
+    /** Commands */
+    private Command m_refreshCommand;
+    private Command m_selectCommand;
+    private Command m_cancelCommand;
     
     /** Creates a new instance of DeviceList */
     public DeviceList(Controller controller) {
@@ -53,11 +61,25 @@ public class DeviceList extends List implements Runnable{
 
         // Set status
         m_status = STATUS_READY;
+
+        // Initialize commands 
+        initializeCommands();
         
-        /** Set search thread */
+        // Set search thread
         m_searchThread = new Thread(this);
         m_searchThread.start();
+    }
+    
+    /** Initialize commands */
+    private void initializeCommands() {
+        m_refreshCommand = new Command("Refresh", Command.ITEM, 2);
+        addCommand(m_refreshCommand);
+        m_selectCommand = new Command("Select", Command.ITEM, 1);
+        addCommand(m_selectCommand);
+        m_cancelCommand = new Command("Cancel", Command.SCREEN, 3);
+        addCommand(m_cancelCommand);
         
+        setCommandListener(this);
     }
     
     public void refresh() {
@@ -120,5 +142,21 @@ public class DeviceList extends List implements Runnable{
             }
         }
     }
+
+    public void commandAction(Command command, Displayable displayable) {
+        if(command==m_refreshCommand) {
+            // Refresh devices
+            refresh();
+        }
+        if(command==m_selectCommand) {
+            BluetoothDevice dev = getSelectedDevice();
+            if(dev!=null) {
+                m_controller.setGpsDevice(dev);
+            }
+            m_controller.showSettings();
+        }
+        
+    }
+    
     
 }

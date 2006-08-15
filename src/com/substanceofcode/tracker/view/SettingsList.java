@@ -1,10 +1,10 @@
 /*
- * SplashCanvas.java
+ * SettingsList.java
  *
  * Copyright (C) 2005-2006 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
- * Created on August 14th 2006
+ * Created on 15. elokuuta 2006
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,60 +25,58 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
-import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.List;
 
 /**
  *
  * @author Tommi
  */
-public class SplashCanvas extends Canvas implements CommandListener {
+public class SettingsList extends List implements CommandListener {
     
     private Controller m_controller;
-    private Command m_okCommand;
     
-    /** Creates a new instance of SplashCanvas */
-    public SplashCanvas(Controller controller) {
+    /** Commands */
+    private Command m_selectCommand;
+    private Command m_backCommand;
 
-        // Set controller
+    private final static int GPS = 0;
+    private final static int RECORDING = 1;
+    
+    /** Creates a new instance of SettingsList */
+    public SettingsList(Controller controller) {
+        super("Settings", List.IMPLICIT);
         m_controller = controller;
         
-        // Set fullscreen
-        setFullScreenMode( true );
+        // List initialization
+        this.append("GPS", null);
+        this.append("Recording", null);
         
-        // Initialize commands
-        m_okCommand = new Command("OK", Command.SCREEN, 1);
-        addCommand(m_okCommand);
-        this.setCommandListener(this);
-    }
-
-    /** Paint canvas */
-    public void paint(Graphics g) {
-        // Get dimensions
-        int height = getHeight();
-        int width = getWidth();
+        // Commands
+        m_selectCommand = new Command("Select", Command.ITEM, 1);
+        addCommand(m_selectCommand);
         
-        // Clear the background to white
-        g.setColor( 255, 255, 255 );
-        g.fillRect( 0, 0, width, height );
+        m_backCommand = new Command("Back", Command.SCREEN, 4);
+        addCommand(m_backCommand);
         
-        // Write title
-        g.setColor(0,0,0);
-        String title = "Trail Explorer";
-        int titleX = width/2;
-        int titleY = height/2;
-        g.drawString(title, titleX, titleY, Graphics.HCENTER|Graphics.BOTTOM);
-    }
-
-    /** Handle commands */
-    public void commandAction(Command command, Displayable displayable) {
-        // Show trail canvas if user presses any key or selects any command
-        m_controller.showTrail();
+        setCommandListener(this);
+                
     }
     
+    /** Command listener */
+    public void commandAction(Command command, Displayable displayable) {
+        if(command == m_selectCommand) {
+            int selectedIndex = this.getSelectedIndex();
+            if(selectedIndex==GPS) {
+                m_controller.showDevices();
+            }
+        }
+        if(command == m_backCommand) {
+            m_controller.showTrail();
+        }
+    }
     
     
 }

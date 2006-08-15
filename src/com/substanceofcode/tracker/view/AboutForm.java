@@ -36,7 +36,6 @@ import javax.microedition.lcdui.Displayable;
 public class AboutForm implements CommandListener {
     
     private Controller m_controller;
-    private Command m_backCommand;
     
     /** Creates a new instance of AboutForm */
     public AboutForm(Controller controller) {
@@ -45,9 +44,7 @@ public class AboutForm implements CommandListener {
 
     /** Handle all commands */
     public void commandAction(Command command, Displayable displayable) {
-        if(command==m_backCommand) {
-            m_controller.showTrail();
-        }
+        m_controller.showTrail();
     }
     
 }
