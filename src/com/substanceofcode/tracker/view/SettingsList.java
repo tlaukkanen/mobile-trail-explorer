@@ -57,6 +57,7 @@ public class SettingsList extends List implements CommandListener {
         // Commands
         m_selectCommand = new Command("Select", Command.ITEM, 1);
         addCommand(m_selectCommand);
+        setSelectCommand(m_selectCommand);
         
         m_backCommand = new Command("Back", Command.SCREEN, 4);
         addCommand(m_backCommand);

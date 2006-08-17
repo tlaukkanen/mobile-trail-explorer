@@ -76,6 +76,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
         addCommand(m_refreshCommand);
         m_selectCommand = new Command("Select", Command.ITEM, 1);
         addCommand(m_selectCommand);
+        setSelectCommand(m_selectCommand);
         m_cancelCommand = new Command("Cancel", Command.SCREEN, 3);
         addCommand(m_cancelCommand);
         
@@ -85,6 +86,9 @@ public class DeviceList extends List implements Runnable, CommandListener {
     public void refresh() {
         this.deleteAll();
         m_status = STATUS_READY;
+        if(m_searchThread==null) {
+            m_searchThread = new Thread(this);
+        }
         m_searchThread.start();
     }
     
@@ -153,6 +157,9 @@ public class DeviceList extends List implements Runnable, CommandListener {
             if(dev!=null) {
                 m_controller.setGpsDevice(dev);
             }
+            m_controller.showSettings();
+        }
+        if(command==m_cancelCommand) {
             m_controller.showSettings();
         }
         

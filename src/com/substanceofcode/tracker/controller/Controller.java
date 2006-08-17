@@ -23,6 +23,7 @@ import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
 import java.lang.Exception;
 import java.util.Vector;
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
@@ -72,7 +73,6 @@ public class Controller {
         m_recorder = new GpsRecorder( this );
         
         /** Initialize forms */
-        m_deviceList = new DeviceList(this);
         m_aboutForm = new AboutForm(this);
         m_display = display;
         
@@ -181,6 +181,9 @@ public class Controller {
                 recordedTrack.writeToFile("C:/track.txt");
             }catch(Exception ex) {
                 setError(ex.toString());
+                Alert saveAlert = new Alert("Error");
+                saveAlert.setString(ex.toString());
+                m_display.setCurrent(saveAlert, getTrailCanvas());
             }
             
         }

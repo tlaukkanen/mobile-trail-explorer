@@ -117,7 +117,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         /** Draw error */
         g.setColor(255,0,0);
-        g.drawString("Err: " + m_error,1,40,Graphics.TOP|Graphics.LEFT );
+        g.drawString("" + m_error,1,40,Graphics.TOP|Graphics.LEFT );
         g.drawString("Cer: " + m_controller.getError(),1,60,Graphics.TOP|Graphics.LEFT );
 
         String gpsUrl = m_controller.getGpsUrl();
@@ -125,6 +125,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
     }
 
+    /** Thread for getting current position */
     public void run() {
         while(m_refresh==true) {
             try{
