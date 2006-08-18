@@ -1,10 +1,23 @@
 /*
  * Controller.java
  *
- * Created on 16. toukokuuta 2006, 22:10
+ * Copyright (C) 2005-2006 Tommi Laukkanen
+ * http://www.substanceofcode.com
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
 
 package com.substanceofcode.tracker.controller;
@@ -31,10 +44,11 @@ import javax.microedition.midlet.MIDlet;
 
 /**
  *
- * @author Tommi
+ * @author Tommi Laukkanen
  */
 public class Controller {
 
+    /** Status codes */
     public final static int STATUS_STOPPED = 0;
     public final static int STATUS_RECORDING = 1;
     public final static int STATUS_NOTCONNECTED = 2;
@@ -106,26 +120,6 @@ public class Controller {
         m_settings.setGpsDeviceConnectionString( m_gpsDevice.getAddress() );
     }
     
-    /** Get splash image */
-    public Image getSplashImage() {
-        Image splashImage = loadImage("/images/logo.png");
-        return splashImage;
-    }
-    
-    /** Load an image */
-    private Image loadImage(String filename) {
-        System.out.println("Loading image: " + filename);
-        Image image = null;
-        try {
-            image = Image.createImage(filename);
-        } catch(Exception e) {
-            System.out.println("Error while loading image: " + filename);
-            System.out.println("Description: " + e.toString());
-            // Use null
-        }
-        return image;
-    }
-    
     /** Get status code */
     public int getStatusCode() {
         return m_status;
@@ -178,14 +172,15 @@ public class Controller {
             m_recorder.stopRecording();
             Track recordedTrack = m_recorder.getTrack();
             try{
-                recordedTrack.writeToFile("C:/track.txt");
+                recordedTrack.writeToFile("c:/track.txt");
             }catch(Exception ex) {
                 setError(ex.toString());
                 Alert saveAlert = new Alert("Error");
+                saveAlert.setTimeout(5000);
                 saveAlert.setString(ex.toString());
                 m_display.setCurrent(saveAlert, getTrailCanvas());
             }
-            
+            m_status = STATUS_STOPPED;            
         }
         
     }

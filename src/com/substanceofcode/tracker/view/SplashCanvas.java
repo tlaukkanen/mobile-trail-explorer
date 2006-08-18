@@ -37,7 +37,7 @@ import javax.microedition.lcdui.Image;
  *
  * @author Tommi Laukkanen
  */
-public class SplashCanvas extends Canvas implements CommandListener {
+public class SplashCanvas extends Canvas implements CommandListener, Runnable {
     
     /** Commands */
     private Controller m_controller;
@@ -45,6 +45,9 @@ public class SplashCanvas extends Canvas implements CommandListener {
     
     /** Images */
     private Image m_splashImage;
+    
+    /** Thread for moving on */
+    private Thread m_timeoutThread;
     
     /** Creates a new instance of SplashCanvas */
     public SplashCanvas(Controller controller) {
@@ -62,6 +65,10 @@ public class SplashCanvas extends Canvas implements CommandListener {
         m_okCommand = new Command("OK", Command.SCREEN, 1);
         addCommand(m_okCommand);
         this.setCommandListener(this);
+        
+        // Initialize timeout thread
+        m_timeoutThread = new Thread(this);
+        m_timeoutThread.start();
     }
 
     /** Paint canvas */
@@ -93,6 +100,12 @@ public class SplashCanvas extends Canvas implements CommandListener {
         m_controller.showTrail();
     }
     
+    /** Key pressed */
+    protected void keyPressed(int keyCode) {
+        // Show trail if any key is pressed
+        m_controller.showTrail();
+    }
+    
     /** Load an image */
     private Image loadImage(String filename) {
         Image image = null;
@@ -104,6 +117,21 @@ public class SplashCanvas extends Canvas implements CommandListener {
             // Use null
         }
         return image;
+    }
+
+    public void run() {
+        int waitSeconds = 0;
+        while(Thread.currentThread()==m_timeoutThread || waitSeconds<5) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            waitSeconds++;            
+        }
+        if(waitSeconds>=5) {
+            m_controller.showTrail();
+        }
     }
     
     

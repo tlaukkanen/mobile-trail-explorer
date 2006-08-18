@@ -24,6 +24,7 @@ package com.substanceofcode.tracker.model;
 
 import java.io.IOException;
 import javax.microedition.midlet.MIDlet;
+import javax.microedition.rms.RecordStoreException;
 
 /**
  *
@@ -54,6 +55,11 @@ public class RecorderSettings {
     /** Set a GPS device connection string */
     public void setGpsDeviceConnectionString(String connectionString) {
         m_settings.setStringProperty(GPS_DEVICE_STRING, connectionString);
+        try {
+            m_settings.save(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
     
 }

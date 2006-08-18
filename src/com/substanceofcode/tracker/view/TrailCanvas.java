@@ -69,7 +69,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private void initializeCommands() {
         
         // Start/Stop command for toggling recording
-        m_startStopCommand = new Command("Start recording", Command.ITEM, 1);
+        m_startStopCommand = new Command("Start/Stop recording", Command.ITEM, 1);
         addCommand(m_startStopCommand);
         
         // Settings command for showing settings list
@@ -102,26 +102,36 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         int height = getHeight();
 
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+        Font currentFont = g.getFont();
+        int fontHeight = currentFont.getHeight();
         
         /** Draw status */
         g.setColor(0,0,255);
         g.drawString("Status: " + m_controller.getStatus(),1,1,Graphics.TOP|Graphics.LEFT );
         
         /** Draw status */
-        g.setColor(0,255,0);
+        g.setColor(0,0,0);
         if(m_lastPosition!=null) {
             g.drawString("Pos: " + m_lastPosition.toString(),1,20,Graphics.TOP|Graphics.LEFT );
         } else {
             g.drawString("Position unknown: " + m_counter,1,20,Graphics.TOP|Graphics.LEFT );
         }
         
-        /** Draw error */
+        /** Draw error texts */
         g.setColor(255,0,0);
-        g.drawString("" + m_error,1,40,Graphics.TOP|Graphics.LEFT );
-        g.drawString("Cer: " + m_controller.getError(),1,60,Graphics.TOP|Graphics.LEFT );
+        if(m_error!=null){
+            g.drawString("" + m_error,1,40,Graphics.TOP|Graphics.LEFT );
+        }
+        if(m_controller.getError()!=null){
+            g.drawString("" + m_controller.getError(),1,60,Graphics.TOP|Graphics.LEFT );
+        }
 
+        /** Draw GPS address */
         String gpsUrl = m_controller.getGpsUrl();
-        g.drawString("GPS: " + gpsUrl,1,80,Graphics.TOP|Graphics.LEFT );
+        g.drawString("GPS: " + gpsUrl, 
+                1, 
+                height - (fontHeight + 2),
+                Graphics.TOP|Graphics.LEFT );
         
     }
 
