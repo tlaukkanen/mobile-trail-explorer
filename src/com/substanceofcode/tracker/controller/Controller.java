@@ -172,7 +172,7 @@ public class Controller {
             m_recorder.stopRecording();
             Track recordedTrack = m_recorder.getTrack();
             try{
-                recordedTrack.writeToFile("c:/track.txt");
+                recordedTrack.writeToFile("E:/mytrack.txt");
             }catch(Exception ex) {
                 setError(ex.toString());
                 Alert saveAlert = new Alert("Error");

@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.OutputConnection;
+import javax.microedition.io.file.FileConnection;
 
 /**
  *
@@ -67,10 +68,18 @@ public class Track {
     /** Write to file */
     public void writeToFile(String filename) throws Exception {
         try {
-            OutputConnection connection = (OutputConnection)                     
-              Connector.open("file://" + filename, Connector.WRITE );
+            FileConnection connection = (FileConnection)                     
+              Connector.open("file:///" + filename, Connector.WRITE );
+            
+            // Check for file existence
+            if(connection.exists()==false) {
+                connection.create();
+            }
+
+            // Create output stream and write data;
             OutputStream out = connection.openOutputStream();
             PrintStream output = new PrintStream( out );
+            
             output.println( this.toString() );
             out.close();
             connection.close();        

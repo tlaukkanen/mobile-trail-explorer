@@ -33,6 +33,8 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
+import com.nokia.mid.ui.DeviceControl;
+
 /**
  *
  * @author Tommi
@@ -63,6 +65,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         initializeCommands();
         setCommandListener(this);
+        
+        // Set backlight always on
+        int backLightIndex = 0;
+        int backLightLevel = 100;
+        DeviceControl.setLights(backLightIndex, backLightLevel);
     }
     
     /** Initialize commands */
