@@ -44,7 +44,7 @@ public class GpsRecorder implements Runnable{
         m_intervalSeconds = 10;
         m_recordedTrack = new Track();
         m_recording = false;
-        m_recorderThread = new Thread();
+        m_recorderThread = new Thread(this);
         m_recorderThread.start();
     }
     
@@ -86,9 +86,10 @@ public class GpsRecorder implements Runnable{
 
     /** Main recording thread */
     public void run() {
-        while(Thread.currentThread() == m_recorderThread) {
+        while(true) {
             System.out.println("Recorder thread...");
             try{
+                Thread.sleep(1000 * m_intervalSeconds);
                 if(m_recording==true) {
                     System.out.println("-Recording-");
                     GpsPosition pos = m_controller.getPosition();
@@ -96,7 +97,6 @@ public class GpsRecorder implements Runnable{
                         m_recordedTrack.addPosition(pos);
                     }
                 }
-                Thread.sleep(1000 * m_intervalSeconds);
             } catch (Exception ex) {
                 System.err.println("Error in recorder thread: " + ex.toString());
             }

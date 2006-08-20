@@ -28,7 +28,7 @@ public class GpsPosition {
     public String toString() {
         String res;
         if(m_longitude.length()>0) {
-            res = "LO:" +  m_longitude + " LA:" + m_latitude;
+            res = m_longitude + ", " + m_latitude + ", " + m_elevation;
         } else {
             res = "Unknown";
         }

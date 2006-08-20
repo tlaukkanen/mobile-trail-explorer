@@ -133,12 +133,18 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             g.drawString("" + m_controller.getError(),1,60,Graphics.TOP|Graphics.LEFT );
         }
 
+        /** Draw recorded position count */
+        String posCount = "Positions recorded: " + m_controller.getRecordedPositionCount();
+        g.drawString(posCount, 1, height - (fontHeight*2 + 4), Graphics.TOP|Graphics.LEFT);
+        
         /** Draw GPS address */
         String gpsUrl = m_controller.getGpsUrl();
         g.drawString("GPS: " + gpsUrl, 
                 1, 
                 height - (fontHeight + 2),
                 Graphics.TOP|Graphics.LEFT );
+        
+        
         
     }
 

@@ -25,6 +25,7 @@ package com.substanceofcode.tracker.model;
 import com.substanceofcode.bluetooth.GpsPosition;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.io.Connector;
@@ -49,14 +50,22 @@ public class Track {
         m_trailPoints.addElement( pos );
     }
     
+    /** Get position count */
+    public int getPositionCount() {
+        int positionCount = m_trailPoints.size();
+        return positionCount;
+    }
+    
     /** Clear */
     public void clear() {
         m_trailPoints.removeAllElements();
     }
     
     /** Convert to string */
-    public String toString() {
-        String trackString = "";
+    public String export() {
+        String trackString = "Trail Explorer, Copyright 2006 Tommi Laukkanen\n";
+        trackString += "http://www.substanceofcode.com\n";
+        trackString += "Track Record:\n";
         Enumeration trackEnum = m_trailPoints.elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
@@ -67,25 +76,46 @@ public class Track {
     
     /** Write to file */
     public void writeToFile(String filename) throws Exception {
+        
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        int hour = cal.get(Calendar.HOUR);
+        int minute = cal.get(Calendar.MINUTE);
+        
+        String dateStamp = year + "-" + month + "-" + day + "_" + hour + "-" + minute;
+        
+        FileConnection connection;
         try {
-            FileConnection connection = (FileConnection)                     
-              Connector.open("file:///" + filename, Connector.WRITE );
-            
-            // Check for file existence
-            if(connection.exists()==false) {
-                connection.create();
-            }
-
-            // Create output stream and write data;
-            OutputStream out = connection.openOutputStream();
-            PrintStream output = new PrintStream( out );
-            
-            output.println( this.toString() );
-            out.close();
-            connection.close();        
+            connection = (FileConnection)
+            Connector.open("file:///E:/track_" + dateStamp + ".txt", Connector.WRITE );
         } catch(Exception ex) {
-            throw new Exception("writeToFile: " + ex.toString());
+            throw new Exception("writeToFile: Open Connector: " + ex.toString());
         }
+        
+        try{
+            // Create file
+            connection.create();
+        } catch(Exception ex) {
+            throw new Exception("writeToFile: Check and create: " + ex.toString());
+        }
+        
+        // Create output stream and write data;
+        
+        OutputStream out;
+        try{
+            out = connection.openOutputStream();
+        } catch(Exception ex) {
+            throw new Exception("writeToFile: Open output stream: " + ex.toString());
+        }
+        PrintStream output = new PrintStream( out );
+        
+        output.println( this.export() );
+        output.close();
+        out.close();
+        connection.close();
+        
     }
     
 }

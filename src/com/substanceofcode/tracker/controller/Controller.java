@@ -168,7 +168,7 @@ public class Controller {
             }
         } else {
             
-            // Disconnect from GPS
+            // Stop recording the track
             m_recorder.stopRecording();
             Track recordedTrack = m_recorder.getTrack();
             try{
@@ -176,13 +176,27 @@ public class Controller {
             }catch(Exception ex) {
                 setError(ex.toString());
                 Alert saveAlert = new Alert("Error");
-                saveAlert.setTimeout(5000);
+                saveAlert.setTimeout(Alert.FOREVER);
                 saveAlert.setString(ex.toString());
                 m_display.setCurrent(saveAlert, getTrailCanvas());
             }
+            
+            // Disconnect from GPS
+            m_gpsDevice.disconnect();
+            
             m_status = STATUS_STOPPED;            
         }
         
+    }
+
+    public int getRecordedPositionCount() {
+        if(m_recorder!=null) {
+            Track recordedTrack = m_recorder.getTrack();
+            int positionCount = recordedTrack.getPositionCount();
+            return positionCount;
+        } else {
+            return 0;
+        }
     }
     
     public synchronized GpsPosition getPosition() {

@@ -20,7 +20,7 @@ import javax.microedition.io.StreamConnection;
  * @author Tommi
  */
 public class GpsDevice extends BluetoothDevice implements Runnable {
-
+    
     private PositionBuffer m_lastPosition;
     private Date m_lastPositionDate;
     
@@ -29,9 +29,9 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
     
     private StreamConnection m_connection;
     private InputStreamReader m_reader;
-    private Thread m_thread;    
-
-   
+    private Thread m_thread;
+    
+    
     /** Creates a new instance of GpsDevice */
     public GpsDevice(BluetoothDevice device) {
         // Initialize base class
@@ -49,57 +49,57 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
     }
     
     /** Disconnect from bluetooth device */
-    private synchronized void disconnect() {
-            try {
-                    if (m_reader != null)
-                            m_reader.close();
-                    if (m_connection != null)
-                            m_connection.close();
-            } catch (IOException e) {
-                    // Ignore.
-            }
-            m_reader = null;
-            m_connection = null;
-            m_thread = null;
-    }    
+    public synchronized void disconnect() {
+        try {
+            if (m_reader != null)
+                m_reader.close();
+            if (m_connection != null)
+                m_connection.close();
+        } catch (IOException e) {
+            // Ignore.
+        }
+        m_reader = null;
+        m_connection = null;
+        m_thread = null;
+    }
     
     /** Get current position from GPS unit */
     public GpsPosition getPosition() {
         return m_lastPosition.getPosition();
     }
-
+    
     /**  */
     public void run() {
-		while (Thread.currentThread() == m_thread) {
-			try {
-
-				String output = new String();
-
-				// Read one line and try to parse it. If successfull put parsed
-				// record in buffer.
-				int input;
-				while ((input = m_reader.read()) != LINE_DELIMITER)
-					output += (char) input;
-				// Remove last character (10 in ASCII)
-				output = output.substring(1, output.length() - 1);
-                                
-                                GpsPosition pos = GpsPositionParser.parse(output);
-                                if(pos!=null) {
-                                    m_lastPosition.setPosition(pos);
-                                }
-				
-			}
-			// Most severe type of exception. Either thrown while connecting or
-			// while reading. Wait some time before continuing.
-			catch (IOException ie) {
-				try {
-					Thread.sleep(BREAK);
-				} catch (InterruptedException e) {
-					//logger.appendString("IO exception: " + e.getMessage());
-				}
-				ie.printStackTrace();
-			}
-		}        
+        while (Thread.currentThread() == m_thread) {
+            try {
+                
+                String output = new String();
+                
+                // Read one line and try to parse it. If successfull put parsed
+                // record in buffer.
+                int input;
+                while ((input = m_reader.read()) != LINE_DELIMITER)
+                    output += (char) input;
+                // Remove last character (10 in ASCII)
+                output = output.substring(1, output.length() - 1);
+                
+                GpsPosition pos = GpsPositionParser.parse(output);
+                if(pos!=null) {
+                    m_lastPosition.setPosition(pos);
+                }
+                
+            }
+            // Most severe type of exception. Either thrown while connecting or
+            // while reading. Wait some time before continuing.
+            catch (IOException ie) {
+                try {
+                    Thread.sleep(BREAK);
+                } catch (InterruptedException e) {
+                    //logger.appendString("IO exception: " + e.getMessage());
+                }
+                ie.printStackTrace();
+            }
+        }
     }
     
 }
