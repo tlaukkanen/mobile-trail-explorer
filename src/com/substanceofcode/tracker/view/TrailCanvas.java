@@ -26,6 +26,8 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
+import java.util.Calendar;
+import java.util.Date;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -114,14 +116,21 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         /** Draw status */
         g.setColor(0,0,255);
-        g.drawString("Status: " + m_controller.getStatus(),1,1,Graphics.TOP|Graphics.LEFT );
+        g.drawString("Status: " + m_controller.getStatus(),1,0,Graphics.TOP|Graphics.LEFT );
         
         /** Draw status */
         g.setColor(0,0,0);
         if(m_lastPosition!=null) {
-            g.drawString("Pos: " + m_lastPosition.toString(),1,20,Graphics.TOP|Graphics.LEFT );
+            g.drawString(m_lastPosition.toString(),1,fontHeight,Graphics.TOP|Graphics.LEFT );
+            
+            long secondsSinceLastPosition;
+            Date now = Calendar.getInstance().getTime();
+            secondsSinceLastPosition = (now.getTime() - m_lastPosition.getDate().getTime())/1000;
+            
+            g.drawString("Last refresh " + secondsSinceLastPosition + " second(s) ago.",1,fontHeight*2,Graphics.TOP|Graphics.LEFT );
+            
         } else {
-            g.drawString("Position unknown: " + m_counter,1,20,Graphics.TOP|Graphics.LEFT );
+            g.drawString("Position data is unavailable. " + m_counter,1,fontHeight,Graphics.TOP|Graphics.LEFT );
         }
         
         /** Draw error texts */

@@ -67,7 +67,7 @@ public class GpsPositionParser {
             // Ground speed
             String courseMadeGood = currentValue;
 
-            GpsPosition pos = new GpsPosition(longitude, lattitude,0);
+            GpsPosition pos = new GpsPosition(record, longitude, lattitude,0);
             return pos;
         } else {
             // Unknown record type

@@ -69,7 +69,7 @@ public class Track {
         Enumeration trackEnum = m_trailPoints.elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
-            trackString += pos.toString() + "\n";
+            trackString += pos.getRawString() + "\n";
         }
         return trackString;
     }
@@ -81,7 +81,7 @@ public class Track {
         int year = cal.get(Calendar.YEAR);
         int month = cal.get(Calendar.MONTH);
         int day = cal.get(Calendar.DAY_OF_MONTH);
-        int hour = cal.get(Calendar.HOUR);
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
         int minute = cal.get(Calendar.MINUTE);
         
         String dateStamp = year + "-" + month + "-" + day + "_" + hour + "-" + minute;
