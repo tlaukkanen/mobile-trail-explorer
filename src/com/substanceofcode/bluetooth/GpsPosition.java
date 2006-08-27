@@ -19,8 +19,11 @@ import java.util.Date;
 public class GpsPosition {
     
     private String m_rawData;
-    private String m_longitude;
-    private String m_latitude;
+    private String m_longitudeString;
+    private double m_longitude;
+    private String m_latitudeString;
+    private double m_latitude;
+    
     private int m_elevation;
     
     private String m_deb;
@@ -41,12 +44,27 @@ public class GpsPosition {
     
     public String toString() {
         String res;
-        if(m_longitude.length()>0) {
-            res = m_longitude + ", " + m_latitude + ", " + m_elevation;
+        if(m_longitudeString.length()>0) {
+            res = m_longitudeString + ", " + m_latitudeString + ", " + m_elevation;
         } else {
             res = "Unknown";
         }
         return res;
+    }
+
+    public String getKmlCoordinate() {
+        
+        String kmlLongitude = "";
+        
+        
+        String kmlCoordinate = "";
+        //todo: Add code
+        
+        return kmlCoordinate;
+    }
+    
+    public double getLongitude() {
+        return m_longitude;
     }
     
     /** Creates a new instance of GpsPosition */
@@ -56,8 +74,8 @@ public class GpsPosition {
             String latitude, 
             int elevation) {
         m_rawData = rawData;
-        m_longitude = longitude;
-        m_latitude = latitude;
+        m_longitudeString = longitude;
+        m_latitudeString = latitude;
         m_elevation = elevation;
         Calendar cal = Calendar.getInstance();
         m_positionDate = cal.getTime();

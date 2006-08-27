@@ -62,15 +62,30 @@ public class Track {
     }
     
     /** Convert to string */
-    public String export() {
-        String trackString = "Trail Explorer, Copyright 2006 Tommi Laukkanen\n";
-        trackString += "http://www.substanceofcode.com\n";
-        trackString += "Track Record:\n";
+    public String export(String dateStamp) {
+        String trackString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";
+        trackString += "<kml xmlns=\"http://earth.google.com/kml/2.0\">\r\n";
+        trackString += "<Folder>\r\n";
+        trackString += "<name>" + dateStamp + "</name>\r\n";
+        trackString += "<open>1</open>\r\n";
+        trackString += "<Placemark>\r\n";
+        trackString += "<LineString>\r\n";
+        
+        trackString += "<extrude>0</extrude>\r\n";
+        trackString += "<altitudeMode>clampedToGround</altitudeMode>\r\n";
+        trackString += "<coordinates>\r\n";
         Enumeration trackEnum = m_trailPoints.elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
-            trackString += pos.getRawString() + "\n";
+            trackString += pos.getKmlCoordinate() + "\r\n";
         }
+        trackString += "</coordinates>\r\n";
+        
+        trackString += "</LineString>\r\n";
+        trackString += "</Placemark>\r\n";
+        trackString += "</Folder>\r\n";
+        trackString += "</kml>\r\n";
+        
         return trackString;
     }
     
@@ -111,7 +126,7 @@ public class Track {
         }
         PrintStream output = new PrintStream( out );
         
-        output.println( this.export() );
+        output.println( this.export(dateStamp) );
         output.close();
         out.close();
         connection.close();

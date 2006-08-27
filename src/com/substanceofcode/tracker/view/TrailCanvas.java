@@ -153,8 +153,6 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 height - (fontHeight + 2),
                 Graphics.TOP|Graphics.LEFT );
         
-        
-        
     }
 
     /** Thread for getting current position */
