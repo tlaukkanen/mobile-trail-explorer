@@ -67,12 +67,42 @@ public class GpsPositionParser {
             // Ground speed
             String courseMadeGood = currentValue;
 
-            GpsPosition pos = new GpsPosition(record, longitude, lattitude,0);
+            double longitudeDouble = parseValue(longitude, true);
+            double latitudeDouble = parseValue(lattitude, false);
+            
+            GpsPosition pos = new GpsPosition(record, longitude, lattitude,0,longitudeDouble,latitudeDouble);
+            
+            
+            
             return pos;
         } else {
             // Unknown record type
             return null;
         }
     }
+    
+        private double parseValue(String longitudeString, boolean isLongitude)
+        {
+            int longitudeDegrees = 0;
+            String longitudeMinutesString = "";
+            if( isLongitude==true ) 
+            {
+                longitudeDegrees = Integer.parseInt(longitudeString.substring(0, 2));
+                longitudeMinutesString = longitudeString.substring(2);
+            } else {
+                longitudeDegrees = Integer.parseInt(longitudeString.substring(0, 3));
+                longitudeMinutesString = longitudeString.substring(3);
+            }
+            double longitudeMinutes = Double.parseDouble(longitudeMinutesString);
+            double degreeDecimals = longitudeMinutes / 60.0;
+            String longitudeDecimals = String.valueOf(degreeDecimals);
+            longitudeDecimals = longitudeDecimals.substring(2);
+            String longitude = String.valueOf(longitudeDegrees) + "." + longitudeDecimals;
+            return longitude;
+            
+            double degrees = longitudeDegrees + longitudeDecimals;
+            return degrees;
+            
+        }    
     
 }

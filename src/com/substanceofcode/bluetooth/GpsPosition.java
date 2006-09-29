@@ -34,6 +34,24 @@ public class GpsPosition {
         m_deb = pos;
     }
     
+    /** Creates a new instance of GpsPosition */
+    public GpsPosition(
+            String rawData, 
+            String longitude, 
+            String latitude, 
+            int elevation,
+            double longitudeDouple,
+            double latitudeDouple) {
+        m_rawData = rawData;
+        m_longitudeString = longitude;
+        m_latitudeString = latitude;
+        m_elevation = elevation;
+        Calendar cal = Calendar.getInstance();
+        m_positionDate = cal.getTime();
+        m_longitude = longitudeDouple;
+        m_latitude = latitudeDouple;
+    }    
+    
     public String getRawString() {
         return m_rawData;
     }
@@ -67,18 +85,6 @@ public class GpsPosition {
         return m_longitude;
     }
     
-    /** Creates a new instance of GpsPosition */
-    public GpsPosition(
-            String rawData, 
-            String longitude, 
-            String latitude, 
-            int elevation) {
-        m_rawData = rawData;
-        m_longitudeString = longitude;
-        m_latitudeString = latitude;
-        m_elevation = elevation;
-        Calendar cal = Calendar.getInstance();
-        m_positionDate = cal.getTime();
-    }
+
     
 }

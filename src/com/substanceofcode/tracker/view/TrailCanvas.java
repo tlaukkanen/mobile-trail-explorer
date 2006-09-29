@@ -35,11 +35,13 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
-import com.nokia.mid.ui.DeviceControl;
+//import com.nokia.mid.ui.DeviceControl;
 
 /**
+ * TrailCanvas is a main view for the application. It contains a current
+ * recording status and current position.
  *
- * @author Tommi
+ * @author Tommi Laukkanen
  */
 public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
@@ -55,6 +57,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private Command m_startStopCommand;
     private Command m_settingsCommand;
     private Command m_exitCommand;
+    private Command m_markWaypointCommand;
     
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller) {
@@ -68,10 +71,12 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         initializeCommands();
         setCommandListener(this);
         
-        // Set backlight always on
+        // Set backlight always on when building with Nokia UI API
+        /*
         int backLightIndex = 0;
         int backLightLevel = 100;
         DeviceControl.setLights(backLightIndex, backLightLevel);
+        */
     }
     
     /** Initialize commands */
@@ -84,6 +89,10 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         // Settings command for showing settings list
         m_settingsCommand = new Command("Settings", Command.SCREEN, 4);
         addCommand(m_settingsCommand);
+        
+        // Mark a new waypoint command
+        m_markWaypointCommand = new Command("Mark waypoint", Command.SCREEN, 3);
+        addCommand(m_markWaypointCommand);
         
         // Exit command
         m_exitCommand = new Command("Exit", Command.EXIT, 10);
@@ -175,6 +184,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     public void commandAction(Command command, Displayable displayable) {
         if(command==m_startStopCommand) {
             m_controller.startStop();
+        }
+        if(command==m_markWaypointCommand) {
+            m_controller.markWaypoint();
         }
         if(command==m_settingsCommand) {
             m_controller.showSettings();

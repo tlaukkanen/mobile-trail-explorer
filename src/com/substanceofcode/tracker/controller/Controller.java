@@ -38,6 +38,7 @@ import java.lang.Exception;
 import java.util.Vector;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Display;
+import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
@@ -189,6 +190,12 @@ public class Controller {
         
     }
 
+    /** Mark waypoint */
+    public void markWaypoint() {
+        Form waypointForm = new Form("Waypoint");
+        // TODO: Add code
+    }
+    
     public int getRecordedPositionCount() {
         if(m_recorder!=null) {
             Track recordedTrack = m_recorder.getTrack();
