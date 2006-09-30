@@ -85,6 +85,10 @@ public class GpsPosition {
         return m_longitude;
     }
     
+    public double getLatitude() {
+        return m_latitude;
+    }
+    
 
     
 }

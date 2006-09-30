@@ -81,25 +81,24 @@ public class GpsPositionParser {
         }
     }
     
-        private double parseValue(String longitudeString, boolean isLongitude)
+        private static double parseValue(String valueString, boolean isLongitude)
         {
             int longitudeDegrees = 0;
             String longitudeMinutesString = "";
             if( isLongitude==true ) 
             {
-                longitudeDegrees = Integer.parseInt(longitudeString.substring(0, 2));
-                longitudeMinutesString = longitudeString.substring(2);
+                longitudeDegrees = Integer.parseInt(valueString.substring(0, 2));
+                longitudeMinutesString = valueString.substring(2);
             } else {
-                longitudeDegrees = Integer.parseInt(longitudeString.substring(0, 3));
-                longitudeMinutesString = longitudeString.substring(3);
+                longitudeDegrees = Integer.parseInt(valueString.substring(0, 3));
+                longitudeMinutesString = valueString.substring(3);
             }
             double longitudeMinutes = Double.parseDouble(longitudeMinutesString);
             double degreeDecimals = longitudeMinutes / 60.0;
             String longitudeDecimals = String.valueOf(degreeDecimals);
             longitudeDecimals = longitudeDecimals.substring(2);
-            String longitude = String.valueOf(longitudeDegrees) + "." + longitudeDecimals;
-            return longitude;
-            
+//            String longitude = String.valueOf(longitudeDegrees) + "." + longitudeDecimals;
+//            return longitude;
             double degrees = longitudeDegrees + longitudeDecimals;
             return degrees;
             
