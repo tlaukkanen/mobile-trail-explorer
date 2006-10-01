@@ -79,8 +79,12 @@ public class GpsPositionParser {
             // Ground speed
             String courseMadeGood = currentValue;
             
-            double longitudeDouble = parseValue(longitude, true);
-            double latitudeDouble = parseValue(lattitude, false);
+            double longitudeDouble = 0.0;
+            double latitudeDouble = 0.0;
+            if(longitude.length()>0 && lattitude.length()>0) {
+                longitudeDouble = parseValue(longitude, false);
+                latitudeDouble = parseValue(lattitude, true);
+            }
             
             GpsPosition pos = new GpsPosition(record, longitude, lattitude,0,longitudeDouble,latitudeDouble);
             

@@ -77,7 +77,8 @@ public class Track {
         Enumeration trackEnum = m_trailPoints.elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
-            trackString += pos.getKmlCoordinate() + "\r\n";
+            trackString += String.valueOf(pos.getLatitude()) + "," +
+                    String.valueOf(pos.getLongitude()) + "\r\n";
         }
         trackString += "</coordinates>\r\n";
         
@@ -104,7 +105,7 @@ public class Track {
         FileConnection connection;
         try {
             connection = (FileConnection)
-            Connector.open("file:///E:/track_" + dateStamp + ".txt", Connector.WRITE );
+            Connector.open("file:///E:/track_" + dateStamp + ".kml", Connector.WRITE );
         } catch(Exception ex) {
             throw new Exception("writeToFile: Open Connector: " + ex.toString());
         }

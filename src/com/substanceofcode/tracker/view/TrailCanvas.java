@@ -98,7 +98,6 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         m_exitCommand = new Command("Exit", Command.EXIT, 10);
         addCommand(m_exitCommand);
         
-        
     }
     
     /** Paint */
@@ -130,13 +129,27 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         /** Draw status */
         g.setColor(0,0,0);
         if(m_lastPosition!=null) {
-            g.drawString(m_lastPosition.toString(),1,fontHeight,Graphics.TOP|Graphics.LEFT );
             
-            long secondsSinceLastPosition;
+            g.drawString("LAT:", 1, fontHeight, Graphics.TOP|Graphics.LEFT);
+            g.drawString("LON:", 1, fontHeight*2, Graphics.TOP|Graphics.LEFT);
+            
+            int positionAdd = currentFont.stringWidth("LAN:O");
+            
+            double latitude = m_lastPosition.getLatitude();
+            
+            g.drawString(getDegreeString( latitude ),positionAdd,fontHeight,Graphics.TOP|Graphics.LEFT );
+
+            double longitude = m_lastPosition.getLongitude();
+            g.drawString(getDegreeString( longitude ),positionAdd,fontHeight*2,Graphics.TOP|Graphics.LEFT );
+                       
+            //g.drawString(m_lastPosition.toString(),1,fontHeight,Graphics.TOP|Graphics.LEFT );
+            
             Date now = Calendar.getInstance().getTime();
+            long secondsSinceLastPosition;
             secondsSinceLastPosition = (now.getTime() - m_lastPosition.getDate().getTime())/1000;
-            
-            g.drawString("Last refresh " + secondsSinceLastPosition + " second(s) ago.",1,fontHeight*2,Graphics.TOP|Graphics.LEFT );
+            if(secondsSinceLastPosition>5) {
+                g.drawString("Last refresh " + secondsSinceLastPosition + " second(s) ago.",1,fontHeight*3,Graphics.TOP|Graphics.LEFT );
+            }
             
         } else {
             g.drawString("Position data is unavailable. " + m_counter,1,fontHeight,Graphics.TOP|Graphics.LEFT );
@@ -153,15 +166,28 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
         /** Draw recorded position count */
         String posCount = "Positions recorded: " + m_controller.getRecordedPositionCount();
-        g.drawString(posCount, 1, height - (fontHeight*2 + 4), Graphics.TOP|Graphics.LEFT);
+        g.drawString(posCount, 1, height - (fontHeight + 2), Graphics.TOP|Graphics.LEFT);
         
         /** Draw GPS address */
-        String gpsUrl = m_controller.getGpsUrl();
+        /*
+         String gpsUrl = m_controller.getGpsUrl();
         g.drawString("GPS: " + gpsUrl, 
                 1, 
                 height - (fontHeight + 2),
                 Graphics.TOP|Graphics.LEFT );
-        
+        */
+    }
+    
+    /** Get degrees in string format (with five decimals) */
+    private String getDegreeString(double latitude) {
+        int latitudeInteger = (int)latitude;
+        long latitudeDecimals = (int)((latitude-latitudeInteger)*100000);
+
+        String latDecString = String.valueOf(latitudeDecimals);
+        while(latDecString.length()<5) {
+            latDecString = "0" + latDecString;
+        }
+        return String.valueOf(latitudeInteger) + "." + latDecString;
     }
 
     /** Thread for getting current position */
