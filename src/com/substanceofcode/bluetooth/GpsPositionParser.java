@@ -1,10 +1,22 @@
 /*
  * GpsPositionParser.java
  *
- * Created on 13. elokuuta 2006, 17:23
+ * Copyright (C) 2005-2006 Tommi Laukkanen
+ * http://www.substanceofcode.com
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 package com.substanceofcode.bluetooth;
@@ -33,27 +45,27 @@ public class GpsPositionParser {
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String dateTimeOfFix = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
-
+            
             // Warning
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String warning = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
-
+            
             // Lattitude
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String lattitude = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
-
+            
             // Lattitude direction
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String lattitudeDirection = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
-
+            
             // Longitude
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String longitude = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
-
+            
             // Longitude direction
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String longitudeDirection = currentValue.substring(0, nextTokenIndex);
@@ -63,10 +75,10 @@ public class GpsPositionParser {
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String groundSpeed = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
-
+            
             // Ground speed
             String courseMadeGood = currentValue;
-
+            
             double longitudeDouble = parseValue(longitude, true);
             double latitudeDouble = parseValue(lattitude, false);
             
@@ -81,27 +93,23 @@ public class GpsPositionParser {
         }
     }
     
-        private static double parseValue(String valueString, boolean isLongitude)
-        {
-            int longitudeDegrees = 0;
-            String longitudeMinutesString = "";
-            if( isLongitude==true ) 
-            {
-                longitudeDegrees = Integer.parseInt(valueString.substring(0, 2));
-                longitudeMinutesString = valueString.substring(2);
-            } else {
-                longitudeDegrees = Integer.parseInt(valueString.substring(0, 3));
-                longitudeMinutesString = valueString.substring(3);
-            }
-            double longitudeMinutes = Double.parseDouble(longitudeMinutesString);
-            double degreeDecimals = longitudeMinutes / 60.0;
-            String longitudeDecimals = String.valueOf(degreeDecimals);
-            longitudeDecimals = longitudeDecimals.substring(2);
-//            String longitude = String.valueOf(longitudeDegrees) + "." + longitudeDecimals;
-//            return longitude;
-            double degrees = longitudeDegrees + longitudeDecimals;
-            return degrees;
-            
-        }    
+    /**
+     * Convert latitude or longitude from NMEA format to Google's decimal degree
+     * format.
+     */
+    private static double parseValue(String valueString, boolean isLongitude) {
+        int degreeInteger = 0;
+        double minutes = 0.0;
+        if( isLongitude==true ) {
+            degreeInteger = Integer.parseInt(valueString.substring(0, 2));
+            minutes = Double.parseDouble( valueString.substring(2) );
+        } else {
+            degreeInteger = Integer.parseInt(valueString.substring(0, 3));
+            minutes = Double.parseDouble( valueString.substring(3) );
+        }
+        double degreeDecimals = minutes / 60.0;
+        double degrees = degreeInteger + degreeDecimals;
+        return degrees;
+    }
     
 }
