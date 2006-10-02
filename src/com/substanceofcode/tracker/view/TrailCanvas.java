@@ -28,6 +28,7 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -47,6 +48,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
     private Controller m_controller;
     private GpsPosition m_lastPosition;
+    private Vector m_positionTrail;
     
     private Thread m_thread;
     private int m_counter;
@@ -63,6 +65,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     public TrailCanvas(Controller controller) {
         m_controller = controller;
         setFullScreenMode( true );
+        
+        m_positionTrail = new Vector();
+        
         m_refresh = true;
         m_thread = new Thread(this);
         m_thread.start();
@@ -111,6 +116,53 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         /** Draw status bar */
         drawStatusBar(g);
+        
+        /** Draw trail */
+        drawTrail(g);
+    }
+    
+    /** Draw trail */
+    private void drawTrail(Graphics g) {
+        int width = getWidth();
+        int height = getHeight();
+        
+        double currentLatitude = m_lastPosition.getLatitude();
+        double currentLongitude = m_lastPosition.getLongitude();
+        
+        double lastLatitude = currentLatitude;
+        double lastLongitude = currentLongitude;
+        
+        int trailPositionCount = m_positionTrail.size();
+        for(int positionIndex=0; positionIndex<trailPositionCount; positionIndex++) {
+            
+            GpsPosition pos = (GpsPosition)m_positionTrail.elementAt(positionIndex);
+            
+            double lat = pos.getLatitude();
+            double lon = pos.getLongitude();
+            
+            lat -= currentLatitude;
+            lon -= currentLongitude;
+            
+            lat *= 10000;
+            lon *= 10000;
+            
+            int x1 = (int) lat;
+            int y1 = (int) lon;
+            
+            lastLatitude -= currentLatitude;
+            lastLatitude *= 10000;
+            int x2 = (int) lastLatitude;
+            
+            lastLongitude -= currentLongitude;
+            lastLongitude *= 10000;
+            int y2 = (int) lastLongitude;
+            
+            g.drawLine(x1, y1, x2, y2);
+            
+            lastLatitude = pos.getLatitude();
+            lastLongitude = pos.getLongitude();            
+        }
+        
     }
     
     /** Draw status bar */
@@ -197,6 +249,12 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 Thread.sleep(1000);
                 m_counter++;
                 m_lastPosition = m_controller.getPosition();
+                
+                // Create trail
+                m_positionTrail.addElement(m_lastPosition);
+                while(m_positionTrail.size()>20) {
+                    m_positionTrail.removeElement( m_positionTrail.lastElement() );
+                }
                 this.repaint();
             } catch(Exception ex) {
                 System.err.println("Error in TrailCanvas.run: " + ex.toString());

@@ -67,18 +67,27 @@ public class Track {
         trackString += "<kml xmlns=\"http://earth.google.com/kml/2.0\">\r\n";
         trackString += "<Folder>\r\n";
         trackString += "<name>" + dateStamp + "</name>\r\n";
+	trackString += "<Style id=\"style\">\r\n";
+	trackString += " <LineStyle>\r\n";
+        trackString += "  <color>ff0000ff</color>\r\n";
+        trackString += "  <width>1.5</width>\r\n";
+        trackString += " </LineStyle>\r\n";
+        trackString += " <PolyStyle>\r\n";
+        trackString += "  <fill>0</fill>\r\n";
+        trackString += " </PolyStyle>\r\n";
+        trackString += "</Style>\r\n";
         trackString += "<open>1</open>\r\n";
         trackString += "<Placemark>\r\n";
+        trackString += "<styleUrl>#style</styleUrl>\r\n";
         trackString += "<LineString>\r\n";
-        
         trackString += "<extrude>0</extrude>\r\n";
         trackString += "<altitudeMode>clampedToGround</altitudeMode>\r\n";
         trackString += "<coordinates>\r\n";
         Enumeration trackEnum = m_trailPoints.elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
-            trackString += String.valueOf(pos.getLatitude()) + "," +
-                    String.valueOf(pos.getLongitude()) + "\r\n";
+            trackString += String.valueOf(pos.getLongitude()) + "," +
+                    String.valueOf(pos.getLatitude()) + "\r\n";
         }
         trackString += "</coordinates>\r\n";
         
