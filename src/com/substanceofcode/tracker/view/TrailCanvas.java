@@ -80,7 +80,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         /*
         int backLightIndex = 0;
         int backLightLevel = 100;
-        DeviceControl.setLights(backLightIndex, backLightLevel);
+        //DeviceControl.setLights(backLightIndex, backLightLevel);
         */
     }
     
@@ -123,46 +123,64 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     
     /** Draw trail */
     private void drawTrail(Graphics g) {
-        int width = getWidth();
-        int height = getHeight();
         
-        double currentLatitude = m_lastPosition.getLatitude();
-        double currentLongitude = m_lastPosition.getLongitude();
-        
-        double lastLatitude = currentLatitude;
-        double lastLongitude = currentLongitude;
-        
-        int trailPositionCount = m_positionTrail.size();
-        for(int positionIndex=0; positionIndex<trailPositionCount; positionIndex++) {
+        try {
+
+            // Exit if we don't have anything to draw
+            if(m_lastPosition==null) {
+                return;
+            }
+
+            int center = getWidth()/2;
+            int middle = getHeight()/2;
+
+            double currentLatitude = m_lastPosition.getLatitude();
+            double currentLongitude = m_lastPosition.getLongitude();
+
+            double lastLatitude = currentLatitude;
+            double lastLongitude = currentLongitude;
+
+            int trailPositionCount = m_positionTrail.size();
+            g.drawString("Trail size: " + trailPositionCount,1,80,Graphics.TOP|Graphics.LEFT );
             
-            GpsPosition pos = (GpsPosition)m_positionTrail.elementAt(positionIndex);
+            for(int positionIndex=0; positionIndex<trailPositionCount; positionIndex++) {
+
+                GpsPosition pos = (GpsPosition)m_positionTrail.elementAt(positionIndex);
+                g.drawString("Pos: " + pos.getRawString(),1,100,Graphics.TOP|Graphics.LEFT );
+
+                double lat = pos.getLatitude();
+                lat -= currentLatitude;
+                lat *= 10000;
+                int x1 = (int)lat+center;
+
+                double lon = pos.getLongitude();
+                lon -= currentLongitude;
+                lon *= 10000;
+                int y1 = (int)lon+middle;
+
+                lastLatitude -= currentLatitude;
+                lastLatitude *= 10000;
+                int x2 = (int)lastLatitude + center;
+
+                lastLongitude -= currentLongitude;
+                lastLongitude *= 10000;
+                int y2 = (int)lastLongitude + middle;
+
+                g.drawLine(x1, y1, x2, y2);
+
+                if(positionIndex==0) {
+                    g.drawString(x1 + "," + y1 + "->" + x2 + "," + y2,1,140,Graphics.TOP|Graphics.LEFT );
+                }
+                
+                lastLatitude = pos.getLatitude();
+                lastLongitude = pos.getLongitude();            
+            }
+        } catch (Exception ex) {
+            g.drawString("ERR: " + ex.toString(),1,120,Graphics.TOP|Graphics.LEFT );
             
-            double lat = pos.getLatitude();
-            double lon = pos.getLongitude();
-            
-            lat -= currentLatitude;
-            lon -= currentLongitude;
-            
-            lat *= 10000;
-            lon *= 10000;
-            
-            int x1 = (int) lat;
-            int y1 = (int) lon;
-            
-            lastLatitude -= currentLatitude;
-            lastLatitude *= 10000;
-            int x2 = (int) lastLatitude;
-            
-            lastLongitude -= currentLongitude;
-            lastLongitude *= 10000;
-            int y2 = (int) lastLongitude;
-            
-            g.drawLine(x1, y1, x2, y2);
-            
-            lastLatitude = pos.getLatitude();
-            lastLongitude = pos.getLongitude();            
+            System.err.println("Exception occured while drawing trail: " + 
+                    ex.toString());
         }
-        
     }
     
     /** Draw status bar */
@@ -251,9 +269,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 m_lastPosition = m_controller.getPosition();
                 
                 // Create trail
-                m_positionTrail.addElement(m_lastPosition);
-                while(m_positionTrail.size()>20) {
-                    m_positionTrail.removeElement( m_positionTrail.lastElement() );
+                if(m_counter%5==0) {
+                    m_positionTrail.addElement(m_lastPosition);
+                    while(m_positionTrail.size()>20) {
+                        m_positionTrail.removeElement( m_positionTrail.firstElement() );
+                    }
                 }
                 this.repaint();
             } catch(Exception ex) {
