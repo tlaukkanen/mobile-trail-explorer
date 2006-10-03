@@ -143,28 +143,30 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             int trailPositionCount = m_positionTrail.size();
             g.drawString("Trail size: " + trailPositionCount,1,80,Graphics.TOP|Graphics.LEFT );
             
-            for(int positionIndex=0; positionIndex<trailPositionCount; positionIndex++) {
+            for(int positionIndex=trailPositionCount-1; 
+                positionIndex>=0; 
+                positionIndex--) {
 
                 GpsPosition pos = (GpsPosition)m_positionTrail.elementAt(positionIndex);
-                g.drawString("Pos: " + pos.getRawString(),1,100,Graphics.TOP|Graphics.LEFT );
+                //g.drawString("Pos: " + pos.getRawString(),1,100,Graphics.TOP|Graphics.LEFT );
 
                 double lat = pos.getLatitude();
                 lat -= currentLatitude;
-                lat *= 10000;
-                int x1 = (int)lat+center;
+                lat *= 100000;
+                int y1 = (int)lat+middle;
 
                 double lon = pos.getLongitude();
                 lon -= currentLongitude;
-                lon *= 10000;
-                int y1 = (int)lon+middle;
+                lon *= 100000;
+                int x1 = (int)lon+center;
 
                 lastLatitude -= currentLatitude;
-                lastLatitude *= 10000;
-                int x2 = (int)lastLatitude + center;
+                lastLatitude *= 100000;
+                int y2 = (int)lastLatitude + middle;
 
                 lastLongitude -= currentLongitude;
-                lastLongitude *= 10000;
-                int y2 = (int)lastLongitude + middle;
+                lastLongitude *= 100000;
+                int x2 = (int)lastLongitude + center;
 
                 g.drawLine(x1, y1, x2, y2);
 
@@ -269,9 +271,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 m_lastPosition = m_controller.getPosition();
                 
                 // Create trail
-                if(m_counter%5==0) {
+                if(m_counter%5==0 && m_lastPosition!=null) {
                     m_positionTrail.addElement(m_lastPosition);
-                    while(m_positionTrail.size()>20) {
+                    while(m_positionTrail.size()>100) {
                         m_positionTrail.removeElement( m_positionTrail.firstElement() );
                     }
                 }

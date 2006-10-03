@@ -29,11 +29,13 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.tracker.view.AboutForm;
 import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.SettingsList;
 import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
+import com.substanceofcode.tracker.view.WaypointForm;
 import java.lang.Exception;
 import java.util.Vector;
 import javax.microedition.lcdui.Alert;
@@ -59,6 +61,7 @@ public class Controller {
     private RecorderSettings m_settings;
     private GpsDevice m_gpsDevice;
     private GpsRecorder m_recorder;
+    private Vector m_waypoints;
     
     /** Screens and Forms */
     private TrailCanvas m_trailCanvas;
@@ -67,6 +70,7 @@ public class Controller {
     private AboutForm m_aboutForm;
     private SettingsList m_settingsList;
     private MIDlet m_midlet;
+    private WaypointForm m_waypointForm;
     
     /** Display device */
     private Display m_display;
@@ -90,6 +94,7 @@ public class Controller {
         /** Initialize forms */
         m_aboutForm = new AboutForm(this);
         m_display = display;
+        
         
     }
     
@@ -189,10 +194,30 @@ public class Controller {
         }
         
     }
+    
+    /** Save new waypoint */
+    public void saveWaypoint(Waypoint waypoint) {
+        if( m_waypoints==null ) {
+            m_waypoints = new Vector();
+        }
+        m_waypoints.addElement( waypoint );
+    }
 
     /** Mark waypoint */
     public void markWaypoint() {
-        Form waypointForm = new Form("Waypoint");
+        if( m_waypointForm==null ) {
+            m_waypointForm = new WaypointForm(this);
+            
+            GpsPosition currentPos = getPosition();
+            String name = "";
+            double latitude = currentPos.getLatitude();
+            double longitude = currentPos.getLongitude();
+            Waypoint waypoint = new Waypoint(name, latitude, longitude);
+            
+            m_waypointForm.setWaypoint( waypoint );
+            m_display.setCurrent( m_waypointForm );
+            
+        }
         // TODO: Add code
     }
     

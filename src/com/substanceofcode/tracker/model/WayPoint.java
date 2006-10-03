@@ -28,14 +28,14 @@ package com.substanceofcode.tracker.model;
  *
  * @author Tommi Laukkanen
  */
-public class WayPoint{
+public class Waypoint{
     
     private String m_name;
     private double m_latitude;
     private double m_longitude;
     
     /** Creates a new instance of WayPoint */
-    public WayPoint(String name, double latitude, double longitude) {
+    public Waypoint(String name, double latitude, double longitude) {
         m_name = name;
         m_latitude = latitude;
         m_longitude = longitude;
