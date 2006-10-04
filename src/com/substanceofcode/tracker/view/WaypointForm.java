@@ -98,6 +98,7 @@ public class WaypointForm extends Form implements CommandListener {
             double longitude = Double.parseDouble( m_longitudeField.getString() );
             Waypoint waypoint = new Waypoint( name, latitude, longitude );
             m_controller.saveWaypoint(waypoint);
+            m_controller.showTrail();
         }
         if( command == m_cancelCommand ) {
             // Do nothing -> show trail

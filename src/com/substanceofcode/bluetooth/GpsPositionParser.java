@@ -85,12 +85,13 @@ public class GpsPositionParser {
                 longitudeDouble = parseValue(longitude, false);
                 latitudeDouble = parseValue(lattitude, true);
             }
+
+            if(warning.equals("A")==true) {
+                GpsPosition pos = new GpsPosition(record, longitude, lattitude,0,longitudeDouble,latitudeDouble);
+                return pos;
+            }
             
-            GpsPosition pos = new GpsPosition(record, longitude, lattitude,0,longitudeDouble,latitudeDouble);
-            
-            
-            
-            return pos;
+            return null;
         } else {
             // Unknown record type
             return null;

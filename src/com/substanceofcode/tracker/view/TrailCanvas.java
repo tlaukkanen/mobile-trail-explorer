@@ -26,6 +26,7 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
@@ -61,6 +62,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private Command m_exitCommand;
     private Command m_markWaypointCommand;
     
+    /** Trail drawing helpers */
+    private int m_center;
+    private int m_middle;
+    private int m_zoomFactor;
+    
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller) {
         m_controller = controller;
@@ -76,6 +82,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         initializeCommands();
         setCommandListener(this);
         
+        m_center = this.getWidth()/2;
+        m_middle = this.getHeight()/2;
         // Set backlight always on when building with Nokia UI API
         /*
         int backLightIndex = 0;
@@ -119,6 +127,61 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         /** Draw trail */
         drawTrail(g);
+        
+        /** Draw waypoints */
+        drawWaypoints(g);
+    }
+    
+    /** Draw waypoints */
+    private void drawWaypoints(Graphics g) {
+        
+        // Draw information about the waypoints
+        Vector waypoints = m_controller.getWaypoints();
+        if(waypoints==null) {
+            g.drawString("No waypoints",1,80,Graphics.TOP|Graphics.LEFT );
+            return;
+        } else {
+            int waypointCount = waypoints.size();
+            g.drawString("Waypoints: " + waypointCount,1,80,Graphics.TOP|Graphics.LEFT );
+        }        
+        
+        // Draw waypoints
+        int waypointCount = waypoints.size();
+        for(int waypointIndex=0; waypointIndex<waypointCount; waypointIndex++) {
+            
+            Waypoint waypoint = (Waypoint) waypoints.elementAt( waypointIndex );
+            double lat = waypoint.getLatitude();
+            double lon = waypoint.getLongitude();
+            CanvasPoint point = convertPosition(lat, lon);
+            if(point!=null) {
+                g.drawString(waypoint.getName(), point.X, point.Y, 
+                        Graphics.BOTTOM|Graphics.HCENTER);
+            }           
+            
+        }
+        
+        
+    }
+    
+    private CanvasPoint convertPosition(double latitude, double longitude) {
+    
+        if(m_lastPosition==null) {
+            return null;
+        }
+        
+        double currentLatitude = m_lastPosition.getLatitude();
+        double currentLongitude = m_lastPosition.getLongitude();        
+        
+        latitude -= currentLatitude;
+        latitude *= 4096;
+        int y = m_middle-(int)latitude;
+
+        longitude -= currentLongitude;
+        longitude *= 4096;
+        int x = (int)longitude+m_center;
+        
+        CanvasPoint point = new CanvasPoint(x,y);
+        return point;        
     }
     
     /** Draw trail */
@@ -142,14 +205,6 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
             int trailPositionCount = m_positionTrail.size();
             
-            Vector waypoints = m_controller.getWaypoints();
-            if(waypoints==null) {
-                g.drawString("No waypoints",1,80,Graphics.TOP|Graphics.LEFT );
-            } else {
-                int waypointCount = waypoints.size();
-                g.drawString("Waypoints: " + waypointCount,1,80,Graphics.TOP|Graphics.LEFT );
-            }
-            
             // Draw trail with black color
             g.setColor(0,0,0); 
             for(int positionIndex=trailPositionCount-1; 
@@ -161,20 +216,20 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
                 double lat = pos.getLatitude();
                 lat -= currentLatitude;
-                lat *= 1000;
+                lat *= 4096;
                 int y1 = middle-(int)lat;
 
                 double lon = pos.getLongitude();
                 lon -= currentLongitude;
-                lon *= 1000;
+                lon *= 4096;
                 int x1 = (int)lon+center;
 
                 lastLatitude -= currentLatitude;
-                lastLatitude *= 1000;
+                lastLatitude *= 4096;
                 int y2 = middle - (int)lastLatitude;
 
                 lastLongitude -= currentLongitude;
-                lastLongitude *= 1000;
+                lastLongitude *= 4096;
                 int x2 = (int)lastLongitude + center;
 
                 g.drawLine(x1, y1, x2, y2);
@@ -278,13 +333,16 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             try{
                 Thread.sleep(1000);
                 m_counter++;
-                m_lastPosition = m_controller.getPosition();
+                GpsPosition pos = m_controller.getPosition();
                 
-                // Create trail
-                if(m_counter%5==0 && m_lastPosition!=null) {
-                    m_positionTrail.addElement(m_lastPosition);
-                    while(m_positionTrail.size()>100) {
-                        m_positionTrail.removeElement( m_positionTrail.firstElement() );
+                if(pos!=null) {
+                    m_lastPosition = pos;
+                    // Create trail
+                    if(m_counter%5==0) {
+                        m_positionTrail.addElement(m_lastPosition);
+                        while(m_positionTrail.size()>100) {
+                            m_positionTrail.removeElement( m_positionTrail.firstElement() );
+                        }
                     }
                 }
                 this.repaint();
