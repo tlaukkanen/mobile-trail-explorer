@@ -195,6 +195,11 @@ public class Controller {
         
     }
     
+    /** Get waypoints */
+    public Vector getWaypoints() {
+        return m_waypoints;
+    }
+    
     /** Save new waypoint */
     public void saveWaypoint(Waypoint waypoint) {
         if( m_waypoints==null ) {
@@ -202,23 +207,30 @@ public class Controller {
         }
         m_waypoints.addElement( waypoint );
     }
+    
+    /** Get waypoint form */
+    private WaypointForm getWaypointForm() {
+        if( m_waypointForm==null ) {
+            m_waypointForm = new WaypointForm(this);
+        }
+        return m_waypointForm;
+    }
 
     /** Mark waypoint */
     public void markWaypoint() {
         if( m_waypointForm==null ) {
             m_waypointForm = new WaypointForm(this);
-            
-            GpsPosition currentPos = getPosition();
+        }
+
+        GpsPosition currentPos = getPosition();
+        if(currentPos!=null) {
             String name = "";
             double latitude = currentPos.getLatitude();
             double longitude = currentPos.getLongitude();
             Waypoint waypoint = new Waypoint(name, latitude, longitude);
-            
             m_waypointForm.setWaypoint( waypoint );
-            m_display.setCurrent( m_waypointForm );
-            
         }
-        // TODO: Add code
+        m_display.setCurrent( m_waypointForm );
     }
     
     public int getRecordedPositionCount() {

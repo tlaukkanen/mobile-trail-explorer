@@ -141,8 +141,17 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             double lastLongitude = currentLongitude;
 
             int trailPositionCount = m_positionTrail.size();
-            g.drawString("Trail size: " + trailPositionCount,1,80,Graphics.TOP|Graphics.LEFT );
             
+            Vector waypoints = m_controller.getWaypoints();
+            if(waypoints==null) {
+                g.drawString("No waypoints",1,80,Graphics.TOP|Graphics.LEFT );
+            } else {
+                int waypointCount = waypoints.size();
+                g.drawString("Waypoints: " + waypointCount,1,80,Graphics.TOP|Graphics.LEFT );
+            }
+            
+            // Draw trail with black color
+            g.setColor(0,0,0); 
             for(int positionIndex=trailPositionCount-1; 
                 positionIndex>=0; 
                 positionIndex--) {
@@ -152,20 +161,20 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
                 double lat = pos.getLatitude();
                 lat -= currentLatitude;
-                lat *= 100000;
-                int y1 = (int)lat+middle;
+                lat *= 1000;
+                int y1 = middle-(int)lat;
 
                 double lon = pos.getLongitude();
                 lon -= currentLongitude;
-                lon *= 100000;
+                lon *= 1000;
                 int x1 = (int)lon+center;
 
                 lastLatitude -= currentLatitude;
-                lastLatitude *= 100000;
-                int y2 = (int)lastLatitude + middle;
+                lastLatitude *= 1000;
+                int y2 = middle - (int)lastLatitude;
 
                 lastLongitude -= currentLongitude;
-                lastLongitude *= 100000;
+                lastLongitude *= 1000;
                 int x2 = (int)lastLongitude + center;
 
                 g.drawLine(x1, y1, x2, y2);
@@ -178,6 +187,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 lastLongitude = pos.getLongitude();            
             }
         } catch (Exception ex) {
+            g.setColor(255,0,0);
             g.drawString("ERR: " + ex.toString(),1,120,Graphics.TOP|Graphics.LEFT );
             
             System.err.println("Exception occured while drawing trail: " + 

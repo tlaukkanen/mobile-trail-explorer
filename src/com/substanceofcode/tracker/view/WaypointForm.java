@@ -53,7 +53,6 @@ public class WaypointForm extends Form implements CommandListener {
         m_controller = controller;
         
         initializeControls();
-        
         initializeCommands();
         
         this.setCommandListener(this);
