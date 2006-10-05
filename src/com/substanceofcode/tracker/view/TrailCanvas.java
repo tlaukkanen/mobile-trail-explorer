@@ -65,7 +65,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     /** Trail drawing helpers */
     private int m_center;
     private int m_middle;
-    private int m_zoomFactor;
+    private int m_verticalZoomFactor;
+    private int m_horizontalZoomFactor;
     
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller) {
@@ -84,6 +85,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         m_center = this.getWidth()/2;
         m_middle = this.getHeight()/2;
+        m_verticalZoomFactor = 4096;
+        m_horizontalZoomFactor = 2048;
         // Set backlight always on when building with Nokia UI API
         /*
         int backLightIndex = 0;
@@ -163,8 +166,12 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
     }
     
-    private CanvasPoint convertPosition(double latitude, double longitude) {
+    /** Convert position to canvas point */
+    private CanvasPoint convertPosition(double lat, double lon) {
     
+        double latitude = lat;
+        double longitude = lon;
+        
         if(m_lastPosition==null) {
             return null;
         }
@@ -173,11 +180,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         double currentLongitude = m_lastPosition.getLongitude();        
         
         latitude -= currentLatitude;
-        latitude *= 4096;
+        latitude *= m_verticalZoomFactor;
         int y = m_middle-(int)latitude;
 
         longitude -= currentLongitude;
-        longitude *= 4096;
+        longitude *= m_horizontalZoomFactor;
         int x = (int)longitude+m_center;
         
         CanvasPoint point = new CanvasPoint(x,y);
@@ -215,29 +222,13 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 //g.drawString("Pos: " + pos.getRawString(),1,100,Graphics.TOP|Graphics.LEFT );
 
                 double lat = pos.getLatitude();
-                lat -= currentLatitude;
-                lat *= 4096;
-                int y1 = middle-(int)lat;
-
                 double lon = pos.getLongitude();
-                lon -= currentLongitude;
-                lon *= 4096;
-                int x1 = (int)lon+center;
+                CanvasPoint point1 = convertPosition(lat, lon);
 
-                lastLatitude -= currentLatitude;
-                lastLatitude *= 4096;
-                int y2 = middle - (int)lastLatitude;
+                CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
 
-                lastLongitude -= currentLongitude;
-                lastLongitude *= 4096;
-                int x2 = (int)lastLongitude + center;
+                g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
 
-                g.drawLine(x1, y1, x2, y2);
-
-                if(positionIndex==0) {
-                    g.drawString(x1 + "," + y1 + "->" + x2 + "," + y2,1,140,Graphics.TOP|Graphics.LEFT );
-                }
-                
                 lastLatitude = pos.getLatitude();
                 lastLongitude = pos.getLongitude();            
             }
