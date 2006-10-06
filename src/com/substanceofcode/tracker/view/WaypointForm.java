@@ -82,12 +82,13 @@ public class WaypointForm extends Form implements CommandListener {
     /** Set values according to a waypoint object */
     public void setWaypoint(Waypoint waypoint) {
         m_nameField.setString(waypoint.getName());
-        
+        /*
         String lat = String.valueOf(waypoint.getLatitude());
         m_latitudeField.setString( lat );
         
         String lon = String.valueOf( waypoint.getLongitude() );
         m_longitudeField.setString( lon );
+         **/
     }
 
     public void commandAction(Command command, Displayable displayable) {

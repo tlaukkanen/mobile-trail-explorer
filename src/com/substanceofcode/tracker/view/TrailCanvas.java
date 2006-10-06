@@ -350,6 +350,12 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         }
         
     }
+    
+    /** Handle key presses */
+    public void keyPressed(int keyCode) {
+        int gameKey = getGameAction(keyCode);
+        
+    }
 
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
@@ -365,6 +371,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         if(command==m_exitCommand) {
             m_controller.exit();
         }
+        
     }
     
 }
