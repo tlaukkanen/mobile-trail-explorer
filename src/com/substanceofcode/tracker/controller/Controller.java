@@ -95,6 +95,14 @@ public class Controller {
         m_aboutForm = new AboutForm(this);
         m_display = display;
         
+        // Debug....
+        m_waypoints = new Vector();
+        
+        Waypoint homeWaypoint = new Waypoint("Home", 61.52292, 23.94771);
+        m_waypoints.addElement( homeWaypoint );
+        
+        Waypoint officeWaypoint = new Waypoint("Office", 61.45639, 23.74065);
+        m_waypoints.addElement( officeWaypoint );        
         
     }
     

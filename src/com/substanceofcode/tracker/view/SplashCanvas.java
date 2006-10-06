@@ -25,6 +25,7 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.ImageUtil;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -56,7 +57,7 @@ public class SplashCanvas extends Canvas implements CommandListener, Runnable {
         m_controller = controller;
         
         // Load title image
-        m_splashImage = loadImage("/images/logo.png");
+        m_splashImage = ImageUtil.loadImage("/images/logo.png");
         
         // Set fullscreen
         setFullScreenMode( true );
@@ -104,19 +105,6 @@ public class SplashCanvas extends Canvas implements CommandListener, Runnable {
     protected void keyPressed(int keyCode) {
         // Show trail if any key is pressed
         m_controller.showTrail();
-    }
-    
-    /** Load an image */
-    private Image loadImage(String filename) {
-        Image image = null;
-        try {
-            image = Image.createImage(filename);
-        } catch(Exception e) {
-            System.err.println("Error while loading image: " + filename);
-            System.out.println("Description: " + e.toString());
-            // Use null
-        }
-        return image;
     }
 
     public void run() {

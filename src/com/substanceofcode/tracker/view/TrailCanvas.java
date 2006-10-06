@@ -26,6 +26,7 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.ImageUtil;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,6 +37,7 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
 
 //import com.nokia.mid.ui.DeviceControl;
 
@@ -68,6 +70,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private int m_verticalZoomFactor;
     private int m_horizontalZoomFactor;
     
+    private Image m_redDotImage;
+    
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller) {
         m_controller = controller;
@@ -85,8 +89,10 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         m_center = this.getWidth()/2;
         m_middle = this.getHeight()/2;
-        m_verticalZoomFactor = 4096;
-        m_horizontalZoomFactor = 2048;
+        m_verticalZoomFactor = 2048;
+        m_horizontalZoomFactor = 1024;
+        
+        m_redDotImage = ImageUtil.loadImage("/images/red-dot.png");
         // Set backlight always on when building with Nokia UI API
         /*
         int backLightIndex = 0;
@@ -141,12 +147,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         // Draw information about the waypoints
         Vector waypoints = m_controller.getWaypoints();
         if(waypoints==null) {
-            g.drawString("No waypoints",1,80,Graphics.TOP|Graphics.LEFT );
             return;
-        } else {
-            int waypointCount = waypoints.size();
-            g.drawString("Waypoints: " + waypointCount,1,80,Graphics.TOP|Graphics.LEFT );
-        }        
+        }
         
         // Draw waypoints
         int waypointCount = waypoints.size();
@@ -212,8 +214,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
             int trailPositionCount = m_positionTrail.size();
             
-            // Draw trail with black color
-            g.setColor(0,0,0); 
+            // Draw trail with red color
+            g.setColor(222,0,0); 
             for(int positionIndex=trailPositionCount-1; 
                 positionIndex>=0; 
                 positionIndex--) {
@@ -232,6 +234,10 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 lastLatitude = pos.getLatitude();
                 lastLongitude = pos.getLongitude();            
             }
+            
+            // Draw red dot on current location
+            g.drawImage(m_redDotImage, center, middle, Graphics.VCENTER|Graphics.HCENTER);
+            
         } catch (Exception ex) {
             g.setColor(255,0,0);
             g.drawString("ERR: " + ex.toString(),1,120,Graphics.TOP|Graphics.LEFT );

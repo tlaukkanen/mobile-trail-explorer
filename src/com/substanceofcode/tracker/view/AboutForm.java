@@ -28,23 +28,44 @@ import com.substanceofcode.tracker.controller.Controller;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.StringItem;
 
 /**
  *
  * @author Tommi Laukkanen
  */
-public class AboutForm implements CommandListener {
+public class AboutForm extends Form implements CommandListener {
     
     private Controller m_controller;
+    private Command m_backCommand;
     
     /** Creates a new instance of AboutForm */
     public AboutForm(Controller controller) {
+        super("About");
         m_controller = controller;
+        
+        m_backCommand = new Command("Back", Command.SCREEN, 1);
+        this.addCommand( m_backCommand );
+        
+        this.append( new StringItem(
+                "Mobile Trail Explorer v0.2",
+                "Copyright (C) 2005-2006 Tommi Laukkanen"));
+        this.append( new StringItem(
+                "License",
+                "GPL"));
+        this.append( new StringItem(
+                "For more information visit:",
+                "www.substanceofcode.com"));        
+        
+        this.setCommandListener( this );
     }
 
     /** Handle all commands */
     public void commandAction(Command command, Displayable displayable) {
-        m_controller.showTrail();
+        if( command == m_backCommand ) {
+            m_controller.showTrail();
+        }
     }
     
 }

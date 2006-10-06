@@ -64,10 +64,10 @@ public class WaypointForm extends Form implements CommandListener {
         m_nameField = new TextField("Name", "", 16, TextField.ANY);
         this.append(m_nameField);
         
-        m_latitudeField = new TextField("Latitude", "", 16, TextField.DECIMAL);
+        m_latitudeField = new TextField("Latitude", "", 16, TextField.ANY);
         this.append(m_latitudeField);
         
-        m_longitudeField = new TextField("Longitude", "", 16, TextField.DECIMAL);
+        m_longitudeField = new TextField("Longitude", "", 16, TextField.ANY);
         this.append(m_longitudeField);
     }
     
