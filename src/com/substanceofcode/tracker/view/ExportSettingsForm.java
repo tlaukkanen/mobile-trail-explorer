@@ -1,5 +1,5 @@
 /*
- * WaypointForm.java
+ * ExportSettingsForm.java
  *
  * Copyright (C) 2005-2006 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -23,7 +23,7 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.model.RecorderSettings;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -31,77 +31,66 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
 /**
+ * ExportSettingsForm includes information about exporting trail.
  *
  * @author Tommi Laukkanen
  */
-public class WaypointForm extends Form implements CommandListener {
+public class ExportSettingsForm extends Form implements CommandListener {
     
     private Controller m_controller;
     
-    // Fields
-    private TextField m_latitudeField;
-    private TextField m_longitudeField;
-    private TextField m_nameField;
-    
-    // Command
     private Command m_okCommand;
     private Command m_cancelCommand;
+
+    private TextField m_exportFolderField;
     
-    /** Creates a new instance of WaypointForm */
-    public WaypointForm(Controller controller) {
-        super("Waypoint");
+    /** Creates a new instance of ExportSettingsForm */
+    public ExportSettingsForm(Controller controller) {
+        super("Exporting");
         m_controller = controller;
-        
+        initializeCommands();        
         initializeControls();
-        initializeCommands();
-        
         this.setCommandListener(this);
     }
 
-    private void initializeControls() {
-        
-        // Set controls
-        m_nameField = new TextField("Name", "", 16, TextField.ANY);
-        this.append(m_nameField);
-        
-        m_latitudeField = new TextField("Latitude", "", 16, TextField.ANY);
-        this.append(m_latitudeField);
-        
-        m_longitudeField = new TextField("Longitude", "", 16, TextField.ANY);
-        this.append(m_longitudeField);
-    }
-    
+    /** Initialize commands */
     private void initializeCommands() {
         m_okCommand = new Command("OK", Command.SCREEN, 1);
         this.addCommand( m_okCommand );
-        
         m_cancelCommand = new Command("Cancel", Command.SCREEN, 2);
         this.addCommand( m_cancelCommand );
     }
-    
-    /** Set values according to a waypoint object */
-    public void setValues(String name, String lat, String lon) {
-        m_nameField.setString( name );
-        m_latitudeField.setString( lat );
-        m_longitudeField.setString( lon );
+
+    /** Handle commands */
+    public void commandAction(Command command, Displayable displayable) {
+        if(command==m_okCommand) {
+            // Save export settings
+            String exportFolder = m_exportFolderField.getString();
+            RecorderSettings settings = m_controller.getSettings();
+            settings.setExportFolder( exportFolder );
+            m_controller.showSettings();
+        }
+        
+        if(command==m_cancelCommand) {
+            // Return to the settings list
+            m_controller.showSettings();
+        }
     }
 
-    public void commandAction(Command command, Displayable displayable) {
-        if( command == m_okCommand ) {
-            // Save waypoint
-            String name = m_nameField.getString();
-            double latitude = Double.parseDouble( m_latitudeField.getString() );
-            double longitude = Double.parseDouble( m_longitudeField.getString() );
-            Waypoint waypoint = new Waypoint( name, latitude, longitude );
-            m_controller.saveWaypoint(waypoint);
-            m_controller.showTrail();
+    /** Initialize form controls */
+    private void initializeControls() {
+        
+        RecorderSettings settings = m_controller.getSettings();
+        if(settings==null) {
+            return;
         }
-        if( command == m_cancelCommand ) {
-            // Do nothing -> show trail
-            m_controller.showTrail();
+        String exportFolder = settings.getExportFolder();
+        if(exportFolder==null) {
+            exportFolder = "E:/";
         }
+        m_exportFolderField = new TextField("Export folder", exportFolder, 32, TextField.ANY);
+        this.append(m_exportFolderField);
+        
     }
-    
-    
     
 }

@@ -32,6 +32,7 @@ import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.tracker.view.AboutForm;
 import com.substanceofcode.tracker.view.DeviceList;
+import com.substanceofcode.tracker.view.ExportSettingsForm;
 import com.substanceofcode.tracker.view.SettingsList;
 import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
@@ -46,6 +47,7 @@ import javax.microedition.lcdui.List;
 import javax.microedition.midlet.MIDlet;
 
 /**
+ * Controller contains methods for the application flow.
  *
  * @author Tommi Laukkanen
  */
@@ -58,10 +60,10 @@ public class Controller {
     
     private Vector m_devices;
     private int m_status;
-    private RecorderSettings m_settings;
     private GpsDevice m_gpsDevice;
     private GpsRecorder m_recorder;
     private Vector m_waypoints;
+    private RecorderSettings m_settings;
     
     /** Screens and Forms */
     private TrailCanvas m_trailCanvas;
@@ -71,10 +73,10 @@ public class Controller {
     private SettingsList m_settingsList;
     private MIDlet m_midlet;
     private WaypointForm m_waypointForm;
+    private ExportSettingsForm m_exportSettingsForm;
     
     /** Display device */
     private Display m_display;
-    
     private String m_error;
     
     /**
@@ -97,13 +99,6 @@ public class Controller {
         
         // Debug....
         m_waypoints = new Vector();
-        
-        Waypoint homeWaypoint = new Waypoint("Home", 61.52292, 23.94771);
-        m_waypoints.addElement( homeWaypoint );
-        
-        Waypoint officeWaypoint = new Waypoint("Office", 61.45639, 23.74065);
-        m_waypoints.addElement( officeWaypoint );        
-        
     }
     
     public void searchDevices() {
@@ -177,8 +172,10 @@ public class Controller {
                 m_recorder.startRecording();
                 m_status = STATUS_RECORDING;
             } catch(Exception ex) {
-                System.err.println("Error while connecting to GPS: " + ex.toString());
-                m_error = "startStop: " + ex.toString();
+                Alert saveAlert = new Alert("Error");
+                saveAlert.setTimeout(Alert.FOREVER);
+                saveAlert.setString("Error while connection to GPS: " + ex.toString());
+                m_display.setCurrent(saveAlert, getTrailCanvas());
             }
         } else {
             
@@ -186,7 +183,8 @@ public class Controller {
             m_recorder.stopRecording();
             Track recordedTrack = m_recorder.getTrack();
             try{
-                recordedTrack.writeToFile("E:/mytrack.txt");
+                String exportFolder = m_settings.getExportFolder();
+                recordedTrack.writeToFile( exportFolder, m_waypoints );
             }catch(Exception ex) {
                 setError(ex.toString());
                 Alert saveAlert = new Alert("Error");
@@ -194,9 +192,17 @@ public class Controller {
                 saveAlert.setString(ex.toString());
                 m_display.setCurrent(saveAlert, getTrailCanvas());
             }
-            
-            // Disconnect from GPS
-            m_gpsDevice.disconnect();
+
+            try{
+                // Disconnect from GPS
+                m_gpsDevice.disconnect();
+            } catch(Exception e) {
+                Alert saveAlert = new Alert("Error");
+                saveAlert.setTimeout(Alert.FOREVER);
+                saveAlert.setString("Error while disconnecting from " +
+                        "GPS device: " + e.toString());
+                m_display.setCurrent(saveAlert, getTrailCanvas());
+            }
             
             m_status = STATUS_STOPPED;            
         }
@@ -225,19 +231,11 @@ public class Controller {
     }
 
     /** Mark waypoint */
-    public void markWaypoint() {
+    public void markWaypoint(String lat, String lon) {
         if( m_waypointForm==null ) {
             m_waypointForm = new WaypointForm(this);
         }
-
-        GpsPosition currentPos = getPosition();
-        if(currentPos!=null) {
-            String name = "";
-            double latitude = currentPos.getLatitude();
-            double longitude = currentPos.getLongitude();
-            Waypoint waypoint = new Waypoint(name, latitude, longitude);
-            m_waypointForm.setWaypoint( waypoint );
-        }
+        m_waypointForm.setValues("", lat, lon);
         m_display.setCurrent( m_waypointForm );
     }
     
@@ -266,9 +264,7 @@ public class Controller {
     
     /** Get settings */
     public RecorderSettings getSettings() {
-        //todo:add code
-        return null;
-        
+        return m_settings;
     }
 
     public String getGpsUrl() {
@@ -294,6 +290,19 @@ public class Controller {
     /** Show splash canvas */
     public void showSplash() {
         m_display.setCurrent( getSplashCanvas() );
+    }
+    
+    /** Show export settings */
+    public void showExportSettings() {
+        m_display.setCurrent( getExportSettingsForm() );
+    }
+    
+    /** Show export settings form */
+    private ExportSettingsForm getExportSettingsForm() {
+        if( m_exportSettingsForm==null ) {
+            m_exportSettingsForm = new ExportSettingsForm(this);
+        }
+        return m_exportSettingsForm;
     }
     
     /** Get instance of splash screen */

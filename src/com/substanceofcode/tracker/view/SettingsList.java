@@ -4,8 +4,6 @@
  * Copyright (C) 2005-2006 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
- * Created on 15. elokuuta 2006
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -31,8 +29,10 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 /**
+ * SettingsList contains links to all settings categories like GPS unit
+ * selection and export settings.
  *
- * @author Tommi
+ * @author Tommi Laukkanen
  */
 public class SettingsList extends List implements CommandListener {
     
@@ -43,7 +43,7 @@ public class SettingsList extends List implements CommandListener {
     private Command m_backCommand;
 
     private final static int GPS = 0;
-    private final static int RECORDING = 1;
+    private final static int EXPORTING = 1;
     
     /** Creates a new instance of SettingsList */
     public SettingsList(Controller controller) {
@@ -52,7 +52,7 @@ public class SettingsList extends List implements CommandListener {
         
         // List initialization
         this.append("GPS", null);
-        this.append("Recording", null);
+        this.append("Exporting", null);
         
         // Commands
         m_selectCommand = new Command("Select", Command.ITEM, 1);
@@ -70,8 +70,16 @@ public class SettingsList extends List implements CommandListener {
     public void commandAction(Command command, Displayable displayable) {
         if(command == m_selectCommand) {
             int selectedIndex = this.getSelectedIndex();
-            if(selectedIndex==GPS) {
-                m_controller.showDevices();
+            switch(selectedIndex) {
+                case(GPS):
+                    m_controller.showDevices();
+                    break;
+                    
+                case(EXPORTING):
+                    m_controller.showExportSettings();
+                    break;
+                    
+                default:
             }
         }
         if(command == m_backCommand) {

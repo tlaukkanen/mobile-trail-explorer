@@ -35,6 +35,7 @@ public class GpsPosition {
     private double m_longitude;
     private String m_latitudeString;
     private double m_latitude;
+    private double m_speed;
     
     private int m_elevation;
     
@@ -53,7 +54,8 @@ public class GpsPosition {
             String latitude, 
             int elevation,
             double longitudeDouple,
-            double latitudeDouple) {
+            double latitudeDouple,
+            double speed) {
         m_rawData = rawData;
         m_longitudeString = longitude;
         m_latitudeString = latitude;
@@ -99,6 +101,10 @@ public class GpsPosition {
     
     public double getLatitude() {
         return m_latitude;
+    }
+    
+    public double getSpeed() {
+        return m_speed;
     }
     
 

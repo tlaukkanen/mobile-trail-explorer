@@ -76,18 +76,28 @@ public class GpsPositionParser {
             String groundSpeed = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Ground speed
+            // Course
             String courseMadeGood = currentValue;
             
             double longitudeDouble = 0.0;
             double latitudeDouble = 0.0;
+            double speed = 0.0;
             if(longitude.length()>0 && lattitude.length()>0) {
                 longitudeDouble = parseValue(longitude, false);
+                if(longitudeDirection.equals("E")==false) {
+                    longitudeDouble = -longitudeDouble;
+                }
+                
                 latitudeDouble = parseValue(lattitude, true);
+                if(lattitudeDirection.equals("N")==false) {
+                    latitudeDouble = -latitudeDouble;
+                }          
+                
+                //speed = Double.parseDouble( groundSpeed );
             }
 
             if(warning.equals("A")==true) {
-                GpsPosition pos = new GpsPosition(record, longitude, lattitude,0,longitudeDouble,latitudeDouble);
+                GpsPosition pos = new GpsPosition(record, longitude, lattitude,0,longitudeDouble,latitudeDouble, speed);
                 return pos;
             }
             

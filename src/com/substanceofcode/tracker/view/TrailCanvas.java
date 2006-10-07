@@ -266,6 +266,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             g.drawString("LAT:", 1, fontHeight, Graphics.TOP|Graphics.LEFT);
             g.drawString("LON:", 1, fontHeight*2, Graphics.TOP|Graphics.LEFT);
+            //g.drawString("SPD:", 1, fontHeight*3, Graphics.TOP|Graphics.LEFT);            
             
             int positionAdd = currentFont.stringWidth("LAN:O");
             
@@ -275,6 +276,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
             double longitude = m_lastPosition.getLongitude();
             g.drawString(getDegreeString( longitude ),positionAdd,fontHeight*2,Graphics.TOP|Graphics.LEFT );
+
+            //double speed = m_lastPosition.getSpeed();
+            //g.drawString(getDegreeString( speed ),positionAdd,fontHeight*3,Graphics.TOP|Graphics.LEFT );
                        
             //g.drawString(m_lastPosition.toString(),1,fontHeight,Graphics.TOP|Graphics.LEFT );
             
@@ -353,8 +357,24 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     
     /** Handle key presses */
     public void keyPressed(int keyCode) {
-        int gameKey = getGameAction(keyCode);
         
+        switch( keyCode ) {
+            case( KEY_NUM1 ):
+                // Zoom in
+                m_verticalZoomFactor *= 2;
+                m_horizontalZoomFactor *= 2;
+                break;
+                
+            case( KEY_NUM3 ):
+                // Zoom out
+                m_verticalZoomFactor /= 2;
+                m_horizontalZoomFactor /= 2;
+                break;
+                
+            default:
+        }        
+        
+        int gameKey = getGameAction(keyCode);
     }
 
     /** Handle commands */
@@ -363,7 +383,18 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             m_controller.startStop();
         }
         if(command==m_markWaypointCommand) {
-            m_controller.markWaypoint();
+    
+            String latString = "";
+            String lonString = "";
+            if(m_lastPosition!=null) {
+                double lat = m_lastPosition.getLatitude();
+                latString = getDegreeString(lat);
+
+                double lon = m_lastPosition.getLongitude();
+                lonString = getDegreeString(lon);
+            }
+            
+            m_controller.markWaypoint(latString, lonString);
         }
         if(command==m_settingsCommand) {
             m_controller.showSettings();

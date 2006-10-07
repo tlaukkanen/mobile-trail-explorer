@@ -4,8 +4,6 @@
  * Copyright (C) 2005-2006 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
- * Created on August 14th 2006
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or

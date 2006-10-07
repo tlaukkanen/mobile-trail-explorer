@@ -23,18 +23,26 @@
 package com.substanceofcode.tracker.model;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.rms.RecordStoreException;
 
 /**
+ * RecorderSettings contains all settings for the Trail Explorer application.
+ * Current settings are:
+ * - GPS unit connection string
+ * - Export folder (default E:/)
  *
- * @author Tommi
+ * @author Tommi Laukkanen
  */
 public class RecorderSettings {
     
     private static Settings m_settings;
     
     private static final String GPS_DEVICE_STRING = "gps-device";
+    private static final String EXPORT_FOLDER = "export-folder";
+    private static final String WAYPOINTS = "waypoints";
     
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
@@ -45,6 +53,25 @@ public class RecorderSettings {
                     "of Settings class: " + ex.toString());
         }
     }
+
+    /** Get export folder. Default is E:/ */
+    public String getExportFolder() {
+        String result = m_settings.getStringProperty(EXPORT_FOLDER, "");
+        if(result.length()==0) {
+            result = "E:/";
+        }
+        return result;
+    }
+    
+    /** Set export folder. */
+    public void setExportFolder(String exportFolder) {
+        m_settings.setStringProperty(EXPORT_FOLDER, exportFolder);
+        try {
+            m_settings.save(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }    
     
     /** Get a GPS device connection string */
     public String getGpsDeviceConnectionString() {
@@ -55,6 +82,59 @@ public class RecorderSettings {
     /** Set a GPS device connection string */
     public void setGpsDeviceConnectionString(String connectionString) {
         m_settings.setStringProperty(GPS_DEVICE_STRING, connectionString);
+        try {
+            m_settings.save(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    /** Get waypoints */
+    public Vector getWaypoints() {
+        // TODO: add code for retrieving waypoints
+        String encodedWaypoints = m_settings.getStringProperty(WAYPOINTS, "");
+
+        // Return empty Vector if we don't have any waypoints
+        if(encodedWaypoints.length()==0) {
+            return new Vector();
+        }
+        
+        // Parse waypoints
+        Vector waypoints = new Vector();
+        String[] waypointLines = StringUtil.split(encodedWaypoints, "\n");
+        int waypointCount = waypointLines.length;
+        for(int waypointIndex=0; waypointIndex<waypointCount; waypointIndex++) {
+            
+            String[] values = StringUtil.split( waypointLines[waypointIndex], "|");
+            if(values.length==3) {
+                String lat = values[0];
+                String lon = values[1];
+                String name = values[2];
+                
+                double latValue = Double.parseDouble( lat );
+                double lonValue = Double.parseDouble( lon );
+                
+                Waypoint newWaypoint = new Waypoint(name, latValue, lonValue);
+                waypoints.addElement( newWaypoint );
+            }
+        }
+        return waypoints;
+    }
+    
+    /** Set waypoints */
+    public void setWaypoints(Vector waypoints) {
+        String waypointString = "";
+        Enumeration wpEnum = waypoints.elements();
+        while(wpEnum.hasMoreElements()==true) {
+            Waypoint wp = (Waypoint) wpEnum.nextElement();
+            
+            String latString = String.valueOf(wp.getLatitude());
+            String lonString = String.valueOf(wp.getLongitude());
+            
+            waypointString += latString + "|" + lonString + "|" + wp.getName() + "\n";
+            
+        }
+        m_settings.setStringProperty(WAYPOINTS, waypointString);
         try {
             m_settings.save(true);
         } catch (Exception ex) {

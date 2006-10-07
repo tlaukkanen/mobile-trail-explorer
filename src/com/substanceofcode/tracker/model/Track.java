@@ -62,7 +62,7 @@ public class Track {
     }
     
     /** Convert to string */
-    public String export(String dateStamp) {
+    public String export(String dateStamp, Vector waypoints) {
         String trackString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";
         trackString += "<kml xmlns=\"http://earth.google.com/kml/2.0\">\r\n";
         trackString += "<Folder>\r\n";
@@ -93,28 +93,51 @@ public class Track {
         
         trackString += "</LineString>\r\n";
         trackString += "</Placemark>\r\n";
+        
+        trackString += generateWaypointData( waypoints );
+        
         trackString += "</Folder>\r\n";
         trackString += "</kml>\r\n";
         
         return trackString;
     }
     
+    private String generateWaypointData(Vector waypoints) {
+        String waypointString = "";
+        Enumeration waypointEnum = waypoints.elements();
+        while(waypointEnum.hasMoreElements()==true) {
+            Waypoint wp = (Waypoint)waypointEnum.nextElement();
+            waypointString += "<Placemark>\r\n";
+            waypointString += "<name>" + wp.getName() + "</name>\r\n";
+            waypointString += "<Point><coordinates>\r\n";
+            waypointString += String.valueOf(wp.getLongitude()) + "," +
+                    String.valueOf(wp.getLatitude()) + ",0\r\n";
+            waypointString += "</coordinates></Point>\r\n";
+            waypointString += "</Placemark>\r\n";        
+        }
+        return waypointString;
+    }
+    
     /** Write to file */
-    public void writeToFile(String filename) throws Exception {
+    public void writeToFile(String folder, Vector waypoints) throws Exception {
         
         Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-        int hour = cal.get(Calendar.HOUR_OF_DAY);
-        int minute = cal.get(Calendar.MINUTE);
+        String year = String.valueOf( cal.get(Calendar.YEAR) );
+        String month = String.valueOf( cal.get(Calendar.MONTH) );
+        if(month.length()==1) { month = "0" + month; }
+        String day = String.valueOf( cal.get(Calendar.DAY_OF_MONTH) );
+        if(day.length()==1) { day = "0" + day; }
+        String hour = String.valueOf( cal.get(Calendar.HOUR_OF_DAY) );
+        if(hour.length()==1) { hour = "0" + hour; }
+        String minute = String.valueOf( cal.get(Calendar.MINUTE) );
+        if(minute.length()==1) { minute = "0" + minute; }
         
         String dateStamp = year + "-" + month + "-" + day + "_" + hour + "-" + minute;
         
         FileConnection connection;
         try {
             connection = (FileConnection)
-            Connector.open("file:///E:/track_" + dateStamp + ".kml", Connector.WRITE );
+            Connector.open("file:///" + folder + "track_" + dateStamp + ".kml", Connector.WRITE );
         } catch(Exception ex) {
             throw new Exception("writeToFile: Open Connector: " + ex.toString());
         }
@@ -136,7 +159,7 @@ public class Track {
         }
         PrintStream output = new PrintStream( out );
         
-        output.println( this.export(dateStamp) );
+        output.println( this.export(dateStamp, waypoints) );
         output.close();
         out.close();
         connection.close();
