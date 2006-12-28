@@ -32,7 +32,7 @@ import com.substanceofcode.tracker.view.*;
 
 /**
  *
- * @author  Tommi
+ * @author  Tommi Laukkanen
  * @version
  */
 public class TrailExplorerMidlet extends MIDlet {

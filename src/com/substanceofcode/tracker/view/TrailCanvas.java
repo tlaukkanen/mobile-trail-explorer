@@ -63,6 +63,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private Command m_settingsCommand;
     private Command m_exitCommand;
     private Command m_markWaypointCommand;
+    private Command m_editWaypointsCommand;
     
     /** Trail drawing helpers */
     private int m_center;
@@ -104,12 +105,16 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     /** Initialize commands */
     private void initializeCommands() {
         
+        // Edit waypoints command for listing existing waypoints
+        m_editWaypointsCommand = new Command("Edit waypoints", Command.SCREEN, 4);
+        addCommand(m_editWaypointsCommand);
+        
         // Start/Stop command for toggling recording
         m_startStopCommand = new Command("Start/Stop recording", Command.ITEM, 1);
         addCommand(m_startStopCommand);
         
         // Settings command for showing settings list
-        m_settingsCommand = new Command("Settings", Command.SCREEN, 4);
+        m_settingsCommand = new Command("Settings", Command.SCREEN, 5);
         addCommand(m_settingsCommand);
         
         // Mark a new waypoint command
@@ -379,10 +384,10 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if(command==m_startStopCommand) {
+        if( command == m_startStopCommand ) {
             m_controller.startStop();
         }
-        if(command==m_markWaypointCommand) {
+        if( command == m_markWaypointCommand ) {
     
             String latString = "";
             String lonString = "";
@@ -396,11 +401,14 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             m_controller.markWaypoint(latString, lonString);
         }
-        if(command==m_settingsCommand) {
+        if( command == m_settingsCommand ) {
             m_controller.showSettings();
         }
-        if(command==m_exitCommand) {
+        if( command == m_exitCommand ) {
             m_controller.exit();
+        }
+        if( command == m_editWaypointsCommand ) {
+            m_controller.showWaypointList();
         }
         
     }

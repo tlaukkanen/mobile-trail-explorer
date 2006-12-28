@@ -52,7 +52,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
     
     /** Creates a new instance of DeviceList */
     public DeviceList(Controller controller) {
-        super(TITLE, List.IMPLICIT);
+        super(TITLE, List.IMPLICIT);        
 
         // Set controller
         m_controller = controller;

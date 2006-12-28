@@ -77,4 +77,65 @@
         </target>
 
     -->
+    
+    <!--
+    
+    <property name="rim.blackberry.home" location="C:\Program Files\Research In Motion\BlackBerry JDE 4.2.0"/>
+    <property name="rim.blackberry.emulator" value="7250"/>
+    <property name="rim.blackberry.jdwp.port" value="8000"/>
+
+    <target name="post-jar">
+        <exec os="Windows NT Windows 95 Windows 98 Windows 2000 Windows XP Windows Vista"
+	dir="${dist.root.dir}"
+	executable="${rim.blackberry.home}/bin/rapc.exe"
+	failonerror="true" resolveExecutable="true">
+          <arg value="import=${rim.blackberry.home}/lib/net_rim_api.jar"/>
+          <arg value="codename=${name}"/>
+          <arg value="-midlet"/>
+          <arg value="jad=${dist.jad}"/>
+          <arg value="${dist.jar}"/>
+        </exec>
+        <copy file="${name}.alx" todir="${dist.root.dir}"/>
+    </target>
+    <target name="run" depends="init,jar">
+        <copy todir="${rim.blackberry.home}/simulator" verbose="true">
+            <fileset dir="${dist.root.dir}">
+                <include name="**/${name}.*"/>
+            </fileset>
+        </copy>
+        <exec os="Windows NT Windows 95 Windows 98 Windows 2000 Windows XP"
+	dir="${rim.blackberry.home}/simulator"
+	executable="${rim.blackberry.home}/simulator/${rim.blackberry.emulator}.bat"
+	failonerror="true" resolveExecutable="true"/>
+    </target>
+
+    <target name="debug" depends="init,jar">
+        <copy todir="${rim.blackberry.home}/simulator" verbose="true">
+            <fileset dir="${dist.root.dir}">
+                <include name="**/${name}.*"/>
+            </fileset>
+        </copy>
+        <delete file="${preprocessed.dir}/.timestamp"/>
+        <parallel>
+            <property name="jpda.port" value="${rim.blackberry.jdwp.port}"/>
+           <java jar="${rim.blackberry.home}/bin/JDWP.jar" fork="true" dir="${rim.blackberry.home}/bin">
+              <jvmarg value="-Xmx128M"/>
+           </java>
+
+            <sequential>
+                <sleep seconds="5"/>
+                <antcall target="nbdebug"/>
+            </sequential>
+        </parallel>
+    </target>
+
+    <target name="post-clean">
+        <echo>Post clean</echo>
+        <delete>
+            <fileset dir="${rim.blackberry.home}/simulator">
+                <include name="**/${name}.*"/>
+            </fileset>
+        </delete>
+    </target>
+   -->
 </project>

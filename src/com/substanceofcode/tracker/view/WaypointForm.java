@@ -47,6 +47,9 @@ public class WaypointForm extends Form implements CommandListener {
     private Command m_okCommand;
     private Command m_cancelCommand;
     
+    private boolean m_editing;
+    private String m_oldWaypointName;
+    
     /** Creates a new instance of WaypointForm */
     public WaypointForm(Controller controller) {
         super("Waypoint");
@@ -56,6 +59,18 @@ public class WaypointForm extends Form implements CommandListener {
         initializeCommands();
         
         this.setCommandListener(this);
+        
+        m_editing = false;
+        m_oldWaypointName = "";
+    }
+    
+    /** 
+     * Set editing flag value.
+     *
+     * @param   editing     If true then we are editing existing waypoint. 
+     */
+    public void setEditingFlag(boolean editing) {
+        m_editing = editing;
     }
 
     private void initializeControls() {
@@ -84,6 +99,16 @@ public class WaypointForm extends Form implements CommandListener {
         m_nameField.setString( name );
         m_latitudeField.setString( lat );
         m_longitudeField.setString( lon );
+        m_oldWaypointName = name;
+    }
+    
+    public void setValues(Waypoint wp) {
+        m_nameField.setString(wp.getName());
+        String latitude = String.valueOf( wp.getLatitude() );
+        String longitude = String.valueOf( wp.getLongitude() );
+        m_latitudeField.setString( latitude );
+        m_longitudeField.setString( longitude );
+        m_oldWaypointName = wp.getName();
     }
 
     public void commandAction(Command command, Displayable displayable) {
@@ -93,14 +118,25 @@ public class WaypointForm extends Form implements CommandListener {
             double latitude = Double.parseDouble( m_latitudeField.getString() );
             double longitude = Double.parseDouble( m_longitudeField.getString() );
             Waypoint waypoint = new Waypoint( name, latitude, longitude );
-            m_controller.saveWaypoint(waypoint);
-            m_controller.showTrail();
+            
+            if(m_editing==false) {
+                /** Create new waypoint */
+                m_controller.saveWaypoint(waypoint);
+                m_controller.showTrail();                
+            } else {
+                /** Update existing waypoint */
+                m_controller.updateWaypoint( m_oldWaypointName, waypoint );
+                m_controller.showWaypointList();
+            }
+
         }
         if( command == m_cancelCommand ) {
             // Do nothing -> show trail
             m_controller.showTrail();
         }
     }
+
+
     
     
     

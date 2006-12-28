@@ -91,7 +91,6 @@ public class RecorderSettings {
     
     /** Get waypoints */
     public Vector getWaypoints() {
-        // TODO: add code for retrieving waypoints
         String encodedWaypoints = m_settings.getStringProperty(WAYPOINTS, "");
 
         // Return empty Vector if we don't have any waypoints

@@ -28,7 +28,7 @@ package com.substanceofcode.tracker.model;
  *
  * @author Tommi Laukkanen
  */
-public class Waypoint{
+public class Waypoint {
     
     private String m_name;
     private double m_latitude;
@@ -71,4 +71,4 @@ public class Waypoint{
         m_longitude = lon;
     }
     
-}
+ }

@@ -37,9 +37,13 @@ import com.substanceofcode.tracker.view.SettingsList;
 import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
+import com.substanceofcode.tracker.view.WaypointList;
 import java.lang.Exception;
+import java.util.Enumeration;
+import java.util.Stack;
 import java.util.Vector;
 import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Image;
@@ -74,6 +78,7 @@ public class Controller {
     private MIDlet m_midlet;
     private WaypointForm m_waypointForm;
     private ExportSettingsForm m_exportSettingsForm;
+    private WaypointList m_waypointList;
     
     /** Display device */
     private Display m_display;
@@ -97,8 +102,11 @@ public class Controller {
         m_aboutForm = new AboutForm(this);
         m_display = display;
         
-        // Debug....
-        m_waypoints = new Vector();
+        /** Waypoints */
+        m_waypoints = m_settings.getWaypoints();
+        if( m_waypoints==null ) {
+            m_waypoints = new Vector();
+        }
     }
     
     public void searchDevices() {
@@ -236,7 +244,18 @@ public class Controller {
             m_waypointForm = new WaypointForm(this);
         }
         m_waypointForm.setValues("", lat, lon);
+        m_waypointForm.setEditingFlag( false );
         m_display.setCurrent( m_waypointForm );
+    }
+    
+    /** Edit waypoint */
+    public void editWaypoint(Waypoint wp) {
+        if( m_waypointForm==null ) {
+            m_waypointForm = new WaypointForm(this);
+        }
+        m_waypointForm.setValues( wp );
+        m_waypointForm.setEditingFlag( true );
+        m_display.setCurrent( m_waypointForm );        
     }
     
     public int getRecordedPositionCount() {
@@ -259,6 +278,8 @@ public class Controller {
 
     /** Exit application */
     public void exit() {
+        saveWaypoints();
+        
         m_midlet.notifyDestroyed();
     }
     
@@ -296,7 +317,7 @@ public class Controller {
     public void showExportSettings() {
         m_display.setCurrent( getExportSettingsForm() );
     }
-    
+           
     /** Show export settings form */
     private ExportSettingsForm getExportSettingsForm() {
         if( m_exportSettingsForm==null ) {
@@ -325,6 +346,15 @@ public class Controller {
         return m_settingsList;
     }
 
+    /** Show waypoint list */
+    public void showWaypointList() {
+        if( m_waypointList==null) {
+            m_waypointList = new WaypointList( this );
+        }
+        m_waypointList.setWaypoints( m_waypoints );
+        m_display.setCurrent( m_waypointList );
+    }
+    
     /** Show device list */
     public void showDevices() {
         m_display.setCurrent(getDeviceList());
@@ -336,6 +366,34 @@ public class Controller {
             m_deviceList = new DeviceList(this);
         }
         return m_deviceList;
+    }
+    
+    /** Show error */
+    public void showError(String message) {
+        Alert newAlert = new Alert("Error", message, null, AlertType.ERROR);
+        newAlert.setTimeout(5000);
+        m_display.setCurrent(newAlert, m_trailCanvas);
+    }
+
+    public void updateWaypoint(String m_oldWaypointName, Waypoint newWaypoint) {
+        Enumeration waypointEnum = m_waypoints.elements();
+        while(waypointEnum.hasMoreElements()) {
+            Waypoint wp = (Waypoint)waypointEnum.nextElement();
+            String currentName = wp.getName();
+            if( currentName.equals( m_oldWaypointName )) {
+                int updateIndex = m_waypoints.indexOf( wp );
+                m_waypoints.setElementAt( newWaypoint, updateIndex);
+                return;
+            }            
+        }
+    }
+
+    private void saveWaypoints() {
+        m_settings.setWaypoints( m_waypoints );
+    }
+
+    public void removeWaypoint(Waypoint wp) {
+        m_waypoints.removeElement(wp);
     }
    
 }
