@@ -43,6 +43,7 @@ public class RecorderSettings {
     private static final String GPS_DEVICE_STRING = "gps-device";
     private static final String EXPORT_FOLDER = "export-folder";
     private static final String WAYPOINTS = "waypoints";
+    private static final String RECORDING_INTERVAL = "recording-interval";
     
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
@@ -141,4 +142,22 @@ public class RecorderSettings {
         }
     }
     
+    /** Get recording interval */
+    public int getRecordingInterval() {
+        int defaultInterval = 10; // Mark default as 10 seconds
+        int recordingInterval = m_settings.getIntProperty( 
+                RECORDING_INTERVAL, 
+                defaultInterval );
+        return recordingInterval;        
+    }
+    
+    /** Set recording interval in seconds */
+    public void setRecordingInterval(int interval) {
+        m_settings.setIntProperty( RECORDING_INTERVAL, interval);
+        try{
+            m_settings.save(true);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }

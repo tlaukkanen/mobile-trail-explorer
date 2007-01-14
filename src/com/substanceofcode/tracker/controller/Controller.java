@@ -33,6 +33,7 @@ import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.tracker.view.AboutForm;
 import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.ExportSettingsForm;
+import com.substanceofcode.tracker.view.RecordingSettingsForm;
 import com.substanceofcode.tracker.view.SettingsList;
 import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
@@ -74,10 +75,13 @@ public class Controller {
     private SplashCanvas m_splashCanvas;
     private DeviceList m_deviceList;    
     private AboutForm m_aboutForm;
-    private SettingsList m_settingsList;
     private MIDlet m_midlet;
-    private WaypointForm m_waypointForm;
+    
+    private SettingsList m_settingsList;
+    private RecordingSettingsForm m_recordingSettingsForm;
     private ExportSettingsForm m_exportSettingsForm;
+
+    private WaypointForm m_waypointForm;
     private WaypointList m_waypointList;
     
     /** Display device */
@@ -375,6 +379,7 @@ public class Controller {
         m_display.setCurrent(newAlert, m_trailCanvas);
     }
 
+    /** Update selected waypoint */
     public void updateWaypoint(String m_oldWaypointName, Waypoint newWaypoint) {
         Enumeration waypointEnum = m_waypoints.elements();
         while(waypointEnum.hasMoreElements()) {
@@ -388,12 +393,28 @@ public class Controller {
         }
     }
 
+    /** Save waypoints to persistent storage */
     private void saveWaypoints() {
         m_settings.setWaypoints( m_waypoints );
     }
 
+    /** Remove selected waypoint */
     public void removeWaypoint(Waypoint wp) {
         m_waypoints.removeElement(wp);
+    }
+
+    /** Display recording settings form */
+    public void showRecordingSettings() {
+        if( m_recordingSettingsForm==null ) {
+            m_recordingSettingsForm = new RecordingSettingsForm(this);
+        }
+        m_display.setCurrent( m_recordingSettingsForm );
+    }
+
+    /** Set recording interval */
+    public void saveRecordingInterval(int interval) {
+        m_settings.setRecordingInterval(interval);
+        m_recorder.setInterval(interval);                
     }
    
 }
