@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -49,9 +49,9 @@ public class GpsPosition {
     
     /** Creates a new instance of GpsPosition */
     public GpsPosition(
-            String rawData, 
-            String longitude, 
-            String latitude, 
+            String rawData,
+            String longitude,
+            String latitude,
             int elevation,
             double longitudeDouple,
             double latitudeDouple,
@@ -64,7 +64,20 @@ public class GpsPosition {
         m_positionDate = cal.getTime();
         m_longitude = longitudeDouple;
         m_latitude = latitudeDouple;
-    }    
+    }
+    
+    /** 
+     * Compare two different positions. 
+     * Positions are checked using longitude and latitude values.
+     */
+    public boolean equals(GpsPosition position) {
+        if( m_longitudeString.equals( position.m_longitudeString ) == true &&
+                m_latitudeString.equals( position.m_latitudeString) == true ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     public String getRawString() {
         return m_rawData;
@@ -83,7 +96,7 @@ public class GpsPosition {
         }
         return res;
     }
-
+    
     public String getKmlCoordinate() {
         
         String kmlLongitude = "";
@@ -107,6 +120,7 @@ public class GpsPosition {
         return m_speed;
     }
     
-
+ 
+    
     
 }

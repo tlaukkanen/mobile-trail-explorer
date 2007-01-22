@@ -335,18 +335,25 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
 
     /** Thread for getting current position */
     public void run() {
+        GpsPosition lastRecordedPosition = null;
         while(m_refresh==true) {
             try{
                 Thread.sleep(1000);
                 m_counter++;
-                GpsPosition pos = m_controller.getPosition();
+                GpsPosition currentPosition = m_controller.getPosition();
                 
-                if(pos!=null) {
-                    m_lastPosition = pos;
-                    // Create trail
-                    if(m_counter%5==0) {
-                        m_positionTrail.addElement(m_lastPosition);
-                        while(m_positionTrail.size()>100) {
+                if(currentPosition!=null) {
+                    boolean stopped = false;
+                    if( lastRecordedPosition!=null ) {
+                        stopped = currentPosition.equals( lastRecordedPosition );
+                    }
+                    m_lastPosition = currentPosition;
+                    
+                    /** Create trail if user have moved */
+                    if(m_counter%5==0 && stopped==false) {
+                        m_positionTrail.addElement( m_lastPosition );
+                        lastRecordedPosition = currentPosition;
+                        while(m_positionTrail.size()>120) {
                             m_positionTrail.removeElement( m_positionTrail.firstElement() );
                         }
                     }

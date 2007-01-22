@@ -86,16 +86,34 @@ public class GpsRecorder implements Runnable{
 
     /** Main recording thread */
     public void run() {
+        GpsPosition lastRecordedPosition = null;
         while(true) {
             System.out.println("Recorder thread...");
             try{
                 Thread.sleep(1000 * m_intervalSeconds);
                 if(m_recording==true) {
                     System.out.println("-Recording-");
-                    GpsPosition pos = m_controller.getPosition();
-                    if(pos!=null) {
-                        m_recordedTrack.addPosition(pos);
+                    
+                    GpsPosition currentPosition = m_controller.getPosition();
+
+                    /**
+                     * Check if user haven't moved 
+                     * -> don't record the same position
+                     */
+                    boolean stopped = false;
+                    if( lastRecordedPosition!=null && currentPosition!=null ) {
+                        stopped = currentPosition.equals( lastRecordedPosition );
                     }
+                   
+                    /** 
+                     * Record current position if user have moved or this is
+                     * a first recorded position.
+                     */
+                    if( currentPosition!=null && stopped==false) {
+                        m_recordedTrack.addPosition(currentPosition);
+                        lastRecordedPosition = currentPosition;
+                    }
+                    
                 }
             } catch (Exception ex) {
                 System.err.println("Error in recorder thread: " + ex.toString());
