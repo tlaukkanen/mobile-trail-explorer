@@ -36,48 +36,56 @@ public class GpsPositionParser {
     public static GpsPosition parse(String record) {
         if(record.startsWith("$GPRMC")==true) {
             //GpsPosition pos = new GpsPosition(record, "100",0);
-            
+            // $GPRMC,041107.000,A,6131.2028,N,02356.8782,E,18.28,198.00,270906,,,A*5
             String currentValue = record;
             int nextTokenIndex = currentValue.indexOf(DELIMETER);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Date time of fix
+            // Date time of fix (eg. 041107.000)
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String dateTimeOfFix = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Warning
+            // Warning (eg. A)
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String warning = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Lattitude
+            // Lattitude (eg. 6131.2028)
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String lattitude = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Lattitude direction
+            // Lattitude direction (eg. N)
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String lattitudeDirection = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Longitude
+            // Longitude (eg. 02356.8782)
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String longitude = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Longitude direction
+            // Longitude direction (eg. E)
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String longitudeDirection = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Ground speed
+            // Ground speed (eg. 18.28)
             nextTokenIndex = currentValue.indexOf(DELIMETER);
             String groundSpeed = currentValue.substring(0, nextTokenIndex);
             currentValue = currentValue.substring(nextTokenIndex+1);
             
-            // Course
-            String courseMadeGood = currentValue;
+            // Course (198.00)
+            String courseString = currentValue;
+            int course = 0;
+            if(courseString.length()>0) {
+                try {
+                    course = (int)Double.parseDouble( courseString );
+                } catch(Exception e) {
+                    course = 180;
+                }
+            }
             
             double longitudeDouble = 0.0;
             double latitudeDouble = 0.0;
@@ -92,12 +100,24 @@ public class GpsPositionParser {
                 if(lattitudeDirection.equals("N")==false) {
                     latitudeDouble = -latitudeDouble;
                 }          
-                
-                //speed = Double.parseDouble( groundSpeed );
             }
+             
 
+             // if we have a speed value, work out the Miles Per Hour
+             if(groundSpeed.length() > 0) {
+                try {
+                    //MPH = knots * 1.150779
+                    speed = (int) (Double.parseDouble(groundSpeed) * 1.150779);
+                } catch( Exception e ) {
+                    speed = -1;
+                }
+             }
+            
             if(warning.equals("A")==true) {
-                GpsPosition pos = new GpsPosition(record, longitude, lattitude,0,longitudeDouble,latitudeDouble, speed);
+                GpsPosition pos = new GpsPosition(
+                        record, 
+                        longitude, lattitude, course, 
+                        longitudeDouble, latitudeDouble, speed);
                 return pos;
             }
             

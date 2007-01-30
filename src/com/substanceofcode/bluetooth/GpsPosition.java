@@ -37,7 +37,7 @@ public class GpsPosition {
     private double m_latitude;
     private double m_speed;
     
-    private int m_elevation;
+    private int m_course;
     
     private String m_deb;
     
@@ -52,22 +52,22 @@ public class GpsPosition {
             String rawData,
             String longitude,
             String latitude,
-            int elevation,
+            int course,
             double longitudeDouple,
             double latitudeDouple,
             double speed) {
         m_rawData = rawData;
         m_longitudeString = longitude;
         m_latitudeString = latitude;
-        m_elevation = elevation;
+        m_course = course;
         Calendar cal = Calendar.getInstance();
         m_positionDate = cal.getTime();
         m_longitude = longitudeDouple;
         m_latitude = latitudeDouple;
     }
     
-    /** 
-     * Compare two different positions. 
+    /**
+     * Compare two different positions.
      * Positions are checked using longitude and latitude values.
      */
     public boolean equals(GpsPosition position) {
@@ -90,7 +90,7 @@ public class GpsPosition {
     public String toString() {
         String res;
         if(m_longitudeString.length()>0) {
-            res = m_longitudeString + ", " + m_latitudeString + ", " + m_elevation;
+            res = m_longitudeString + ", " + m_latitudeString + ", " + m_course;
         } else {
             res = "Unknown";
         }
@@ -98,10 +98,7 @@ public class GpsPosition {
     }
     
     public String getKmlCoordinate() {
-        
         String kmlLongitude = "";
-        
-        
         String kmlCoordinate = "";
         //todo: Add code
         
@@ -116,11 +113,31 @@ public class GpsPosition {
         return m_latitude;
     }
     
+    public int getCourse() {
+        return m_course;
+    }
+    
+    /** Get heading in string format. Example N, NE, S */
+    public String getHeadingString() {
+
+        double sector= 22.5; //  = 360 degrees / 16 sectors
+        String[] compass = {
+            "N","NE","NE","E",
+            "E","SE","SE","S",
+            "S","SW","SW","W",
+            "W","NW","NW","N"};
+        String  heading = "";
+        
+        int directionIndex = (int)Math.floor(m_course / sector);
+        heading = compass[directionIndex];
+        return heading;
+    }
+    
     public double getSpeed() {
         return m_speed;
     }
     
- 
+    
     
     
 }

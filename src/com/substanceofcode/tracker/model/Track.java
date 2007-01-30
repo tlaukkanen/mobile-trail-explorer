@@ -123,7 +123,7 @@ public class Track {
         
         Calendar cal = Calendar.getInstance();
         String year = String.valueOf( cal.get(Calendar.YEAR) );
-        String month = String.valueOf( cal.get(Calendar.MONTH) );
+        String month = String.valueOf( cal.get(Calendar.MONTH)+1 );
         if(month.length()==1) { month = "0" + month; }
         String day = String.valueOf( cal.get(Calendar.DAY_OF_MONTH) );
         if(day.length()==1) { day = "0" + day; }
@@ -132,7 +132,7 @@ public class Track {
         String minute = String.valueOf( cal.get(Calendar.MINUTE) );
         if(minute.length()==1) { minute = "0" + minute; }
         
-        String dateStamp = year + "-" + month + "-" + day + "_" + hour + "-" + minute;
+        String dateStamp = year + month + day + "_" + hour + minute;
         
         FileConnection connection;
         try {

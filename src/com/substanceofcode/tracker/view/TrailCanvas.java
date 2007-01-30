@@ -139,11 +139,12 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         /** Draw status bar */
         drawStatusBar(g);
         
+        /** Draw waypoints */
+        drawWaypoints(g);
+        
         /** Draw trail */
         drawTrail(g);
         
-        /** Draw waypoints */
-        drawWaypoints(g);
     }
     
     /** Draw waypoints */
@@ -157,6 +158,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         // Draw waypoints
         int waypointCount = waypoints.size();
+        g.setColor(50,200,50);
         for(int waypointIndex=0; waypointIndex<waypointCount; waypointIndex++) {
             
             Waypoint waypoint = (Waypoint) waypoints.elementAt( waypointIndex );
@@ -271,7 +273,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             g.drawString("LAT:", 1, fontHeight, Graphics.TOP|Graphics.LEFT);
             g.drawString("LON:", 1, fontHeight*2, Graphics.TOP|Graphics.LEFT);
-            //g.drawString("SPD:", 1, fontHeight*3, Graphics.TOP|Graphics.LEFT);            
+            g.drawString("SPD:", 1, fontHeight*3, Graphics.TOP|Graphics.LEFT);
+            g.drawString("HEA:", 1, fontHeight*4, Graphics.TOP|Graphics.LEFT);            
             
             int positionAdd = currentFont.stringWidth("LAN:O");
             
@@ -282,10 +285,12 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             double longitude = m_lastPosition.getLongitude();
             g.drawString(getDegreeString( longitude ),positionAdd,fontHeight*2,Graphics.TOP|Graphics.LEFT );
 
-            //double speed = m_lastPosition.getSpeed();
-            //g.drawString(getDegreeString( speed ),positionAdd,fontHeight*3,Graphics.TOP|Graphics.LEFT );
-                       
-            //g.drawString(m_lastPosition.toString(),1,fontHeight,Graphics.TOP|Graphics.LEFT );
+            int speed = (int) m_lastPosition.getSpeed();
+            String units = " km/h";
+            g.drawString( speed + units, positionAdd, fontHeight*3, Graphics.TOP|Graphics.LEFT );
+
+            String heading = m_lastPosition.getHeadingString();
+            g.drawString( heading, positionAdd, fontHeight*4, Graphics.TOP|Graphics.LEFT );
             
             Date now = Calendar.getInstance().getTime();
             long secondsSinceLastPosition;

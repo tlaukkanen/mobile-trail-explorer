@@ -416,5 +416,9 @@ public class Controller {
         m_settings.setRecordingInterval(interval);
         m_recorder.setInterval(interval);                
     }
+
+    public int showDisplaySettings() {
+        return 0;
+    }
    
 }
