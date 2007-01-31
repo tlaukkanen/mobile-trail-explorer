@@ -286,11 +286,13 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             g.drawString(getDegreeString( longitude ),positionAdd,fontHeight*2,Graphics.TOP|Graphics.LEFT );
 
             int speed = (int) m_lastPosition.getSpeed();
-            String units = " km/h";
-            g.drawString( speed + units, positionAdd, fontHeight*3, Graphics.TOP|Graphics.LEFT );
+            String speedString = m_lastPosition.getSpeedString(); 
+            String units = " km/h ";
+            g.drawString( speed + units + speedString, positionAdd, fontHeight*3, Graphics.TOP|Graphics.LEFT );
 
             String heading = m_lastPosition.getHeadingString();
-            g.drawString( heading, positionAdd, fontHeight*4, Graphics.TOP|Graphics.LEFT );
+            String courseString = m_lastPosition.getCourseString();
+            g.drawString( heading + " " + courseString, positionAdd, fontHeight*4, Graphics.TOP|Graphics.LEFT );
             
             Date now = Calendar.getInstance().getTime();
             long secondsSinceLastPosition;

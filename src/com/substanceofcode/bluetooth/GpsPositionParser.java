@@ -21,6 +21,8 @@
 
 package com.substanceofcode.bluetooth;
 
+import com.substanceofcode.tracker.model.StringUtil;
+
 /**
  *
  * @author Tommi
@@ -37,47 +39,33 @@ public class GpsPositionParser {
         if(record.startsWith("$GPRMC")==true) {
             //GpsPosition pos = new GpsPosition(record, "100",0);
             // $GPRMC,041107.000,A,6131.2028,N,02356.8782,E,18.28,198.00,270906,,,A*5
-            String currentValue = record;
-            int nextTokenIndex = currentValue.indexOf(DELIMETER);
-            currentValue = currentValue.substring(nextTokenIndex+1);
             
+            String[] values = StringUtil.split(record, DELIMETER);
+            
+            // First value = $GPRMC
             // Date time of fix (eg. 041107.000)
-            nextTokenIndex = currentValue.indexOf(DELIMETER);
-            String dateTimeOfFix = currentValue.substring(0, nextTokenIndex);
-            currentValue = currentValue.substring(nextTokenIndex+1);
+            String dateTimeOfFix = values[1];
             
             // Warning (eg. A)
-            nextTokenIndex = currentValue.indexOf(DELIMETER);
-            String warning = currentValue.substring(0, nextTokenIndex);
-            currentValue = currentValue.substring(nextTokenIndex+1);
+            String warning = values[2];
             
             // Lattitude (eg. 6131.2028)
-            nextTokenIndex = currentValue.indexOf(DELIMETER);
-            String lattitude = currentValue.substring(0, nextTokenIndex);
-            currentValue = currentValue.substring(nextTokenIndex+1);
+            String lattitude = values[3];
             
             // Lattitude direction (eg. N)
-            nextTokenIndex = currentValue.indexOf(DELIMETER);
-            String lattitudeDirection = currentValue.substring(0, nextTokenIndex);
-            currentValue = currentValue.substring(nextTokenIndex+1);
+            String lattitudeDirection = values[4];
             
             // Longitude (eg. 02356.8782)
-            nextTokenIndex = currentValue.indexOf(DELIMETER);
-            String longitude = currentValue.substring(0, nextTokenIndex);
-            currentValue = currentValue.substring(nextTokenIndex+1);
+            String longitude = values[5];
             
             // Longitude direction (eg. E)
-            nextTokenIndex = currentValue.indexOf(DELIMETER);
-            String longitudeDirection = currentValue.substring(0, nextTokenIndex);
-            currentValue = currentValue.substring(nextTokenIndex+1);
+            String longitudeDirection = values[6];
             
             // Ground speed (eg. 18.28)
-            nextTokenIndex = currentValue.indexOf(DELIMETER);
-            String groundSpeed = currentValue.substring(0, nextTokenIndex);
-            currentValue = currentValue.substring(nextTokenIndex+1);
+            String groundSpeed = values[7];
             
             // Course (198.00)
-            String courseString = currentValue;
+            String courseString = values[8];
             int course = 0;
             if(courseString.length()>0) {
                 try {
@@ -89,7 +77,7 @@ public class GpsPositionParser {
             
             double longitudeDouble = 0.0;
             double latitudeDouble = 0.0;
-            double speed = 0.0;
+            double speed = -2.0;
             if(longitude.length()>0 && lattitude.length()>0) {
                 longitudeDouble = parseValue(longitude, false);
                 if(longitudeDirection.equals("E")==false) {
@@ -116,8 +104,8 @@ public class GpsPositionParser {
             if(warning.equals("A")==true) {
                 GpsPosition pos = new GpsPosition(
                         record, 
-                        longitude, lattitude, course, 
-                        longitudeDouble, latitudeDouble, speed);
+                        longitude, lattitude, course, courseString,
+                        longitudeDouble, latitudeDouble, speed, groundSpeed);
                 return pos;
             }
             

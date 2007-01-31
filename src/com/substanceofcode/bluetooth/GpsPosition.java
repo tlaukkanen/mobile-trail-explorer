@@ -36,8 +36,9 @@ public class GpsPosition {
     private String m_latitudeString;
     private double m_latitude;
     private double m_speed;
-    
+    private String m_speedString;
     private int m_course;
+    private String m_courseString;
     
     private String m_deb;
     
@@ -53,17 +54,22 @@ public class GpsPosition {
             String longitude,
             String latitude,
             int course,
+            String courseString,
             double longitudeDouple,
             double latitudeDouple,
-            double speed) {
+            double speed,
+            String speedString) {
         m_rawData = rawData;
         m_longitudeString = longitude;
         m_latitudeString = latitude;
         m_course = course;
+        m_courseString = courseString;
         Calendar cal = Calendar.getInstance();
         m_positionDate = cal.getTime();
         m_longitude = longitudeDouple;
         m_latitude = latitudeDouple;
+        m_speedString = speedString;
+        m_speed = speed;
     }
     
     /**
@@ -117,6 +123,10 @@ public class GpsPosition {
         return m_course;
     }
     
+    public String getCourseString() {
+        return m_courseString;
+    }
+    
     /** Get heading in string format. Example N, NE, S */
     public String getHeadingString() {
 
@@ -135,6 +145,10 @@ public class GpsPosition {
     
     public double getSpeed() {
         return m_speed;
+    }
+    
+    public String getSpeedString() {
+        return m_speedString;
     }
     
     
