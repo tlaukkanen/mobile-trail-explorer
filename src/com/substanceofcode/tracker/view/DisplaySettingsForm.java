@@ -23,6 +23,7 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.RecorderSettings;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -44,6 +45,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     
     /** Controls */
     private ChoiceGroup unitGroup;
+    private ChoiceGroup displayGroup;
     
     /** Creates a new instance of DisplaySettingsForm */
     public DisplaySettingsForm(Controller controller) {
@@ -65,7 +67,21 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     public void commandAction(Command command, Displayable displayable) {
         if(command == okCommand) {
             /** Save settings and go back to settings menu */
-            // TODO: Add code
+            /** 1. Save used units */
+            boolean isKilometersSelected = unitGroup.isSelected(0);
+            RecorderSettings settings = controller.getSettings();
+            settings.setUnitsAsKilometers( isKilometersSelected );
+            
+            /** 2. Save displayable items */
+            boolean showCoordinates = displayGroup.isSelected(0);
+            boolean showSpeed = displayGroup.isSelected(1);
+            boolean showHeading = displayGroup.isSelected(2);
+            boolean showAltitude = displayGroup.isSelected(3);            
+            settings.setDisplayValue(RecorderSettings.DISPLAY_COORDINATES, showCoordinates);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_SPEED, showSpeed);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_HEADING, showHeading);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_ALTITUDE, showAltitude);
+            
             controller.showSettings();
         }
         if(command == cancelCommand) {
@@ -77,8 +93,20 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     /** Add controls to form */
     private void addControls() {
         String[] units = {"Kilometers", "Miles"};
-        unitGroup = new ChoiceGroup("Units", ChoiceGroup.EXCLUSIVE,units,null);
+        unitGroup = new ChoiceGroup(
+                "Units", 
+                ChoiceGroup.EXCLUSIVE,
+                units,
+                null);
         this.append(unitGroup);
+        
+        String[] displayItems = {"Coordinates", "Speed", "Heading", "Altitude"};
+        displayGroup = new ChoiceGroup(
+                "Display the following", 
+                ChoiceGroup.MULTIPLE, 
+                displayItems,
+                null);
+        this.append(displayGroup);
     }
     
 }

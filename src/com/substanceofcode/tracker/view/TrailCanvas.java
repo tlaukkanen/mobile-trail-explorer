@@ -27,6 +27,7 @@ package com.substanceofcode.tracker.view;
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.ImageUtil;
+import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Calendar;
 import java.util.Date;
@@ -278,21 +279,23 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             int positionAdd = currentFont.stringWidth("LAN:O");
             
-            double latitude = m_lastPosition.getLatitude();
-            
-            g.drawString(getDegreeString( latitude ),positionAdd,fontHeight,Graphics.TOP|Graphics.LEFT );
+            RecorderSettings settings = m_controller.getSettings();
+            if(settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES)==true) {
+                double latitude = m_lastPosition.getLatitude();            
+                g.drawString(getDegreeString( latitude ),positionAdd,fontHeight,Graphics.TOP|Graphics.LEFT );
 
-            double longitude = m_lastPosition.getLongitude();
-            g.drawString(getDegreeString( longitude ),positionAdd,fontHeight*2,Graphics.TOP|Graphics.LEFT );
+                double longitude = m_lastPosition.getLongitude();
+                g.drawString(getDegreeString( longitude ),positionAdd,fontHeight*2,Graphics.TOP|Graphics.LEFT );
+            }
 
             int speed = (int) m_lastPosition.getSpeed();
             String speedString = m_lastPosition.getSpeedString(); 
             String units = " km/h ";
-            g.drawString( speed + units + speedString, positionAdd, fontHeight*3, Graphics.TOP|Graphics.LEFT );
+            g.drawString( speed + units, positionAdd, fontHeight*3, Graphics.TOP|Graphics.LEFT );
 
             String heading = m_lastPosition.getHeadingString();
             String courseString = m_lastPosition.getCourseString();
-            g.drawString( heading + " " + courseString, positionAdd, fontHeight*4, Graphics.TOP|Graphics.LEFT );
+            g.drawString( heading , positionAdd, fontHeight*4, Graphics.TOP|Graphics.LEFT );
             
             Date now = Calendar.getInstance().getTime();
             long secondsSinceLastPosition;

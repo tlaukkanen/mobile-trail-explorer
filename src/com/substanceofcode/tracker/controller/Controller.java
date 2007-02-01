@@ -80,6 +80,7 @@ public class Controller {
     private SettingsList m_settingsList;
     private RecordingSettingsForm m_recordingSettingsForm;
     private ExportSettingsForm m_exportSettingsForm;
+    private DisplaySettingsForm m_displaySettingsForm;
 
     private WaypointForm m_waypointForm;
     private WaypointList m_waypointList;
@@ -417,8 +418,12 @@ public class Controller {
         m_recorder.setInterval(interval);                
     }
 
+    /** Display display settings form */
     public int showDisplaySettings() {
-        return 0;
+        if( m_displaySettingsForm==null) {
+            m_displaySettingsForm = new DisplaySettingsForm(this);
+        }
+        m_display.setCurrent(m_displaySettingsForm);
     }
    
 }

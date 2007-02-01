@@ -66,6 +66,7 @@ public class GpsPositionParser {
             
             // Course (198.00)
             String courseString = values[8];
+            
             int course = 0;
             if(courseString.length()>0) {
                 try {
@@ -90,12 +91,11 @@ public class GpsPositionParser {
                 }          
             }
              
-
              // if we have a speed value, work out the Miles Per Hour
              if(groundSpeed.length() > 0) {
                 try {
-                    //MPH = knots * 1.150779
-                    speed = (int) (Double.parseDouble(groundSpeed) * 1.150779);
+                    // km/h = knots * 1.852
+                    speed = (int) (Double.parseDouble(groundSpeed) * 1.852);
                 } catch( Exception e ) {
                     speed = -1;
                 }

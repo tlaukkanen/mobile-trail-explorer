@@ -22,6 +22,7 @@
 
 package com.substanceofcode.tracker.model;
 
+import com.substanceofcode.tracker.controller.Controller;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -44,17 +45,24 @@ public class RecorderSettings {
     private static final String EXPORT_FOLDER = "export-folder";
     private static final String WAYPOINTS = "waypoints";
     private static final String RECORDING_INTERVAL = "recording-interval";
+    private static final String UNITS = "units";
+    
+    /** Display setting keys */
+    public static final String DISPLAY_COORDINATES = "display-coordinates";
+    public static final String DISPLAY_SPEED = "display-speed";
+    public static final String DISPLAY_HEADING = "display-heading";
+    public static final String DISPLAY_ALTITUDE = "display-altitude";
     
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
         try {
             m_settings = Settings.getInstance(midlet);
         }catch(Exception ex) {
-            System.err.println("Error occured while creating an instance " + 
+            System.err.println("Error occured while creating an instance " +
                     "of Settings class: " + ex.toString());
         }
     }
-
+    
     /** Get export folder. Default is E:/ */
     public String getExportFolder() {
         String result = m_settings.getStringProperty(EXPORT_FOLDER, "");
@@ -67,12 +75,8 @@ public class RecorderSettings {
     /** Set export folder. */
     public void setExportFolder(String exportFolder) {
         m_settings.setStringProperty(EXPORT_FOLDER, exportFolder);
-        try {
-            m_settings.save(true);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }    
+        saveSettings();
+    }
     
     /** Get a GPS device connection string */
     public String getGpsDeviceConnectionString() {
@@ -83,17 +87,13 @@ public class RecorderSettings {
     /** Set a GPS device connection string */
     public void setGpsDeviceConnectionString(String connectionString) {
         m_settings.setStringProperty(GPS_DEVICE_STRING, connectionString);
-        try {
-            m_settings.save(true);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        saveSettings();
     }
     
     /** Get waypoints */
     public Vector getWaypoints() {
         String encodedWaypoints = m_settings.getStringProperty(WAYPOINTS, "");
-
+        
         // Return empty Vector if we don't have any waypoints
         if(encodedWaypoints.length()==0) {
             return new Vector();
@@ -135,25 +135,48 @@ public class RecorderSettings {
             
         }
         m_settings.setStringProperty(WAYPOINTS, waypointString);
-        try {
-            m_settings.save(true);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        saveSettings();
     }
     
     /** Get recording interval */
     public int getRecordingInterval() {
         int defaultInterval = 10; // Mark default as 10 seconds
-        int recordingInterval = m_settings.getIntProperty( 
-                RECORDING_INTERVAL, 
+        int recordingInterval = m_settings.getIntProperty(
+                RECORDING_INTERVAL,
                 defaultInterval );
-        return recordingInterval;        
+        return recordingInterval;
     }
     
     /** Set recording interval in seconds */
     public void setRecordingInterval(int interval) {
         m_settings.setIntProperty( RECORDING_INTERVAL, interval);
+        saveSettings();
+    }
+            
+    /** Get display setting */
+    public boolean getDisplayValue(String displayItem) {
+        return m_settings.getBooleanProperty(displayItem, true);
+    }
+    
+    /**Set display setting */
+    public void setDisplayValue(String displayItem, boolean value) {
+        m_settings.setBooleanProperty(displayItem, value);
+        saveSettings();
+    }
+    
+    /** Do we use kilometers as units? */
+    public boolean getUnitsAsKilometers() {
+        return m_settings.getBooleanProperty(UNITS, true);
+    }
+    
+    /** Set units */
+    public void setUnitsAsKilometers(boolean value) {
+        m_settings.setBooleanProperty(UNITS, value);
+        saveSettings();
+    }
+    
+    /** Save settings */
+    private void saveSettings() {
         try{
             m_settings.save(true);
         } catch(Exception ex) {
