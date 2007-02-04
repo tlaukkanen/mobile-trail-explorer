@@ -99,13 +99,28 @@ public class DisplaySettingsForm extends Form implements CommandListener {
                 units,
                 null);
         this.append(unitGroup);
-        
+                        
         String[] displayItems = {"Coordinates", "Speed", "Heading", "Altitude"};
         displayGroup = new ChoiceGroup(
                 "Display the following", 
                 ChoiceGroup.MULTIPLE, 
                 displayItems,
                 null);
+        
+        RecorderSettings settings = controller.getSettings();
+        // Load settings
+        boolean useKilometers = settings.getUnitsAsKilometers();
+        unitGroup.setSelectedIndex(0,useKilometers);
+        
+        boolean showCoordinates = settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES);
+        displayGroup.setSelectedIndex(0, showCoordinates);
+        boolean showSpeed = settings.getDisplayValue(RecorderSettings.DISPLAY_SPEED);
+        displayGroup.setSelectedIndex(1, showSpeed);
+        boolean showHeading = settings.getDisplayValue(RecorderSettings.DISPLAY_HEADING);
+        displayGroup.setSelectedIndex(2, showHeading);
+        boolean showAltitude = settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE);
+        displayGroup.setSelectedIndex(3, showAltitude);        
+        
         this.append(displayGroup);
     }
     

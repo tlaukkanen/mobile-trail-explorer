@@ -31,14 +31,39 @@ public class GpsPositionParser {
     
     private static final String DELIMETER = ",";
     
+    private static double lastAltitude;
+    private static short satelliteCount;
+    
     /** Creates a new instance of GpsPositionParser */
     public GpsPositionParser() {
     }
     
+    /** Get satellite count */
+    public static short getSatelliteCount() {
+        return satelliteCount;
+    }
+    
+    /** Parse GPS position */
     public static GpsPosition parse(String record) {
+        if(record.startsWith("$GPGGA")==true) {
+            /** 
+             * Parse altitude information
+             * Example value:
+             * $GPGGA,170834,4124.8963,N,08151.6838,W,1,05,1.5,280.2,M,-34.0,M,,,*75
+             */
+            String[] values = StringUtil.split(record, DELIMETER);
+            short isFixed = Short.parseShort( values[ 6 ] );
+            if(isFixed>0) {
+                satelliteCount = Short.parseShort( values[ 7 ] );
+                lastAltitude = Double.parseDouble( values[9] );
+            }
+        }
         if(record.startsWith("$GPRMC")==true) {
-            //GpsPosition pos = new GpsPosition(record, "100",0);
-            // $GPRMC,041107.000,A,6131.2028,N,02356.8782,E,18.28,198.00,270906,,,A*5
+            /** 
+             * Parse coordinates, speed and heading information.
+             * Example value:
+             * $GPRMC,041107.000,A,6131.2028,N,02356.8782,E,18.28,198.00,270906,,,A*5
+             */
             
             String[] values = StringUtil.split(record, DELIMETER);
             
@@ -102,10 +127,12 @@ public class GpsPositionParser {
              }
             
             if(warning.equals("A")==true) {
+                
                 GpsPosition pos = new GpsPosition(
                         record, 
-                        longitude, lattitude, course, courseString,
-                        longitudeDouble, latitudeDouble, speed, groundSpeed);
+                        longitude, lattitude, (short)course,
+                        longitudeDouble, latitudeDouble, speed, 
+                        lastAltitude);
                 return pos;
             }
             

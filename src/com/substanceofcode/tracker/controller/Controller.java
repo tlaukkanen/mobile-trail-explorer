@@ -32,6 +32,7 @@ import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.tracker.view.AboutForm;
 import com.substanceofcode.tracker.view.DeviceList;
+import com.substanceofcode.tracker.view.DisplaySettingsForm;
 import com.substanceofcode.tracker.view.ExportSettingsForm;
 import com.substanceofcode.tracker.view.RecordingSettingsForm;
 import com.substanceofcode.tracker.view.SettingsList;
@@ -419,7 +420,7 @@ public class Controller {
     }
 
     /** Display display settings form */
-    public int showDisplaySettings() {
+    public void showDisplaySettings() {
         if( m_displaySettingsForm==null) {
             m_displaySettingsForm = new DisplaySettingsForm(this);
         }

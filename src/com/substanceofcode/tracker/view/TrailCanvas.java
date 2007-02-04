@@ -28,6 +28,7 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.ImageUtil;
 import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,7 +50,7 @@ import javax.microedition.lcdui.Image;
  * @author Tommi Laukkanen
  */
 public class TrailCanvas extends Canvas implements Runnable, CommandListener {
-
+    
     private Controller m_controller;
     private GpsPosition m_lastPosition;
     private Vector m_positionTrail;
@@ -100,7 +101,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         int backLightIndex = 0;
         int backLightLevel = 100;
         //DeviceControl.setLights(backLightIndex, backLightLevel);
-        */
+         */
     }
     
     /** Initialize commands */
@@ -167,9 +168,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             double lon = waypoint.getLongitude();
             CanvasPoint point = convertPosition(lat, lon);
             if(point!=null) {
-                g.drawString(waypoint.getName(), point.X, point.Y, 
+                g.drawString(waypoint.getName(), point.X, point.Y,
                         Graphics.BOTTOM|Graphics.HCENTER);
-            }           
+            }
             
         }
         
@@ -178,7 +179,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     
     /** Convert position to canvas point */
     private CanvasPoint convertPosition(double lat, double lon) {
-    
+        
         double latitude = lat;
         double longitude = lon;
         
@@ -187,60 +188,59 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         }
         
         double currentLatitude = m_lastPosition.getLatitude();
-        double currentLongitude = m_lastPosition.getLongitude();        
+        double currentLongitude = m_lastPosition.getLongitude();
         
         latitude -= currentLatitude;
         latitude *= m_verticalZoomFactor;
         int y = m_middle-(int)latitude;
-
+        
         longitude -= currentLongitude;
         longitude *= m_horizontalZoomFactor;
         int x = (int)longitude+m_center;
         
         CanvasPoint point = new CanvasPoint(x,y);
-        return point;        
+        return point;
     }
     
     /** Draw trail */
     private void drawTrail(Graphics g) {
         
         try {
-
+            
             // Exit if we don't have anything to draw
             if(m_lastPosition==null) {
                 return;
             }
-
+            
             int center = getWidth()/2;
             int middle = getHeight()/2;
-
+            
             double currentLatitude = m_lastPosition.getLatitude();
             double currentLongitude = m_lastPosition.getLongitude();
-
+            
             double lastLatitude = currentLatitude;
             double lastLongitude = currentLongitude;
-
+            
             int trailPositionCount = m_positionTrail.size();
             
             // Draw trail with red color
-            g.setColor(222,0,0); 
-            for(int positionIndex=trailPositionCount-1; 
-                positionIndex>=0; 
-                positionIndex--) {
-
+            g.setColor(222,0,0);
+            for(int positionIndex=trailPositionCount-1;
+            positionIndex>=0;
+            positionIndex--) {
+                
                 GpsPosition pos = (GpsPosition)m_positionTrail.elementAt(positionIndex);
-                //g.drawString("Pos: " + pos.getRawString(),1,100,Graphics.TOP|Graphics.LEFT );
-
+                
                 double lat = pos.getLatitude();
                 double lon = pos.getLongitude();
                 CanvasPoint point1 = convertPosition(lat, lon);
-
+                
                 CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
-
+                
                 g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
-
+                
                 lastLatitude = pos.getLatitude();
-                lastLongitude = pos.getLongitude();            
+                lastLongitude = pos.getLongitude();
             }
             
             // Draw red dot on current location
@@ -250,7 +250,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             g.setColor(255,0,0);
             g.drawString("ERR: " + ex.toString(),1,120,Graphics.TOP|Graphics.LEFT );
             
-            System.err.println("Exception occured while drawing trail: " + 
+            System.err.println("Exception occured while drawing trail: " +
                     ex.toString());
         }
     }
@@ -259,7 +259,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private void drawStatusBar(Graphics g) {
         int width = getWidth();
         int height = getHeight();
-
+        
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
         Font currentFont = g.getFont();
         int fontHeight = currentFont.getHeight();
@@ -272,51 +272,144 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         g.setColor(0,0,0);
         if(m_lastPosition!=null) {
             
-            g.drawString("LAT:", 1, fontHeight, Graphics.TOP|Graphics.LEFT);
-            g.drawString("LON:", 1, fontHeight*2, Graphics.TOP|Graphics.LEFT);
-            g.drawString("SPD:", 1, fontHeight*3, Graphics.TOP|Graphics.LEFT);
-            g.drawString("HEA:", 1, fontHeight*4, Graphics.TOP|Graphics.LEFT);            
-            
             int positionAdd = currentFont.stringWidth("LAN:O");
+            int displayRow = 1;
             
             RecorderSettings settings = m_controller.getSettings();
+            
+            /** Draw coordinates information */
             if(settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES)==true) {
-                double latitude = m_lastPosition.getLatitude();            
-                g.drawString(getDegreeString( latitude ),positionAdd,fontHeight,Graphics.TOP|Graphics.LEFT );
-
+                g.drawString(
+                        "LAT:", 1, fontHeight, Graphics.TOP|Graphics.LEFT);
+                g.drawString(
+                        "LON:", 1, fontHeight*2, Graphics.TOP|Graphics.LEFT);
+                
+                double latitude = m_lastPosition.getLatitude();
+                g.drawString(
+                        getDegreeString( latitude ),
+                        positionAdd,
+                        fontHeight,
+                        Graphics.TOP|Graphics.LEFT );
+                
                 double longitude = m_lastPosition.getLongitude();
-                g.drawString(getDegreeString( longitude ),positionAdd,fontHeight*2,Graphics.TOP|Graphics.LEFT );
+                g.drawString(
+                        getDegreeString( longitude ),
+                        positionAdd,
+                        fontHeight*2,
+                        Graphics.TOP|Graphics.LEFT );
+                
+                displayRow += 2;
             }
-
-            int speed = (int) m_lastPosition.getSpeed();
-            String speedString = m_lastPosition.getSpeedString(); 
-            String units = " km/h ";
-            g.drawString( speed + units, positionAdd, fontHeight*3, Graphics.TOP|Graphics.LEFT );
-
-            String heading = m_lastPosition.getHeadingString();
-            String courseString = m_lastPosition.getCourseString();
-            g.drawString( heading , positionAdd, fontHeight*4, Graphics.TOP|Graphics.LEFT );
+            
+            /** Draw speed information */
+            if(settings.getDisplayValue(RecorderSettings.DISPLAY_SPEED)==true) {
+                int speed;
+                String units;
+                if(settings.getUnitsAsKilometers() == false) {
+                    speed = (int) UnitConverter.convertSpeed(
+                            m_lastPosition.getSpeed(),
+                            UnitConverter.KILOMETERS_PER_HOUR,
+                            UnitConverter.MILES_PER_HOUR);
+                    units = " mph";
+                } else {
+                    speed = (int) m_lastPosition.getSpeed();
+                    units = " km/h";
+                }
+                g.drawString(
+                        "SPD:",
+                        1,
+                        fontHeight*displayRow,
+                        Graphics.TOP|Graphics.LEFT);
+                g.drawString(
+                        speed + units,
+                        positionAdd,
+                        fontHeight*displayRow,
+                        Graphics.TOP|Graphics.LEFT );
+                displayRow++;
+            }
+            
+            /** Draw heading information */
+            if(settings.getDisplayValue(RecorderSettings.DISPLAY_HEADING)==true) {
+                String heading = m_lastPosition.getHeadingString();
+                g.drawString(
+                        "HEA:",
+                        1,
+                        fontHeight*displayRow,
+                        Graphics.TOP|Graphics.LEFT);
+                g.drawString(
+                        heading,
+                        positionAdd,
+                        fontHeight*displayRow,
+                        Graphics.TOP|Graphics.LEFT );
+                displayRow++;
+            }
+            
+                        /** Draw heading information */
+            if(settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE)==true) {
+                String altitude;
+                String units;
+                double altitudeInMeters = m_lastPosition.getAltitude();
+                if( settings.getUnitsAsKilometers()==false) {
+                    /** Altitude in feets */
+                    double altitudeInFeets = UnitConverter.convertLength( 
+                            altitudeInMeters,
+                            UnitConverter.METERS,
+                            UnitConverter.FEETS); 
+                    altitude = String.valueOf( altitudeInFeets );
+                } else {
+                    /** Altitude in meters */
+                    altitude = String.valueOf( altitudeInMeters );
+                            
+                }
+                g.drawString(
+                        "ALT:",
+                        1,
+                        fontHeight*displayRow,
+                        Graphics.TOP|Graphics.LEFT);
+                g.drawString(
+                        altitude,
+                        positionAdd,
+                        fontHeight*displayRow,
+                        Graphics.TOP|Graphics.LEFT );
+                displayRow++;
+            }
             
             Date now = Calendar.getInstance().getTime();
             long secondsSinceLastPosition;
             secondsSinceLastPosition = (now.getTime() - m_lastPosition.getDate().getTime())/1000;
             if(secondsSinceLastPosition>5) {
-                g.drawString("Last refresh " + secondsSinceLastPosition + " second(s) ago.",1,fontHeight*3,Graphics.TOP|Graphics.LEFT );
+                g.drawString(
+                        "Last refresh " + secondsSinceLastPosition +
+                        " second(s) ago.",
+                        1,
+                        height - (fontHeight*4 + 2),
+                        Graphics.TOP|Graphics.LEFT );
             }
             
         } else {
-            g.drawString("Position data is unavailable. " + m_counter,1,fontHeight,Graphics.TOP|Graphics.LEFT );
+            g.drawString(
+                    "Position data is unavailable. " + m_counter,
+                    1,
+                    fontHeight,
+                    Graphics.TOP|Graphics.LEFT );
         }
         
         /** Draw error texts */
         g.setColor(255,0,0);
         if(m_error!=null){
-            g.drawString("" + m_error,1,40,Graphics.TOP|Graphics.LEFT );
+            g.drawString(
+                    "" + m_error,
+                    1,
+                    height - (fontHeight*3 + 2),
+                    Graphics.TOP|Graphics.LEFT );
         }
         if(m_controller.getError()!=null){
-            g.drawString("" + m_controller.getError(),1,60,Graphics.TOP|Graphics.LEFT );
+            g.drawString("" + m_controller.getError(),
+                    1,
+                    height - (fontHeight*2 + 2),
+                    Graphics.TOP|Graphics.LEFT );
         }
-
+        
         /** Draw recorded position count */
         String posCount = "Positions recorded: " + m_controller.getRecordedPositionCount();
         g.drawString(posCount, 1, height - (fontHeight + 2), Graphics.TOP|Graphics.LEFT);
@@ -324,25 +417,25 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         /** Draw GPS address */
         /*
          String gpsUrl = m_controller.getGpsUrl();
-        g.drawString("GPS: " + gpsUrl, 
-                1, 
+        g.drawString("GPS: " + gpsUrl,
+                1,
                 height - (fontHeight + 2),
                 Graphics.TOP|Graphics.LEFT );
-        */
+         */
     }
     
     /** Get degrees in string format (with five decimals) */
     private String getDegreeString(double latitude) {
         int latitudeInteger = (int)latitude;
         long latitudeDecimals = (int)((latitude-latitudeInteger)*100000);
-
+        
         String latDecString = String.valueOf(latitudeDecimals);
         while(latDecString.length()<5) {
             latDecString = "0" + latDecString;
         }
         return String.valueOf(latitudeInteger) + "." + latDecString;
     }
-
+    
     /** Thread for getting current position */
     public void run() {
         GpsPosition lastRecordedPosition = null;
@@ -372,7 +465,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             } catch(Exception ex) {
                 System.err.println("Error in TrailCanvas.run: " + ex.toString());
                 m_error = ex.toString();
-            }            
+            }
         }
         
     }
@@ -393,25 +486,27 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 m_horizontalZoomFactor /= 2;
                 break;
                 
+                /** We could handle arrow key presses here for panning the view */
+                
             default:
-        }        
+        }
         
         int gameKey = getGameAction(keyCode);
     }
-
+    
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
         if( command == m_startStopCommand ) {
             m_controller.startStop();
         }
         if( command == m_markWaypointCommand ) {
-    
+            
             String latString = "";
             String lonString = "";
             if(m_lastPosition!=null) {
                 double lat = m_lastPosition.getLatitude();
                 latString = getDegreeString(lat);
-
+                
                 double lon = m_lastPosition.getLongitude();
                 lonString = getDegreeString(lon);
             }
