@@ -38,27 +38,40 @@ import javax.microedition.io.file.FileConnection;
  */
 public class Track {
     
-    private Vector m_trailPoints;
+    private Vector trailPoints;
+    private Vector markers;
     
     /** Creates a new instance of Track */
     public Track() {
-        m_trailPoints = new Vector();
+        trailPoints = new Vector();
+        markers = new Vector();
     }
     
     /** Add new trail point */
     public void addPosition(GpsPosition pos) {
-        m_trailPoints.addElement( pos );
+        trailPoints.addElement( pos );
+    }
+        
+    /** Add new marker */
+    public void addMarker(GpsPosition marker) {
+        markers.addElement( marker );
     }
     
     /** Get position count */
     public int getPositionCount() {
-        int positionCount = m_trailPoints.size();
+        int positionCount = trailPoints.size();
         return positionCount;
+    }
+    
+    /** Get marker count */
+    public int getMarkerCount() {
+        int markerCount = markers.size();
+        return markerCount;
     }
     
     /** Clear */
     public void clear() {
-        m_trailPoints.removeAllElements();
+        trailPoints.removeAllElements();
     }
     
     /** Convert to string */
@@ -83,7 +96,7 @@ public class Track {
         trackString += "<extrude>0</extrude>\r\n";
         trackString += "<altitudeMode>clampedToGround</altitudeMode>\r\n";
         trackString += "<coordinates>\r\n";
-        Enumeration trackEnum = m_trailPoints.elements();
+        Enumeration trackEnum = trailPoints.elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
             trackString += String.valueOf(pos.getLongitude()) + "," +
@@ -96,6 +109,8 @@ public class Track {
         
         trackString += generateWaypointData( waypoints );
         
+        trackString += generateMarkers( markers );
+        
         trackString += "</Folder>\r\n";
         trackString += "</kml>\r\n";
         
@@ -105,8 +120,11 @@ public class Track {
     private String generateWaypointData(Vector waypoints) {
         String waypointString = "";
         Enumeration waypointEnum = waypoints.elements();
+        waypointString += "<Folder>\r\n";
+        waypointString += "<name>Waypoints</name>\r\n";
         while(waypointEnum.hasMoreElements()==true) {
             Waypoint wp = (Waypoint)waypointEnum.nextElement();
+
             waypointString += "<Placemark>\r\n";
             waypointString += "<name>" + wp.getName() + "</name>\r\n";
             waypointString += "<Point><coordinates>\r\n";
@@ -115,6 +133,7 @@ public class Track {
             waypointString += "</coordinates></Point>\r\n";
             waypointString += "</Placemark>\r\n";        
         }
+        waypointString += "</Folder>\r\n";
         return waypointString;
     }
     
@@ -164,6 +183,29 @@ public class Track {
         out.close();
         connection.close();
         
+    }
+
+    private String generateMarkers(Vector markers) {
+        String markerString = "";
+        Enumeration markerEnum = markers.elements();
+        markerString += "<Folder>\r\n";
+        markerString += "<name>Markers</name>\r\n";
+        while(markerEnum.hasMoreElements()==true) {
+            
+            GpsPosition pos = (GpsPosition)markerEnum.nextElement();            
+            String units = " km/h";
+            
+            String name = String.valueOf( pos.getSpeed() ) + units;
+            markerString += "<Placemark>\r\n";
+            markerString += "<name>" + name + "</name>\r\n";
+            markerString += "<Point><coordinates>\r\n";
+            markerString += String.valueOf(pos.getLongitude()) + "," +
+                    String.valueOf(pos.getLatitude()) + ",0\r\n";
+            markerString += "</coordinates></Point>\r\n";
+            markerString += "</Placemark>\r\n";        
+        }
+        markerString += "</Folder>\r\n";
+        return markerString;
     }
     
 }

@@ -356,10 +356,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                             UnitConverter.METERS,
                             UnitConverter.FEETS); 
                     altitude = String.valueOf( altitudeInFeets );
+                    units = " f";
                 } else {
                     /** Altitude in meters */
                     altitude = String.valueOf( altitudeInMeters );
-                            
+                    units = " m";                            
                 }
                 g.drawString(
                         "ALT:",
@@ -367,7 +368,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                         fontHeight*displayRow,
                         Graphics.TOP|Graphics.LEFT);
                 g.drawString(
-                        altitude,
+                        altitude + units,
                         positionAdd,
                         fontHeight*displayRow,
                         Graphics.TOP|Graphics.LEFT );
@@ -411,7 +412,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         }
         
         /** Draw recorded position count */
-        String posCount = "Positions recorded: " + m_controller.getRecordedPositionCount();
+        int positionCount = m_controller.getRecordedPositionCount();
+        int markerCount = m_controller.getRecordedMarkerCount();
+        String posCount = "Positions recorded: " + positionCount + "/" + markerCount;
         g.drawString(posCount, 1, height - (fontHeight + 2), Graphics.TOP|Graphics.LEFT);
         
         /** Draw GPS address */

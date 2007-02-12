@@ -274,6 +274,16 @@ public class Controller {
         }
     }
     
+    public int getRecordedMarkerCount() {
+        if(m_recorder!=null) {
+            Track recordedTrack = m_recorder.getTrack();
+            int markerCount = recordedTrack.getMarkerCount();
+            return markerCount;
+        } else {
+            return 0;
+        }
+    }
+    
     public synchronized GpsPosition getPosition() {
         if(m_gpsDevice==null) {
             return null;

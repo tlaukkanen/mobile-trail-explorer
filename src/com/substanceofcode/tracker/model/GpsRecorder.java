@@ -36,12 +36,15 @@ public class GpsRecorder implements Runnable{
     private boolean m_recording;
     private Track m_recordedTrack;
     private int m_intervalSeconds;
+    private int m_intervalMarkerSeconds;
     private Controller m_controller;
     
     /** Creates a new instance of GpsRecorder */
     public GpsRecorder(Controller controller) {
-        m_controller = controller;
-        m_intervalSeconds = 10;
+        m_controller = controller;           
+        RecorderSettings settings = controller.getSettings();
+        m_intervalSeconds = settings.getRecordingInterval();
+        m_intervalMarkerSeconds = settings.getRecordingMarkerInterval();
         m_recordedTrack = new Track();
         m_recording = false;
         m_recorderThread = new Thread(this);
@@ -52,11 +55,15 @@ public class GpsRecorder implements Runnable{
     public void setInterval(int seconds) {
         m_intervalSeconds = seconds;
     }
+    
+    /** Set interval for marker recording */
+    public void setIntervalForMarkers(int seconds) {
+        m_intervalMarkerSeconds = seconds;
+    }
            
     /** Check status */
     public boolean isRecording() {
         return m_recording;
-
     }
     
     /** Clear track */
@@ -87,13 +94,14 @@ public class GpsRecorder implements Runnable{
     /** Main recording thread */
     public void run() {
         GpsPosition lastRecordedPosition = null;
+        GpsPosition lastRecordedMarker = null;
+        int secondsFromLastTrailPoint = 0;
+        int secondsFromLastMarker = 0;
         while(true) {
-            System.out.println("Recorder thread...");
             try{
                 Thread.sleep(1000 * m_intervalSeconds);
-                if(m_recording==true) {
-                    System.out.println("-Recording-");
-                    
+                if(m_recording==true && secondsFromLastTrailPoint>=m_intervalSeconds) {                    
+                    secondsFromLastMarker = 0;
                     GpsPosition currentPosition = m_controller.getPosition();
 
                     /**
@@ -113,8 +121,32 @@ public class GpsRecorder implements Runnable{
                         m_recordedTrack.addPosition(currentPosition);
                         lastRecordedPosition = currentPosition;
                     }
-                    
                 }
+                if(m_recording==true && secondsFromLastMarker>=m_intervalMarkerSeconds) {
+                    secondsFromLastTrailPoint = 0;
+                    
+                    GpsPosition currentPosition = m_controller.getPosition();
+
+                    /**
+                     * Check if user haven't moved 
+                     * -> don't record the same position
+                     */
+                    boolean stopped = false;
+                    if( lastRecordedMarker!=null && currentPosition!=null ) {
+                        stopped = currentPosition.equals( lastRecordedMarker );
+                    }
+                   
+                    /** 
+                     * Record current position if user have moved or this is
+                     * a first recorded position.
+                     */
+                    if( currentPosition!=null && stopped==false) {
+                        m_recordedTrack.addMarker(currentPosition);
+                        lastRecordedMarker = currentPosition;
+                    }
+                }
+                secondsFromLastTrailPoint++;
+                secondsFromLastMarker++;
             } catch (Exception ex) {
                 System.err.println("Error in recorder thread: " + ex.toString());
             }

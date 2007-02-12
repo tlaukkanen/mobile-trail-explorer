@@ -44,8 +44,11 @@ public class RecorderSettings {
     private static final String GPS_DEVICE_STRING = "gps-device";
     private static final String EXPORT_FOLDER = "export-folder";
     private static final String WAYPOINTS = "waypoints";
-    private static final String RECORDING_INTERVAL = "recording-interval";
     private static final String UNITS = "units";
+    
+    /** Recording setting keys */
+    private static final String RECORDING_INTERVAL = "recording-interval";
+    private static final String RECORDING_MARKER_INTERVAL = "recording-marker-interval";
     
     /** Display setting keys */
     public static final String DISPLAY_COORDINATES = "display-coordinates";
@@ -151,6 +154,16 @@ public class RecorderSettings {
     public void setRecordingInterval(int interval) {
         m_settings.setIntProperty( RECORDING_INTERVAL, interval);
         saveSettings();
+    }
+    
+    /** Get recording interval for markers */
+    public int getRecordingMarkerInterval() {
+        return m_settings.getIntProperty(RECORDING_MARKER_INTERVAL, 60);
+    }
+    
+    /** Set recording interval for markers */
+    public void setRecordingMarkerInterval(int interval) {
+        m_settings.setIntProperty(RECORDING_MARKER_INTERVAL, interval);
     }
             
     /** Get display setting */
