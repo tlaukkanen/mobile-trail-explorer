@@ -158,7 +158,7 @@ public class RecorderSettings {
     
     /** Get recording interval for markers */
     public int getRecordingMarkerInterval() {
-        return m_settings.getIntProperty(RECORDING_MARKER_INTERVAL, 60);
+        return m_settings.getIntProperty(RECORDING_MARKER_INTERVAL, 10);
     }
     
     /** Set recording interval for markers */

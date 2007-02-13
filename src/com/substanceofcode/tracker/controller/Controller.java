@@ -436,5 +436,11 @@ public class Controller {
         }
         m_display.setCurrent(m_displaySettingsForm);
     }
+ 
+    /** Set recording marker step */
+    public void saveRecordingMarkerStep(int newStep) {
+        m_settings.setRecordingMarkerInterval( newStep );
+        m_recorder.setIntervalForMarkers(newStep);
+    }
    
 }

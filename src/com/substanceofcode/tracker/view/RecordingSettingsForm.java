@@ -31,8 +31,9 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
 /**
+ * Recording settings form. Includes settings for recording intervals.
  *
- * @author Tommi
+ * @author Tommi Laukkanen
  */
 public class RecordingSettingsForm extends Form implements CommandListener {
     
@@ -42,6 +43,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     private Command m_cancelCommand;
     
     private TextField m_intervalField;
+    private TextField m_markerStepField;
     
     /** Creates a new instance of RecordingSettingsForm */
     public RecordingSettingsForm(Controller controller) {
@@ -50,7 +52,6 @@ public class RecordingSettingsForm extends Form implements CommandListener {
         
         initializeControls();
         initializeCommands();
-
         
         this.setCommandListener( this );
     }
@@ -61,14 +62,21 @@ public class RecordingSettingsForm extends Form implements CommandListener {
         if(command == m_okCommand) {
             // Save new interval
             String intervalText = m_intervalField.getString();
+            String markerStepText = m_markerStepField.getString();
             int newInterval;
+            int newStep;
             try{
                 newInterval = Integer.valueOf( intervalText ).intValue();
+                newStep = Integer.valueOf( markerStepText ).intValue();
             }catch(Exception ex) {
                 ex.printStackTrace();
                 newInterval = 10;
+                newStep = 5;
             }
-            m_controller.saveRecordingInterval(newInterval);
+            RecorderSettings settings = m_controller.getSettings();
+            m_controller.saveRecordingInterval( newInterval );
+            m_controller.saveRecordingMarkerStep( newStep );
+            
             m_controller.showSettings();
         } else {
             // Don't save the new interval
@@ -96,6 +104,13 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 6,
                 TextField.NUMERIC);
         this.append(m_intervalField);
+        
+        int markerStep = settings.getRecordingMarkerInterval();
+        m_markerStepField = new TextField("Create marker every Nth position",
+                String.valueOf(markerStep),
+                6,
+                TextField.NUMERIC);
+        this.append(m_markerStepField);
     }
     
 }
