@@ -41,7 +41,7 @@ public class GpsRecorder implements Runnable{
     
     /** Creates a new instance of GpsRecorder */
     public GpsRecorder(Controller controller) {
-        m_controller = controller;           
+        m_controller = controller;
         RecorderSettings settings = controller.getSettings();
         m_intervalSeconds = settings.getRecordingInterval();
         m_intervalMarkerStep = settings.getRecordingMarkerInterval();
@@ -60,7 +60,7 @@ public class GpsRecorder implements Runnable{
     public void setIntervalForMarkers(int intervalStep) {
         m_intervalMarkerStep = intervalStep;
     }
-           
+    
     /** Check status */
     public boolean isRecording() {
         return m_recording;
@@ -90,7 +90,7 @@ public class GpsRecorder implements Runnable{
     public void setRecording(boolean active) {
         m_recording = active;
     }
-
+    
     /** Main recording thread */
     public void run() {
         GpsPosition lastRecordedPosition = null;
@@ -99,35 +99,35 @@ public class GpsRecorder implements Runnable{
         int recordedCount = 0;
         while(true) {
             try{
-                Thread.sleep(1000 * m_intervalSeconds);
-                if(m_recording==true && secondsFromLastTrailPoint>=m_intervalSeconds) {                    
+                Thread.sleep(1000);
+                if(m_recording==true && secondsFromLastTrailPoint>=m_intervalSeconds) {
                     secondsFromLastTrailPoint = 0;
                     GpsPosition currentPosition = m_controller.getPosition();
-
+                    
                     /**
-                     * Check if user haven't moved 
+                     * Check if user haven't moved
                      * -> don't record the same position
                      */
                     boolean stopped = false;
                     if( lastRecordedPosition!=null && currentPosition!=null ) {
                         stopped = currentPosition.equals( lastRecordedPosition );
-                    } 
-                   
-                    /** 
+                    }
+                    
+                    /**
                      * Record current position if user have moved or this is
                      * a first recorded position.
                      */
                     if( currentPosition!=null && stopped==false) {
                         m_recordedTrack.addPosition(currentPosition);
-                        if(     m_intervalMarkerStep > 0 && 
+                        if(     m_intervalMarkerStep > 0 &&
                                 recordedCount % m_intervalMarkerStep == 0 ) {
                             m_recordedTrack.addMarker(currentPosition);
                         }
                         lastRecordedPosition = currentPosition;
                         recordedCount++;
                     }
-                }                
-                secondsFromLastTrailPoint++;                
+                }
+                secondsFromLastTrailPoint++;
             } catch (Exception ex) {
                 System.err.println("Error in recorder thread: " + ex.toString());
             }

@@ -63,4 +63,16 @@ public class StringUtil {
         return result;
     }    
     
+    /** Get degrees in string format (with five decimals) */
+    public static String valueOf(double value, int decimalCount) {
+        int integerValue = (int)value;
+        long decimals = (int)((value-integerValue)*10*decimalCount);
+        
+        String valueString = String.valueOf(decimals);
+        while(valueString.length()<decimalCount) {
+            valueString = "0" + valueString;
+        }
+        return String.valueOf(integerValue) + "." + valueString;
+    }
+    
 }

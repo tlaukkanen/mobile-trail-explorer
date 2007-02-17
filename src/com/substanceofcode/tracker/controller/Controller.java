@@ -197,8 +197,9 @@ public class Controller {
             m_recorder.stopRecording();
             Track recordedTrack = m_recorder.getTrack();
             try{
+                boolean useKilometers = m_settings.getUnitsAsKilometers();
                 String exportFolder = m_settings.getExportFolder();
-                recordedTrack.writeToFile( exportFolder, m_waypoints );
+                recordedTrack.writeToFile( exportFolder, m_waypoints, useKilometers );
             }catch(Exception ex) {
                 setError(ex.toString());
                 Alert saveAlert = new Alert("Error");

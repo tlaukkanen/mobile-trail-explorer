@@ -28,6 +28,7 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.ImageUtil;
 import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.tracker.model.StringUtil;
 import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Calendar;
@@ -355,11 +356,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                             altitudeInMeters,
                             UnitConverter.METERS,
                             UnitConverter.FEETS); 
-                    altitude = String.valueOf( altitudeInFeets );
+                    altitude = StringUtil.valueOf( altitudeInFeets, 2 );
                     units = " f";
                 } else {
                     /** Altitude in meters */
-                    altitude = String.valueOf( altitudeInMeters );
+                    altitude = StringUtil.valueOf( altitudeInMeters, 2 );
                     units = " m";                            
                 }
                 g.drawString(
