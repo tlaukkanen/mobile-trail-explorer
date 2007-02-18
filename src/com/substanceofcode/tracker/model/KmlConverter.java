@@ -32,11 +32,11 @@ import java.util.Vector;
  */
 public class KmlConverter implements TrackConverter {
     
-    private boolean useKilometers;
+    private boolean m_useKilometers;
     
     /** Creates a new instance of KmlConverter */
     public KmlConverter(boolean useKilometers) {
-        useKilometers = true;
+        m_useKilometers = true;
     }
 
     /** Convert track to Google Eart format (KML) */
@@ -128,7 +128,7 @@ public class KmlConverter implements TrackConverter {
             GpsPosition pos = (GpsPosition)markerEnum.nextElement();      
             String units;
             String speed;
-            if( useKilometers==true ) {
+            if( m_useKilometers==true ) {
                 units = " km/h";
                 speed = String.valueOf(pos.getSpeed());
             } else {
@@ -142,7 +142,7 @@ public class KmlConverter implements TrackConverter {
             
             String name = "";
             String timeStamp = DateUtil.convertToTimeStamp( pos.getDate() );
-            name = "timeStamp, " + speed + units;
+            name = timeStamp + ", " + speed + units;
             markerString += "<Placemark>\r\n";
             markerString += "<name>" + name + "</name>\r\n";
             markerString += "<Point><coordinates>\r\n";
