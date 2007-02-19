@@ -131,6 +131,24 @@ public class Track {
     public Vector getMarkers() {
         return markers;
     }
+
+    /** Get the first position */
+    GpsPosition getStartPosition() {
+        if(trailPoints.size()>0) {
+            return (GpsPosition)trailPoints.firstElement();
+        } else {
+            return null;
+        }
+    }
+
+    /** Get the last position */
+    GpsPosition getEndPosition() {
+        if(trailPoints.size()>0) {
+            return (GpsPosition)trailPoints.lastElement();
+        } else {
+            return null;
+        }
+    }
   
     
 }

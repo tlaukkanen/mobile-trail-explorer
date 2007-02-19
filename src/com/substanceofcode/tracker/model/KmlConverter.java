@@ -57,6 +57,31 @@ public class KmlConverter implements TrackConverter {
             Vector waypoints) {
         String trackString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";
         trackString += "<kml xmlns=\"http://earth.google.com/kml/2.0\">\r\n";
+        
+        /** Define styles */
+        trackString += "<Style id=\"startpoint\">\r\n";
+        trackString += "<IconStyle>\r\n";
+        trackString += "<Icon>\r\n";
+        trackString += "<href>http://maps.google.com/mapfiles/kml/pal5/icon18l.png</href>\r\n";
+        trackString += "</Icon>\r\n";
+        trackString += "</IconStyle>\r\n";
+        trackString += "</Style>\r\n";
+        trackString += "<Style id=\"endpoint\">\r\n";
+        trackString += "<IconStyle>\r\n";
+        trackString += "<Icon>\r\n";
+        trackString += "<href>http://maps.google.com/mapfiles/kml/pal5/icon52l.png</href>\r\n";
+        trackString += "</Icon>\r\n";
+        trackString += "</IconStyle>\r\n";
+        trackString += "</Style>\r\n";
+        
+        trackString += "<Style id=\"marker\">\r\n";
+	trackString += "<IconStyle>\r\n";
+	trackString += "<Icon>\r\n";
+	trackString += "<href>http://maps.google.com/mapfiles/kml/pal3/icon61.png</href>\r\n";
+        trackString += "</Icon>\r\n";
+	trackString += "</IconStyle>\r\n";
+	trackString += "</Style>\r\n";
+        
         trackString += "<Folder>\r\n";
         trackString += "<name>" + dateStamp + "</name>\r\n";
 	trackString += "<Style id=\"style\">\r\n";
@@ -89,6 +114,8 @@ public class KmlConverter implements TrackConverter {
         trackString += generateWaypointData( waypoints );
         
         trackString += generateMarkers( track.getMarkers() );
+        
+        trackString += generateEndpoints( track );
         
         trackString += "</Folder>\r\n";
         trackString += "</kml>\r\n";
@@ -145,6 +172,7 @@ public class KmlConverter implements TrackConverter {
             name = timeStamp + ", " + speed + units;
             markerString += "<Placemark>\r\n";
             markerString += "<name>" + name + "</name>\r\n";
+            markerString += "<styleUrl>#marker</styleUrl>\r\n";
             markerString += "<Point><coordinates>\r\n";
             markerString += String.valueOf(pos.getLongitude()) + "," +
                     String.valueOf(pos.getLatitude()) + ",0\r\n";
@@ -153,6 +181,37 @@ public class KmlConverter implements TrackConverter {
         }
         markerString += "</Folder>\r\n";
         return markerString;
+    }
+
+    private String generateEndpoints(Track track) {
+            String markerString = "";
+        
+            // Start position
+            String name = "";
+            GpsPosition startPosition = track.getStartPosition();            
+            String timeStamp = DateUtil.convertToTimeStamp( startPosition.getDate() );
+            name = timeStamp;
+            markerString += "<Placemark>\r\n";
+            markerString += "<name>" + name + "</name>\r\n";
+            markerString += "<styleUrl>#startpoint</styleUrl>\r\n";
+            markerString += "<Point><coordinates>\r\n";
+            markerString += String.valueOf(startPosition.getLongitude()) + "," +
+                    String.valueOf(startPosition.getLatitude()) + ",0\r\n";
+            markerString += "</coordinates></Point>\r\n";
+            markerString += "</Placemark>\r\n";        
+
+            // End position
+            GpsPosition endPosition = track.getEndPosition();
+            timeStamp = DateUtil.convertToTimeStamp( endPosition.getDate() );
+            name = timeStamp;
+            markerString += "<Placemark>\r\n";
+            markerString += "<name>" + name + "</name>\r\n";
+            markerString += "<styleUrl>#endpoint</styleUrl>\r\n";
+            markerString += "<Point><coordinates>\r\n";
+            markerString += String.valueOf(endPosition.getLongitude()) + "," +
+                    String.valueOf(endPosition.getLatitude()) + ",0\r\n";
+            markerString += "</coordinates></Point>\r\n";
+            markerString += "</Placemark>\r\n";        
     }
     
 }

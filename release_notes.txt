@@ -1,0 +1,13 @@
+Mobile Trail Explorer
+
+Copyright (c) 2006-2007 Tommi Laukkanen
+http://www.substanceofcode.com
+
+Release Notes:
+
+v1.3
++ Display speed
++ Display altitude
++ Display heading
++ Record markers every Nth recorded position containing time stamp and speed
+
