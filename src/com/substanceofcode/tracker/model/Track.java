@@ -78,7 +78,8 @@ public class Track {
     public void writeToFile(
             String folder, 
             Vector waypoints,
-            boolean useKilometers) 
+            boolean useKilometers,
+            int format) 
             throws Exception {
                 
         String dateStamp = DateUtil.getCurrentDateStamp();
@@ -107,8 +108,12 @@ public class Track {
             throw new Exception("writeToFile: Open output stream: " + ex.toString());
         }
         PrintStream output = new PrintStream( out );
-        
-        TrackConverter converter = new KmlConverter( useKilometers );
+        TrackConverter converter = null;
+        if( format==RecorderSettings.EXPORT_FORMAT_KML) {
+            converter = new KmlConverter( useKilometers );
+        } else if( format==RecorderSettings.EXPORT_FORMAT_GPX) {
+            converter = new GpxConverter();
+        }
         String exportData = converter.convert(
                 this, 
                 waypoints,

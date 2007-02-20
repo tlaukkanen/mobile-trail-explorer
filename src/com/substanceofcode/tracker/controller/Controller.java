@@ -199,7 +199,12 @@ public class Controller {
             try{
                 boolean useKilometers = m_settings.getUnitsAsKilometers();
                 String exportFolder = m_settings.getExportFolder();
-                recordedTrack.writeToFile( exportFolder, m_waypoints, useKilometers );
+                int exportFormat = m_settings.getExportFormat();
+                recordedTrack.writeToFile( 
+                        exportFolder, 
+                        m_waypoints, 
+                        useKilometers,
+                        exportFormat );
             }catch(Exception ex) {
                 setError(ex.toString());
                 Alert saveAlert = new Alert("Error");

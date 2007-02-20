@@ -42,9 +42,14 @@ public class RecorderSettings {
     private static Settings m_settings;
     
     private static final String GPS_DEVICE_STRING = "gps-device";
-    private static final String EXPORT_FOLDER = "export-folder";
     private static final String WAYPOINTS = "waypoints";
     private static final String UNITS = "units";
+    
+    /** Exporting setting keys */
+    private static final String EXPORT_FOLDER = "export-folder";
+    private static final String EXPORT_FORMAT = "export-format";
+    public static final int EXPORT_FORMAT_KML = 0;
+    public static final int EXPORT_FORMAT_GPX = 1;
     
     /** Recording setting keys */
     private static final String RECORDING_INTERVAL = "recording-interval";
@@ -185,6 +190,17 @@ public class RecorderSettings {
     /** Set units */
     public void setUnitsAsKilometers(boolean value) {
         m_settings.setBooleanProperty(UNITS, value);
+        saveSettings();
+    }
+    
+    /** Get export format */
+    public int getExportFormat() {
+        return m_settings.getIntProperty(EXPORT_FORMAT,0);
+    }
+    
+    /** Set export format */
+    public void setExportFormat( int format ) {
+        m_settings.setIntProperty(EXPORT_FORMAT, format);
         saveSettings();
     }
     

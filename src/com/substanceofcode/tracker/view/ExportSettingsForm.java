@@ -24,6 +24,7 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
+import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -43,6 +44,7 @@ public class ExportSettingsForm extends Form implements CommandListener {
     private Command m_cancelCommand;
 
     private TextField m_exportFolderField;
+    private ChoiceGroup m_exportFormatGroup;
     
     /** Creates a new instance of ExportSettingsForm */
     public ExportSettingsForm(Controller controller) {
@@ -64,10 +66,15 @@ public class ExportSettingsForm extends Form implements CommandListener {
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
         if(command==m_okCommand) {
-            // Save export settings
+            // Save export folder
             String exportFolder = m_exportFolderField.getString();
             RecorderSettings settings = m_controller.getSettings();
             settings.setExportFolder( exportFolder );
+            
+            // Save export format
+            int selectedFormat = m_exportFormatGroup.getSelectedIndex();
+            settings.setExportFormat( selectedFormat );
+            
             m_controller.showSettings();
         }
         
@@ -84,13 +91,29 @@ public class ExportSettingsForm extends Form implements CommandListener {
         if(settings==null) {
             return;
         }
+        
+        // Initialize export folder field
         String exportFolder = settings.getExportFolder();
         if(exportFolder==null) {
             exportFolder = "E:/";
         }
-        m_exportFolderField = new TextField("Export folder", exportFolder, 32, TextField.ANY);
+        m_exportFolderField = new TextField(
+                "Export folder", 
+                exportFolder, 
+                32, 
+                TextField.ANY);
         this.append(m_exportFolderField);
         
+        // Initialize format group
+        String[] formats = {"KML, Google Earth", "GPX, GPS eXchange Format"};
+        m_exportFormatGroup = new ChoiceGroup(
+                "Format",
+                ChoiceGroup.EXCLUSIVE, 
+                formats, 
+                null);
+        int selectedFormat = settings.getExportFormat();
+        m_exportFormatGroup.setSelectedIndex(selectedFormat, true);
+        this.append( m_exportFormatGroup );
     }
     
 }

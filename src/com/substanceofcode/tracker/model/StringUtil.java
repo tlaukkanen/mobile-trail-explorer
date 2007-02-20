@@ -35,15 +35,15 @@ public class StringUtil {
     private StringUtil() {
     }
     
-    /** 
-     * Split string into multiple strings 
+    /**
+     * Split string into multiple strings
      * @param original      Original string
      * @param separator     Separator string in original string
      * @return              Splitted string array
      */
     static public String[] split(String original, String separator) {
         Vector nodes = new Vector();
-
+        
         // Parse nodes into vector
         int index = original.indexOf(separator);
         while(index>=0) {
@@ -53,20 +53,21 @@ public class StringUtil {
         }
         // Get the last node
         nodes.addElement( original );
-
+        
         // Create splitted string array
         String[] result = new String[ nodes.size() ];
         if( nodes.size()>0 ) {
-            for(int loop=0; loop<nodes.size(); loop++)
-            result[loop] = (String)nodes.elementAt(loop);
+            for(int loop=0; loop<nodes.size(); loop++) {
+                result[loop] = (String)nodes.elementAt(loop);
+            }
         }
         return result;
-    }    
+    }
     
     /** Get degrees in string format (with five decimals) */
     public static String valueOf(double value, int decimalCount) {
         int integerValue = (int)value;
-        long decimals = (int)((value-integerValue)*10*decimalCount);
+        long decimals = (int)((value-integerValue)*MathUtil.pow(10,decimalCount));
         
         String valueString = String.valueOf(decimals);
         while(valueString.length()<decimalCount) {

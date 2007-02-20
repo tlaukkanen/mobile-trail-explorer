@@ -119,7 +119,8 @@ public class GpsRecorder implements Runnable{
                      */
                     if( currentPosition!=null && stopped==false) {
                         m_recordedTrack.addPosition(currentPosition);
-                        if(     m_intervalMarkerStep > 0 &&
+                        if( m_intervalMarkerStep > 0 &&
+                                recordedCount > 0 &&
                                 recordedCount % m_intervalMarkerStep == 0 ) {
                             m_recordedTrack.addMarker(currentPosition);
                         }
