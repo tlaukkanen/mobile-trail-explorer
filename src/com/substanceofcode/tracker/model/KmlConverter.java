@@ -82,6 +82,17 @@ public class KmlConverter implements TrackConverter {
         trackString += "</IconStyle>\r\n";
         trackString += "</Style>\r\n";
         
+        trackString += "<StyleMap id=\"ms_startpoint\">";
+        trackString += "<Pair>";
+        trackString += "<key>normal</key>";
+        trackString += "<styleUrl>#sn_icon29</styleUrl>";
+        trackString += "</Pair>";
+        trackString += "<Pair>";
+        trackString += "<key>highlight</key>";
+        trackString += "<styleUrl>#sh_icon29</styleUrl>";
+        trackString += "</Pair>";
+        trackString += "</StyleMap>";
+        
         trackString += "<Folder>\r\n";
         trackString += "<name>" + dateStamp + "</name>\r\n";
         trackString += "<Style id=\"style\">\r\n";
@@ -192,8 +203,8 @@ public class KmlConverter implements TrackConverter {
         String timeStamp = DateUtil.convertToTimeStamp( startPosition.getDate() );
         name = timeStamp;
         markerString += "<Placemark>\r\n";
-        markerString += "<name>" + name + "</name>\r\n";
-        markerString += "<styleUrl>#startpoint</styleUrl>\r\n";
+        markerString += "<name>Start " + name + "</name>\r\n";
+        markerString += "<styleUrl>#ms_startpoint</styleUrl>\r\n";
         markerString += "<Point><coordinates>\r\n";
         markerString += String.valueOf(startPosition.getLongitude()) + "," +
                 String.valueOf(startPosition.getLatitude()) + ",0\r\n";
@@ -205,7 +216,7 @@ public class KmlConverter implements TrackConverter {
         timeStamp = DateUtil.convertToTimeStamp( endPosition.getDate() );
         name = timeStamp;
         markerString += "<Placemark>\r\n";
-        markerString += "<name>" + name + "</name>\r\n";
+        markerString += "<name>End " + name + "</name>\r\n";
         markerString += "<styleUrl>#endpoint</styleUrl>\r\n";
         markerString += "<Point><coordinates>\r\n";
         markerString += String.valueOf(endPosition.getLongitude()) + "," +
