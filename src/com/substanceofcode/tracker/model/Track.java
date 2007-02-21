@@ -74,20 +74,37 @@ public class Track {
         trailPoints.removeAllElements();
     }
     
-    /** Write to file */
+    /** 
+     * Export track to file.
+     *
+     * @throws java.lang.Exception 
+     * @param folder        Folder where file is written.
+     * @param waypoints     Vector containing waypoints.
+     * @param useKilometers Use meters as units?
+     * @param exportFormat  Export format.
+     */
     public void writeToFile(
             String folder, 
             Vector waypoints,
             boolean useKilometers,
-            int format) 
+            int exportFormat) 
             throws Exception {
                 
-        String dateStamp = DateUtil.getCurrentDateStamp();
+        TrackConverter converter = null;
+        String extension = ".xml";
+        if( exportFormat==RecorderSettings.EXPORT_FORMAT_KML) {
+            converter = new KmlConverter( useKilometers );
+            extension = ".kml";
+        } else if( exportFormat==RecorderSettings.EXPORT_FORMAT_GPX) {
+            converter = new GpxConverter();
+            extension = ".gpx";
+        }
         
+        String dateStamp = DateUtil.getCurrentDateStamp();
         FileConnection connection;
         try {
             connection = (FileConnection)
-            Connector.open("file:///" + folder + "track_" + dateStamp + ".kml", Connector.WRITE );
+                    Connector.open("file:///" + folder + "track_" + dateStamp + extension, Connector.WRITE );
         } catch(Exception ex) {
             throw new Exception("writeToFile: Open Connector: " + ex.toString());
         }
@@ -108,12 +125,7 @@ public class Track {
             throw new Exception("writeToFile: Open output stream: " + ex.toString());
         }
         PrintStream output = new PrintStream( out );
-        TrackConverter converter = null;
-        if( format==RecorderSettings.EXPORT_FORMAT_KML) {
-            converter = new KmlConverter( useKilometers );
-        } else if( format==RecorderSettings.EXPORT_FORMAT_GPX) {
-            converter = new GpxConverter();
-        }
+
         String exportData = converter.convert(
                 this, 
                 waypoints,
