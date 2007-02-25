@@ -5,9 +5,9 @@ http://www.substanceofcode.com
 
 Release Notes:
 
-v1.3
+v1.3 (February 25th 2007)
 + Display speed
 + Display altitude
 + Display heading
 + Record markers every Nth recorded position containing time stamp and speed
-
++ Export trail in GPX format
