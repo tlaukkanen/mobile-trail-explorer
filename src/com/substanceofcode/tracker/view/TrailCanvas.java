@@ -345,7 +345,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 displayRow++;
             }
             
-                        /** Draw heading information */
+            /** Draw heading information */
             if(settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE)==true) {
                 String altitude;
                 String units;
@@ -357,7 +357,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                             UnitConverter.METERS,
                             UnitConverter.FEETS); 
                     altitude = StringUtil.valueOf( altitudeInFeets, 2 );
-                    units = " f";
+                    units = " ft";
                 } else {
                     /** Altitude in meters */
                     altitude = StringUtil.valueOf( altitudeInMeters, 2 );

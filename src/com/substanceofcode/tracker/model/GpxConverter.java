@@ -37,6 +37,7 @@ public class GpxConverter implements TrackConverter {
     public GpxConverter() {
     }
 
+    /** Convert trail to GPX format. */
     public String convert(
             Track track, 
             Vector waypoints, 
