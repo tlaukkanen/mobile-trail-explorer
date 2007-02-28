@@ -44,27 +44,23 @@ public class GpxConverter implements TrackConverter {
             boolean includeWaypoints, 
             boolean includeMarkers) {
         String gpx = "";
-        gpx += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>";
-        gpx += "<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" " +
-                "creator=\"MobileTrailExplorer\" version=\"1.1\" " +
-                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
-                "xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 " + 
-                "http://www.topografix.com/GPX/1/1/gpx.xsd\">";
-        
+        gpx += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\r\n";
+        gpx += "<gpx version=\"1.0\" creator=\"Mobile Trail Explorer\" xmlns=\"http://www.topografix.com/GPX/1/0\">\r\n";
+       
         // Create trail
-        gpx += "<trk><trkseg>";
+        gpx += "<trk>\r\n<trkseg>\r\n";
         Enumeration posEnum = track.getTrailPoints().elements();
         while(posEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)posEnum.nextElement();
             String lat = String.valueOf( pos.getLatitude() );
             String lon = String.valueOf( pos.getLongitude() );
             String alt = String.valueOf( pos.getAltitude() );
-            gpx += "<trkpt lat=\"" + lat + "\" lon=\"" + lon + "\" />";
+            gpx += "<trkpt lat=\"" + lat + "\" lon=\"" + lon + "\"></trkpt>\r\n";
         }
-        gpx += "</trkseg></trk>";
+        gpx += "</trkseg>\r\n</trk>\r\n";
         
         // Finalize the GPX
-        gpx += "</gpx>";
+        gpx += "</gpx>\r\n";
         return gpx;        
     }
     

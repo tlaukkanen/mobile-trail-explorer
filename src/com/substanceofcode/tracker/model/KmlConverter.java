@@ -183,12 +183,14 @@ public class KmlConverter implements TrackConverter {
         markerString += "<name>Start/End</name>\r\n";
         markerString += "<Placemark>\r\n";
         markerString += "<name>" + name + "</name>\r\n";
+        markerString += "<Style>\r\n";
         markerString += "<IconStyle>\r\n";
         markerString += "<scale>0.6</scale>\r\n";
         markerString += "<Icon>\r\n";
         markerString += "<href>http://maps.google.com/mapfiles/kml/pal5/icon18l.png</href>\r\n";
         markerString += "</Icon>\r\n";
         markerString += "</IconStyle>\r\n";
+        markerString += "</Style>\r\n";
         markerString += "<Point><coordinates>\r\n";
         markerString += String.valueOf(startPosition.getLongitude()) + "," +
                 String.valueOf(startPosition.getLatitude()) + ",0\r\n";
@@ -201,12 +203,14 @@ public class KmlConverter implements TrackConverter {
         name = timeStamp;
         markerString += "<Placemark>\r\n";
         markerString += "<name>" + name + "</name>\r\n";
+        markerString += "<Style>\r\n";
         markerString += "<IconStyle>\r\n";
         markerString += "<scale>0.6</scale>\r\n";
         markerString += "<Icon>\r\n";
         markerString += "<href>http://maps.google.com/mapfiles/kml/pal5/icon52l.png</href>\r\n";
         markerString += "</Icon>\r\n";
         markerString += "</IconStyle>\r\n";
+        markerString += "</Style>\r\n";
         markerString += "<Point><coordinates>\r\n";
         markerString += String.valueOf(endPosition.getLongitude()) + "," +
                 String.valueOf(endPosition.getLatitude()) + ",0\r\n";
