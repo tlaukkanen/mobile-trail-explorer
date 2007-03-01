@@ -129,8 +129,7 @@ public class GpsPositionParser {
             if(warning.equals("A")==true) {
                 
                 GpsPosition pos = new GpsPosition(
-                        record, 
-                        longitude, lattitude, (short)course,
+                        record, (short)course,
                         longitudeDouble, latitudeDouble, speed, 
                         lastAltitude);
                 return pos;

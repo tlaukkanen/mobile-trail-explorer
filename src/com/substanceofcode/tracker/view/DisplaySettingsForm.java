@@ -31,6 +31,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 
 /**
+ * Settings form for displayable items.
  *
  * @author Tommi Laukkanen
  */
@@ -76,11 +77,13 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             boolean showCoordinates = displayGroup.isSelected(0);
             boolean showSpeed = displayGroup.isSelected(1);
             boolean showHeading = displayGroup.isSelected(2);
-            boolean showAltitude = displayGroup.isSelected(3);            
+            boolean showAltitude = displayGroup.isSelected(3); 
+            boolean showDistance = displayGroup.isSelected(4);
             settings.setDisplayValue(RecorderSettings.DISPLAY_COORDINATES, showCoordinates);
             settings.setDisplayValue(RecorderSettings.DISPLAY_SPEED, showSpeed);
             settings.setDisplayValue(RecorderSettings.DISPLAY_HEADING, showHeading);
             settings.setDisplayValue(RecorderSettings.DISPLAY_ALTITUDE, showAltitude);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_DISTANCE, showDistance);
             
             controller.showSettings();
         }
@@ -100,7 +103,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
                 null);
         this.append(unitGroup);
                         
-        String[] displayItems = {"Coordinates", "Speed", "Heading", "Altitude"};
+        String[] displayItems = {"Coordinates", "Speed", "Heading", "Altitude", "Distance"};
         displayGroup = new ChoiceGroup(
                 "Display the following", 
                 ChoiceGroup.MULTIPLE, 
@@ -120,6 +123,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         displayGroup.setSelectedIndex(2, showHeading);
         boolean showAltitude = settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE);
         displayGroup.setSelectedIndex(3, showAltitude);        
+        boolean showDistance = settings.getDisplayValue(RecorderSettings.DISPLAY_DISTANCE);
+        displayGroup.setSelectedIndex(4, showDistance);    
         
         this.append(displayGroup);
     }

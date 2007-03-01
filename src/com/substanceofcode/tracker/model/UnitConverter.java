@@ -33,6 +33,8 @@ public class UnitConverter {
     public static final int MILES_PER_HOUR = 2;
     public static final int METERS = 3;
     public static final int FEETS = 4;
+    public static final int KILOMETERS = 5;
+    public static final int MILES = 6;
     
     /** Creates a new instance of UnitConverter */
     private UnitConverter() {
@@ -80,6 +82,11 @@ public class UnitConverter {
             convertedUnits == METERS ) {
             return originalLength * 0.3048;
         }
+        /** Check for feets to meters conversion */
+        if( originalUnits == KILOMETERS && 
+            convertedUnits == MILES ) {
+            return originalLength * 0.621371192;
+        }        
         /** Return original speed by default */
         return originalLength;  
     }

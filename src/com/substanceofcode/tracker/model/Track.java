@@ -40,15 +40,23 @@ public class Track {
     
     private Vector trailPoints;
     private Vector markers;
+    private double distance;
     
     /** Creates a new instance of Track */
     public Track() {
         trailPoints = new Vector();
         markers = new Vector();
+        distance = 0.0;
     }
     
     /** Add new trail point */
     public void addPosition(GpsPosition pos) {
+        if(trailPoints.size()>0) {
+            GpsPosition lastPosition = getEndPosition();
+            double trip = lastPosition.getDistanceFromPosition( pos );
+            distance += trip;
+        }
+        
         trailPoints.addElement( pos );
     }
         
@@ -69,9 +77,16 @@ public class Track {
         return markerCount;
     }
     
+    /** Get trail distance in kilometers */
+    public double getDistance() {
+        return distance;
+    }
+    
     /** Clear */
     public void clear() {
         trailPoints.removeAllElements();
+        markers.removeAllElements();
+        distance = 0.0;
     }
     
     /** 

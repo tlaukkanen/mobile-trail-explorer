@@ -60,6 +60,7 @@ public class RecorderSettings {
     public static final String DISPLAY_SPEED = "display-speed";
     public static final String DISPLAY_HEADING = "display-heading";
     public static final String DISPLAY_ALTITUDE = "display-altitude";
+    public static final String DISPLAY_DISTANCE = "display-distance";
     
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
@@ -212,4 +213,5 @@ public class RecorderSettings {
             ex.printStackTrace();
         }
     }
+    
 }

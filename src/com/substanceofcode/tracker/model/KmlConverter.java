@@ -201,8 +201,24 @@ public class KmlConverter implements TrackConverter {
         GpsPosition endPosition = track.getEndPosition();
         timeStamp = DateUtil.convertToTimeStamp( endPosition.getDate() );
         name = timeStamp;
+        
+        String units;
+        String distance;
+        if( m_useKilometers==true ) {
+            units = " km";
+            distance = String.valueOf(track.getDistance());
+        } else {
+            double mileDistance = UnitConverter.convertLength(
+                    track.getDistance(),
+                    UnitConverter.KILOMETERS,
+                    UnitConverter.MILES );
+            distance = StringUtil.valueOf(mileDistance, 1);
+            units = " ml";
+        }
+        
         markerString += "<Placemark>\r\n";
         markerString += "<name>" + name + "</name>\r\n";
+        markerString += "<description>Distance " + distance + units + "</description>";
         markerString += "<Style>\r\n";
         markerString += "<IconStyle>\r\n";
         markerString += "<scale>0.6</scale>\r\n";

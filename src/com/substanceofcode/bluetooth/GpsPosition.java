@@ -21,6 +21,7 @@
 
 package com.substanceofcode.bluetooth;
 
+import com.substanceofcode.tracker.model.MathUtil;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -31,9 +32,7 @@ import java.util.Date;
 public class GpsPosition {
     
     private String m_rawData;
-    private String m_longitudeString;
     private double m_longitude;
-    private String m_latitudeString;
     private double m_latitude;
     private double m_speed;
     private short m_course;
@@ -50,16 +49,12 @@ public class GpsPosition {
     /** Creates a new instance of GpsPosition */
     public GpsPosition(
             String rawData,
-            String longitude,
-            String latitude,
             short course,
             double longitudeDouple,
             double latitudeDouple,
             double speed,
             double altitude) {
         m_rawData = rawData;
-        m_longitudeString = longitude;
-        m_latitudeString = latitude;
         m_course = course;
         Calendar cal = Calendar.getInstance();
         m_positionDate = cal.getTime();
@@ -74,8 +69,8 @@ public class GpsPosition {
      * Positions are checked using longitude and latitude values.
      */
     public boolean equals(GpsPosition position) {
-        if( m_longitudeString.equals( position.m_longitudeString ) == true &&
-                m_latitudeString.equals( position.m_latitudeString) == true ) {
+        if( String.valueOf(m_longitude).equals( String.valueOf(position.m_longitude) ) == true &&
+                String.valueOf(m_latitude).equals( String.valueOf(position.m_latitude) ) == true ) {
             return true;
         } else {
             return false;
@@ -90,24 +85,6 @@ public class GpsPosition {
         return m_positionDate;
     }
     
-    public String toString() {
-        String res;
-        if(m_longitudeString.length()>0) {
-            res = m_longitudeString + ", " + m_latitudeString + ", " + m_course;
-        } else {
-            res = "Unknown";
-        }
-        return res;
-    }
-    
-    public String getKmlCoordinate() {
-        String kmlLongitude = "";
-        String kmlCoordinate = "";
-        //todo: Add code
-        
-        return kmlCoordinate;
-    }
-    
     public double getLongitude() {
         return m_longitude;
     }
@@ -120,8 +97,14 @@ public class GpsPosition {
         return m_course;
     }
     
+    /** Get altitude in meters */
     public double getAltitude() {
         return m_altitude;
+    }
+
+    /** Get speed in km/h format */
+    public double getSpeed() {
+        return m_speed;
     }
     
     /** Get heading in string format. Example N, NE, S */
@@ -140,8 +123,18 @@ public class GpsPosition {
         return heading;
     }
     
-    public double getSpeed() {
-        return m_speed;
+    /** 
+     * Calculate distance from given position.
+     * Using formula from: http://williams.best.vwh.net/avform.htm#Dist
+     */
+    public double getDistanceFromPosition(GpsPosition position) {
+        double lat1 = (Math.PI/180.0)*this.getLatitude();
+        double lon1 = (Math.PI/180.0)*this.getLongitude();
+        double lat2 = (Math.PI/180.0)*position.getLatitude();
+        double lon2 = (Math.PI/180.0)*position.getLongitude();
+        double distance = 2*MathUtil.asin( Math.sqrt( MathUtil.pow(Math.sin((lat1-lat2)/2),2) + 
+                 Math.cos(lat1)*Math.cos(lat2)*MathUtil.pow(Math.sin((lon1-lon2)/2),2)));
+        return distance*6371.0;
     }
     
 }

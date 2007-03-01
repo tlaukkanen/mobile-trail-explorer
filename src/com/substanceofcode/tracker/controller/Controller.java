@@ -448,5 +448,10 @@ public class Controller {
         m_settings.setRecordingMarkerInterval( newStep );
         m_recorder.setIntervalForMarkers(newStep);
     }
+
+    /** Get recorded track */
+    public Track getTrack() {
+        return m_recorder.getTrack();
+    }
    
 }

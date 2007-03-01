@@ -29,6 +29,7 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.ImageUtil;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.StringUtil;
+import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Calendar;
@@ -345,6 +346,38 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 displayRow++;
             }
             
+            /** Draw distance information */
+            if(settings.getDisplayValue(RecorderSettings.DISPLAY_DISTANCE)==true) {
+                String distance;
+                String units;
+                Track track = m_controller.getTrack();
+                double distanceInKilometers = track.getDistance();
+                if( settings.getUnitsAsKilometers()==false) {
+                    /** Distance in feets */
+                    double distanceInMiles = UnitConverter.convertLength( 
+                            distanceInKilometers,
+                            UnitConverter.KILOMETERS,
+                            UnitConverter.MILES); 
+                    distance = StringUtil.valueOf( distanceInMiles, 2 );
+                    units = " ml";
+                } else {
+                    /** Altitude in meters */
+                    distance = StringUtil.valueOf( distanceInKilometers, 2 );
+                    units = " km";                            
+                }
+                g.drawString(
+                        "DST:",
+                        1,
+                        fontHeight*displayRow,
+                        Graphics.TOP|Graphics.LEFT);
+                g.drawString(
+                        distance + units,
+                        positionAdd,
+                        fontHeight*displayRow,
+                        Graphics.TOP|Graphics.LEFT );
+                displayRow++;
+            }
+            
             /** Draw heading information */
             if(settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE)==true) {
                 String altitude;
@@ -388,7 +421,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                         Graphics.TOP|Graphics.LEFT );
             }
             
-        } else {
+        } else if (m_controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
             g.drawString(
                     "Position data is unavailable. " + m_counter,
                     1,
