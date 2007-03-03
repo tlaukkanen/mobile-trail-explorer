@@ -122,7 +122,23 @@ public class GpsPosition {
         heading = compass[directionIndex];
         return heading;
     }
-    
+
+    /** Get heading as index. Example 0 = N, 1 = NNE, 2 = NE, 3 = ENE, 4 = E, ..., 15 = NNW */
+    public int getHeadingIndex() {
+
+        double sector= 22.5; //  = 360 degrees / 16 sectors
+        int[] compass = {
+            1 /* NNE */, 2 /* NE */, 3 /* ENE */, 4 /* E */,
+            5 /* ESE */, 6 /* SE */, 7 /* SSE */, 8 /* S */,
+            9 /* SSW */, 10 /* SW */, 11 /* WSW */, 12 /* W */,
+            13 /* WNW */, 14 /* NW */, 15 /* NNW */, 0 /* N */};
+        int heading = 0;
+        
+        int directionIndex = (int)Math.floor(m_course / sector);
+        heading = compass[directionIndex];
+        return heading;
+    }
+
     /** 
      * Calculate distance from given position.
      * Using formula from: http://williams.best.vwh.net/avform.htm#Dist

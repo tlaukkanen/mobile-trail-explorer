@@ -42,6 +42,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.game.Sprite;
 
 //import com.nokia.mid.ui.DeviceControl;
 
@@ -76,6 +77,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private int m_horizontalZoomFactor;
     
     private Image m_redDotImage;
+    private Image m_compass;
+    private Sprite m_compassArrows;
     
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller) {
@@ -104,6 +107,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         int backLightLevel = 100;
         //DeviceControl.setLights(backLightIndex, backLightLevel);
          */
+        
+        Image tempCompassArrows = ImageUtil.loadImage("/images/compass-arrows.png");
+        m_compassArrows = new Sprite (tempCompassArrows, 11, 11);
+        m_compassArrows.setPosition(this.getWidth() - 22, 11);
+        m_compass = ImageUtil.loadImage("/images/compass.png");
     }
     
     /** Initialize commands */
@@ -149,6 +157,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         /** Draw trail */
         drawTrail(g);
         
+        /** Draw compass */
+        drawCompass(g);
     }
     
     /** Draw waypoints */
@@ -254,6 +264,15 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             System.err.println("Exception occured while drawing trail: " +
                     ex.toString());
+        }
+    }
+    
+    /** Draw compass */
+    private void drawCompass(Graphics g) {
+        if(m_lastPosition != null) {
+            g.drawImage(m_compass, m_compassArrows.getX() - 10, m_compassArrows.getY() - 10, 0);
+            m_compassArrows.setFrame(m_lastPosition.getHeadingIndex());
+            m_compassArrows.paint(g);
         }
     }
     
