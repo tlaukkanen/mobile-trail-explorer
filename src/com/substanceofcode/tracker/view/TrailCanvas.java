@@ -79,6 +79,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private Image m_redDotImage;
     private Image m_compass;
     private Sprite m_compassArrows;
+    private boolean m_largeCompass;
     
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller) {
@@ -109,9 +110,27 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
          */
         
         Image tempCompassArrows = ImageUtil.loadImage("/images/compass-arrows.png");
-        m_compassArrows = new Sprite (tempCompassArrows, 11, 11);
-        m_compassArrows.setPosition(this.getWidth() - 22, 11);
         m_compass = ImageUtil.loadImage("/images/compass.png");
+        // Check for high resolution (eg. N80 352x416)
+        if(this.getWidth()>250) {
+            // Double the compass size
+            m_largeCompass = true;
+            m_compass = ImageUtil.scale(
+                    m_compass, 
+                    m_compass.getWidth()*2, 
+                    m_compass.getHeight()*2);
+            tempCompassArrows = ImageUtil.scale(
+                    tempCompassArrows,
+                    tempCompassArrows.getWidth()*2, 
+                    tempCompassArrows.getHeight()*2);
+            m_compassArrows = new Sprite (tempCompassArrows, 22, 22);
+            m_compassArrows.setPosition(this.getWidth() - 44, 22);
+        } else {
+            m_largeCompass = false;
+            m_compassArrows = new Sprite (tempCompassArrows, 11, 11);
+            m_compassArrows.setPosition(this.getWidth() - 22, 11);
+        }
+        
     }
     
     /** Initialize commands */
@@ -270,7 +289,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     /** Draw compass */
     private void drawCompass(Graphics g) {
         if(m_lastPosition != null) {
-            g.drawImage(m_compass, m_compassArrows.getX() - 10, m_compassArrows.getY() - 10, 0);
+            int fix = 10;
+            if(m_largeCompass) {
+                fix = 20;
+            }
+            g.drawImage(m_compass, m_compassArrows.getX() - fix, m_compassArrows.getY() - fix, 0);
             m_compassArrows.setFrame(m_lastPosition.getHeadingIndex());
             m_compassArrows.paint(g);
         }

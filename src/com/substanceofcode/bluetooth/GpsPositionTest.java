@@ -1,5 +1,5 @@
 package com.substanceofcode.bluetooth;
-import jmunit.framework.cldc10.*;
+import jmunit.framework.cldc11.*;
 
 public class GpsPositionTest extends TestCase {
 
