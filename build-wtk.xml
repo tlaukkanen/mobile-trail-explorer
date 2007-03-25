@@ -11,6 +11,9 @@
 	You must set the property: 'install.api.root' to the root of your Wireless Tookit(WTK), 
 	one level above the 'lib' and 'bin' folders.
 	
+	If you are not using the 'Default' WTK, which is the SUN one, you must change the DEFAULT target to 
+	one which is appropriate for your WTK.
+	
 	If you use this script, remember to add the created 'collated' and 'bin' folders to 'svn:ignore' 
 	as they should not be added to the svn repository.
 	
@@ -20,7 +23,11 @@
 <project name="Mobile Trail" default="R01-Standard Build and Run" >
 	
 	<!-- IDE/WTK Setup Spesific Variables -->
-	<property name="install.api.root" value="C:/SonyEricsson/JavaME_SDK_CLDC/PC_Emulation/WTK2" />
+	<!-- You must UN-Comment the 'install.api.root' which is appropriate for you, and recomment the default one bellow -->
+	<property name="install.api.root" value="C:/WTK" />	
+	<!-- <property name="install.api.root" value="C:/WTK25" />	-->
+	<!-- <property name="install.api.root" value="C:/WTK22" />	-->
+	<!-- <property name="install.api.root" value="C:/SonyEricsson/JavaME_SDK_CLDC/PC_Emulation/WTK2" /> -->
 	<property name="install.api.lib" value="${install.api.root}/lib" />
 	<property name="install.api.bin" value="${install.api.root}/bin" />
 	
@@ -136,7 +143,13 @@
 		<wtkrun jad="${bin.dir}/${release.name}.jad" device="${buildtype}" emulator="${install.api.bin}/emulator.exe" />
 	</target>
 	
-	<target name="Standard Build">
+	<target name="Standard Build" depends="Default_Color_Phone" />
+	
+	<target name="Default_Color_Phone">
+		<property name="buildtype" value="DefaultColorPhone"/>
+	</target>
+	
+	<target name="SonyEricsson_K750_Emu">
 		<property name="buildtype" value="SonyEricsson_K750_Emu"/>
 	</target>
 	
