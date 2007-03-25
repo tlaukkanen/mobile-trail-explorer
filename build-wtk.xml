@@ -1,0 +1,153 @@
+<!--
+	Description: Build script for the Mobile Trail Explorer
+	
+	Author: barryred
+-->
+<!-- NOTES:
+	 ====== 
+	Use this script only if you can't get the build.xml script working, or you have another good reason.
+	The build.xml script should be considered the 'primary' script.
+	
+	You must set the property: 'install.api.root' to the root of your Wireless Tookit(WTK), 
+	one level above the 'lib' and 'bin' folders.
+	
+	If you use this script, remember to add the created 'collated' and 'bin' folders to 'svn:ignore' 
+	as they should not be added to the svn repository.
+	
+	If a build fails a folder 'temp####' will be created, these can be deleted without fear.
+-->
+
+<project name="Mobile Trail" default="R01-Standard Build and Run" >
+	
+	<!-- IDE/WTK Setup Spesific Variables -->
+	<property name="install.api.root" value="C:/SonyEricsson/JavaME_SDK_CLDC/PC_Emulation/WTK2" />
+	<property name="install.api.lib" value="${install.api.root}/lib" />
+	<property name="install.api.bin" value="${install.api.root}/bin" />
+	
+	
+	<!-- MIDlet properties -->
+	<!-- midlet.name must not contain spaces -->
+	<property name="midlet.name" value="TrailExplorer" />
+	<property name="midlet.vendor" value="Tommi Laukkanen" />
+	<property name="midlet.version" value="1.3.1" />
+	<!-- This is the path to the MIDlet that is started when the Application is run -->
+	<property name="midlet.class" value="com.substanceofcode.tracker.view.TrailExplorerMidlet" /> 
+
+	<!-- User Directories -->
+	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="lib" />
+	<property name="collated.dir" value="collated" />
+	<property name="bin.dir" value="bin" />
+
+	<!-- Ant extensions -->
+	<!-- This is a non-standard extension! -->
+	<taskdef resource="wtk.properties" classpath="${lib.dir}/Wtk.jar" />
+	
+	<!-- List of all the required JSRs for this App. -->
+	<property name="api.cldc" value="${install.api.lib}/cldcapi11.jar" />
+	<property name="api.midp" value="${install.api.lib}/midpapi20.jar" />
+	<property name="api.bluetooth" value="${install.api.lib}/jsr082.jar" />
+	<property name="api.fileIO" value="${install.api.lib}/jsr75.jar" />
+	<property name="api.junit-10" value="${lib.dir}/JMUnit4CLDC10.jar" />
+	<property name="api.junit-11" value="${lib.dir}/jmunit4cldc11-1.0.1.jar" />
+	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-10};${api.junit-11}" />
+	<!-- APIs I've removed... c:/wtk25/lib/wma11.jar; c:/wtk25/lib/mmapi.jar; -->
+	
+	
+	<!-- Setup the project build-->
+	<target name="setup">
+		
+		<!-- Create directories if they don't exist-->
+		<mkdir dir="${collated.dir}"/>
+		<mkdir dir="${bin.dir}"/>
+		
+		<!-- Clean any files from previous build -->
+		<delete includeemptydirs="true">
+			<fileset dir="${collated.dir}" includes="**/*" />
+		</delete>
+		
+		<!-- Copy accross the images files -->
+		<copy file="${src.dir}/images/compass.png"       tofile="${collated.dir}/images/compass.png" />
+		<copy file="${src.dir}/images/compass-arrows.png"       tofile="${collated.dir}/images/compass-arrows.png" />
+		<copy file="${src.dir}/images/explorer.png"       tofile="${collated.dir}/images/explorer.png" />
+		<copy file="${src.dir}/images/logo.png"       tofile="${collated.dir}/images/logo.png" />
+		<copy file="${src.dir}/images/red-dot.png"       tofile="${collated.dir}/images/red-dot.png" />
+
+		<!-- Copy accross the MTE icon -->
+		<copy file="${src.dir}/images/explorer.png" tofile="${collated.dir}/icon.png" />
+		
+		
+		<property name="release.name" value="${midlet.name}_${midlet.version}" />
+		
+	</target>
+	
+	<target name="build_no_obfustication">		
+    	<wtk
+    		jad="${bin.dir}/${release.name}.jad"
+    		jar="${bin.dir}/${release.name}.jar"
+    		source="${src.dir}"
+    		resource="${collated.dir}"
+    		jsr="${jsr}"
+    		debug="false"
+    		preverify="${install.api.bin}/preverify.exe" >
+    		
+			<!-- Required -->
+			<attribute name="MicroEdition-Configuration" value="CLDC-1.1" />
+			<attribute name="MicroEdition-Profile" value="MIDP-2.0" />
+			<attribute name="MIDlet-Name" value="${midlet.name}" />
+			<attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
+			<attribute name="MIDlet-Version" value="${midlet.version}" />
+    		
+    		
+			<!-- MIDlet suites -->
+			<midlet name="${midlet.name}" class="${midlet.class}" icon="/resources/icon.png" />
+		
+		</wtk>
+	</target>
+	
+	<target name="build_with_obfustication">					
+    	<wtk
+    		jad="${bin.dir}/${release.name}.jad"
+    		jar="${bin.dir}/${release.name}.jar"
+    		source="${src.dir}"
+    		resource="${collated.dir}"
+    		jsr="${jsr}"
+    		debug="false"
+    		obfuscate="${lib.dir}/proguard.jar"
+    		preverify="${install.api.bin}/preverify.exe" >
+    		
+			<!-- Required -->
+			<attribute name="MicroEdition-Configuration" value="CLDC-1.1" />
+			<attribute name="MicroEdition-Profile" value="MIDP-2.0" />
+			<attribute name="MIDlet-Name" value="${midlet.name}" />
+			<attribute name="MIDlet-Vendor" value="${midlet.vendor}" />
+			<attribute name="MIDlet-Version" value="${midlet.version}" />
+    		
+    		
+			<!-- MIDlet suites -->
+			<midlet name="${midlet.name}" class="${midlet.class}" icon="/resources/icon.png" />
+		
+		</wtk>
+		
+	</target>
+
+	
+	<target name="run">
+		<wtkrun jad="${bin.dir}/${release.name}.jad" device="${buildtype}" emulator="${install.api.bin}/emulator.exe" />
+	</target>
+	
+	<target name="Standard Build">
+		<property name="buildtype" value="SonyEricsson_K750_Emu"/>
+	</target>
+	
+	<!-- Build targets for non-critical deployment AND development/debugging (i.e. no obfustication)-->
+	<target name="B01-Standard Build" description="B01" depends="Standard Build,setup,build_no_obfustication"></target>
+	
+	<!-- Run with normal setings -->
+	<target name="R01-Standard Build and Run" description="R01" depends="B01-Standard Build,run"></target>
+	
+	<!-- Build target for Deployment! With obfustication for minimum jar size,and maximum performance (Hard to debug...)-->
+	<target name="D01-Standard Deployment" description="D01" depends="Standard Build,setup,build_with_obfustication,run"></target>
+
+	
+</project>
