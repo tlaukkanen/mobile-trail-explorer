@@ -206,13 +206,13 @@ public class KmlConverter implements TrackConverter {
         String distance;
         if( m_useKilometers==true ) {
             units = " km";
-            distance = String.valueOf(track.getDistance());
+            distance = StringUtil.valueOf(track.getDistance(), 2);
         } else {
             double mileDistance = UnitConverter.convertLength(
                     track.getDistance(),
                     UnitConverter.KILOMETERS,
                     UnitConverter.MILES );
-            distance = StringUtil.valueOf(mileDistance, 1);
+            distance = StringUtil.valueOf(mileDistance, 2);
             units = " ml";
         }
         

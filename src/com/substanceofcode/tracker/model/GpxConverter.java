@@ -23,6 +23,7 @@
 package com.substanceofcode.tracker.model;
 
 import com.substanceofcode.bluetooth.GpsPosition;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -46,16 +47,24 @@ public class GpxConverter implements TrackConverter {
         String gpx = "";
         gpx += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\r\n";
         gpx += "<gpx version=\"1.0\" creator=\"Mobile Trail Explorer\" xmlns=\"http://www.topografix.com/GPX/1/0\">\r\n";
-       
+        
         // Create trail
         gpx += "<trk>\r\n<trkseg>\r\n";
+       
         Enumeration posEnum = track.getTrailPoints().elements();
         while(posEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)posEnum.nextElement();
             String lat = String.valueOf( pos.getLatitude() );
             String lon = String.valueOf( pos.getLongitude() );
             String alt = String.valueOf( pos.getAltitude() );
-            gpx += "<trkpt lat=\"" + lat + "\" lon=\"" + lon + "\"></trkpt>\r\n";
+            gpx += "<trkpt lat=\"" + lat + "\" lon=\"" + lon + "\">\r\n";
+            
+            // Create time stamp
+            Date date = pos.getDate();
+            String universalDateStamp = DateUtil.getUniversalDateStamp( date );
+            gpx += "<time>" + universalDateStamp + "</time>\r\n"; 
+            
+            gpx += "</trkpt>\r\n";
         }
         gpx += "</trkseg>\r\n</trk>\r\n";
         

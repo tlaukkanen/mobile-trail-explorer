@@ -67,6 +67,29 @@ public class DateUtil {
         return dateStamp;        
     }
     
+    /** 
+     * Get current time stamp in universal format:
+     * 1999-09-09T13:10:40Z
+     */
+    public static String getUniversalDateStamp(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime( date );
+        
+        String year = String.valueOf( cal.get(Calendar.YEAR) );
+        String month = String.valueOf( cal.get(Calendar.MONTH)+1 );
+        if(month.length()==1) { month = "0" + month; }
+        String day = String.valueOf( cal.get(Calendar.DAY_OF_MONTH) );
+        if(day.length()==1) { day = "0" + day; }
+        String hour = String.valueOf( cal.get(Calendar.HOUR_OF_DAY) );
+        if(hour.length()==1) { hour = "0" + hour; }
+        String minute = String.valueOf( cal.get(Calendar.MINUTE) );
+        if(minute.length()==1) { minute = "0" + minute; }
+        String second = String.valueOf( cal.get(Calendar.SECOND) );
+        if(second.length()==1) { second = "0" + second; }
+        String dateStamp = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00Z";
+        return dateStamp;        
+    }
+    
     /** Get current time stamp */
     public static String getCurrentDateStamp() {
         Calendar cal = Calendar.getInstance();

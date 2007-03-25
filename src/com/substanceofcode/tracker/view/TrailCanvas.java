@@ -73,6 +73,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     /** Trail drawing helpers */
     private int m_center;
     private int m_middle;
+    private int m_movementSize;
+    private int m_verticalMovement;
+    private int m_horizontalMovement;
     private int m_verticalZoomFactor;
     private int m_horizontalZoomFactor;
     
@@ -98,6 +101,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         m_center = this.getWidth()/2;
         m_middle = this.getHeight()/2;
+        m_movementSize = this.getWidth()/8;
+        m_verticalMovement = 0;
+        m_horizontalMovement = 0;
         m_verticalZoomFactor = 2048;
         m_horizontalZoomFactor = 1024;
         
@@ -116,18 +122,18 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             // Double the compass size
             m_largeCompass = true;
             m_compass = ImageUtil.scale(
-                    m_compass, 
-                    m_compass.getWidth()*2, 
+                    m_compass,
+                    m_compass.getWidth()*2,
                     m_compass.getHeight()*2);
             tempCompassArrows = ImageUtil.scale(
                     tempCompassArrows,
-                    tempCompassArrows.getWidth()*2, 
+                    tempCompassArrows.getWidth()*2,
                     tempCompassArrows.getHeight()*2);
-            m_compassArrows = new Sprite (tempCompassArrows, 22, 22);
+            m_compassArrows = new Sprite(tempCompassArrows, 22, 22);
             m_compassArrows.setPosition(this.getWidth() - 44, 22);
         } else {
             m_largeCompass = false;
-            m_compassArrows = new Sprite (tempCompassArrows, 11, 11);
+            m_compassArrows = new Sprite(tempCompassArrows, 11, 11);
             m_compassArrows.setPosition(this.getWidth() - 22, 11);
         }
         
@@ -223,11 +229,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         latitude -= currentLatitude;
         latitude *= m_verticalZoomFactor;
-        int y = m_middle-(int)latitude;
+        int y = m_middle + m_verticalMovement - (int)latitude;
         
         longitude -= currentLongitude;
         longitude *= m_horizontalZoomFactor;
-        int x = (int)longitude+m_center;
+        int x = (int)longitude + m_center + m_horizontalMovement;
         
         CanvasPoint point = new CanvasPoint(x,y);
         return point;
@@ -275,7 +281,11 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             }
             
             // Draw red dot on current location
-            g.drawImage(m_redDotImage, center, middle, Graphics.VCENTER|Graphics.HCENTER);
+            g.drawImage(
+                    m_redDotImage, 
+                    center + m_horizontalMovement, 
+                    middle + m_verticalMovement, 
+                    Graphics.VCENTER|Graphics.HCENTER);
             
         } catch (Exception ex) {
             g.setColor(255,0,0);
@@ -396,16 +406,16 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 double distanceInKilometers = track.getDistance();
                 if( settings.getUnitsAsKilometers()==false) {
                     /** Distance in feets */
-                    double distanceInMiles = UnitConverter.convertLength( 
+                    double distanceInMiles = UnitConverter.convertLength(
                             distanceInKilometers,
                             UnitConverter.KILOMETERS,
-                            UnitConverter.MILES); 
+                            UnitConverter.MILES);
                     distance = StringUtil.valueOf( distanceInMiles, 2 );
                     units = " ml";
                 } else {
                     /** Altitude in meters */
                     distance = StringUtil.valueOf( distanceInKilometers, 2 );
-                    units = " km";                            
+                    units = " km";
                 }
                 g.drawString(
                         "DST:",
@@ -427,16 +437,16 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 double altitudeInMeters = m_lastPosition.getAltitude();
                 if( settings.getUnitsAsKilometers()==false) {
                     /** Altitude in feets */
-                    double altitudeInFeets = UnitConverter.convertLength( 
+                    double altitudeInFeets = UnitConverter.convertLength(
                             altitudeInMeters,
                             UnitConverter.METERS,
-                            UnitConverter.FEETS); 
+                            UnitConverter.FEETS);
                     altitude = StringUtil.valueOf( altitudeInFeets, 2 );
                     units = " ft";
                 } else {
                     /** Altitude in meters */
                     altitude = StringUtil.valueOf( altitudeInMeters, 2 );
-                    units = " m";                            
+                    units = " m";
                 }
                 g.drawString(
                         "ALT:",
@@ -552,6 +562,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     /** Handle key presses */
     public void keyPressed(int keyCode) {
         
+        /** Handle zooming keys */
         switch( keyCode ) {
             case( KEY_NUM1 ):
                 // Zoom in
@@ -570,7 +581,34 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             default:
         }
         
-        int gameKey = getGameAction(keyCode);
+        /** Handle panning keys */
+        int gameKey = -1;
+        try {
+            gameKey = getGameAction(keyCode);
+        } catch(Exception ex) {
+            /**
+             * We don't need to handle this error. It is only caught because
+             * getGameAction() method generates exceptions on some phones for
+             * some buttons.
+             */
+        }
+        if(gameKey==UP || keyCode==KEY_NUM2) {
+            m_verticalMovement += m_movementSize;
+        }
+        if(gameKey==DOWN || keyCode==KEY_NUM8) {
+            m_verticalMovement -= m_movementSize;
+        }
+        if(gameKey==LEFT || keyCode==KEY_NUM4) {
+            m_horizontalMovement += m_movementSize;
+        }
+        if(gameKey==RIGHT || keyCode==KEY_NUM6) {
+            m_horizontalMovement -= m_movementSize;
+        }
+        if(gameKey==FIRE || keyCode==KEY_NUM5) {
+            m_verticalMovement = 0;
+            m_horizontalMovement = 0;
+        }
+        
     }
     
     /** Handle commands */
