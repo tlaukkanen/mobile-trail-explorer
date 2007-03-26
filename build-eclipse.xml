@@ -11,8 +11,11 @@
 	You must set the property: 'install.api.root' to the root of your Wireless Tookit(WTK), 
 	one level above the 'lib' and 'bin' folders.
 	
-	If you are not using the 'Default' WTK, which is the SUN one, you must change the DEFAULT target to 
-	one which is appropriate for your WTK.
+	If you are not using the 'Default' WTK, which is the SUN one, installed at "C:\WTK", 
+	you must change the DEFAULT target to one which is appropriate for your WTK.
+	
+	N.B. "C:\WTK" is NOT the default installation folder for the SUN wtk, so you will PROBABLY NEED TO CHANGE 
+	the defualt target (or move the WTK.)
 	
 	If you use this script, remember to add the created 'collated' and 'bin' folders to 'svn:ignore' 
 	as they should not be added to the svn repository.
@@ -20,11 +23,15 @@
 	If a build fails a folder 'temp####' will be created, these can be deleted without fear.
 -->
 
-<project name="Mobile Trail" default="R01-Standard Build and Run" >
+<project name="Mobile Trail" default="R01-Default Build and Run" >
+
+	<!-- If you are using the SonyEricsson WTK, Uncomment the following line, and comment the one after it. -->
+	<!-- <target name="Default Build" depends="SonyEricsson_K750_Emu" /> -->
+	<target name="Default Build" depends="Default_Color_Phone" />
 	
 	<!-- IDE/WTK Setup Spesific Variables -->
 	<!-- You must UN-Comment the 'install.api.root' which is appropriate for you, and recomment the default one bellow -->
-	<property name="install.api.root" value="C:/WTK" />	
+	<property name="install.api.root" value="C:/WTK" />
 	<!-- <property name="install.api.root" value="C:/WTK25" />	-->
 	<!-- <property name="install.api.root" value="C:/WTK22" />	-->
 	<!-- <property name="install.api.root" value="C:/SonyEricsson/JavaME_SDK_CLDC/PC_Emulation/WTK2" /> -->
@@ -61,7 +68,7 @@
 	<!-- APIs I've removed... c:/wtk25/lib/wma11.jar; c:/wtk25/lib/mmapi.jar; -->
 	
 	
-	<!-- Setup the project build-->
+	<!-- Setup the project build, create required folders, and copy accross required files. -->
 	<target name="setup">
 		
 		<!-- Create directories if they don't exist-->
@@ -73,15 +80,11 @@
 			<fileset dir="${collated.dir}" includes="**/*" />
 		</delete>
 		
-		<!-- Copy accross the images files -->
-		<copy file="${src.dir}/images/compass.png"       tofile="${collated.dir}/images/compass.png" />
-		<copy file="${src.dir}/images/compass-arrows.png"       tofile="${collated.dir}/images/compass-arrows.png" />
-		<copy file="${src.dir}/images/explorer.png"       tofile="${collated.dir}/images/explorer.png" />
-		<copy file="${src.dir}/images/logo.png"       tofile="${collated.dir}/images/logo.png" />
-		<copy file="${src.dir}/images/red-dot.png"       tofile="${collated.dir}/images/red-dot.png" />
+		<!-- Copy accross the image files -->
+		<copydir src="${src.dir}/images/" dest="${collated.dir}/images/" />
 
-		<!-- Copy accross the MTE icon -->
-		<copy file="${src.dir}/images/explorer.png" tofile="${collated.dir}/icon.png" />
+		<!-- Copy accross the Mobile Trail Explorer icon -->
+		<copy file="${src.dir}/images/explorer.png" tofile="${collated.dir}/resources/icon.png" />
 		
 		
 		<property name="release.name" value="${midlet.name}_${midlet.version}" />
@@ -143,8 +146,6 @@
 		<wtkrun jad="${bin.dir}/${release.name}.jad" device="${buildtype}" emulator="${install.api.bin}/emulator.exe" />
 	</target>
 	
-	<target name="Standard Build" depends="Default_Color_Phone" />
-	
 	<target name="Default_Color_Phone">
 		<property name="buildtype" value="DefaultColorPhone"/>
 	</target>
@@ -154,13 +155,19 @@
 	</target>
 	
 	<!-- Build targets for non-critical deployment AND development/debugging (i.e. no obfustication)-->
-	<target name="B01-Standard Build" description="B01" depends="Standard Build,setup,build_no_obfustication"></target>
+	<target name="B01-Default Build"         description="B01" depends="Default Build,setup,build_no_obfustication"></target>
+	<target name="B02-Default_Color_Phone"    description="B02" depends="Default_Color_Phone,setup,build_no_obfustication"></target>
+	<target name="B03-SonyEricsson_K750_Emu"  description="B03" depends="SonyEricsson_K750_Emu,setup,build_no_obfustication"></target>
 	
 	<!-- Run with normal setings -->
-	<target name="R01-Standard Build and Run" description="R01" depends="B01-Standard Build,run"></target>
+	<target name="R01-Default Build and Run" description="R01" depends="B01-Default Build,run"></target>
+	<target name="R02-Default_Color_Phone"    description="R02" depends="B02-Default_Color_Phone,run"></target>
+	<target name="R03-SonyEricsson_K750_Emu"  description="R03" depends="B03-SonyEricsson_K750_Emu,run"></target>
 	
 	<!-- Build target for Deployment! With obfustication for minimum jar size,and maximum performance (Hard to debug...)-->
-	<target name="D01-Standard Deployment" description="D01" depends="Standard Build,setup,build_with_obfustication,run"></target>
+	<target name="D01-Default Deployment"    description="D01" depends="Default Build,setup,build_with_obfustication,run"></target>
+	<target name="D02-Default_Color_Phone"  description="D02" depends="Default_Color_Phone,setup,build_with_obfustication,run"></target>
+	<target name="D03-SonyEricsson_K750_Emu"  description="D03" depends="SonyEricsson_K750_Emu,setup,build_with_obfustication,run"></target>
 
 	
 </project>
