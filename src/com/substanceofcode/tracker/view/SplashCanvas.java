@@ -21,13 +21,9 @@
  */
 
 package com.substanceofcode.tracker.view;
-
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.ImageUtil;
 import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
@@ -35,18 +31,22 @@ import javax.microedition.lcdui.Image;
  * Splash canvas for Trail Explorer application.
  *
  * @author Tommi Laukkanen
+ * @author barryred
  */
-public class SplashCanvas extends Canvas implements CommandListener, Runnable {
+public class SplashCanvas extends Canvas implements Runnable {
     
     /** Commands */
     private Controller m_controller;
-    private Command m_okCommand;
     
     /** Images */
     private Image m_splashImage;
     
     /** Thread for moving on */
     private Thread m_timeoutThread;
+    
+    /** <p>The length of time to show the SplashScreen for before automatically exiting</p>  
+     * This is in miliseconds, so 1 seconds should be (displayTime = 1000).*/
+    private long displayTime;
     
     /** Creates a new instance of SplashCanvas */
     public SplashCanvas(Controller controller) {
@@ -60,12 +60,8 @@ public class SplashCanvas extends Canvas implements CommandListener, Runnable {
         // Set fullscreen
         setFullScreenMode( true );
         
-        // Initialize commands
-        m_okCommand = new Command("OK", Command.SCREEN, 1);
-        addCommand(m_okCommand);
-        this.setCommandListener(this);
-        
         // Initialize timeout thread
+        this.displayTime = 6000; // 6 seconds.
         m_timeoutThread = new Thread(this);
         m_timeoutThread.start();
     }
@@ -92,12 +88,6 @@ public class SplashCanvas extends Canvas implements CommandListener, Runnable {
             g.drawString(title, titleX, titleY, Graphics.HCENTER|Graphics.VCENTER);
         }
     }
-
-    /** Handle commands */
-    public void commandAction(Command command, Displayable displayable) {
-        // Show trail canvas if user presses any key or selects any command
-        m_controller.showTrail();
-    }
     
     /** Key pressed */
     protected void keyPressed(int keyCode) {
@@ -105,18 +95,20 @@ public class SplashCanvas extends Canvas implements CommandListener, Runnable {
         m_controller.showTrail();
     }
 
+    /**
+     * This is the run() method for the thread, it simply exits the SplashCanvas to 
+     * the Trail Screen after 'dispalyTime' miliseconds have passed.
+     */
     public void run() {
-        int waitSeconds = 0;
-        while(Thread.currentThread()==m_timeoutThread || waitSeconds<5) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-            waitSeconds++;            
+        long waitMiliSeconds = this.displayTime;
+        try{
+        	Thread.sleep(waitMiliSeconds);
+        }catch (InterruptedException ex) {
+            ex.printStackTrace();
         }
-        if(waitSeconds>=5) {
-            m_controller.showTrail();
+        // Make sure the SplashCanvas is being displayed.
+        if(m_controller.getCurrentScreen() == this){
+        	m_controller.showTrail();
         }
     }
     
