@@ -3,7 +3,19 @@ Mobile Trail Explorer
 Copyright (c) 2006-2007 Tommi Laukkanen
 http://www.substanceofcode.com
 
+Contributors:
+Mario Sansone
+Barry Redmond
+Dave Walsh
+
+
 Release Notes:
+
+v1.4 (March 27th 2007)
++ Compass
++ Fixed the GPX format and file extension
++ Distance is calculated
++ User can pan the view
 
 v1.3 (February 25th 2007)
 + Display speed
