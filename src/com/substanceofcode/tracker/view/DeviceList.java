@@ -81,15 +81,19 @@ public class DeviceList extends List implements Runnable, CommandListener {
         setCommandListener(this);
     }
     
+    /** 
+     * Refresh the device list. List is not refreshed if another search is
+     * already in progress.
+     */
     public void refresh() {
         this.deleteAll();
         m_status = STATUS_READY;
-        if(m_searchThread==null) {
+        if(!m_searchThread.isAlive()) {
             m_searchThread = new Thread(this);
+            m_searchThread.start();
         }
-        m_searchThread.start();
-    }
-    
+    } 
+       
     /** Get selected bluetooth device */
     public BluetoothDevice getSelectedDevice() {
         // Set selected device as GPS
