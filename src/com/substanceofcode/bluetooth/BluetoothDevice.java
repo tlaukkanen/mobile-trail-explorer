@@ -27,22 +27,22 @@ package com.substanceofcode.bluetooth;
  */
 public class BluetoothDevice {
     
-    private String m_address;
-    private String m_alias;
+    private String address;
+    private String alias;
     
     /** Creates a new instance of BluetoothDevice */
     public BluetoothDevice(String address, String alias) {
-        m_alias = alias;
-        m_address = address;
+        alias = alias;
+        address = address;
     }
     
     public String getAddress() {
         String url;
-        url =  m_address;
+        url =  address;
         return url;
     }
     
     public String getAlias() {
-        return m_alias;
+        return alias;
     }
 }

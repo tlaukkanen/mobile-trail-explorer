@@ -61,54 +61,54 @@ public class Controller {
     public final static int STATUS_RECORDING = 1;
     public final static int STATUS_NOTCONNECTED = 2;
     
-    private Vector m_devices;
-    private int m_status;
-    private GpsDevice m_gpsDevice;
-    private GpsRecorder m_recorder;
-    private Vector m_waypoints;
-    private RecorderSettings m_settings;
+    private Vector devices;
+    private int status;
+    private GpsDevice gpsDevice;
+    private GpsRecorder recorder;
+    private Vector waypoints;
+    private RecorderSettings settings;
     
     /** Screens and Forms */
-    private TrailCanvas m_trailCanvas;
-    private SplashCanvas m_splashCanvas;
-    private DeviceList m_deviceList;    
-    private AboutForm m_aboutForm;
-    private MIDlet m_midlet;
+    private TrailCanvas trailCanvas;
+    private SplashCanvas splashCanvas;
+    private DeviceList deviceList;    
+    private AboutForm aboutForm;
+    private MIDlet midlet;
     
-    private SettingsList m_settingsList;
-    private RecordingSettingsForm m_recordingSettingsForm;
-    private ExportSettingsForm m_exportSettingsForm;
-    private DisplaySettingsForm m_displaySettingsForm;
+    private SettingsList settingsList;
+    private RecordingSettingsForm recordingSettingsForm;
+    private ExportSettingsForm exportSettingsForm;
+    private DisplaySettingsForm displaySettingsForm;
 
-    private WaypointForm m_waypointForm;
-    private WaypointList m_waypointList;
+    private WaypointForm waypointForm;
+    private WaypointList waypointList;
     
     /** Display device */
-    private Display m_display;
-    private String m_error;
+    private Display display;
+    private String error;
     
     /**
      * Creates a new instance of Controller
      */
     public Controller(MIDlet midlet, Display display) {
-        m_midlet = midlet;
-        m_status = STATUS_NOTCONNECTED;
-        m_settings = new RecorderSettings(m_midlet);
-        String gpsAddress = m_settings.getGpsDeviceConnectionString();
+        this.midlet = midlet;
+        status = STATUS_NOTCONNECTED;
+        settings = new RecorderSettings(midlet);
+        String gpsAddress = settings.getGpsDeviceConnectionString();
         if(gpsAddress.length()>0) {
             BluetoothDevice dev = new BluetoothDevice(gpsAddress, "GPS");
-            m_gpsDevice = new GpsDevice(dev);
+            gpsDevice = new GpsDevice(dev);
         }
-        m_recorder = new GpsRecorder( this );
+        recorder = new GpsRecorder( this );
         
         /** Initialize forms */
-        m_aboutForm = new AboutForm(this);
-        m_display = display;
+        aboutForm = new AboutForm(this);
+        this.display = display;
         
         /** Waypoints */
-        m_waypoints = m_settings.getWaypoints();
-        if( m_waypoints==null ) {
-            m_waypoints = new Vector();
+        waypoints = settings.getWaypoints();
+        if( waypoints==null ) {
+            waypoints = new Vector();
         }
     }
     
@@ -123,7 +123,7 @@ public class Controller {
                 Thread.sleep(100);
             }
             System.out.println("Getting devices.");
-            m_devices = bt.getDevices();
+            devices = bt.getDevices();
         } catch(Exception ex) {
             System.err.println("Error in Controller.searchDevices: " + ex.toString());
             ex.printStackTrace();
@@ -131,32 +131,32 @@ public class Controller {
     }
     
     public Vector getDevices() {
-        return m_devices;
+        return devices;
     }
     
     /** Set GPS device */
     public void setGpsDevice(BluetoothDevice device) {
-        m_gpsDevice = new GpsDevice(device);
-        m_settings.setGpsDeviceConnectionString( m_gpsDevice.getAddress() );
+        gpsDevice = new GpsDevice(device);
+        settings.setGpsDeviceConnectionString( gpsDevice.getAddress() );
     }
     
     /** Get status code */
     public int getStatusCode() {
-        return m_status;
+        return status;
     }
     
     public void setError(String err) {
-        m_error = err;
+        error = err;
     }
     
     public String getError() {
-        return m_error;
+        return error;
     }
 
     /** Get current status text */
     public String getStatus() {
         String statusText = "";
-        switch(m_status) {
+        switch(status) {
             case STATUS_STOPPED:
                 statusText = "STOPPED";
                 break;
@@ -175,31 +175,31 @@ public class Controller {
     /** Method for starting and stopping the recording */
     public void startStop() {
         
-        if(m_status!=STATUS_RECORDING) {
+        if(status!=STATUS_RECORDING) {
 
             // Connect to GPS device
             try {
-                m_gpsDevice.connect();
-                m_recorder.startRecording();
-                m_status = STATUS_RECORDING;
+                gpsDevice.connect();
+                recorder.startRecording();
+                status = STATUS_RECORDING;
             } catch(Exception ex) {
                 Alert saveAlert = new Alert("Error");
                 saveAlert.setTimeout(Alert.FOREVER);
                 saveAlert.setString("Error while connection to GPS: " + ex.toString());
-                m_display.setCurrent(saveAlert, getTrailCanvas());
+                display.setCurrent(saveAlert, getTrailCanvas());
             }
         } else {
             
             // Stop recording the track
-            m_recorder.stopRecording();
-            Track recordedTrack = m_recorder.getTrack();
+            recorder.stopRecording();
+            Track recordedTrack = recorder.getTrack();
             try{
-                boolean useKilometers = m_settings.getUnitsAsKilometers();
-                String exportFolder = m_settings.getExportFolder();
-                int exportFormat = m_settings.getExportFormat();
+                boolean useKilometers = settings.getUnitsAsKilometers();
+                String exportFolder = settings.getExportFolder();
+                int exportFormat = settings.getExportFormat();
                 recordedTrack.writeToFile( 
                         exportFolder, 
-                        m_waypoints, 
+                        waypoints, 
                         useKilometers,
                         exportFormat );
             }catch(Exception ex) {
@@ -207,69 +207,71 @@ public class Controller {
                 Alert saveAlert = new Alert("Error");
                 saveAlert.setTimeout(Alert.FOREVER);
                 saveAlert.setString(ex.toString());
-                m_display.setCurrent(saveAlert, getTrailCanvas());
+                display.setCurrent(saveAlert, getTrailCanvas());
             }
 
             try{
                 // Disconnect from GPS
-                m_gpsDevice.disconnect();
+                gpsDevice.disconnect();
             } catch(Exception e) {
                 Alert saveAlert = new Alert("Error");
                 saveAlert.setTimeout(Alert.FOREVER);
                 saveAlert.setString("Error while disconnecting from " +
                         "GPS device: " + e.toString());
-                m_display.setCurrent(saveAlert, getTrailCanvas());
+                display.setCurrent(saveAlert, getTrailCanvas());
             }
             
-            m_status = STATUS_STOPPED;            
+            status = STATUS_STOPPED;            
         }
         
     }
     
     /** Get waypoints */
     public Vector getWaypoints() {
-        return m_waypoints;
+        return waypoints;
     }
     
     /** Save new waypoint */
     public void saveWaypoint(Waypoint waypoint) {
-        if( m_waypoints==null ) {
-            m_waypoints = new Vector();
+        if( waypoints==null ) {
+            waypoints = new Vector();
         }
-        m_waypoints.addElement( waypoint );
+        waypoints.addElement( waypoint );
     }
     
-    /** Get waypoint form */
+    /* Not used, so comment out 
+    /** Get waypoint form 
     private WaypointForm getWaypointForm() {
-        if( m_waypointForm==null ) {
-            m_waypointForm = new WaypointForm(this);
+        if( waypointForm==null ) {
+            waypointForm = new WaypointForm(this);
         }
-        return m_waypointForm;
+        return waypointForm;
     }
+    */
 
     /** Mark waypoint */
     public void markWaypoint(String lat, String lon) {
-        if( m_waypointForm==null ) {
-            m_waypointForm = new WaypointForm(this);
+        if( waypointForm==null ) {
+            waypointForm = new WaypointForm(this);
         }
-        m_waypointForm.setValues("", lat, lon);
-        m_waypointForm.setEditingFlag( false );
-        m_display.setCurrent( m_waypointForm );
+        waypointForm.setValues("", lat, lon);
+        waypointForm.setEditingFlag( false );
+        display.setCurrent( waypointForm );
     }
     
     /** Edit waypoint */
     public void editWaypoint(Waypoint wp) {
-        if( m_waypointForm==null ) {
-            m_waypointForm = new WaypointForm(this);
+        if( waypointForm==null ) {
+            waypointForm = new WaypointForm(this);
         }
-        m_waypointForm.setValues( wp );
-        m_waypointForm.setEditingFlag( true );
-        m_display.setCurrent( m_waypointForm );        
+        waypointForm.setValues( wp );
+        waypointForm.setEditingFlag( true );
+        display.setCurrent( waypointForm );        
     }
     
     public int getRecordedPositionCount() {
-        if(m_recorder!=null) {
-            Track recordedTrack = m_recorder.getTrack();
+        if(recorder!=null) {
+            Track recordedTrack = recorder.getTrack();
             int positionCount = recordedTrack.getPositionCount();
             return positionCount;
         } else {
@@ -278,8 +280,8 @@ public class Controller {
     }
     
     public int getRecordedMarkerCount() {
-        if(m_recorder!=null) {
-            Track recordedTrack = m_recorder.getTrack();
+        if(recorder!=null) {
+            Track recordedTrack = recorder.getTrack();
             int markerCount = recordedTrack.getMarkerCount();
             return markerCount;
         } else {
@@ -288,10 +290,10 @@ public class Controller {
     }
     
     public synchronized GpsPosition getPosition() {
-        if(m_gpsDevice==null) {
+        if(gpsDevice==null) {
             return null;
         }
-        GpsPosition pos = m_gpsDevice.getPosition();
+        GpsPosition pos = gpsDevice.getPosition();
         return pos;
     }
 
@@ -299,17 +301,17 @@ public class Controller {
     public void exit() {
         saveWaypoints();
         
-        m_midlet.notifyDestroyed();
+        midlet.notifyDestroyed();
     }
     
     /** Get settings */
     public RecorderSettings getSettings() {
-        return m_settings;
+        return settings;
     }
 
     public String getGpsUrl() {
-        if(m_gpsDevice!=null) {
-            return m_gpsDevice.getAddress();
+        if(gpsDevice!=null) {
+            return gpsDevice.getAddress();
         } else {
             return "-";
         }
@@ -317,92 +319,92 @@ public class Controller {
 
     /** Show trail */
     public void showTrail() {
-        m_display.setCurrent(getTrailCanvas());
+        display.setCurrent(getTrailCanvas());
     }
     
     private TrailCanvas getTrailCanvas() {
-        if(m_trailCanvas==null) {
-            m_trailCanvas = new TrailCanvas(this);
+        if(trailCanvas==null) {
+            trailCanvas = new TrailCanvas(this);
         }
-        return m_trailCanvas;
+        return trailCanvas;
     }
 
     /** Show splash canvas */
     public void showSplash() {
-        m_display.setCurrent( getSplashCanvas() );
+        display.setCurrent( getSplashCanvas() );
     }
     
     /** Show export settings */
     public void showExportSettings() {
-        m_display.setCurrent( getExportSettingsForm() );
+        display.setCurrent( getExportSettingsForm() );
     }
            
     /** Show export settings form */
     private ExportSettingsForm getExportSettingsForm() {
-        if( m_exportSettingsForm==null ) {
-            m_exportSettingsForm = new ExportSettingsForm(this);
+        if( exportSettingsForm==null ) {
+            exportSettingsForm = new ExportSettingsForm(this);
         }
-        return m_exportSettingsForm;
+        return exportSettingsForm;
     }
     
     /** Get instance of splash screen */
     private SplashCanvas getSplashCanvas() {
-        if( m_splashCanvas==null ) {
-            m_splashCanvas = new SplashCanvas(this);
+        if( splashCanvas==null ) {
+            splashCanvas = new SplashCanvas(this);
         }
-        return m_splashCanvas;
+        return splashCanvas;
     }
 
     public void showSettings() {
-        m_display.setCurrent(getSettingsList());
+        display.setCurrent(getSettingsList());
     }
     
     /** Get instance of settings list */
     private SettingsList getSettingsList() {
-        if(m_settingsList==null) {
-            m_settingsList = new SettingsList(this);
+        if(settingsList==null) {
+            settingsList = new SettingsList(this);
         }
-        return m_settingsList;
+        return settingsList;
     }
 
     /** Show waypoint list */
     public void showWaypointList() {
-        if( m_waypointList==null) {
-            m_waypointList = new WaypointList( this );
+        if( waypointList==null) {
+            waypointList = new WaypointList( this );
         }
-        m_waypointList.setWaypoints( m_waypoints );
-        m_display.setCurrent( m_waypointList );
+        waypointList.setWaypoints( waypoints );
+        display.setCurrent( waypointList );
     }
     
     /** Show device list */
     public void showDevices() {
-        m_display.setCurrent(getDeviceList());
+        display.setCurrent(getDeviceList());
     }
     
     /** Get instance of device list */
     private DeviceList getDeviceList() {
-        if(m_deviceList==null) {
-            m_deviceList = new DeviceList(this);
+        if(deviceList==null) {
+            deviceList = new DeviceList(this);
         }
-        return m_deviceList;
+        return deviceList;
     }
     
     /** Show error */
     public void showError(String message) {
         Alert newAlert = new Alert("Error", message, null, AlertType.ERROR);
         newAlert.setTimeout(5000);
-        m_display.setCurrent(newAlert, m_trailCanvas);
+        display.setCurrent(newAlert, trailCanvas);
     }
 
     /** Update selected waypoint */
     public void updateWaypoint(String m_oldWaypointName, Waypoint newWaypoint) {
-        Enumeration waypointEnum = m_waypoints.elements();
+        Enumeration waypointEnum = waypoints.elements();
         while(waypointEnum.hasMoreElements()) {
             Waypoint wp = (Waypoint)waypointEnum.nextElement();
             String currentName = wp.getName();
             if( currentName.equals( m_oldWaypointName )) {
-                int updateIndex = m_waypoints.indexOf( wp );
-                m_waypoints.setElementAt( newWaypoint, updateIndex);
+                int updateIndex = waypoints.indexOf( wp );
+                waypoints.setElementAt( newWaypoint, updateIndex);
                 return;
             }            
         }
@@ -410,49 +412,49 @@ public class Controller {
 
     /** Save waypoints to persistent storage */
     private void saveWaypoints() {
-        m_settings.setWaypoints( m_waypoints );
+        settings.setWaypoints( waypoints );
     }
 
     /** Remove selected waypoint */
     public void removeWaypoint(Waypoint wp) {
-        m_waypoints.removeElement(wp);
+        waypoints.removeElement(wp);
     }
 
     /** Display recording settings form */
     public void showRecordingSettings() {
-        if( m_recordingSettingsForm==null ) {
-            m_recordingSettingsForm = new RecordingSettingsForm(this);
+        if( recordingSettingsForm==null ) {
+            recordingSettingsForm = new RecordingSettingsForm(this);
         }
-        m_display.setCurrent( m_recordingSettingsForm );
+        display.setCurrent( recordingSettingsForm );
     }
 
     /** Set recording interval */
     public void saveRecordingInterval(int interval) {
-        m_settings.setRecordingInterval(interval);
-        m_recorder.setInterval(interval);                
+        settings.setRecordingInterval(interval);
+        recorder.setInterval(interval);                
     }
 
     /** Display display settings form */
     public void showDisplaySettings() {
-        if( m_displaySettingsForm==null) {
-            m_displaySettingsForm = new DisplaySettingsForm(this);
+        if( displaySettingsForm==null) {
+            displaySettingsForm = new DisplaySettingsForm(this);
         }
-        m_display.setCurrent(m_displaySettingsForm);
+        display.setCurrent(displaySettingsForm);
     }
  
     /** Set recording marker step */
     public void saveRecordingMarkerStep(int newStep) {
-        m_settings.setRecordingMarkerInterval( newStep );
-        m_recorder.setIntervalForMarkers(newStep);
+        settings.setRecordingMarkerInterval( newStep );
+        recorder.setIntervalForMarkers(newStep);
     }
 
     /** Get recorded track */
     public Track getTrack() {
-        return m_recorder.getTrack();
+        return recorder.getTrack();
     }
    
     public Displayable getCurrentScreen(){
-    	return this.m_display.getCurrent();
+    	return this.display.getCurrent();
     }
     
 }

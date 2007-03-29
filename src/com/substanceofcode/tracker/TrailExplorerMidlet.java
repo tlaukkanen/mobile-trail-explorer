@@ -35,13 +35,13 @@ import com.substanceofcode.tracker.controller.*;
  */
 public class TrailExplorerMidlet extends MIDlet {
     
-    private static Controller m_controller;
+    private static Controller controller;
     
     public TrailExplorerMidlet() {
     	try{
 	        Display disp = Display.getDisplay(this);
-	        m_controller = new Controller(this, disp);
-	        m_controller.showSplash();
+	        controller = new Controller(this, disp);
+	        controller.showSplash();
     	}catch(Exception any){
     		any.printStackTrace();
     	}

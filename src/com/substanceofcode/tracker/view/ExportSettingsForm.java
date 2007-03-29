@@ -38,18 +38,18 @@ import javax.microedition.lcdui.TextField;
  */
 public class ExportSettingsForm extends Form implements CommandListener {
     
-    private Controller m_controller;
+    private Controller controller;
     
-    private Command m_okCommand;
-    private Command m_cancelCommand;
+    private Command okCommand;
+    private Command cancelCommand;
 
-    private TextField m_exportFolderField;
-    private ChoiceGroup m_exportFormatGroup;
+    private TextField exportFolderField;
+    private ChoiceGroup exportFormatGroup;
     
     /** Creates a new instance of ExportSettingsForm */
     public ExportSettingsForm(Controller controller) {
         super("Exporting");
-        m_controller = controller;
+        this.controller = controller;
         initializeCommands();        
         initializeControls();
         this.setCommandListener(this);
@@ -57,37 +57,37 @@ public class ExportSettingsForm extends Form implements CommandListener {
 
     /** Initialize commands */
     private void initializeCommands() {
-        m_okCommand = new Command("OK", Command.SCREEN, 1);
-        this.addCommand( m_okCommand );
-        m_cancelCommand = new Command("Cancel", Command.SCREEN, 2);
-        this.addCommand( m_cancelCommand );
+        okCommand = new Command("OK", Command.SCREEN, 1);
+        this.addCommand( okCommand );
+        cancelCommand = new Command("Cancel", Command.SCREEN, 2);
+        this.addCommand( cancelCommand );
     }
 
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if(command==m_okCommand) {
+        if(command==okCommand) {
             // Save export folder
-            String exportFolder = m_exportFolderField.getString();
-            RecorderSettings settings = m_controller.getSettings();
+            String exportFolder = exportFolderField.getString();
+            RecorderSettings settings = controller.getSettings();
             settings.setExportFolder( exportFolder );
             
             // Save export format
-            int selectedFormat = m_exportFormatGroup.getSelectedIndex();
+            int selectedFormat = exportFormatGroup.getSelectedIndex();
             settings.setExportFormat( selectedFormat );
             
-            m_controller.showSettings();
+            controller.showSettings();
         }
         
-        if(command==m_cancelCommand) {
+        if(command==cancelCommand) {
             // Return to the settings list
-            m_controller.showSettings();
+            controller.showSettings();
         }
     }
 
     /** Initialize form controls */
     private void initializeControls() {
         
-        RecorderSettings settings = m_controller.getSettings();
+        RecorderSettings settings = controller.getSettings();
         if(settings==null) {
             return;
         }
@@ -97,23 +97,23 @@ public class ExportSettingsForm extends Form implements CommandListener {
         if(exportFolder==null) {
             exportFolder = "E:/";
         }
-        m_exportFolderField = new TextField(
+        exportFolderField = new TextField(
                 "Export folder", 
                 exportFolder, 
                 32, 
                 TextField.ANY);
-        this.append(m_exportFolderField);
+        this.append(exportFolderField);
         
         // Initialize format group
         String[] formats = {"KML, Google Earth", "GPX, GPS eXchange Format"};
-        m_exportFormatGroup = new ChoiceGroup(
+        exportFormatGroup = new ChoiceGroup(
                 "Format",
                 ChoiceGroup.EXCLUSIVE, 
                 formats, 
                 null);
         int selectedFormat = settings.getExportFormat();
-        m_exportFormatGroup.setSelectedIndex(selectedFormat, true);
-        this.append( m_exportFormatGroup );
+        exportFormatGroup.setSelectedIndex(selectedFormat, true);
+        this.append( exportFormatGroup );
     }
     
 }

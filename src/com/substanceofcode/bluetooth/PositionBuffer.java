@@ -27,18 +27,18 @@ package com.substanceofcode.bluetooth;
  */
 public class PositionBuffer {
     
-    private GpsPosition m_position;
+    private GpsPosition position;
     
     /** Creates a new instance of PositionBuffer */
     public PositionBuffer() {
     }
     
     public synchronized GpsPosition getPosition() {
-        return m_position;
+        return position;
     }
     
     public synchronized void setPosition(GpsPosition position) {
-        m_position = position;
+        this.position = position;
     }
     
 }

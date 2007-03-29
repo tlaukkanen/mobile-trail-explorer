@@ -54,60 +54,60 @@ import javax.microedition.lcdui.game.Sprite;
  */
 public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     
-    private Controller m_controller;
-    private GpsPosition m_lastPosition;
-    private Vector m_positionTrail;
+    private Controller controller;
+    private GpsPosition lastPosition;
+    private Vector positionTrail;
     
-    private Thread m_thread;
-    private int m_counter;
-    private boolean m_refresh;
-    private String m_error;
+    private Thread thread;
+    private int counter;
+    private boolean refresh;
+    private String error;
     
     /** Commands */
-    private Command m_startStopCommand;
-    private Command m_settingsCommand;
-    private Command m_exitCommand;
-    private Command m_markWaypointCommand;
-    private Command m_editWaypointsCommand;
+    private Command startStopCommand;
+    private Command settingsCommand;
+    private Command exitCommand;
+    private Command markWaypointCommand;
+    private Command editWaypointsCommand;
     
     /** Trail drawing helpers */
-    private int m_center;
-    private int m_middle;
-    private int m_movementSize;
-    private int m_verticalMovement;
-    private int m_horizontalMovement;
-    private int m_verticalZoomFactor;
-    private int m_horizontalZoomFactor;
+    private int center;
+    private int middle;
+    private int movementSize;
+    private int verticalMovement;
+    private int horizontalMovement;
+    private int verticalZoomFactor;
+    private int horizontalZoomFactor;
     
-    private Image m_redDotImage;
-    private Image m_compass;
-    private Sprite m_compassArrows;
-    private boolean m_largeCompass;
+    private Image redDotImage;
+    private Image compass;
+    private Sprite compassArrows;
+    private boolean largeCompass;
     
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller) {
-        m_controller = controller;
+        this.controller = controller;
         setFullScreenMode( true );
         
-        m_positionTrail = new Vector();
+        positionTrail = new Vector();
         
-        m_refresh = true;
-        m_thread = new Thread(this);
-        m_thread.start();
-        m_counter=0;
+        refresh = true;
+        thread = new Thread(this);
+        thread.start();
+        counter=0;
         
         initializeCommands();
         setCommandListener(this);
         
-        m_center = this.getWidth()/2;
-        m_middle = this.getHeight()/2;
-        m_movementSize = this.getWidth()/8;
-        m_verticalMovement = 0;
-        m_horizontalMovement = 0;
-        m_verticalZoomFactor = 2048;
-        m_horizontalZoomFactor = 1024;
+        center = this.getWidth()/2;
+        middle = this.getHeight()/2;
+        movementSize = this.getWidth()/8;
+        verticalMovement = 0;
+        horizontalMovement = 0;
+        verticalZoomFactor = 2048;
+        horizontalZoomFactor = 1024;
         
-        m_redDotImage = ImageUtil.loadImage("/images/red-dot.png");
+        redDotImage = ImageUtil.loadImage("/images/red-dot.png");
         // Set backlight always on when building with Nokia UI API
         /*
         int backLightIndex = 0;
@@ -116,25 +116,25 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
          */
         
         Image tempCompassArrows = ImageUtil.loadImage("/images/compass-arrows.png");
-        m_compass = ImageUtil.loadImage("/images/compass.png");
+        compass = ImageUtil.loadImage("/images/compass.png");
         // Check for high resolution (eg. N80 352x416)
         if(this.getWidth()>250) {
             // Double the compass size
-            m_largeCompass = true;
-            m_compass = ImageUtil.scale(
-                    m_compass,
-                    m_compass.getWidth()*2,
-                    m_compass.getHeight()*2);
+            largeCompass = true;
+            compass = ImageUtil.scale(
+                    compass,
+                    compass.getWidth()*2,
+                    compass.getHeight()*2);
             tempCompassArrows = ImageUtil.scale(
                     tempCompassArrows,
                     tempCompassArrows.getWidth()*2,
                     tempCompassArrows.getHeight()*2);
-            m_compassArrows = new Sprite(tempCompassArrows, 22, 22);
-            m_compassArrows.setPosition(this.getWidth() - 44, 22);
+            compassArrows = new Sprite(tempCompassArrows, 22, 22);
+            compassArrows.setPosition(this.getWidth() - 44, 22);
         } else {
-            m_largeCompass = false;
-            m_compassArrows = new Sprite(tempCompassArrows, 11, 11);
-            m_compassArrows.setPosition(this.getWidth() - 22, 11);
+            largeCompass = false;
+            compassArrows = new Sprite(tempCompassArrows, 11, 11);
+            compassArrows.setPosition(this.getWidth() - 22, 11);
         }
         
     }
@@ -143,24 +143,24 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private void initializeCommands() {
         
         // Edit waypoints command for listing existing waypoints
-        m_editWaypointsCommand = new Command("Edit waypoints", Command.SCREEN, 4);
-        addCommand(m_editWaypointsCommand);
+        editWaypointsCommand = new Command("Edit waypoints", Command.SCREEN, 4);
+        addCommand(editWaypointsCommand);
         
         // Start/Stop command for toggling recording
-        m_startStopCommand = new Command("Start/Stop recording", Command.ITEM, 1);
-        addCommand(m_startStopCommand);
+        startStopCommand = new Command("Start/Stop recording", Command.ITEM, 1);
+        addCommand(startStopCommand);
         
         // Settings command for showing settings list
-        m_settingsCommand = new Command("Settings", Command.SCREEN, 5);
-        addCommand(m_settingsCommand);
+        settingsCommand = new Command("Settings", Command.SCREEN, 5);
+        addCommand(settingsCommand);
         
         // Mark a new waypoint command
-        m_markWaypointCommand = new Command("Mark waypoint", Command.SCREEN, 3);
-        addCommand(m_markWaypointCommand);
+        markWaypointCommand = new Command("Mark waypoint", Command.SCREEN, 3);
+        addCommand(markWaypointCommand);
         
         // Exit command
-        m_exitCommand = new Command("Exit", Command.EXIT, 10);
-        addCommand(m_exitCommand);
+        exitCommand = new Command("Exit", Command.EXIT, 10);
+        addCommand(exitCommand);
         
     }
     
@@ -190,7 +190,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private void drawWaypoints(Graphics g) {
         
         // Draw information about the waypoints
-        Vector waypoints = m_controller.getWaypoints();
+        Vector waypoints = controller.getWaypoints();
         if(waypoints==null) {
             return;
         }
@@ -220,20 +220,20 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         double latitude = lat;
         double longitude = lon;
         
-        if(m_lastPosition==null) {
+        if(lastPosition==null) {
             return null;
         }
         
-        double currentLatitude = m_lastPosition.latitude;
-        double currentLongitude = m_lastPosition.longitude;
+        double currentLatitude = lastPosition.latitude;
+        double currentLongitude = lastPosition.longitude;
         
         latitude -= currentLatitude;
-        latitude *= m_verticalZoomFactor;
-        int y = m_middle + m_verticalMovement - (int)latitude;
+        latitude *= verticalZoomFactor;
+        int y = middle + verticalMovement - (int)latitude;
         
         longitude -= currentLongitude;
-        longitude *= m_horizontalZoomFactor;
-        int x = (int)longitude + m_center + m_horizontalMovement;
+        longitude *= horizontalZoomFactor;
+        int x = (int)longitude + center + horizontalMovement;
         
         CanvasPoint point = new CanvasPoint(x,y);
         return point;
@@ -245,20 +245,20 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         try {
             
             // Exit if we don't have anything to draw
-            if(m_lastPosition==null) {
+            if(lastPosition==null) {
                 return;
             }
             
             int center = getWidth()/2;
             int middle = getHeight()/2;
             
-            double currentLatitude = m_lastPosition.latitude;
-            double currentLongitude = m_lastPosition.longitude;
+            double currentLatitude = lastPosition.latitude;
+            double currentLongitude = lastPosition.longitude;
             
             double lastLatitude = currentLatitude;
             double lastLongitude = currentLongitude;
             
-            int trailPositionCount = m_positionTrail.size();
+            int trailPositionCount = positionTrail.size();
             
             // Draw trail with red color
             g.setColor(222,0,0);
@@ -266,7 +266,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             positionIndex>=0;
             positionIndex--) {
                 
-                GpsPosition pos = (GpsPosition)m_positionTrail.elementAt(positionIndex);
+                GpsPosition pos = (GpsPosition)positionTrail.elementAt(positionIndex);
                 
                 double lat = pos.latitude;
                 double lon = pos.longitude;
@@ -282,9 +282,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             // Draw red dot on current location
             g.drawImage(
-                    m_redDotImage, 
-                    center + m_horizontalMovement, 
-                    middle + m_verticalMovement, 
+                    redDotImage, 
+                    center + horizontalMovement, 
+                    middle + verticalMovement, 
                     Graphics.VCENTER|Graphics.HCENTER);
             
         } catch (Exception ex) {
@@ -298,20 +298,20 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     
     /** Draw compass */
     private void drawCompass(Graphics g) {
-        if(m_lastPosition != null) {
+        if(lastPosition != null) {
             int fix = 10;
-            if(m_largeCompass) {
+            if(largeCompass) {
                 fix = 20;
             }
-            g.drawImage(m_compass, m_compassArrows.getX() - fix, m_compassArrows.getY() - fix, 0);
-            m_compassArrows.setFrame(m_lastPosition.getHeadingIndex());
-            m_compassArrows.paint(g);
+            g.drawImage(compass, compassArrows.getX() - fix, compassArrows.getY() - fix, 0);
+            compassArrows.setFrame(lastPosition.getHeadingIndex());
+            compassArrows.paint(g);
         }
     }
     
     /** Draw status bar */
     private void drawStatusBar(Graphics g) {
-        int width = getWidth();
+        //int width = getWidth();
         int height = getHeight();
         
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
@@ -320,16 +320,16 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         /** Draw status */
         g.setColor(0,0,255);
-        g.drawString("Status: " + m_controller.getStatus(),1,0,Graphics.TOP|Graphics.LEFT );
+        g.drawString("Status: " + controller.getStatus(),1,0,Graphics.TOP|Graphics.LEFT );
         
         /** Draw status */
         g.setColor(0,0,0);
-        if(m_lastPosition!=null) {
+        if(lastPosition!=null) {
             
             int positionAdd = currentFont.stringWidth("LAN:O");
             int displayRow = 1;
             
-            RecorderSettings settings = m_controller.getSettings();
+            RecorderSettings settings = controller.getSettings();
             
             /** Draw coordinates information */
             if(settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES)==true) {
@@ -338,14 +338,14 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 g.drawString(
                         "LON:", 1, fontHeight*2, Graphics.TOP|Graphics.LEFT);
                 
-                double latitude = m_lastPosition.latitude;
+                double latitude = lastPosition.latitude;
                 g.drawString(
                         getDegreeString( latitude ),
                         positionAdd,
                         fontHeight,
                         Graphics.TOP|Graphics.LEFT );
                 
-                double longitude = m_lastPosition.longitude;
+                double longitude = lastPosition.longitude;
                 g.drawString(
                         getDegreeString( longitude ),
                         positionAdd,
@@ -361,12 +361,12 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 String units;
                 if(settings.getUnitsAsKilometers() == false) {
                     speed = (int) UnitConverter.convertSpeed(
-                            m_lastPosition.speed,
+                            lastPosition.speed,
                             UnitConverter.KILOMETERS_PER_HOUR,
                             UnitConverter.MILES_PER_HOUR);
                     units = " mph";
                 } else {
-                    speed = (int) m_lastPosition.speed;
+                    speed = (int) lastPosition.speed;
                     units = " km/h";
                 }
                 g.drawString(
@@ -384,7 +384,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             /** Draw heading information */
             if(settings.getDisplayValue(RecorderSettings.DISPLAY_HEADING)==true) {
-                String heading = m_lastPosition.getHeadingString();
+                String heading = lastPosition.getHeadingString();
                 g.drawString(
                         "HEA:",
                         1,
@@ -402,7 +402,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             if(settings.getDisplayValue(RecorderSettings.DISPLAY_DISTANCE)==true) {
                 String distance;
                 String units;
-                Track track = m_controller.getTrack();
+                Track track = controller.getTrack();
                 double distanceInKilometers = track.getDistance();
                 if( settings.getUnitsAsKilometers()==false) {
                     /** Distance in feets */
@@ -434,7 +434,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             if(settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE)==true) {
                 String altitude;
                 String units;
-                double altitudeInMeters = m_lastPosition.altitude;
+                double altitudeInMeters = lastPosition.altitude;
                 if( settings.getUnitsAsKilometers()==false) {
                     /** Altitude in feets */
                     double altitudeInFeets = UnitConverter.convertLength(
@@ -463,7 +463,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             Date now = Calendar.getInstance().getTime();
             long secondsSinceLastPosition;
-            secondsSinceLastPosition = (now.getTime() - m_lastPosition.date.getTime())/1000;
+            secondsSinceLastPosition = (now.getTime() - lastPosition.date.getTime())/1000;
             if(secondsSinceLastPosition>5) {
                 g.drawString(
                         "Last refresh " + secondsSinceLastPosition +
@@ -473,9 +473,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                         Graphics.TOP|Graphics.LEFT );
             }
             
-        } else if (m_controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
+        } else if (controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
             g.drawString(
-                    "Position data is unavailable. " + m_counter,
+                    "Position data is unavailable. " + counter,
                     1,
                     fontHeight,
                     Graphics.TOP|Graphics.LEFT );
@@ -483,23 +483,23 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         
         /** Draw error texts */
         g.setColor(255,0,0);
-        if(m_error!=null){
+        if(error!=null){
             g.drawString(
-                    "" + m_error,
+                    "" + error,
                     1,
                     height - (fontHeight*3 + 2),
                     Graphics.TOP|Graphics.LEFT );
         }
-        if(m_controller.getError()!=null){
-            g.drawString("" + m_controller.getError(),
+        if(controller.getError()!=null){
+            g.drawString("" + controller.getError(),
                     1,
                     height - (fontHeight*2 + 2),
                     Graphics.TOP|Graphics.LEFT );
         }
         
         /** Draw recorded position count */
-        int positionCount = m_controller.getRecordedPositionCount();
-        int markerCount = m_controller.getRecordedMarkerCount();
+        int positionCount = controller.getRecordedPositionCount();
+        int markerCount = controller.getRecordedMarkerCount();
         String posCount = "Positions recorded: " + positionCount + "/" + markerCount;
         g.drawString(posCount, 1, height - (fontHeight + 2), Graphics.TOP|Graphics.LEFT);
         
@@ -528,32 +528,32 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     /** Thread for getting current position */
     public void run() {
         GpsPosition lastRecordedPosition = null;
-        while(m_refresh==true) {
+        while(refresh==true) {
             try{
                 Thread.sleep(1000);
-                m_counter++;
-                GpsPosition currentPosition = m_controller.getPosition();
+                counter++;
+                GpsPosition currentPosition = controller.getPosition();
                 
                 if(currentPosition!=null) {
                     boolean stopped = false;
                     if( lastRecordedPosition!=null ) {
                         stopped = currentPosition.equals( lastRecordedPosition );
                     }
-                    m_lastPosition = currentPosition;
+                    lastPosition = currentPosition;
                     
                     /** Create trail if user have moved */
-                    if(m_counter%5==0 && stopped==false) {
-                        m_positionTrail.addElement( m_lastPosition );
+                    if(counter%5==0 && stopped==false) {
+                        positionTrail.addElement( lastPosition );
                         lastRecordedPosition = currentPosition;
-                        while(m_positionTrail.size()>120) {
-                            m_positionTrail.removeElement( m_positionTrail.firstElement() );
+                        while(positionTrail.size()>120) {
+                            positionTrail.removeElement( positionTrail.firstElement() );
                         }
                     }
                 }
                 this.repaint();
             } catch(Exception ex) {
                 System.err.println("Error in TrailCanvas.run: " + ex.toString());
-                m_error = ex.toString();
+                error = ex.toString();
             }
         }
         
@@ -566,14 +566,14 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         switch( keyCode ) {
             case( KEY_NUM1 ):
                 // Zoom in
-                m_verticalZoomFactor *= 2;
-                m_horizontalZoomFactor *= 2;
+                verticalZoomFactor *= 2;
+                horizontalZoomFactor *= 2;
                 break;
                 
             case( KEY_NUM3 ):
                 // Zoom out
-                m_verticalZoomFactor /= 2;
-                m_horizontalZoomFactor /= 2;
+                verticalZoomFactor /= 2;
+                horizontalZoomFactor /= 2;
                 break;
                 
                 /** We could handle arrow key presses here for panning the view */
@@ -593,51 +593,51 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
              */
         }
         if(gameKey==UP || keyCode==KEY_NUM2) {
-            m_verticalMovement += m_movementSize;
+            verticalMovement += movementSize;
         }
         if(gameKey==DOWN || keyCode==KEY_NUM8) {
-            m_verticalMovement -= m_movementSize;
+            verticalMovement -= movementSize;
         }
         if(gameKey==LEFT || keyCode==KEY_NUM4) {
-            m_horizontalMovement += m_movementSize;
+            horizontalMovement += movementSize;
         }
         if(gameKey==RIGHT || keyCode==KEY_NUM6) {
-            m_horizontalMovement -= m_movementSize;
+            horizontalMovement -= movementSize;
         }
         if(gameKey==FIRE || keyCode==KEY_NUM5) {
-            m_verticalMovement = 0;
-            m_horizontalMovement = 0;
+            verticalMovement = 0;
+            horizontalMovement = 0;
         }
         
     }
     
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if( command == m_startStopCommand ) {
-            m_controller.startStop();
+        if( command == startStopCommand ) {
+            controller.startStop();
         }
-        if( command == m_markWaypointCommand ) {
+        if( command == markWaypointCommand ) {
             
             String latString = "";
             String lonString = "";
-            if(m_lastPosition!=null) {
-                double lat = m_lastPosition.latitude;
+            if(lastPosition!=null) {
+                double lat = lastPosition.latitude;
                 latString = getDegreeString(lat);
                 
-                double lon = m_lastPosition.longitude;
+                double lon = lastPosition.longitude;
                 lonString = getDegreeString(lon);
             }
             
-            m_controller.markWaypoint(latString, lonString);
+            controller.markWaypoint(latString, lonString);
         }
-        if( command == m_settingsCommand ) {
-            m_controller.showSettings();
+        if( command == settingsCommand ) {
+            controller.showSettings();
         }
-        if( command == m_exitCommand ) {
-            m_controller.exit();
+        if( command == exitCommand ) {
+            controller.exit();
         }
-        if( command == m_editWaypointsCommand ) {
-            m_controller.showWaypointList();
+        if( command == editWaypointsCommand ) {
+            controller.showWaypointList();
         }
         
     }

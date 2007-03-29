@@ -37,9 +37,9 @@ import javax.bluetooth.ServiceRecord;
  */
 public class BluetoothUtility implements DiscoveryListener {
     
-    private LocalDevice m_localDevice; // local Bluetooth Manager
-    private DiscoveryAgent m_discoveryAgent; // discovery agent   
-    private boolean m_searchComplete;
+    private LocalDevice localDevice; // local Bluetooth Manager
+    private DiscoveryAgent discoveryAgent; // discovery agent   
+    private boolean searchComplete;
     
     /** Collects the remote devices found during a search. */
     private Vector /* BluetoothDevice */ devices = new Vector();
@@ -51,12 +51,12 @@ public class BluetoothUtility implements DiscoveryListener {
    
     /** Creates a new instance of BluetoothUtility */
     public BluetoothUtility() {
-        m_searchComplete = false;
+        searchComplete = false;
     }
     
     /** Check for search status */
     public boolean searchComplete() {
-        return m_searchComplete;
+        return searchComplete;
     }
     
     /** Get discovered devices */
@@ -68,14 +68,14 @@ public class BluetoothUtility implements DiscoveryListener {
      * Initialize bluetooth
      */
     public void initialize() throws BluetoothStateException {
-        m_localDevice = null;
-        m_discoveryAgent = null;
+        localDevice = null;
+        discoveryAgent = null;
         // Retrieve the local device to get to the Bluetooth Manager
-        m_localDevice = LocalDevice.getLocalDevice();
+        localDevice = LocalDevice.getLocalDevice();
         // Servers set the discoverable mode to GIAC
-        m_localDevice.setDiscoverable(DiscoveryAgent.GIAC);
+        localDevice.setDiscoverable(DiscoveryAgent.GIAC);
         // Clients retrieve the discovery agent
-        m_discoveryAgent = m_localDevice.getDiscoveryAgent();
+        discoveryAgent = localDevice.getDiscoveryAgent();
     }    
     
     /**
@@ -83,8 +83,8 @@ public class BluetoothUtility implements DiscoveryListener {
      */
     public void findDevices() {
         try {
-            boolean complete = m_discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
-            m_searchComplete = false;
+            boolean complete = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
+            searchComplete = false;
         } catch (BluetoothStateException ex) {
             System.err.println("Error in BluetoothUtility.findDevices: " + ex.toString());
             ex.printStackTrace();
@@ -117,7 +117,7 @@ public class BluetoothUtility implements DiscoveryListener {
     }
 
     public void inquiryCompleted(int i) {
-        m_searchComplete = true;
+        searchComplete = true;
     }
     
 }

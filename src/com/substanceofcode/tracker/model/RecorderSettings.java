@@ -36,7 +36,7 @@ import javax.microedition.midlet.MIDlet;
  */
 public class RecorderSettings {
     
-    private static Settings m_settings;
+    private static Settings settings;
     
     private static final String GPS_DEVICE_STRING = "gps-device";
     private static final String WAYPOINTS = "waypoints";
@@ -62,7 +62,7 @@ public class RecorderSettings {
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
         try {
-            m_settings = Settings.getInstance(midlet);
+            settings = Settings.getInstance(midlet);
         }catch(Exception ex) {
             System.err.println("Error occured while creating an instance " +
                     "of Settings class: " + ex.toString());
@@ -71,7 +71,7 @@ public class RecorderSettings {
     
     /** Get export folder. Default is E:/ */
     public String getExportFolder() {
-        String result = m_settings.getStringProperty(EXPORT_FOLDER, "");
+        String result = settings.getStringProperty(EXPORT_FOLDER, "");
         if(result.length()==0) {
             result = "E:/";
         }
@@ -80,25 +80,25 @@ public class RecorderSettings {
     
     /** Set export folder. */
     public void setExportFolder(String exportFolder) {
-        m_settings.setStringProperty(EXPORT_FOLDER, exportFolder);
+        settings.setStringProperty(EXPORT_FOLDER, exportFolder);
         saveSettings();
     }
     
     /** Get a GPS device connection string */
     public String getGpsDeviceConnectionString() {
-        String result = m_settings.getStringProperty(GPS_DEVICE_STRING, "");
+        String result = settings.getStringProperty(GPS_DEVICE_STRING, "");
         return result;
     }
     
     /** Set a GPS device connection string */
     public void setGpsDeviceConnectionString(String connectionString) {
-        m_settings.setStringProperty(GPS_DEVICE_STRING, connectionString);
+        settings.setStringProperty(GPS_DEVICE_STRING, connectionString);
         saveSettings();
     }
     
     /** Get waypoints */
     public Vector getWaypoints() {
-        String encodedWaypoints = m_settings.getStringProperty(WAYPOINTS, "");
+        String encodedWaypoints = settings.getStringProperty(WAYPOINTS, "");
         
         // Return empty Vector if we don't have any waypoints
         if(encodedWaypoints.length()==0) {
@@ -140,14 +140,14 @@ public class RecorderSettings {
             waypointString += latString + "|" + lonString + "|" + wp.getName() + "\n";
             
         }
-        m_settings.setStringProperty(WAYPOINTS, waypointString);
+        settings.setStringProperty(WAYPOINTS, waypointString);
         saveSettings();
     }
     
     /** Get recording interval */
     public int getRecordingInterval() {
         int defaultInterval = 10; // Mark default as 10 seconds
-        int recordingInterval = m_settings.getIntProperty(
+        int recordingInterval = settings.getIntProperty(
                 RECORDING_INTERVAL,
                 defaultInterval );
         return recordingInterval;
@@ -155,57 +155,57 @@ public class RecorderSettings {
     
     /** Set recording interval in seconds */
     public void setRecordingInterval(int interval) {
-        m_settings.setIntProperty( RECORDING_INTERVAL, interval);
+        settings.setIntProperty( RECORDING_INTERVAL, interval);
         saveSettings();
     }
     
     /** Get recording interval for markers */
     public int getRecordingMarkerInterval() {
-        return m_settings.getIntProperty(RECORDING_MARKER_INTERVAL, 10);
+        return settings.getIntProperty(RECORDING_MARKER_INTERVAL, 10);
     }
     
     /** Set recording interval for markers */
     public void setRecordingMarkerInterval(int interval) {
-        m_settings.setIntProperty(RECORDING_MARKER_INTERVAL, interval);
+        settings.setIntProperty(RECORDING_MARKER_INTERVAL, interval);
     }
             
     /** Get display setting */
     public boolean getDisplayValue(String displayItem) {
-        return m_settings.getBooleanProperty(displayItem, true);
+        return settings.getBooleanProperty(displayItem, true);
     }
     
     /**Set display setting */
     public void setDisplayValue(String displayItem, boolean value) {
-        m_settings.setBooleanProperty(displayItem, value);
+        settings.setBooleanProperty(displayItem, value);
         saveSettings();
     }
     
     /** Do we use kilometers as units? */
     public boolean getUnitsAsKilometers() {
-        return m_settings.getBooleanProperty(UNITS, true);
+        return settings.getBooleanProperty(UNITS, true);
     }
     
     /** Set units */
     public void setUnitsAsKilometers(boolean value) {
-        m_settings.setBooleanProperty(UNITS, value);
+        settings.setBooleanProperty(UNITS, value);
         saveSettings();
     }
     
     /** Get export format */
     public int getExportFormat() {
-        return m_settings.getIntProperty(EXPORT_FORMAT,0);
+        return settings.getIntProperty(EXPORT_FORMAT,0);
     }
     
     /** Set export format */
     public void setExportFormat( int format ) {
-        m_settings.setIntProperty(EXPORT_FORMAT, format);
+        settings.setIntProperty(EXPORT_FORMAT, format);
         saveSettings();
     }
     
     /** Save settings */
     private void saveSettings() {
         try{
-            m_settings.save(true);
+            settings.save(true);
         } catch(Exception ex) {
             ex.printStackTrace();
         }

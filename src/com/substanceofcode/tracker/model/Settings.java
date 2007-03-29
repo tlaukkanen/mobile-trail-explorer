@@ -37,10 +37,10 @@ import javax.microedition.rms.*;
  */
 public class Settings {
     
-    private static Settings m_store;
-    private MIDlet          m_midlet;
-    private boolean         m_valuesChanged = false;
-    private Hashtable       m_properties = new Hashtable();
+    private static Settings store;
+    private MIDlet          midlet;
+    private boolean         valuesChanged = false;
+    private Hashtable       properties = new Hashtable();
     
     /**
      * Singleton pattern is used to return 
@@ -48,31 +48,33 @@ public class Settings {
      */
     public static synchronized Settings getInstance( MIDlet midlet )
     throws IOException, RecordStoreException {
-        if( m_store == null ) {
-            m_store = new Settings( midlet );
+        if( store == null ) {
+            store = new Settings( midlet );
         }
-        return m_store;
+        return store;
     }
 
     /** Constructor */
     private Settings( MIDlet midlet )
     throws IOException, RecordStoreException {
-        m_midlet = midlet;
+        this.midlet = midlet;
         load();
     }
     
-    /** Return true if value exists in record store */
+    /* Method never called, so comment out.
+    /** Return true if value exists in record store 
     private boolean exists( String name ) {
         return getProperty( name ) != null;
     }
+    */
     
     /** Get property from Hashtable*/
     private synchronized String getProperty( String name ) {
-        String value = (String) m_properties.get( name );
-        if( value == null && m_midlet != null ) {
-            value = m_midlet.getAppProperty( name );
+        String value = (String) properties.get( name );
+        if( value == null && midlet != null ) {
+            value = midlet.getAppProperty( name );
             if( value != null ) {
-                m_properties.put( name, value );
+                properties.put( name, value );
             }
         }
         return value;
@@ -112,8 +114,8 @@ public class Settings {
         ByteArrayInputStream bin = null;
         DataInputStream din = null;
         
-        m_valuesChanged = false;
-        m_properties.clear();
+        valuesChanged = false;
+        properties.clear();
         
         try {
             rs = RecordStore.openRecordStore("Store", true );
@@ -128,7 +130,7 @@ public class Settings {
                     while( num-- > 0 ) {
                         String name = din.readUTF();
                         String value = din.readUTF();
-                        m_properties.put( name, value );
+                        properties.put( name, value );
                     }
                 }
             }
@@ -146,7 +148,7 @@ public class Settings {
     /** Save property Hashtable to record store */
     public synchronized void save( boolean force )
             throws IOException, RecordStoreException {
-        if( !m_valuesChanged && !force ) return;
+        if( !valuesChanged && !force ) return;
         
         RecordStore rs = null;
         ByteArrayOutputStream bout = new
@@ -155,11 +157,11 @@ public class Settings {
                 DataOutputStream( bout );
         
         try {
-            dout.writeInt( m_properties.size() );
-            Enumeration e = m_properties.keys();
+            dout.writeInt( properties.size() );
+            Enumeration e = properties.keys();
             while( e.hasMoreElements() ) {
                 String name = (String) e.nextElement();
-                String value = m_properties.get( name ).toString();
+                String value = properties.get( name ).toString();
                 dout.writeUTF( name );
                 dout.writeUTF( value );
             }
@@ -190,8 +192,8 @@ public class Settings {
     /** Set a string property */
     public synchronized boolean setStringProperty( String name, String value ) {
         if( name == null && value == null ) return false;
-        m_properties.put( name, value );
-        m_valuesChanged = true;
+        properties.put( name, value );
+        valuesChanged = true;
         return true;
     }
 }

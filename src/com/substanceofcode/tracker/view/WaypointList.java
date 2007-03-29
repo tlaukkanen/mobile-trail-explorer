@@ -37,39 +37,39 @@ import javax.microedition.lcdui.List;
  */
 public class WaypointList extends List implements CommandListener {
     
-    private Controller m_controller;
+    private Controller controller;
     
-    private Command m_editCommand;
-    private Command m_deleteCommand;
-    private Command m_backCommand;
+    private Command editCommand;
+    private Command deleteCommand;
+    private Command backCommand;
     
     private static final String TITLE = "Waypoints";
     
-    private Vector m_waypoints;
+    private Vector waypoints;
     
     
     /** Creates a new instance of WaypointList */
     public WaypointList(Controller controller) {
         super(TITLE, List.IMPLICIT);        
-        m_controller = controller;
+        this.controller = controller;
         
-        m_editCommand = new Command("Edit", Command.SCREEN, 1);
-        this.addCommand( m_editCommand );
-        setSelectCommand( m_editCommand );
+        editCommand = new Command("Edit", Command.SCREEN, 1);
+        this.addCommand( editCommand );
+        setSelectCommand( editCommand );
 
-        m_deleteCommand = new Command("Remove", Command.SCREEN, 2);
-        this.addCommand( m_deleteCommand );
+        deleteCommand = new Command("Remove", Command.SCREEN, 2);
+        this.addCommand( deleteCommand );
         
-        m_backCommand = new Command("Back", Command.SCREEN, 3);
-        this.addCommand( m_backCommand );
+        backCommand = new Command("Back", Command.SCREEN, 3);
+        this.addCommand( backCommand );
         
         this.setCommandListener( this );
     }
     
     /** Set waypoints */
     public void setWaypoints(Vector waypoints) {
-        m_waypoints = waypoints;
-        Enumeration waypointEnum = m_waypoints.elements();
+        this.waypoints = waypoints;
+        Enumeration waypointEnum = waypoints.elements();
         this.deleteAll();
         while(waypointEnum.hasMoreElements()) {
             Waypoint wp = (Waypoint)waypointEnum.nextElement();
@@ -78,21 +78,21 @@ public class WaypointList extends List implements CommandListener {
     }
         
     public void commandAction(Command command, Displayable displayable) {
-        if( command == m_backCommand ) {
+        if( command == backCommand ) {
             /** Display the trail canvas */
-            m_controller.showTrail();
+            controller.showTrail();
         }
         
-        if( command == m_editCommand ) {
+        if( command == editCommand ) {
             /** Display selected waypoint */
             Waypoint wp = getSelectedWaypoint();
-            m_controller.editWaypoint( wp );
+            controller.editWaypoint( wp );
         }
         
-        if( command == m_deleteCommand ) {
+        if( command == deleteCommand ) {
             /** Delete selected waypoint */
             Waypoint wp = getSelectedWaypoint();
-            m_controller.removeWaypoint(wp);
+            controller.removeWaypoint(wp);
             int selectedIndex = this.getSelectedIndex();
             this.delete( selectedIndex );
         }
@@ -102,7 +102,7 @@ public class WaypointList extends List implements CommandListener {
     private Waypoint getSelectedWaypoint() {
         if( this.size()>0 )  {
             int selectedIndex = this.getSelectedIndex();
-            Waypoint selectedWaypoint = (Waypoint)m_waypoints.elementAt( selectedIndex );
+            Waypoint selectedWaypoint = (Waypoint)waypoints.elementAt( selectedIndex );
             return selectedWaypoint;
         }
         return null;

@@ -37,16 +37,16 @@ import javax.microedition.lcdui.StringItem;
  */
 public class AboutForm extends Form implements CommandListener {
     
-    private Controller m_controller;
-    private Command m_backCommand;
+    private Controller controller;
+    private Command backCommand;
     
     /** Creates a new instance of AboutForm */
     public AboutForm(Controller controller) {
         super("About");
-        m_controller = controller;
+        this.controller = controller;
         
-        m_backCommand = new Command("Back", Command.SCREEN, 1);
-        this.addCommand( m_backCommand );
+        backCommand = new Command("Back", Command.SCREEN, 1);
+        this.addCommand( backCommand );
         
         this.append( new StringItem(
                 "Mobile Trail Explorer v0.2",
@@ -63,8 +63,8 @@ public class AboutForm extends Form implements CommandListener {
 
     /** Handle all commands */
     public void commandAction(Command command, Displayable displayable) {
-        if( command == m_backCommand ) {
-            m_controller.showTrail();
+        if( command == backCommand ) {
+            controller.showTrail();
         }
     }
     

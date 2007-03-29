@@ -37,18 +37,18 @@ import javax.microedition.lcdui.TextField;
  */
 public class RecordingSettingsForm extends Form implements CommandListener {
     
-    private Controller m_controller;
+    private Controller controller;
     
-    private Command m_okCommand;
-    private Command m_cancelCommand;
+    private Command okCommand;
+    private Command cancelCommand;
     
-    private TextField m_intervalField;
-    private TextField m_markerStepField;
+    private TextField intervalField;
+    private TextField markerStepField;
     
     /** Creates a new instance of RecordingSettingsForm */
     public RecordingSettingsForm(Controller controller) {
         super("Recording");
-        m_controller = controller;
+        this.controller = controller;
         
         initializeControls();
         initializeCommands();
@@ -59,10 +59,10 @@ public class RecordingSettingsForm extends Form implements CommandListener {
 
     
     public void commandAction(Command command, Displayable displayable) {
-        if(command == m_okCommand) {
+        if(command == okCommand) {
             // Save new interval
-            String intervalText = m_intervalField.getString();
-            String markerStepText = m_markerStepField.getString();
+            String intervalText = intervalField.getString();
+            String markerStepText = markerStepField.getString();
             int newInterval;
             int newStep;
             try{
@@ -73,44 +73,44 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 newInterval = 10;
                 newStep = 5;
             }
-            RecorderSettings settings = m_controller.getSettings();
-            m_controller.saveRecordingInterval( newInterval );
-            m_controller.saveRecordingMarkerStep( newStep );
+            RecorderSettings settings = controller.getSettings();
+            controller.saveRecordingInterval( newInterval );
+            controller.saveRecordingMarkerStep( newStep );
             
-            m_controller.showSettings();
+            controller.showSettings();
         } else {
             // Don't save the new interval
-            m_controller.showSettings();
+            controller.showSettings();
         }
     }
     
     /** Initialize commands */
     private void initializeCommands() {
-        m_okCommand = new Command("OK", Command.SCREEN, 1);
-        this.addCommand( m_okCommand );
-        m_cancelCommand = new Command("Cancel", Command.SCREEN, 2);
-        this.addCommand( m_cancelCommand );
+        okCommand = new Command("OK", Command.SCREEN, 1);
+        this.addCommand( okCommand );
+        cancelCommand = new Command("Cancel", Command.SCREEN, 2);
+        this.addCommand( cancelCommand );
     }
     
     /** Initialize form controls */
     private void initializeControls() {
-        RecorderSettings settings = m_controller.getSettings();
+        RecorderSettings settings = controller.getSettings();
         int interval = settings.getRecordingInterval();
         String intervalText = String.valueOf(interval);
         
-        m_intervalField = new TextField(
+        intervalField = new TextField(
                 "Recording interval in seconds", 
                 intervalText,
                 6,
                 TextField.NUMERIC);
-        this.append(m_intervalField);
+        this.append(intervalField);
         
         int markerStep = settings.getRecordingMarkerInterval();
-        m_markerStepField = new TextField("Create marker every Nth position",
+        markerStepField = new TextField("Create marker every Nth position",
                 String.valueOf(markerStep),
                 6,
                 TextField.NUMERIC);
-        this.append(m_markerStepField);
+        this.append(markerStepField);
     }
     
 }

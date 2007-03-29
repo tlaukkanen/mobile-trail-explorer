@@ -37,46 +37,46 @@ import javax.microedition.lcdui.List;
  */
 public class DeviceList extends List implements Runnable, CommandListener {
     
-    private Controller m_controller;
-    private int m_status;
+    private Controller controller;
+    private int status;
     private final static int STATUS_READY = 0;
     private final static int STATUS_SEARCHING = 2;
     private final static int STATUS_COMPLETE = 3;
-    private Thread m_searchThread;
+    private Thread searchThread;
     private final static String TITLE = "Devices";
     
     /** Commands */
-    private Command m_refreshCommand;
-    private Command m_selectCommand;
-    private Command m_cancelCommand;
+    private Command refreshCommand;
+    private Command selectCommand;
+    private Command cancelCommand;
     
     /** Creates a new instance of DeviceList */
     public DeviceList(Controller controller) {
         super(TITLE, List.IMPLICIT);        
 
         // Set controller
-        m_controller = controller;
+        this.controller = controller;
 
         // Set status
-        m_status = STATUS_READY;
+        status = STATUS_READY;
 
         // Initialize commands 
         initializeCommands();
         
         // Set search thread
-        m_searchThread = new Thread(this);
-        m_searchThread.start();
+        searchThread = new Thread(this);
+        searchThread.start();
     }
     
     /** Initialize commands */
     private void initializeCommands() {
-        m_refreshCommand = new Command("Refresh", Command.ITEM, 2);
-        addCommand(m_refreshCommand);
-        m_selectCommand = new Command("Select", Command.ITEM, 1);
-        addCommand(m_selectCommand);
-        setSelectCommand(m_selectCommand);
-        m_cancelCommand = new Command("Cancel", Command.SCREEN, 3);
-        addCommand(m_cancelCommand);
+        refreshCommand = new Command("Refresh", Command.ITEM, 2);
+        addCommand(refreshCommand);
+        selectCommand = new Command("Select", Command.ITEM, 1);
+        addCommand(selectCommand);
+        setSelectCommand(selectCommand);
+        cancelCommand = new Command("Cancel", Command.SCREEN, 3);
+        addCommand(cancelCommand);
         
         setCommandListener(this);
     }
@@ -87,10 +87,10 @@ public class DeviceList extends List implements Runnable, CommandListener {
      */
     public void refresh() {
         this.deleteAll();
-        m_status = STATUS_READY;
-        if(!m_searchThread.isAlive()) {
-            m_searchThread = new Thread(this);
-            m_searchThread.start();
+        status = STATUS_READY;
+        if(!searchThread.isAlive()) {
+            searchThread = new Thread(this);
+            searchThread.start();
         }
     } 
        
@@ -100,7 +100,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
         int selectedIndex = this.getSelectedIndex();
         String selectedDeviceAlias = this.getString( selectedIndex );
 
-        Vector devices = m_controller.getDevices();
+        Vector devices = controller.getDevices();
         int deviceCount = devices.size();
         int deviceIndex;
         BluetoothDevice selectedDevice = null;
@@ -117,52 +117,52 @@ public class DeviceList extends List implements Runnable, CommandListener {
     }
 
     public void run() {
-        while(m_status!=STATUS_COMPLETE) {
+        while(status!=STATUS_COMPLETE) {
             try {
                 
                 /** If we are ready then we'll search for the devices */
-                if(m_status==STATUS_READY) {
+                if(status==STATUS_READY) {
                     this.append("Searching...", null);
                     System.out.println("Searching GPS devices");
-                    m_controller.searchDevices();
-                    m_status = STATUS_SEARCHING;
+                    controller.searchDevices();
+                    status = STATUS_SEARCHING;
                 }
                 
                 /** Search is complete */
-                Vector devices = m_controller.getDevices();
+                Vector devices = controller.getDevices();
                 if(devices!=null) {
                     this.set(0, "Found " + devices.size() + " device(s)", null);
                     for(int devIndex=0; devIndex<devices.size(); devIndex++) {
                         BluetoothDevice device = (BluetoothDevice)devices.elementAt(devIndex);
                         this.append(device.getAlias(), null);
                     }
-                    m_status = STATUS_COMPLETE;
+                    status = STATUS_COMPLETE;
                 } else {
                     this.set(0, "No devices found", null);
-                    m_status = STATUS_COMPLETE;
+                    status = STATUS_COMPLETE;
                 }
                 
             } catch(Exception ex) {
                 System.err.println("Error in DeviceList.run: " + ex.toString());
-                m_status = STATUS_COMPLETE;
+                status = STATUS_COMPLETE;
             }
         }
     }
 
     public void commandAction(Command command, Displayable displayable) {
-        if(command==m_refreshCommand) {
+        if(command==refreshCommand) {
             // Refresh devices
             refresh();
         }
-        if(command==m_selectCommand) {
+        if(command==selectCommand) {
             BluetoothDevice dev = getSelectedDevice();
             if(dev!=null) {
-                m_controller.setGpsDevice(dev);
+                controller.setGpsDevice(dev);
             }
-            m_controller.showSettings();
+            controller.showSettings();
         }
-        if(command==m_cancelCommand) {
-            m_controller.showSettings();
+        if(command==cancelCommand) {
+            controller.showSettings();
         }
         
     }

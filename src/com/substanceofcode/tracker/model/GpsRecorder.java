@@ -32,63 +32,63 @@ import com.substanceofcode.tracker.controller.Controller;
  */
 public class GpsRecorder implements Runnable{
     
-    private Thread m_recorderThread;
-    private boolean m_recording;
-    private Track m_recordedTrack;
-    private int m_intervalSeconds;
-    private int m_intervalMarkerStep;
-    private Controller m_controller;
+    private Thread recorderThread;
+    private boolean recording;
+    private Track recordedTrack;
+    private int intervalSeconds;
+    private int intervalMarkerStep;
+    private Controller controller;
     
     /** Creates a new instance of GpsRecorder */
     public GpsRecorder(Controller controller) {
-        m_controller = controller;
+        this.controller = controller;
         RecorderSettings settings = controller.getSettings();
-        m_intervalSeconds = settings.getRecordingInterval();
-        m_intervalMarkerStep = settings.getRecordingMarkerInterval();
-        m_recordedTrack = new Track();
-        m_recording = false;
-        m_recorderThread = new Thread(this);
-        m_recorderThread.start();
+        intervalSeconds = settings.getRecordingInterval();
+        intervalMarkerStep = settings.getRecordingMarkerInterval();
+        recordedTrack = new Track();
+        recording = false;
+        recorderThread = new Thread(this);
+        recorderThread.start();
     }
     
     /** Set interval for recording */
     public void setInterval(int seconds) {
-        m_intervalSeconds = seconds;
+        intervalSeconds = seconds;
     }
     
     /** Set interval for marker recording */
     public void setIntervalForMarkers(int intervalStep) {
-        m_intervalMarkerStep = intervalStep;
+        intervalMarkerStep = intervalStep;
     }
     
     /** Check status */
     public boolean isRecording() {
-        return m_recording;
+        return recording;
     }
     
     /** Clear track */
     public void clearTrack() {
-        m_recordedTrack.clear();
+        recordedTrack.clear();
     }
     
     /** Get track */
     public Track getTrack() {
-        return m_recordedTrack;
+        return recordedTrack;
     }
     
     /** Start recording positions */
     public void startRecording() {
-        m_recording = true;
+        recording = true;
     }
     
     /** Stop recording positions */
     public void stopRecording() {
-        m_recording = false;
+        recording = false;
     }
     
     /** Set recording status */
     public void setRecording(boolean active) {
-        m_recording = active;
+        recording = active;
     }
     
     /** Main recording thread */
@@ -100,9 +100,9 @@ public class GpsRecorder implements Runnable{
         while(true) {
             try{
                 Thread.sleep(1000);
-                if(m_recording==true && secondsFromLastTrailPoint>=m_intervalSeconds) {
+                if(recording==true && secondsFromLastTrailPoint>=intervalSeconds) {
                     secondsFromLastTrailPoint = 0;
-                    GpsPosition currentPosition = m_controller.getPosition();
+                    GpsPosition currentPosition = controller.getPosition();
                     
                     /**
                      * Check if user haven't moved
@@ -118,11 +118,11 @@ public class GpsRecorder implements Runnable{
                      * a first recorded position.
                      */
                     if( currentPosition!=null && stopped==false) {
-                        m_recordedTrack.addPosition(currentPosition);
-                        if( m_intervalMarkerStep > 0 &&
+                        recordedTrack.addPosition(currentPosition);
+                        if( intervalMarkerStep > 0 &&
                                 recordedCount > 0 &&
-                                recordedCount % m_intervalMarkerStep == 0 ) {
-                            m_recordedTrack.addMarker(currentPosition);
+                                recordedCount % intervalMarkerStep == 0 ) {
+                            recordedTrack.addMarker(currentPosition);
                         }
                         lastRecordedPosition = currentPosition;
                         recordedCount++;

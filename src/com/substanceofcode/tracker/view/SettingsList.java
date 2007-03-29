@@ -36,11 +36,11 @@ import javax.microedition.lcdui.List;
  */
 public class SettingsList extends List implements CommandListener {
     
-    private Controller m_controller;
+    private Controller controller;
     
     /** Commands */
-    private Command m_selectCommand;
-    private Command m_backCommand;
+    private Command selectCommand;
+    private Command backCommand;
 
     private final static int GPS = 0;
     private final static int EXPORTING = 1;
@@ -50,7 +50,7 @@ public class SettingsList extends List implements CommandListener {
     /** Creates a new instance of SettingsList */
     public SettingsList(Controller controller) {
         super("Settings", List.IMPLICIT);
-        m_controller = controller;
+        this.controller = controller;
         
         // List initialization
         this.append("GPS", null);
@@ -59,12 +59,12 @@ public class SettingsList extends List implements CommandListener {
         this.append("Display", null);
         
         // Commands
-        m_selectCommand = new Command("Select", Command.ITEM, 1);
-        addCommand(m_selectCommand);
-        setSelectCommand(m_selectCommand);
+        selectCommand = new Command("Select", Command.ITEM, 1);
+        addCommand(selectCommand);
+        setSelectCommand(selectCommand);
         
-        m_backCommand = new Command("Back", Command.SCREEN, 4);
-        addCommand(m_backCommand);
+        backCommand = new Command("Back", Command.SCREEN, 4);
+        addCommand(backCommand);
         
         setCommandListener(this);
                 
@@ -72,30 +72,30 @@ public class SettingsList extends List implements CommandListener {
     
     /** Command listener */
     public void commandAction(Command command, Displayable displayable) {
-        if(command == m_selectCommand) {
+        if(command == selectCommand) {
             int selectedIndex = this.getSelectedIndex();
             switch(selectedIndex) {
                 case(GPS):
-                    m_controller.showDevices();
+                    controller.showDevices();
                     break;
                     
                 case(EXPORTING):
-                    m_controller.showExportSettings();
+                    controller.showExportSettings();
                     break;
              
                 case(RECORDING):
-                    m_controller.showRecordingSettings();
+                    controller.showRecordingSettings();
                     break;
                 
                 case(DISPLAY):
-                    m_controller.showDisplaySettings();
+                    controller.showDisplaySettings();
                     break;
                     
                 default:
             }
         }
-        if(command == m_backCommand) {
-            m_controller.showTrail();
+        if(command == backCommand) {
+            controller.showTrail();
         }
     }
     
