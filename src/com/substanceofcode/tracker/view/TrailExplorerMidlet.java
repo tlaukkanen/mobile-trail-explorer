@@ -26,9 +26,7 @@ package com.substanceofcode.tracker.view;
 
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
-import com.substanceofcode.tracker.model.*;
 import com.substanceofcode.tracker.controller.*;
-import com.substanceofcode.tracker.view.*;
 
 /**
  *

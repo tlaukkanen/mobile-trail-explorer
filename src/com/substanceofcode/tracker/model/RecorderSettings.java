@@ -22,12 +22,9 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.tracker.controller.Controller;
-import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
-import javax.microedition.rms.RecordStoreException;
 
 /**
  * RecorderSettings contains all settings for the Trail Explorer application.

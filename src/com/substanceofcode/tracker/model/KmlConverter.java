@@ -85,8 +85,8 @@ public class KmlConverter implements TrackConverter {
         Enumeration trackEnum = track.getTrailPoints().elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
-            trackString += String.valueOf(pos.getLongitude()) + "," +
-                    String.valueOf(pos.getLatitude()) + "\r\n";
+            trackString += String.valueOf(pos.longitude) + "," +
+                    String.valueOf(pos.latitude) + "\r\n";
         }
         trackString += "</coordinates>\r\n";
         
@@ -139,10 +139,10 @@ public class KmlConverter implements TrackConverter {
             String speed;
             if( m_useKilometers==true ) {
                 units = " km/h";
-                speed = String.valueOf(pos.getSpeed());
+                speed = String.valueOf(pos.speed);
             } else {
                 double mileSpeed = UnitConverter.convertSpeed(
-                        pos.getSpeed(),
+                        pos.speed,
                         UnitConverter.KILOMETERS_PER_HOUR,
                         UnitConverter.MILES_PER_HOUR );
                 speed = StringUtil.valueOf(mileSpeed, 1);
@@ -150,7 +150,7 @@ public class KmlConverter implements TrackConverter {
             }
             
             String name = "";
-            String timeStamp = DateUtil.convertToTimeStamp( pos.getDate() );
+            String timeStamp = DateUtil.convertToTimeStamp( pos.date );
             name = timeStamp + ", " + speed + units;
             markerString += "<Placemark>\r\n";
             markerString += "<name>" + name + "</name>\r\n";
@@ -160,8 +160,8 @@ public class KmlConverter implements TrackConverter {
             markerString += "</Icon>\r\n";
             markerString += "</IconStyle>\r\n";
             markerString += "<Point><coordinates>\r\n";
-            markerString += String.valueOf(pos.getLongitude()) + "," +
-                    String.valueOf(pos.getLatitude()) + ",0\r\n";
+            markerString += String.valueOf(pos.longitude) + "," +
+                    String.valueOf(pos.latitude) + ",0\r\n";
             markerString += "</coordinates></Point>\r\n";
             markerString += "</Placemark>\r\n";
         }
@@ -178,7 +178,7 @@ public class KmlConverter implements TrackConverter {
         // Start position
         String name = "";
         GpsPosition startPosition = track.getStartPosition();
-        String timeStamp = DateUtil.convertToTimeStamp( startPosition.getDate() );
+        String timeStamp = DateUtil.convertToTimeStamp( startPosition.date );
         name = timeStamp;
         markerString += "<name>Start/End</name>\r\n";
         markerString += "<Placemark>\r\n";
@@ -192,14 +192,14 @@ public class KmlConverter implements TrackConverter {
         markerString += "</IconStyle>\r\n";
         markerString += "</Style>\r\n";
         markerString += "<Point><coordinates>\r\n";
-        markerString += String.valueOf(startPosition.getLongitude()) + "," +
-                String.valueOf(startPosition.getLatitude()) + ",0\r\n";
+        markerString += String.valueOf(startPosition.longitude) + "," +
+                String.valueOf(startPosition.latitude) + ",0\r\n";
         markerString += "</coordinates></Point>\r\n";
         markerString += "</Placemark>\r\n";
         
         // End position
         GpsPosition endPosition = track.getEndPosition();
-        timeStamp = DateUtil.convertToTimeStamp( endPosition.getDate() );
+        timeStamp = DateUtil.convertToTimeStamp( endPosition.date );
         name = timeStamp;
         
         String units;
@@ -228,8 +228,8 @@ public class KmlConverter implements TrackConverter {
         markerString += "</IconStyle>\r\n";
         markerString += "</Style>\r\n";
         markerString += "<Point><coordinates>\r\n";
-        markerString += String.valueOf(endPosition.getLongitude()) + "," +
-                String.valueOf(endPosition.getLatitude()) + ",0\r\n";
+        markerString += String.valueOf(endPosition.longitude) + "," +
+                String.valueOf(endPosition.latitude) + ",0\r\n";
         markerString += "</coordinates></Point>\r\n";
         markerString += "</Placemark>\r\n";
         

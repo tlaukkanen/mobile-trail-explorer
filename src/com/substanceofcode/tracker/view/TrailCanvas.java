@@ -224,8 +224,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             return null;
         }
         
-        double currentLatitude = m_lastPosition.getLatitude();
-        double currentLongitude = m_lastPosition.getLongitude();
+        double currentLatitude = m_lastPosition.latitude;
+        double currentLongitude = m_lastPosition.longitude;
         
         latitude -= currentLatitude;
         latitude *= m_verticalZoomFactor;
@@ -252,8 +252,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             int center = getWidth()/2;
             int middle = getHeight()/2;
             
-            double currentLatitude = m_lastPosition.getLatitude();
-            double currentLongitude = m_lastPosition.getLongitude();
+            double currentLatitude = m_lastPosition.latitude;
+            double currentLongitude = m_lastPosition.longitude;
             
             double lastLatitude = currentLatitude;
             double lastLongitude = currentLongitude;
@@ -268,16 +268,16 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 
                 GpsPosition pos = (GpsPosition)m_positionTrail.elementAt(positionIndex);
                 
-                double lat = pos.getLatitude();
-                double lon = pos.getLongitude();
+                double lat = pos.latitude;
+                double lon = pos.longitude;
                 CanvasPoint point1 = convertPosition(lat, lon);
                 
                 CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
                 
                 g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
                 
-                lastLatitude = pos.getLatitude();
-                lastLongitude = pos.getLongitude();
+                lastLatitude = pos.latitude;
+                lastLongitude = pos.longitude;
             }
             
             // Draw red dot on current location
@@ -338,14 +338,14 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 g.drawString(
                         "LON:", 1, fontHeight*2, Graphics.TOP|Graphics.LEFT);
                 
-                double latitude = m_lastPosition.getLatitude();
+                double latitude = m_lastPosition.latitude;
                 g.drawString(
                         getDegreeString( latitude ),
                         positionAdd,
                         fontHeight,
                         Graphics.TOP|Graphics.LEFT );
                 
-                double longitude = m_lastPosition.getLongitude();
+                double longitude = m_lastPosition.longitude;
                 g.drawString(
                         getDegreeString( longitude ),
                         positionAdd,
@@ -361,12 +361,12 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 String units;
                 if(settings.getUnitsAsKilometers() == false) {
                     speed = (int) UnitConverter.convertSpeed(
-                            m_lastPosition.getSpeed(),
+                            m_lastPosition.speed,
                             UnitConverter.KILOMETERS_PER_HOUR,
                             UnitConverter.MILES_PER_HOUR);
                     units = " mph";
                 } else {
-                    speed = (int) m_lastPosition.getSpeed();
+                    speed = (int) m_lastPosition.speed;
                     units = " km/h";
                 }
                 g.drawString(
@@ -434,7 +434,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             if(settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE)==true) {
                 String altitude;
                 String units;
-                double altitudeInMeters = m_lastPosition.getAltitude();
+                double altitudeInMeters = m_lastPosition.altitude;
                 if( settings.getUnitsAsKilometers()==false) {
                     /** Altitude in feets */
                     double altitudeInFeets = UnitConverter.convertLength(
@@ -463,7 +463,7 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             
             Date now = Calendar.getInstance().getTime();
             long secondsSinceLastPosition;
-            secondsSinceLastPosition = (now.getTime() - m_lastPosition.getDate().getTime())/1000;
+            secondsSinceLastPosition = (now.getTime() - m_lastPosition.date.getTime())/1000;
             if(secondsSinceLastPosition>5) {
                 g.drawString(
                         "Last refresh " + secondsSinceLastPosition +
@@ -621,10 +621,10 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             String latString = "";
             String lonString = "";
             if(m_lastPosition!=null) {
-                double lat = m_lastPosition.getLatitude();
+                double lat = m_lastPosition.latitude;
                 latString = getDegreeString(lat);
                 
-                double lon = m_lastPosition.getLongitude();
+                double lon = m_lastPosition.longitude;
                 lonString = getDegreeString(lon);
             }
             

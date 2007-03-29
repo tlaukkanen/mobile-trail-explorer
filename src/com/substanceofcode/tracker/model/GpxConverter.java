@@ -54,13 +54,13 @@ public class GpxConverter implements TrackConverter {
         Enumeration posEnum = track.getTrailPoints().elements();
         while(posEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)posEnum.nextElement();
-            String lat = String.valueOf( pos.getLatitude() );
-            String lon = String.valueOf( pos.getLongitude() );
-            String alt = String.valueOf( pos.getAltitude() );
+            String lat = String.valueOf( pos.latitude );
+            String lon = String.valueOf( pos.longitude );
+            String alt = String.valueOf( pos.altitude );
             gpx += "<trkpt lat=\"" + lat + "\" lon=\"" + lon + "\">\r\n";
             
             // Create time stamp
-            Date date = pos.getDate();
+            Date date = pos.date;
             String universalDateStamp = DateUtil.getUniversalDateStamp( date );
             gpx += "<time>" + universalDateStamp + "</time>\r\n"; 
             

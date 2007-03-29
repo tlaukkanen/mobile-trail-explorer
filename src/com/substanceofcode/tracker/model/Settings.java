@@ -23,7 +23,6 @@ package com.substanceofcode.tracker.model;
 
 import java.io.*;
 import java.util.*;
-import javax.microedition.lcdui.*;
 import javax.microedition.midlet.*;
 import javax.microedition.rms.*;
 

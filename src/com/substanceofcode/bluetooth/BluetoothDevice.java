@@ -21,11 +21,6 @@
 
 package com.substanceofcode.bluetooth;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import javax.microedition.io.Connector;
-import javax.microedition.io.StreamConnection;
-
 /**
  *
  * @author Tommi

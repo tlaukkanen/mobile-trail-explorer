@@ -25,11 +25,8 @@ package com.substanceofcode.tracker.model;
 import com.substanceofcode.bluetooth.GpsPosition;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Calendar;
-import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.io.Connector;
-import javax.microedition.io.OutputConnection;
 import javax.microedition.io.file.FileConnection;
 
 /**
