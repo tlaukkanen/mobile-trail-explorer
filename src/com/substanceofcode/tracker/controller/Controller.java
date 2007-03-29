@@ -30,6 +30,7 @@ import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.view.AboutScreen;
 import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.DisplaySettingsForm;
 import com.substanceofcode.tracker.view.ExportSettingsForm;
@@ -73,8 +74,7 @@ public class Controller {
     private SplashCanvas splashCanvas;
     private DeviceList deviceList;    
     private MIDlet midlet;
-    /* Not used, so comment out */
-    // private AboutForm aboutForm;
+    private AboutScreen aboutScreen;
     
     private SettingsList settingsList;
     private RecordingSettingsForm recordingSettingsForm;
@@ -359,6 +359,15 @@ public class Controller {
         }
         return splashCanvas;
     }
+    
+
+
+	public void showAboutScreen() {
+		if( aboutScreen == null){
+			aboutScreen = new AboutScreen(this);
+		}
+		display.setCurrent(aboutScreen);		
+	}
 
     public void showSettings() {
         display.setCurrent(getSettingsList());

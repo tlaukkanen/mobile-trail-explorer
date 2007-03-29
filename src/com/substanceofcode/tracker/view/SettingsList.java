@@ -46,6 +46,7 @@ public class SettingsList extends List implements CommandListener {
     private final static int EXPORTING = 1;
     private final static int RECORDING = 2;
     private final static int DISPLAY = 3;
+    private final static int ABOUT = 4;
     
     /** Creates a new instance of SettingsList */
     public SettingsList(Controller controller) {
@@ -57,6 +58,7 @@ public class SettingsList extends List implements CommandListener {
         this.append("Exporting", null);
         this.append("Recording", null);
         this.append("Display", null);
+        this.append("About", null);
         
         // Commands
         selectCommand = new Command("Select", Command.ITEM, 1);
@@ -90,6 +92,10 @@ public class SettingsList extends List implements CommandListener {
                 case(DISPLAY):
                     controller.showDisplaySettings();
                     break;
+                    
+                case(ABOUT):
+                	controller.showAboutScreen();
+                	break;
                     
                 default:
             }
