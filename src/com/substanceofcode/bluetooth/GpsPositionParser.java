@@ -69,7 +69,7 @@ public class GpsPositionParser {
             
             // First value = $GPRMC
             // Date time of fix (eg. 041107.000)
-            String dateTimeOfFix = values[1];
+            // String dateTimeOfFix = values[1];
             
             // Warning (eg. A)
             String warning = values[2];

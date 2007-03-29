@@ -32,10 +32,6 @@ import java.util.Date;
  */
 public class DateUtil {
     
-    /** Creates a new instance of DateUtil */
-    private DateUtil() {
-    }
-    
     /** Convert given date to string */
     public static String convertToDateStamp(Date date) {
         Calendar cal = Calendar.getInstance();

@@ -1,7 +1,7 @@
 package com.substanceofcode.tracker.model;
 import java.util.Calendar;
 import java.util.Date;
-import jmunit.framework.cldc10.*;
+import jmunit.framework.cldc11.*;
 
 public class DateUtilTest extends TestCase {
 

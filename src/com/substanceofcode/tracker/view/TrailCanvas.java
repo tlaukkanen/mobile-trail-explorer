@@ -85,8 +85,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private boolean largeCompass;
     
     /** Creates a new instance of TrailCanvas */
-    public TrailCanvas(Controller controller) {
+    public TrailCanvas(Controller controller, GpsPosition initialPosition) {
         this.controller = controller;
+        this.lastPosition = initialPosition;
         setFullScreenMode( true );
         
         positionTrail = new Vector();
@@ -207,11 +208,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             if(point!=null) {
                 g.drawString(waypoint.getName(), point.X, point.Y,
                         Graphics.BOTTOM|Graphics.HCENTER);
-            }
-            
+            }   
         }
-        
-        
     }
     
     /** Convert position to canvas point */
@@ -465,11 +463,34 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             long secondsSinceLastPosition;
             secondsSinceLastPosition = (now.getTime() - lastPosition.date.getTime())/1000;
             if(secondsSinceLastPosition>5) {
+            	String timeSinceLastPosition;
+            	if(secondsSinceLastPosition > 60){
+            		/* If it's been more than a minute, we should just give
+            		 * a rough estimate since last refresh
+            		 * to the second if under an hour, 
+            		 * to the minute if under a day
+            		 * to the hour if over a day. */
+            		final long days = secondsSinceLastPosition/86400;
+            		secondsSinceLastPosition -= days*86400;
+            		final long hours = secondsSinceLastPosition/3600;
+            		secondsSinceLastPosition -= hours*3600;
+            		final long minutes = secondsSinceLastPosition/60;
+            		secondsSinceLastPosition -= minutes*60;
+            		if(days > 0){
+            			timeSinceLastPosition = days + " days " + hours + " hours " ;
+            		}else if(hours > 0){
+            			timeSinceLastPosition = hours + " hours " + minutes + " mins";
+            		}else{
+            			timeSinceLastPosition = minutes + " mins " + secondsSinceLastPosition + " seconds";
+            		}
+            	}else{
+            		timeSinceLastPosition = secondsSinceLastPosition + " seconds";
+            	}
                 g.drawString(
-                        "Last refresh " + secondsSinceLastPosition +
-                        " second(s) ago.",
-                        1,
+                        "Last refresh:", 1,
                         height - (fontHeight*4 + 2),
+                        Graphics.TOP|Graphics.LEFT );
+                g.drawString(timeSinceLastPosition + " ago.",1, height - (fontHeight*3 + 2),
                         Graphics.TOP|Graphics.LEFT );
             }
             

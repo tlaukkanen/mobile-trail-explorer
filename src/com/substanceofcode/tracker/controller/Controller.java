@@ -30,7 +30,6 @@ import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.Waypoint;
-import com.substanceofcode.tracker.view.AboutForm;
 import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.DisplaySettingsForm;
 import com.substanceofcode.tracker.view.ExportSettingsForm;
@@ -40,6 +39,7 @@ import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
 import com.substanceofcode.tracker.view.WaypointList;
+
 import java.lang.Exception;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -72,8 +72,9 @@ public class Controller {
     private TrailCanvas trailCanvas;
     private SplashCanvas splashCanvas;
     private DeviceList deviceList;    
-    private AboutForm aboutForm;
     private MIDlet midlet;
+    /* Not used, so comment out */
+    // private AboutForm aboutForm;
     
     private SettingsList settingsList;
     private RecordingSettingsForm recordingSettingsForm;
@@ -102,7 +103,7 @@ public class Controller {
         recorder = new GpsRecorder( this );
         
         /** Initialize forms */
-        aboutForm = new AboutForm(this);
+        // aboutForm = new AboutForm(this);
         this.display = display;
         
         /** Waypoints */
@@ -324,7 +325,11 @@ public class Controller {
     
     private TrailCanvas getTrailCanvas() {
         if(trailCanvas==null) {
-            trailCanvas = new TrailCanvas(this);
+        	GpsPosition initialPosition = null;
+			try {
+				initialPosition = this.recorder.getPositionFromRMS();
+			} catch (Exception anyException){/* discard */}
+			trailCanvas = new TrailCanvas(this, initialPosition);
         }
         return trailCanvas;
     }
@@ -378,15 +383,10 @@ public class Controller {
     
     /** Show device list */
     public void showDevices() {
-        display.setCurrent(getDeviceList());
-    }
-    
-    /** Get instance of device list */
-    private DeviceList getDeviceList() {
-        if(deviceList==null) {
+    	if(deviceList==null) {
             deviceList = new DeviceList(this);
         }
-        return deviceList;
+        display.setCurrent(deviceList);
     }
     
     /** Show error */

@@ -23,7 +23,6 @@ package com.substanceofcode.bluetooth;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Date;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
@@ -34,7 +33,6 @@ import javax.microedition.io.StreamConnection;
 public class GpsDevice extends BluetoothDevice implements Runnable {
     
     private PositionBuffer lastPosition;
-    private Date lastPositionDate;
     
     private static final long BREAK = 2000;
     private static final int LINE_DELIMITER = 13;

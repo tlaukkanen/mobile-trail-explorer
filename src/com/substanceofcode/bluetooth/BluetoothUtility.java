@@ -83,7 +83,8 @@ public class BluetoothUtility implements DiscoveryListener {
      */
     public void findDevices() {
         try {
-            boolean complete = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
+            //boolean complete = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
+        	discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
             searchComplete = false;
         } catch (BluetoothStateException ex) {
             System.err.println("Error in BluetoothUtility.findDevices: " + ex.toString());

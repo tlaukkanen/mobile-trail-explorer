@@ -56,7 +56,7 @@ public class GpxConverter implements TrackConverter {
             GpsPosition pos = (GpsPosition)posEnum.nextElement();
             String lat = String.valueOf( pos.latitude );
             String lon = String.valueOf( pos.longitude );
-            String alt = String.valueOf( pos.altitude );
+            //String alt = String.valueOf( pos.altitude );
             gpx += "<trkpt lat=\"" + lat + "\" lon=\"" + lon + "\">\r\n";
             
             // Create time stamp

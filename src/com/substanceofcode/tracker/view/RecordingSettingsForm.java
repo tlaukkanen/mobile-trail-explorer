@@ -73,7 +73,6 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 newInterval = 10;
                 newStep = 5;
             }
-            RecorderSettings settings = controller.getSettings();
             controller.saveRecordingInterval( newInterval );
             controller.saveRecordingMarkerStep( newStep );
             

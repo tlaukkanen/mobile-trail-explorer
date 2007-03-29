@@ -132,8 +132,8 @@ public class DeviceList extends List implements Runnable, CommandListener {
                 Vector devices = controller.getDevices();
                 if(devices!=null) {
                     this.set(0, "Found " + devices.size() + " device(s)", null);
-                    for(int devIndex=0; devIndex<devices.size(); devIndex++) {
-                        BluetoothDevice device = (BluetoothDevice)devices.elementAt(devIndex);
+                    for(int deviceIndex = 0; deviceIndex < devices.size(); deviceIndex++) {
+                        BluetoothDevice device = (BluetoothDevice)devices.elementAt(deviceIndex);
                         this.append(device.getAlias(), null);
                     }
                     status = STATUS_COMPLETE;
