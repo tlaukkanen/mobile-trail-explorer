@@ -62,10 +62,9 @@
 	<property name="api.midp" value="${install.api.lib}/midpapi20.jar" />
 	<property name="api.bluetooth" value="${install.api.lib}/jsr082.jar" />
 	<property name="api.fileIO" value="${install.api.lib}/jsr75.jar" />
-	<property name="api.junit-10" value="${lib.dir}/JMUnit4CLDC10.jar" />
+	<!-- <property name="api.junit-10" value="${lib.dir}/JMUnit4CLDC10.jar" /> -->
 	<property name="api.junit-11" value="${lib.dir}/jmunit4cldc11-1.0.1.jar" />
-	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-10};${api.junit-11}" />
-	<!-- APIs I've removed... c:/wtk25/lib/wma11.jar; c:/wtk25/lib/mmapi.jar; -->
+	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-11}" />
 	
 	
 	<!-- Setup the project build, create required folders, and copy accross required files. -->
