@@ -32,8 +32,8 @@ public class BluetoothDevice {
     
     /** Creates a new instance of BluetoothDevice */
     public BluetoothDevice(String address, String alias) {
-        alias = alias;
-        address = address;
+        this.alias = alias;
+        this.address = address;
     }
     
     public String getAddress() {
