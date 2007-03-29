@@ -27,16 +27,18 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 /**
+ * Class to convert a Track to KML (google-earth) format.
  *
  * @author Tommi Laukkanen
+ * @author barryred
  */
 public class KmlConverter implements TrackConverter {
     
-    private boolean m_useKilometers;
+    private boolean useKilometers;
     
     /** Creates a new instance of KmlConverter */
     public KmlConverter(boolean useKilometers) {
-        m_useKilometers = useKilometers;
+        this.useKilometers = useKilometers;
     }
     
     /** Convert track to Google Eart format (KML) */
@@ -51,93 +53,89 @@ public class KmlConverter implements TrackConverter {
     }
     
     /** Convert to string */
-    public String export(
-            String dateStamp,
-            Track track,
-            Vector waypoints) {
-        String trackString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n";
-        trackString += "<kml xmlns=\"http://earth.google.com/kml/2.0\">\r\n";
+    public String export( String dateStamp, Track track, Vector waypoints) {
+        StringBuffer trackString = new StringBuffer();
+        trackString.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        trackString.append("<kml xmlns=\"http://earth.google.com/kml/2.0\">\r\n");
         
         /** Define styles */
-        trackString += "<Style id=\"startpoint\">\r\n";
-        trackString += "</Style>\r\n";
-        trackString += "<Style id=\"endpoint\">\r\n";
-        trackString += "</Style>\r\n";
+        trackString.append("<Style id=\"startpoint\">\r\n");
+        trackString.append("</Style>\r\n");
+        trackString.append("<Style id=\"endpoint\">\r\n");
+        trackString.append("</Style>\r\n");
         
-        trackString += "<Folder>\r\n";
-        trackString += "<name>" + dateStamp + "</name>\r\n";
-        trackString += "<Style id=\"style\">\r\n";
-        trackString += " <LineStyle>\r\n";
-        trackString += "  <color>ff0000ff</color>\r\n";
-        trackString += "  <width>1.5</width>\r\n";
-        trackString += " </LineStyle>\r\n";
-        trackString += " <PolyStyle>\r\n";
-        trackString += "  <fill>0</fill>\r\n";
-        trackString += " </PolyStyle>\r\n";
-        trackString += "</Style>\r\n";
-        trackString += "<open>1</open>\r\n";
-        trackString += "<Placemark>\r\n";
-        trackString += "<styleUrl>#style</styleUrl>\r\n";
-        trackString += "<LineString>\r\n";
-        trackString += "<extrude>0</extrude>\r\n";
-        trackString += "<altitudeMode>clampToGround</altitudeMode>\r\n";
-        trackString += "<coordinates>\r\n";
+        trackString.append("<Folder>\r\n");
+        trackString.append("<name>").append(dateStamp).append("</name>\r\n");
+        trackString.append("<Style id=\"style\">\r\n");
+        trackString.append(" <LineStyle>\r\n");
+        trackString.append("  <color>ff0000ff</color>\r\n");
+        trackString.append("  <width>1.5</width>\r\n");
+        trackString.append(" </LineStyle>\r\n");
+        trackString.append(" <PolyStyle>\r\n");
+        trackString.append("  <fill>0</fill>\r\n");
+        trackString.append(" </PolyStyle>\r\n");
+        trackString.append("</Style>\r\n");
+        trackString.append("<open>1</open>\r\n");
+        trackString.append("<Placemark>\r\n");
+        trackString.append("<styleUrl>#style</styleUrl>\r\n");
+        trackString.append("<LineString>\r\n");
+        trackString.append("<extrude>0</extrude>\r\n");
+        trackString.append("<altitudeMode>clampToGround</altitudeMode>\r\n");
+        trackString.append("<coordinates>\r\n");
         Enumeration trackEnum = track.getTrailPoints().elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
-            trackString += String.valueOf(pos.longitude) + "," +
-                    String.valueOf(pos.latitude) + "\r\n";
+            trackString.append(String.valueOf(pos.longitude)).append(",").append(String.valueOf(pos.latitude)).append("\r\n");
         }
-        trackString += "</coordinates>\r\n";
+        trackString.append("</coordinates>\r\n");
         
-        trackString += "</LineString>\r\n";
-        trackString += "</Placemark>\r\n";
+        trackString.append("</LineString>\r\n");
+        trackString.append("</Placemark>\r\n");
         
-        trackString += generateWaypointData( waypoints );
+        trackString.append(generateWaypointData( waypoints ));
         
-        trackString += generateMarkers( track.getMarkers() );
+        trackString.append(generateMarkers( track.getMarkers() ));
         
-        trackString += generateEndpoints( track );
+        trackString.append(generateEndpoints( track ));
         
-        trackString += "</Folder>\r\n";
-        trackString += "</kml>\r\n";
+        trackString.append("</Folder>\r\n");
+        trackString.append("</kml>\r\n");
         
-        return trackString;
+        return trackString.toString();
     }
     
     /** Generate waypoint data */
-    private String generateWaypointData(Vector waypoints) {
-        String waypointString = "";
+    private StringBuffer generateWaypointData(Vector waypoints) {
+        StringBuffer waypointString = new StringBuffer();
         Enumeration waypointEnum = waypoints.elements();
-        waypointString += "<Folder>\r\n";
-        waypointString += "<name>Waypoints</name>\r\n";
+        waypointString.append("<Folder>\r\n");
+        waypointString.append("<name>Waypoints</name>\r\n");
         while(waypointEnum.hasMoreElements()==true) {
             Waypoint wp = (Waypoint)waypointEnum.nextElement();
             
-            waypointString += "<Placemark>\r\n";
-            waypointString += "<name>" + wp.getName() + "</name>\r\n";
-            waypointString += "<Point><coordinates>\r\n";
-            waypointString += String.valueOf(wp.getLongitude()) + "," +
-                    String.valueOf(wp.getLatitude()) + ",0\r\n";
-            waypointString += "</coordinates></Point>\r\n";
-            waypointString += "</Placemark>\r\n";
+            waypointString.append("<Placemark>\r\n");
+            waypointString.append("<name>").append(wp.getName()).append("</name>\r\n");
+            waypointString.append("<Point><coordinates>\r\n");
+            waypointString.append(String.valueOf(wp.getLongitude())).append(",").append(String.valueOf(wp.getLatitude())).append(",0\r\n");
+            waypointString.append("</coordinates></Point>\r\n");
+            waypointString.append("</Placemark>\r\n");
         }
-        waypointString += "</Folder>\r\n";
+        waypointString.append("</Folder>\r\n");
         return waypointString;
     }
     
     /** Export markers */
-    private String generateMarkers(Vector markers) {
+    private StringBuffer generateMarkers(Vector markers) {
         
-        String markerString = "";
+        StringBuffer markerString = new StringBuffer();
         Enumeration markerEnum = markers.elements();
-        markerString += "<Folder>\r\n";
-        markerString += "<name>Markers</name>\r\n";
+        markerString.append("<Folder>\r\n");
+        markerString.append("<name>Markers</name>\r\n");
         while(markerEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)markerEnum.nextElement();
             String units;
             String speed;
-            if( m_useKilometers==true ) {
+            if( useKilometers==true ) {
                 units = " km/h";
                 speed = String.valueOf(pos.speed);
             } else {
@@ -152,50 +150,48 @@ public class KmlConverter implements TrackConverter {
             String name = "";
             String timeStamp = DateUtil.convertToTimeStamp( pos.date );
             name = timeStamp + ", " + speed + units;
-            markerString += "<Placemark>\r\n";
-            markerString += "<name>" + name + "</name>\r\n";
-            markerString += "<IconStyle>\r\n";
-            markerString += "<Icon>\r\n";
-            markerString += "<href>http://maps.google.com/mapfiles/kml/pal3/icon61.png</href>\r\n";
-            markerString += "</Icon>\r\n";
-            markerString += "</IconStyle>\r\n";
-            markerString += "<Point><coordinates>\r\n";
-            markerString += String.valueOf(pos.longitude) + "," +
-                    String.valueOf(pos.latitude) + ",0\r\n";
-            markerString += "</coordinates></Point>\r\n";
-            markerString += "</Placemark>\r\n";
+            markerString.append("<Placemark>\r\n");
+            markerString.append("<name>" + name + "</name>\r\n");
+            markerString.append("<IconStyle>\r\n");
+            markerString.append("<Icon>\r\n");
+            markerString.append("<href>http://maps.google.com/mapfiles/kml/pal3/icon61.png</href>\r\n");
+            markerString.append("</Icon>\r\n");
+            markerString.append("</IconStyle>\r\n");
+            markerString.append("<Point><coordinates>\r\n");
+            markerString.append(String.valueOf(pos.longitude)).append(",").append(String.valueOf(pos.latitude)).append(",0\r\n");
+            markerString.append("</coordinates></Point>\r\n");
+            markerString.append("</Placemark>\r\n");
         }
-        markerString += "</Folder>\r\n";
+        markerString.append("</Folder>\r\n");
         return markerString;
     }
     
-    private String generateEndpoints(Track track) {
-        String markerString = "";
+    private StringBuffer generateEndpoints(Track track) {
+        StringBuffer markerString = new StringBuffer();
 
         // Open start/end folder
-        markerString += "<Folder>\r\n";
+        markerString.append("<Folder>\r\n");
         
         // Start position
         String name = "";
         GpsPosition startPosition = track.getStartPosition();
         String timeStamp = DateUtil.convertToTimeStamp( startPosition.date );
         name = timeStamp;
-        markerString += "<name>Start/End</name>\r\n";
-        markerString += "<Placemark>\r\n";
-        markerString += "<name>" + name + "</name>\r\n";
-        markerString += "<Style>\r\n";
-        markerString += "<IconStyle>\r\n";
-        markerString += "<scale>0.6</scale>\r\n";
-        markerString += "<Icon>\r\n";
-        markerString += "<href>http://maps.google.com/mapfiles/kml/pal5/icon18l.png</href>\r\n";
-        markerString += "</Icon>\r\n";
-        markerString += "</IconStyle>\r\n";
-        markerString += "</Style>\r\n";
-        markerString += "<Point><coordinates>\r\n";
-        markerString += String.valueOf(startPosition.longitude) + "," +
-                String.valueOf(startPosition.latitude) + ",0\r\n";
-        markerString += "</coordinates></Point>\r\n";
-        markerString += "</Placemark>\r\n";
+        markerString.append("<name>Start/End</name>\r\n");
+        markerString.append("<Placemark>\r\n");
+        markerString.append("<name>" + name + "</name>\r\n");
+        markerString.append("<Style>\r\n");
+        markerString.append("<IconStyle>\r\n");
+        markerString.append("<scale>0.6</scale>\r\n");
+        markerString.append("<Icon>\r\n");
+        markerString.append("<href>http://maps.google.com/mapfiles/kml/pal5/icon18l.png</href>\r\n");
+        markerString.append("</Icon>\r\n");
+        markerString.append("</IconStyle>\r\n");
+        markerString.append("</Style>\r\n");
+        markerString.append("<Point><coordinates>\r\n");
+        markerString.append(String.valueOf(startPosition.longitude)).append(",").append(String.valueOf(startPosition.latitude)).append(",0\r\n");
+        markerString.append("</coordinates></Point>\r\n");
+        markerString.append("</Placemark>\r\n");
         
         // End position
         GpsPosition endPosition = track.getEndPosition();
@@ -204,7 +200,7 @@ public class KmlConverter implements TrackConverter {
         
         String units;
         String distance;
-        if( m_useKilometers==true ) {
+        if( useKilometers==true ) {
             units = " km";
             distance = StringUtil.valueOf(track.getDistance(), 2);
         } else {
@@ -216,25 +212,24 @@ public class KmlConverter implements TrackConverter {
             units = " ml";
         }
         
-        markerString += "<Placemark>\r\n";
-        markerString += "<name>" + name + "</name>\r\n";
-        markerString += "<description>Distance " + distance + units + "</description>";
-        markerString += "<Style>\r\n";
-        markerString += "<IconStyle>\r\n";
-        markerString += "<scale>0.6</scale>\r\n";
-        markerString += "<Icon>\r\n";
-        markerString += "<href>http://maps.google.com/mapfiles/kml/pal5/icon52l.png</href>\r\n";
-        markerString += "</Icon>\r\n";
-        markerString += "</IconStyle>\r\n";
-        markerString += "</Style>\r\n";
-        markerString += "<Point><coordinates>\r\n";
-        markerString += String.valueOf(endPosition.longitude) + "," +
-                String.valueOf(endPosition.latitude) + ",0\r\n";
-        markerString += "</coordinates></Point>\r\n";
-        markerString += "</Placemark>\r\n";
+        markerString.append("<Placemark>\r\n");
+        markerString.append("<name>").append(name).append("</name>\r\n");
+        markerString.append("<description>Distance ").append(distance).append(units).append("</description>");
+        markerString.append("<Style>\r\n");
+        markerString.append("<IconStyle>\r\n");
+        markerString.append("<scale>0.6</scale>\r\n");
+        markerString.append("<Icon>\r\n");
+        markerString.append("<href>http://maps.google.com/mapfiles/kml/pal5/icon52l.png</href>\r\n");
+        markerString.append("</Icon>\r\n");
+        markerString.append("</IconStyle>\r\n");
+        markerString.append("</Style>\r\n");
+        markerString.append("<Point><coordinates>\r\n");
+        markerString.append(String.valueOf(endPosition.longitude)).append(",").append(String.valueOf(endPosition.latitude)).append(",0\r\n");
+        markerString.append("</coordinates></Point>\r\n");
+        markerString.append("</Placemark>\r\n");
         
         // Close the start/end folder
-        markerString += "</Folder>\r\n";
+        markerString.append("</Folder>\r\n");
         return markerString;
     }
     
