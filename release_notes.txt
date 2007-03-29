@@ -11,6 +11,12 @@ Dave Walsh
 
 Release Notes:
 
+v1.5 ????
++ Improved speed of KmlConverter ??
++ MTE now remembers last position on startup (Issue 17)
++ About Screen (Issue 23)
++ Fixed Bluetooth Device List refresh exception (Issue 22)
+
 v1.4 (March 27th 2007)
 + Compass
 + Fixed the GPX format and file extension
