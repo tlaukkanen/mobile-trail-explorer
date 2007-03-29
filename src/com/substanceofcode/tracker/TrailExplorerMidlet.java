@@ -22,7 +22,7 @@
  *
  */
 
-package com.substanceofcode.tracker.view;
+package com.substanceofcode.tracker;
 
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
@@ -38,9 +38,13 @@ public class TrailExplorerMidlet extends MIDlet {
     private static Controller m_controller;
     
     public TrailExplorerMidlet() {
-        Display disp = Display.getDisplay(this);
-        m_controller = new Controller(this, disp);
-        m_controller.showSplash();
+    	try{
+	        Display disp = Display.getDisplay(this);
+	        m_controller = new Controller(this, disp);
+	        m_controller.showSplash();
+    	}catch(Exception any){
+    		any.printStackTrace();
+    	}
     }
     
     public void startApp() {
