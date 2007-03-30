@@ -44,7 +44,7 @@ import javax.microedition.lcdui.Image;
  */
 public final class AboutScreen extends Canvas{
     
-	private static final String[] aboutText = {"Mobile Trail Explorer v1.3", 
+	private static final String[] aboutText = {"Mobile Trail Explorer,", "Version: 1.5  beta", 
 			"Copyright (C) 2005-2006", "Tommi Laukkanen", "", "Licensed under the GPL", "",
 			"For more information visit:", "www.substanceofcode.com"}; 
 	 
