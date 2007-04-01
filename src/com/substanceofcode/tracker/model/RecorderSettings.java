@@ -41,6 +41,7 @@ public class RecorderSettings {
     private static final String GPS_DEVICE_STRING = "gps-device";
     private static final String WAYPOINTS = "waypoints";
     private static final String UNITS = "units";
+    private static final String BACKLIGHT = "backlight";
     
     /** Exporting setting keys */
     private static final String EXPORT_FOLDER = "export-folder";
@@ -167,6 +168,7 @@ public class RecorderSettings {
     /** Set recording interval for markers */
     public void setRecordingMarkerInterval(int interval) {
         settings.setIntProperty(RECORDING_MARKER_INTERVAL, interval);
+        saveSettings();
     }
             
     /** Get display setting */
@@ -180,7 +182,9 @@ public class RecorderSettings {
         saveSettings();
     }
     
-    /** Do we use kilometers as units? */
+    /** Do we use kilometers as units? 
+     *  Default is true!
+     */
     public boolean getUnitsAsKilometers() {
         return settings.getBooleanProperty(UNITS, true);
     }
@@ -190,6 +194,23 @@ public class RecorderSettings {
         settings.setBooleanProperty(UNITS, value);
         saveSettings();
     }
+    
+    /**
+     * Should the backlight always be on?
+     * Default is false;
+     */
+    public boolean getBacklightOn(){
+    	return settings.getBooleanProperty(BACKLIGHT, false);
+    }
+    
+    /**
+     * Set wheather or not the backlight should always be ON.
+     */
+    public void setBacklightOn(boolean value){
+    	settings.setBooleanProperty(BACKLIGHT, value);
+        saveSettings();
+    }
+    
     
     /** Get export format */
     public int getExportFormat() {

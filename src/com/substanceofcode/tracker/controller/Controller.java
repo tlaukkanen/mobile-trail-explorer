@@ -57,6 +57,9 @@ import javax.microedition.midlet.MIDlet;
  */
 public class Controller {
 
+	/** Constants */
+	private static final int BACKLIGHT_THREAD_INTERVAL = 5000;
+	
     /** Status codes */
     public final static int STATUS_STOPPED = 0;
     public final static int STATUS_RECORDING = 1;
@@ -68,6 +71,8 @@ public class Controller {
     private GpsRecorder recorder;
     private Vector waypoints;
     private RecorderSettings settings;
+    
+    private Thread backlightAlwaysOnThread;
     
     /** Screens and Forms */
     private TrailCanvas trailCanvas;
@@ -111,6 +116,58 @@ public class Controller {
         if( waypoints==null ) {
             waypoints = new Vector();
         }
+        
+        if(settings.getBacklightOn()){
+        	this.startBacklightThread();
+        }
+    }
+    
+    /**
+     * Starts the '{@link Controller#backlightAlwaysOnThread}.
+     */
+    private void startBacklightThread(){
+    	// Make sure there isn't another version of this thread running.
+    	this.stopBacklightThread();
+		backlightAlwaysOnThread = new Thread(new Runnable(){
+			public void run() {
+				final Thread thisThread = Thread.currentThread();
+				while(thisThread == backlightAlwaysOnThread){
+					try {
+						Thread.sleep(BACKLIGHT_THREAD_INTERVAL);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					Display.getDisplay(midlet).flashBacklight(1);
+				}
+			}}
+		);
+		backlightAlwaysOnThread.start();
+    	
+    }
+    
+    /**
+     * Stops the '{@link Controller#backlightAlwaysOnThread}'
+     */
+    private void stopBacklightThread(){
+    	if(backlightAlwaysOnThread != null){
+			backlightAlwaysOnThread = null;
+    	}
+    }
+    
+    /**
+     * Tells this Controller if it should be running the '{@link Controller#backlightAlwaysOnThread}' thread, 
+     * which does as it's name suggests and tries to keep the backlight from turning OFF.
+     * 
+     * @param backlightOn If true, the thread should be running, if False, it should NOT be running.
+     */
+    public void backlightOn(boolean backlightOn){
+    	if(backlightOn){
+    		if(this.backlightAlwaysOnThread == null){
+    			this.startBacklightThread();
+    		}
+    	}else{
+    		this.stopBacklightThread();
+    	}
     }
     
     public void searchDevices() {
