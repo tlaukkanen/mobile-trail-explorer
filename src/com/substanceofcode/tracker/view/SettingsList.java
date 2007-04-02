@@ -35,75 +35,79 @@ import javax.microedition.lcdui.List;
  * @author Tommi Laukkanen
  */
 public class SettingsList extends List implements CommandListener {
-    
+
     private Controller controller;
-    
+
     /** Commands */
     private Command selectCommand;
+
     private Command backCommand;
 
     private final static int GPS = 0;
+
     private final static int EXPORTING = 1;
+
     private final static int RECORDING = 2;
+
     private final static int DISPLAY = 3;
+
     private final static int ABOUT = 4;
-    
+
     /** Creates a new instance of SettingsList */
     public SettingsList(Controller controller) {
-        super("Settings", List.IMPLICIT);
-        this.controller = controller;
-        
-        // List initialization
-        this.append("GPS", null);
-        this.append("Exporting", null);
-        this.append("Recording", null);
-        this.append("Display", null);
-        this.append("About", null);
-        
-        // Commands
-        selectCommand = new Command("Select", Command.ITEM, 1);
-        addCommand(selectCommand);
-        setSelectCommand(selectCommand);
-        
-        backCommand = new Command("Back", Command.SCREEN, 4);
-        addCommand(backCommand);
-        
-        setCommandListener(this);
-                
+	super("Settings", List.IMPLICIT);
+	this.controller = controller;
+
+	// List initialization
+	this.append("GPS", null);
+	this.append("Exporting", null);
+	this.append("Recording", null);
+	this.append("Display", null);
+	this.append("About/Help", null);
+
+	// Commands
+	selectCommand = new Command("Select", Command.ITEM, 1);
+	addCommand(selectCommand);
+	setSelectCommand(selectCommand);
+
+	backCommand = new Command("Back", Command.SCREEN, 4);
+	addCommand(backCommand);
+
+	setCommandListener(this);
+
     }
-    
+
     /** Command listener */
     public void commandAction(Command command, Displayable displayable) {
-        if(command == selectCommand) {
-            int selectedIndex = this.getSelectedIndex();
-            switch(selectedIndex) {
-                case(GPS):
-                    controller.showDevices();
-                    break;
-                    
-                case(EXPORTING):
-                    controller.showExportSettings();
-                    break;
-             
-                case(RECORDING):
-                    controller.showRecordingSettings();
-                    break;
-                
-                case(DISPLAY):
-                    controller.showDisplaySettings();
-                    break;
-                    
-                case(ABOUT):
-                	controller.showAboutScreen();
-                	break;
-                    
-                default:
-            }
-        }
-        if(command == backCommand) {
-            controller.showTrail();
-        }
+	if (command == selectCommand) {
+	    int selectedIndex = this.getSelectedIndex();
+	    switch (selectedIndex) {
+	    case (GPS):
+		controller.showDevices();
+		break;
+
+	    case (EXPORTING):
+		controller.showExportSettings();
+		break;
+
+	    case (RECORDING):
+		controller.showRecordingSettings();
+		break;
+
+	    case (DISPLAY):
+		controller.showDisplaySettings();
+		break;
+
+	    case (ABOUT):
+		controller.showAboutScreen();
+		break;
+
+	    default:
+	    }
+	}
+	if (command == backCommand) {
+	    controller.showTrail();
+	}
     }
-    
-    
+
 }

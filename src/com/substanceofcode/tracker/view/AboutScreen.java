@@ -24,8 +24,11 @@
 
 package com.substanceofcode.tracker.view;
 
+import java.util.Vector;
+
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.ImageUtil;
+import com.substanceofcode.tracker.model.StringUtil;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
@@ -33,151 +36,255 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 /**
- * <p>The AboutScreen is a Canvas which shows the MTE Logo and some information about the MTE</p>
+ * <p>
+ * The AboutScreen is a Canvas which shows the MTE Logo and some information
+ * about the MTE
+ * </p>
  * 
- * The AboutScreen has 3 sections, the Mobile Trail Explorer (MTE) Logo/Image at the top, 
- * followed by an "About" section, and finally a "Useage" section.<br>
+ * The AboutScreen has 3 sections, the Mobile Trail Explorer (MTE) Logo/Image at
+ * the top, followed by an "About" section, and finally a "Useage" section.<br>
  * 
- * Both the About and Useage sections consist of an underlined 'Title' followed by multiple lines of text.
- *
+ * Both the About and Useage sections consist of an underlined 'Title' followed
+ * by multiple lines of text.
+ * 
  * @author barryred
  */
-public final class AboutScreen extends Canvas{
-    
-	private static final String[] aboutText = {"Mobile Trail Explorer,", "Version: 1.5  beta", 
-			"Copyright (C) 2005-2006", "Tommi Laukkanen", "", "Licensed under the GPL", "",
-			"For more information visit:", "www.substanceofcode.com"}; 
-	 
-	private static final String[] helpText = {"Pan the Trail Screen using", "either the arrow keys, or", "2 for UP", "4 for LEFT", "5 for CENTRE", 
-												"6 for RIGHT", "8 for DOWN", "",
-												"1 is Zoom In", "3 is Zoom Out", ""};
-	
+public final class AboutScreen extends Canvas {
+
+    /**
+         * The size margin to draw when margins are needed.
+         */
+    private static final int MARGIN = 5;
+
+    /**
+         * The default font to use for drawing the messages.
+         */
+    private static final Font DEFAULT_SIMPLE_FONT = Font.getDefaultFont();
+
+    private static final String[] aboutText = { "Mobile Trail Explorer,",
+	    "Version: 1.5  beta", "Copyright (C) 2005-2006", "Tommi Laukkanen",
+	    "", "Licensed under the GPL", "", "For more information visit:",
+	    "www.substanceofcode.com" };
+
+    private static final String[] paningText = {
+	    "Pan the Trail Screen using either the arrow keys, or", "2 for UP",
+	    "4 for LEFT", "5 for CENTRE", "6 for RIGHT", "8 for DOWN", "",
+	    "1 is Zoom In", "3 is Zoom Out" };
+
+    private static final String[] helpText = {
+	    "The 'Phone Backlight' option in the Display menu only works on SOME phones"
+		    + " on the rest it will simply make the screen flash every 5 seconds or so.",
+	    "",
+	    "You can comment on wheather this feature worked on your "
+		    + "phone or not at the above address, stating your phone model." };
+
+    /**
+         * <p>
+         * The titles of the different sections
+         * </p>
+         * {@link AboutScreen#TITLES}[n] is the title corrosponding to
+         * {@link AboutScreen#MESSAGES}[n]<br>
+         * Both {@link AboutScreen#TITLES} and {@link AboutScreen#MESSAGES} must
+         * NOT be null, and must have the same number of elements.
+         */
+    private static final String[] TITLES = { "About", "Useage", "Help" };
+
+    /**
+         * <p>
+         * The text for the different sections
+         * </p>
+         * {@link AboutScreen#MESSAGES}[n] is the text corrosponding to
+         * {@link AboutScreen#TITLES}[n]<br>
+         * Both {@link AboutScreen#TITLES} and {@link AboutScreen#MESSAGES} must
+         * NOT be null, and must have the same number of elements.
+         */
+    private static final String[][] MESSAGES = { aboutText, paningText,
+	    helpText };
+
+    static {
+	if (TITLES == null || MESSAGES == null
+		|| TITLES.length != MESSAGES.length) {
+	    try {
+		throw new java.lang.IllegalStateException(
+			"There was a problem with the coding of the "
+				+ AboutScreen.class.getName()
+				+ " class. neither titles, nor messages may be null, and they both must have the same number of elements");
+	    } catch (IllegalStateException e) {
+		e.printStackTrace();
+		throw e;
+	    }
+	}
+    }
+
     private Controller controller;
-    
+
     private final Image logo;
-    
+
     private int yPos;
-    
-    // this is calculated the first time the paint(Graphics) method is called.
+
+    // this is calculated the first time the paint(Graphics) method is
+    // called.
     private int totalHeight;
+
     // Used to decide if we should set the 'totalHeight' property.
     private boolean firstTime = true;
-    
+
+    private String[][] formattedMessages;
+
     /** Creates a new instance of AboutScreen */
-    public AboutScreen(Controller controller) {
-        this.controller = controller;
-        
-        this.setFullScreenMode(true);
-        
-        this.logo = ImageUtil.loadImage("/images/logo.png");
-              
-        this.yPos = 0;
-        
-    }
-    
+    public AboutScreen(Controller controller, int screenWidth) {
+	this.controller = controller;
 
-    private static final int MARGIN = 5;
-	protected void paint(Graphics g) {
-		int width = this.getWidth();
-		
-		
-		// Fill in the background White
-		g.setColor(0xFFFFFF); // White 
-		g.fillRect(0, 0, width, this.getHeight());
-		
-		int y = yPos;
-		y += MARGIN;
-		
-		if(this.logo != null){
-			g.drawImage(this.logo, width/2, y, Graphics.TOP|Graphics.HCENTER);
-			y += logo.getHeight() + MARGIN;
-		}
+	this.setFullScreenMode(true);
 
-		g.setColor(0x0); // Black
-		
-		// Write the title "About"
-		final Font basicFont = g.getFont();
-		final Font titleFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD|Font.STYLE_UNDERLINED, Font.SIZE_LARGE);
-		g.setFont(titleFont);
-		String title = "About";
-		int stringWidth = g.getFont().stringWidth(title);
-		g.drawString(title, (width-stringWidth)/2, y, 0);
-		y += titleFont.getHeight();
-		g.setFont(basicFont);
+	this.logo = ImageUtil.loadImage("/images/logo.png");
 
-		// Write out the 'aboutText' text.
-		int basicFontHeight = g.getFont().getHeight();
-		for(int i = 0; i < aboutText.length; i++){
-			stringWidth = g.getFont().stringWidth(aboutText[i]);
-			g.drawString(aboutText[i], (width-stringWidth)/2, y, 0);
-			y += basicFontHeight;
-		}
+	this.yPos = 0;
 
-		y += basicFontHeight;
-		
-		// Write out the "Useage" title
-		g.setFont(titleFont);
-		title = "Useage";
-		stringWidth = g.getFont().stringWidth(title);
-		g.drawString(title, (width-stringWidth)/2, y, 0);
-		y += titleFont.getHeight();
-		g.setFont(basicFont);
-		
-		
-		// Write out the 'helpText' text
-		for(int i = 0; i < helpText.length; i++){
-			stringWidth = g.getFont().stringWidth(helpText[i]);
-			g.drawString(helpText[i], (width-stringWidth)/2, y, 0);
-			y += basicFontHeight;
-		}
-		
-		// Set the total-Height the first time
-		if(firstTime){
-			totalHeight = y + MARGIN;
-			firstTime = false;
-		}
+	this.formattedMessages = new String[MESSAGES.length][];
+	for (int i = 0; i < MESSAGES.length; i++) {
+	    formattedMessages[i] = formatMessage(MESSAGES[i], screenWidth);
 	}
-    
-	/** Handle all keyPressed-events */
-    public void keyPressed(int keycode){
-    	if(this.getGameAction(keycode) == UP){
-    		upPressed();
-    	}else if(this.getGameAction(keycode) == DOWN){
-    		downPressed();
-    	}else{
-    		// Exit on ANY other key press.
-    		controller.showSettings();
-    	}
     }
-    
-    /** Handle all keyRepeaded-events */
-    public void keyRepeated(int keycode){
-    	if(this.getGameAction(keycode) == UP){
-    		upPressed();
-    	}else if(this.getGameAction(keycode) == DOWN){
-    		downPressed();
-    	}
-    }
-    
-    /** 
-     * <p>Pan the screen up if an Up-Key is pressed</p>
-     */
-    private void upPressed(){
-    	yPos += 20;
-    	if(yPos > 0){
-    		yPos = 0;
-    	}
-    	this.repaint();
-    }
-    
+
     /**
-     * <p>Pan the screen down if a Down-Key is pressed</p>
-     */
-    private void downPressed(){
-    	yPos -= 20;
-    	if(yPos < this.getHeight()-this.totalHeight){
-    		yPos = this.getHeight()-this.totalHeight;
-    	}
-    	this.repaint();
+         * <p>
+         * Takes an array of messages and a 'Screen-width' and returns the same
+         * messages, but any string in that that is wider than 'width' will be
+         * split up into 2 or more Strings that will fit on the screen
+         * </p>
+         * 
+         * 'Spliting' up a String is done on the basis of Words, so if a single
+         * WORD is longer than 'width' it will be on a Line on it's own, but
+         * that line WILL be WIDER than 'width'
+         * 
+         * @param message
+         * @param width
+         *                the maximum width a string may be before being split
+         *                up.
+         * @return
+         */
+    private String[] formatMessage(String[] message, int width) {
+	Vector result = new Vector(message.length);
+	for (int i = 0; i < message.length; i++) {
+	    if (DEFAULT_SIMPLE_FONT.stringWidth(message[i]) <= width) {
+		result.addElement(message[i]);
+	    } else {
+		String[] splitUp = StringUtil.chopStrings(message[i], " ",
+			AboutScreen.DEFAULT_SIMPLE_FONT, width);
+		for (int j = 0; j < splitUp.length; j++) {
+		    result.addElement(splitUp[j]);
+		}
+	    }
+	}
+
+	String[] finalResult = new String[result.size()];
+	for (int i = 0; i < finalResult.length; i++) {
+	    finalResult[i] = (String) result.elementAt(i);
+	}
+	return finalResult;
+
+    }
+
+    protected void paint(Graphics g) {
+	int width = this.getWidth();
+
+	// Fill in the background White
+	g.setColor(0xFFFFFF); // White
+	g.fillRect(0, 0, width, this.getHeight());
+
+	int y = yPos;
+	y += MARGIN;
+
+	if (this.logo != null) {
+	    g.drawImage(this.logo, width / 2, y, Graphics.TOP
+		    | Graphics.HCENTER);
+	    y += logo.getHeight() + MARGIN;
+	}
+
+	g.setColor(0x0); // Black
+
+	// Write the title "About"
+	final Font titleFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD
+		| Font.STYLE_UNDERLINED, Font.SIZE_LARGE);
+
+	/*
+         * FIXME: currently paints ALL the text, even if there is (a lot) more
+         * than can fit on the screen. (must do this first time to assess
+         * 'height', but shouldn't need to do it for any other repaint
+         */
+	for (int i = 0; i < TITLES.length; i++) {
+	    final int basicFontHeight = DEFAULT_SIMPLE_FONT.getHeight();
+	    final int titleFontHeight = titleFont.getHeight();
+	    // Write out the 'message' heading
+	    g.setFont(titleFont);
+	    final String title = TITLES[i];
+	    int stringWidth = g.getFont().stringWidth(title);
+	    g.drawString(title, (width - stringWidth) / 2, y, 0);
+	    y += titleFontHeight;
+
+	    // Write out the 'message' text.
+	    g.setFont(DEFAULT_SIMPLE_FONT);
+	    for (int j = 0; j < this.formattedMessages[i].length; j++) {
+		final String message = this.formattedMessages[i][j];
+		stringWidth = g.getFont().stringWidth(message);
+		g.drawString(message, (width - stringWidth) / 2, y, 0);
+		y += basicFontHeight;
+	    }
+	    y += basicFontHeight;
+	}
+
+	// Set the total-Height the first time
+	if (firstTime) {
+	    totalHeight = y + MARGIN;
+	    firstTime = false;
+	}
+    }
+
+    /** Handle all keyPressed-events */
+    public void keyPressed(int keycode) {
+	if (this.getGameAction(keycode) == UP) {
+	    upPressed();
+	} else if (this.getGameAction(keycode) == DOWN) {
+	    downPressed();
+	} else {
+	    // Exit on ANY other key press.
+	    controller.showSettings();
+	}
+    }
+
+    /** Handle all keyRepeaded-events */
+    public void keyRepeated(int keycode) {
+	if (this.getGameAction(keycode) == UP) {
+	    upPressed();
+	} else if (this.getGameAction(keycode) == DOWN) {
+	    downPressed();
+	}
+    }
+
+    /**
+         * <p>
+         * Pan the screen up if an Up-Key is pressed
+         * </p>
+         */
+    private void upPressed() {
+	yPos += 20;
+	if (yPos > 0) {
+	    yPos = 0;
+	}
+	this.repaint();
+    }
+
+    /**
+         * <p>
+         * Pan the screen down if a Down-Key is pressed
+         * </p>
+         */
+    private void downPressed() {
+	yPos -= 20;
+	if (yPos < this.getHeight() - this.totalHeight) {
+	    yPos = this.getHeight() - this.totalHeight;
+	}
+	this.repaint();
     }
 }
