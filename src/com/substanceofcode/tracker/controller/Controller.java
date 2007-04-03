@@ -315,18 +315,17 @@ public class Controller {
 	waypoints.addElement(waypoint);
     }
 
-    /*
-         * Not used, so comment out /** Get waypoint form private WaypointForm
-         * getWaypointForm() { if( waypointForm==null ) { waypointForm = new
-         * WaypointForm(this); } return waypointForm; }
-         */
-
-    /** Mark waypoint */
+    /** Mark new waypoint */
     public void markWaypoint(String lat, String lon) {
 	if (waypointForm == null) {
 	    waypointForm = new WaypointForm(this);
 	}
-	waypointForm.setValues("", lat, lon);
+	/** 
+	 * Autofill the waypoint form fields with current location and 
+	 * autonumber (1,2,3...).
+	 */
+	int waypointCount = waypoints.size();
+	waypointForm.setValues("WP" + String.valueOf(waypointCount + 1), lat, lon);
 	waypointForm.setEditingFlag(false);
 	display.setCurrent(waypointForm);
     }

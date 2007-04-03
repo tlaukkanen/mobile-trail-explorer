@@ -31,6 +31,8 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
 /**
+ * WaypointForm contains user interface for adding and editing waypoint 
+ * information. 
  *
  * @author Tommi Laukkanen
  */
@@ -73,9 +75,9 @@ public class WaypointForm extends Form implements CommandListener {
         this.editing = editing;
     }
 
+    /** Initialize waypoint fields (name, lon and lat) */
     private void initializeControls() {
         
-        // Set controls
         nameField = new TextField("Name", "", 16, TextField.ANY);
         this.append(nameField);
         
@@ -86,6 +88,7 @@ public class WaypointForm extends Form implements CommandListener {
         this.append(longitudeField);
     }
     
+    /** Initialize commands */
     private void initializeCommands() {
         okCommand = new Command("OK", Command.SCREEN, 1);
         this.addCommand( okCommand );
@@ -102,6 +105,7 @@ public class WaypointForm extends Form implements CommandListener {
         oldWaypointName = name;
     }
     
+    /** Initialize controls with waypoint values. */
     public void setValues(Waypoint wp) {
         nameField.setString(wp.getName());
         String latitude = String.valueOf( wp.getLatitude() );
@@ -111,6 +115,7 @@ public class WaypointForm extends Form implements CommandListener {
         oldWaypointName = wp.getName();
     }
 
+    /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
         if( command == okCommand ) {
             // Save waypoint
