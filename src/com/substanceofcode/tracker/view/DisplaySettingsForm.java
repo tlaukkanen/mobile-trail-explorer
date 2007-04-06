@@ -55,106 +55,108 @@ public class DisplaySettingsForm extends Form implements CommandListener {
 
     /** Creates a new instance of DisplaySettingsForm */
     public DisplaySettingsForm(Controller controller) {
-	super("Display");
-	this.controller = controller;
+        super("Display");
+        this.controller = controller;
 
-	addControls();
+        addControls();
 
-	okCommand = new Command("Save", Command.SCREEN, 1);
-	this.addCommand(okCommand);
+        okCommand = new Command("Save", Command.SCREEN, 1);
+        this.addCommand(okCommand);
 
-	cancelCommand = new Command("Cancel", Command.SCREEN, 2);
-	this.addCommand(cancelCommand);
+        cancelCommand = new Command("Cancel", Command.SCREEN, 2);
+        this.addCommand(cancelCommand);
 
-	this.setCommandListener(this);
+        this.setCommandListener(this);
     }
 
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-	if (command == okCommand) {
-	    /** Save settings and go back to settings menu */
-	    RecorderSettings settings = controller.getSettings();
-	    /** 1. Save used units */
-	    boolean isKilometersSelected = unitGroup.isSelected(0);
-	    settings.setUnitsAsKilometers(isKilometersSelected);
+        if (command == okCommand) {
+            /** Save settings and go back to settings menu */
+            
+            RecorderSettings settings = controller.getSettings();
+            
+            /** 1. Save used units */
+            boolean isKilometersSelected = unitGroup.isSelected(0);
+            settings.setUnitsAsKilometers(isKilometersSelected);
 
-	    /** 2. Save displayable items */
-	    boolean showCoordinates = displayGroup.isSelected(0);
-	    boolean showSpeed = displayGroup.isSelected(1);
-	    boolean showHeading = displayGroup.isSelected(2);
-	    boolean showAltitude = displayGroup.isSelected(3);
-	    boolean showDistance = displayGroup.isSelected(4);
-	    settings.setDisplayValue(RecorderSettings.DISPLAY_COORDINATES,
-		    showCoordinates);
-	    settings.setDisplayValue(RecorderSettings.DISPLAY_SPEED, showSpeed);
-	    settings.setDisplayValue(RecorderSettings.DISPLAY_HEADING,
-		    showHeading);
-	    settings.setDisplayValue(RecorderSettings.DISPLAY_ALTITUDE,
-		    showAltitude);
-	    settings.setDisplayValue(RecorderSettings.DISPLAY_DISTANCE,
-		    showDistance);
+            /** 2. Save displayable items */
+            boolean showCoordinates = displayGroup.isSelected(0);
+            boolean showSpeed = displayGroup.isSelected(1);
+            boolean showHeading = displayGroup.isSelected(2);
+            boolean showAltitude = displayGroup.isSelected(3);
+            boolean showDistance = displayGroup.isSelected(4);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_COORDINATES, showCoordinates);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_SPEED, showSpeed);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_HEADING, showHeading);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_ALTITUDE, showAltitude);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_DISTANCE, showDistance);
 
-	    /** 3. Save the Backlight property */
-	    boolean backlightOn = backlightGroup.isSelected(1);
-	    settings.setBacklightOn(backlightOn);
-	    // Tell the controller if it should be running the
-	    // 'backlightAlwaysOn' Thread
-	    controller.backlightOn(backlightOn);
+            /** 3. Save the Backlight property */
+            boolean backlightOn = backlightGroup.isSelected(1);
+            if (settings.getBacklightOn() != backlightOn) {
+                settings.setBacklightOn(backlightOn);
+                // Tell the controller if it should keep the backlight always on
+                controller.backlightOn(backlightOn);
+            }
 
-	    controller.showSettings();
-	}
-	if (command == cancelCommand) {
-	    /** Don't save anything, just go back to settings menu */
-	    controller.showSettings();
-	}
+            controller.showSettings();
+        }
+        if (command == cancelCommand) {
+            /** Don't save anything, just reinitialize the controls and go back to 
+             * settings menu */
+            this.deleteAll();
+            this.addControls();
+            controller.showSettings();
+        }
     }
 
     /** Add controls to form */
     private void addControls() {
-	RecorderSettings settings = controller.getSettings();
+        RecorderSettings settings = controller.getSettings();
 
-	String[] units = { "Kilometers", "Miles" };
-	unitGroup = new ChoiceGroup("Units", ChoiceGroup.EXCLUSIVE, units, null);
-	if (settings.getUnitsAsKilometers()) {
-	    unitGroup.setSelectedIndex(0, true);
-	} else {
-	    unitGroup.setSelectedIndex(1, true);
-	}
-	this.append(unitGroup);
+        String[] units = { "Kilometers", "Miles" };
+        unitGroup = new ChoiceGroup("Units", ChoiceGroup.EXCLUSIVE, units, null);
+        if (settings.getUnitsAsKilometers()) {
+            unitGroup.setSelectedIndex(0, true);
+        } else {
+            unitGroup.setSelectedIndex(1, true);
+        }
+        this.append(unitGroup);
 
-	String[] displayItems = { "Coordinates", "Speed", "Heading",
-		"Altitude", "Distance" };
-	displayGroup = new ChoiceGroup("Display the following",
-		ChoiceGroup.MULTIPLE, displayItems, null);
+        String[] displayItems = { "Coordinates", "Speed", "Heading",
+                "Altitude", "Distance" };
+        displayGroup = new ChoiceGroup("Display the following",
+                ChoiceGroup.MULTIPLE, displayItems, null);
 
-	boolean showCoordinates = settings
-		.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES);
-	displayGroup.setSelectedIndex(0, showCoordinates);
-	boolean showSpeed = settings
-		.getDisplayValue(RecorderSettings.DISPLAY_SPEED);
-	displayGroup.setSelectedIndex(1, showSpeed);
-	boolean showHeading = settings
-		.getDisplayValue(RecorderSettings.DISPLAY_HEADING);
-	displayGroup.setSelectedIndex(2, showHeading);
-	boolean showAltitude = settings
-		.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE);
-	displayGroup.setSelectedIndex(3, showAltitude);
-	boolean showDistance = settings
-		.getDisplayValue(RecorderSettings.DISPLAY_DISTANCE);
-	displayGroup.setSelectedIndex(4, showDistance);
+        boolean showCoordinates = settings
+                .getDisplayValue(RecorderSettings.DISPLAY_COORDINATES);
+        displayGroup.setSelectedIndex(0, showCoordinates);
+        boolean showSpeed = settings
+                .getDisplayValue(RecorderSettings.DISPLAY_SPEED);
+        displayGroup.setSelectedIndex(1, showSpeed);
+        boolean showHeading = settings
+                .getDisplayValue(RecorderSettings.DISPLAY_HEADING);
+        displayGroup.setSelectedIndex(2, showHeading);
+        boolean showAltitude = settings
+                .getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE);
+        displayGroup.setSelectedIndex(3, showAltitude);
+        boolean showDistance = settings
+                .getDisplayValue(RecorderSettings.DISPLAY_DISTANCE);
+        displayGroup.setSelectedIndex(4, showDistance);
 
-	this.append(displayGroup);
+        this.append(displayGroup);
 
-	String[] backlight = { "Phones Default" /* Allow Off */,
-		"Attempt to Force On" };
-	backlightGroup = new ChoiceGroup("Phone Backlight (see About/Help)",
-		ChoiceGroup.EXCLUSIVE, backlight, null);
-	if (settings.getBacklightOn()) {
-	    backlightGroup.setSelectedIndex(1, true);
-	} else {
-	    backlightGroup.setSelectedIndex(0, true);
-	}
-	this.append(backlightGroup);
+        String[] backlight = { "Phones Default" /* Allow Off */,
+                "Attempt to Force On" };
+        backlightGroup = new ChoiceGroup("Phone Backlight (see About/Help)",
+                ChoiceGroup.EXCLUSIVE, backlight, null);
+        if (settings.getBacklightOn()) {
+            backlightGroup.setSelectedIndex(1, true);
+        } else {
+            backlightGroup.setSelectedIndex(0, true);
+        }
+        this.append(backlightGroup);
     }
 
 }

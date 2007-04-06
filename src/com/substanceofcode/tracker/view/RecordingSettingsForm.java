@@ -78,7 +78,10 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             
             controller.showSettings();
         } else {
-            // Don't save the new interval
+            // Reinitialize all controls
+            this.deleteAll();
+            this.initializeControls();
+            // Return to the settings list
             controller.showSettings();
         }
     }

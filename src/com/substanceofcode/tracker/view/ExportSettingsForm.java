@@ -79,6 +79,9 @@ public class ExportSettingsForm extends Form implements CommandListener {
         }
         
         if(command==cancelCommand) {
+            // Reinitialize all controls
+            this.deleteAll();
+            this.initializeControls();
             // Return to the settings list
             controller.showSettings();
         }
@@ -100,7 +103,7 @@ public class ExportSettingsForm extends Form implements CommandListener {
         exportFolderField = new TextField(
                 "Export folder", 
                 exportFolder, 
-                32, 
+                50, 
                 TextField.ANY);
         this.append(exportFolderField);
         
