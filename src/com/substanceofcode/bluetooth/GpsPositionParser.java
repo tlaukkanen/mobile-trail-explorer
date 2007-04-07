@@ -105,12 +105,12 @@ public class GpsPositionParser {
             double latitudeDouble = 0.0;
             double speed = -2.0;
             if(longitude.length()>0 && lattitude.length()>0) {
-                longitudeDouble = parseValue(longitude, false);
+                longitudeDouble = parseValue(longitude, true);
                 if(longitudeDirection.equals("E")==false) {
                     longitudeDouble = -longitudeDouble;
                 }
                 
-                latitudeDouble = parseValue(lattitude, true);
+                latitudeDouble = parseValue(lattitude, false);
                 if(lattitudeDirection.equals("N")==false) {
                     latitudeDouble = -latitudeDouble;
                 }          
@@ -150,11 +150,11 @@ public class GpsPositionParser {
         int degreeInteger = 0;
         double minutes = 0.0;
         if( isLongitude==true ) {
-            degreeInteger = Integer.parseInt(valueString.substring(0, 2));
-            minutes = Double.parseDouble( valueString.substring(2) );
-        } else {
             degreeInteger = Integer.parseInt(valueString.substring(0, 3));
             minutes = Double.parseDouble( valueString.substring(3) );
+        } else {
+            degreeInteger = Integer.parseInt(valueString.substring(0, 2));
+            minutes = Double.parseDouble( valueString.substring(2) );
         }
         double degreeDecimals = minutes / 60.0;
         double degrees = degreeInteger + degreeDecimals;

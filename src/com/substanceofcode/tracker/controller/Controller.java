@@ -26,6 +26,7 @@ import com.substanceofcode.bluetooth.BluetoothDevice;
 import com.substanceofcode.bluetooth.BluetoothUtility;
 import com.substanceofcode.bluetooth.GpsDevice;
 import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.tracker.model.Backlight;
 import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
@@ -57,51 +58,30 @@ import javax.microedition.midlet.MIDlet;
  */
 public class Controller {
 
-    /** Constants */
-    private static final int BACKLIGHT_THREAD_INTERVAL = 5000;
-
     /** Status codes */
     public final static int STATUS_STOPPED = 0;
-
     public final static int STATUS_RECORDING = 1;
-
     public final static int STATUS_NOTCONNECTED = 2;
 
     private Vector devices;
-
     private int status;
-
     private GpsDevice gpsDevice;
-
     private GpsRecorder recorder;
-
     private Vector waypoints;
-
-    private RecorderSettings settings;
-
-    private Thread backlightAlwaysOnThread;
+    private RecorderSettings settings;  
+    private Backlight backlight;
 
     /** Screens and Forms */
     private TrailCanvas trailCanvas;
-
     private SplashCanvas splashCanvas;
-
     private DeviceList deviceList;
-
     private MIDlet midlet;
-
     private AboutScreen aboutScreen;
-
     private SettingsList settingsList;
-
     private RecordingSettingsForm recordingSettingsForm;
-
     private ExportSettingsForm exportSettingsForm;
-
     private DisplaySettingsForm displaySettingsForm;
-
     private WaypointForm waypointForm;
-
     private WaypointList waypointList;
 
     /** Display device */
@@ -110,430 +90,397 @@ public class Controller {
     private String error;
 
     /**
-         * Creates a new instance of Controller
-         */
+     * Creates a new instance of Controller
+     */
     public Controller(MIDlet midlet, Display display) {
-	this.midlet = midlet;
-	status = STATUS_NOTCONNECTED;
-	settings = new RecorderSettings(midlet);
-	String gpsAddress = settings.getGpsDeviceConnectionString();
-	if (gpsAddress.length() > 0) {
-	    BluetoothDevice dev = new BluetoothDevice(gpsAddress, "GPS");
-	    gpsDevice = new GpsDevice(dev);
-	}
-	recorder = new GpsRecorder(this);
+        this.midlet = midlet;
+        status = STATUS_NOTCONNECTED;
+        settings = new RecorderSettings(midlet);
+        String gpsAddress = settings.getGpsDeviceConnectionString();
+        if (gpsAddress.length() > 0) {
+            BluetoothDevice dev = new BluetoothDevice(gpsAddress, "GPS");
+            gpsDevice = new GpsDevice(dev);
+        }
+        recorder = new GpsRecorder(this);
 
-	/** Initialize forms */
-	// aboutForm = new AboutForm(this);
-	this.display = display;
+        /** Initialize forms */
+        // aboutForm = new AboutForm(this);
+        this.display = display;
 
-	/** Waypoints */
-	waypoints = settings.getWaypoints();
-	if (waypoints == null) {
-	    waypoints = new Vector();
-	}
+        /** Waypoints */
+        waypoints = settings.getWaypoints();
+        if (waypoints == null) {
+            waypoints = new Vector();
+        }
 
-	if (settings.getBacklightOn()) {
-	    this.startBacklightThread();
-	}
+        /** Backlight class is used to keep backlight always on */
+        if (backlight == null) {
+            backlight = new Backlight(midlet);
+        }
+        if (settings.getBacklightOn()) {
+            backlight.backlightOn();
+        }
     }
 
     /**
-         * Starts the '{@link Controller#backlightAlwaysOnThread}.
-         */
-    private void startBacklightThread() {
-	// Make sure there isn't another version of this thread running.
-	this.stopBacklightThread();
-	backlightAlwaysOnThread = new Thread(new Runnable() {
-	    public void run() {
-		final Thread thisThread = Thread.currentThread();
-		while (thisThread == backlightAlwaysOnThread) {
-		    try {
-			Thread.sleep(BACKLIGHT_THREAD_INTERVAL);
-		    } catch (InterruptedException e) {
-			e.printStackTrace();
-		    }
-		    Display.getDisplay(midlet).flashBacklight(1);
-		}
-	    }
-	});
-	backlightAlwaysOnThread.start();
-
-    }
-
-    /**
-         * Stops the '{@link Controller#backlightAlwaysOnThread}'
-         */
-    private void stopBacklightThread() {
-	if (backlightAlwaysOnThread != null) {
-	    backlightAlwaysOnThread = null;
-	}
-    }
-
-    /**
-         * Tells this Controller if it should be running the '{@link Controller#backlightAlwaysOnThread}'
-         * thread, which does as it's name suggests and tries to keep the
-         * backlight from turning OFF.
-         * 
-         * @param backlightOn
-         *                If true, the thread should be running, if False, it
-         *                should NOT be running.
-         */
+     * Tells this Controller if the Backlight class should keep the backlight
+     * on or switch to phone's default behaviour
+     * @param backlightOn   true = keep backlight always on,
+     *                      false = switch to phone's default backlight behaviour
+     */
     public void backlightOn(boolean backlightOn) {
-	if (backlightOn) {
-	    if (this.backlightAlwaysOnThread == null) {
-		this.startBacklightThread();
-	    }
-	} else {
-	    this.stopBacklightThread();
-	}
+        if (backlightOn) {
+            backlight.backlightOn();
+        } else {
+            backlight.backlightOff();
+        }
     }
 
     public void searchDevices() {
-	try {
-	    BluetoothUtility bt = new BluetoothUtility();
-	    System.out.println("Initializing bluetooth utility");
-	    bt.initialize();
-	    System.out.println("Finding devices.");
-	    bt.findDevices();
-	    while (bt.searchComplete() == false) {
-		Thread.sleep(100);
-	    }
-	    System.out.println("Getting devices.");
-	    devices = bt.getDevices();
-	} catch (Exception ex) {
-	    System.err.println("Error in Controller.searchDevices: "
-		    + ex.toString());
-	    ex.printStackTrace();
-	}
+        try {
+            BluetoothUtility bt = new BluetoothUtility();
+            System.out.println("Initializing bluetooth utility");
+            bt.initialize();
+            System.out.println("Finding devices.");
+            bt.findDevices();
+            while (bt.searchComplete() == false) {
+                Thread.sleep(100);
+            }
+            System.out.println("Getting devices.");
+            devices = bt.getDevices();
+        } catch (Exception ex) {
+            System.err.println("Error in Controller.searchDevices: "
+                + ex.toString());
+            ex.printStackTrace();
+        }
     }
 
     public Vector getDevices() {
-	return devices;
+        return devices;
     }
 
     /** Set GPS device */
     public void setGpsDevice(BluetoothDevice device) {
-	gpsDevice = new GpsDevice(device);
-	settings.setGpsDeviceConnectionString(gpsDevice.getAddress());
+        gpsDevice = new GpsDevice(device);
+        settings.setGpsDeviceConnectionString(gpsDevice.getAddress());
     }
 
     /** Get status code */
     public int getStatusCode() {
-	return status;
+        return status;
     }
 
     public void setError(String err) {
-	error = err;
+        error = err;
     }
 
     public String getError() {
-	return error;
+        return error;
     }
 
     /** Get current status text */
     public String getStatus() {
-	String statusText = "";
-	switch (status) {
-	case STATUS_STOPPED:
-	    statusText = "STOPPED";
-	    break;
-	case STATUS_RECORDING:
-	    statusText = "RECORDING";
-	    break;
-	case STATUS_NOTCONNECTED:
-	    statusText = "NOT CONNECTED";
-	    break;
-	default:
-	    statusText = "UNKNOWN";
-	}
-	return statusText;
+        String statusText = "";
+        switch (status) {
+            case STATUS_STOPPED:
+                statusText = "STOPPED";
+                break;
+            case STATUS_RECORDING:
+                statusText = "RECORDING";
+                break;
+            case STATUS_NOTCONNECTED:
+                statusText = "NOT CONNECTED";
+                break;
+            default:
+                statusText = "UNKNOWN";
+        }
+        return statusText;
     }
 
     /** Method for starting and stopping the recording */
     public void startStop() {
 
-	if (status != STATUS_RECORDING) {
+        if (status != STATUS_RECORDING) {
 
-	    // Connect to GPS device
-	    try {
-		gpsDevice.connect();
-		recorder.startRecording();
-		status = STATUS_RECORDING;
-	    } catch (Exception ex) {
-		Alert saveAlert = new Alert("Error");
-		saveAlert.setTimeout(Alert.FOREVER);
-		saveAlert.setString("Error while connection to GPS: "
-			+ ex.toString());
-		display.setCurrent(saveAlert, getTrailCanvas());
-	    }
-	} else {
+            // Connect to GPS device
+            try {
+                gpsDevice.connect();
+                recorder.startRecording();
+                status = STATUS_RECORDING;
+            } catch (Exception ex) {
+                Alert saveAlert = new Alert("Error");
+                saveAlert.setTimeout(Alert.FOREVER);
+                saveAlert.setString("Error while connection to GPS: "
+                        + ex.toString());
+                display.setCurrent(saveAlert, getTrailCanvas());
+            }
+        } else {
 
-	    // Stop recording the track
-	    recorder.stopRecording();
-	    Track recordedTrack = recorder.getTrack();
-	    try {
-		boolean useKilometers = settings.getUnitsAsKilometers();
-		String exportFolder = settings.getExportFolder();
-		int exportFormat = settings.getExportFormat();
-		recordedTrack.writeToFile(exportFolder, waypoints,
-			useKilometers, exportFormat);
-	    } catch (Exception ex) {
-		setError(ex.toString());
-		Alert saveAlert = new Alert("Error");
-		saveAlert.setTimeout(Alert.FOREVER);
-		saveAlert.setString(ex.toString());
-		display.setCurrent(saveAlert, getTrailCanvas());
-	    }
+            // Stop recording the track
+            recorder.stopRecording();
+            Track recordedTrack = recorder.getTrack();
+            try {
+                boolean useKilometers = settings.getUnitsAsKilometers();
+                String exportFolder = settings.getExportFolder();
+                int exportFormat = settings.getExportFormat();
+                recordedTrack.writeToFile(exportFolder, waypoints,
+                        useKilometers, exportFormat);
+            } catch (Exception ex) {
+                setError(ex.toString());
+                Alert saveAlert = new Alert("Error");
+                saveAlert.setTimeout(Alert.FOREVER);
+                saveAlert.setString(ex.toString());
+                display.setCurrent(saveAlert, getTrailCanvas());
+            }
 
-	    try {
-		// Disconnect from GPS
-		gpsDevice.disconnect();
-	    } catch (Exception e) {
-		Alert saveAlert = new Alert("Error");
-		saveAlert.setTimeout(Alert.FOREVER);
-		saveAlert.setString("Error while disconnecting from "
-			+ "GPS device: " + e.toString());
-		display.setCurrent(saveAlert, getTrailCanvas());
-	    }
+            try {
+                // Disconnect from GPS
+                gpsDevice.disconnect();
+            } catch (Exception e) {
+                Alert saveAlert = new Alert("Error");
+                saveAlert.setTimeout(Alert.FOREVER);
+                saveAlert.setString("Error while disconnecting from "
+                        + "GPS device: " + e.toString());
+                display.setCurrent(saveAlert, getTrailCanvas());
+            }
 
-	    status = STATUS_STOPPED;
-	}
+            status = STATUS_STOPPED;
+        }
 
     }
 
     /** Get waypoints */
     public Vector getWaypoints() {
-	return waypoints;
+        return waypoints;
     }
 
     /** Save new waypoint */
     public void saveWaypoint(Waypoint waypoint) {
-	if (waypoints == null) {
-	    waypoints = new Vector();
-	}
-	waypoints.addElement(waypoint);
+        if (waypoints == null) {
+            waypoints = new Vector();
+        }
+        waypoints.addElement(waypoint);
     }
 
     /** Mark new waypoint */
     public void markWaypoint(String lat, String lon) {
-	if (waypointForm == null) {
-	    waypointForm = new WaypointForm(this);
-	}
-	/** 
-	 * Autofill the waypoint form fields with current location and 
-	 * autonumber (1,2,3...).
-	 */
-	int waypointCount = waypoints.size();
-	waypointForm.setValues("WP" + String.valueOf(waypointCount + 1), lat, lon);
-	waypointForm.setEditingFlag(false);
-	display.setCurrent(waypointForm);
+        if (waypointForm == null) {
+            waypointForm = new WaypointForm(this);
+        }
+        /** 
+         * Autofill the waypoint form fields with current location and 
+         * autonumber (1,2,3...).
+         */
+        int waypointCount = waypoints.size();
+        waypointForm.setValues("WP" + String.valueOf(waypointCount + 1), lat, lon);
+        waypointForm.setEditingFlag(false);
+        display.setCurrent(waypointForm);
     }
 
     /** Edit waypoint */
     public void editWaypoint(Waypoint wp) {
-	if (waypointForm == null) {
-	    waypointForm = new WaypointForm(this);
-	}
-	waypointForm.setValues(wp);
-	waypointForm.setEditingFlag(true);
-	display.setCurrent(waypointForm);
+        if (waypointForm == null) {
+            waypointForm = new WaypointForm(this);
+        }
+        waypointForm.setValues(wp);
+        waypointForm.setEditingFlag(true);
+        display.setCurrent(waypointForm);
     }
 
     public int getRecordedPositionCount() {
-	if (recorder != null) {
-	    Track recordedTrack = recorder.getTrack();
-	    int positionCount = recordedTrack.getPositionCount();
-	    return positionCount;
-	} else {
-	    return 0;
-	}
+        if (recorder != null) {
+            Track recordedTrack = recorder.getTrack();
+            int positionCount = recordedTrack.getPositionCount();
+            return positionCount;
+        } else {
+            return 0;
+        }
     }
 
     public int getRecordedMarkerCount() {
-	if (recorder != null) {
-	    Track recordedTrack = recorder.getTrack();
-	    int markerCount = recordedTrack.getMarkerCount();
-	    return markerCount;
-	} else {
-	    return 0;
-	}
+        if (recorder != null) {
+            Track recordedTrack = recorder.getTrack();
+            int markerCount = recordedTrack.getMarkerCount();
+            return markerCount;
+        } else {
+            return 0;
+        }
     }
 
     public synchronized GpsPosition getPosition() {
-	if (gpsDevice == null) {
-	    return null;
-	}
-	GpsPosition pos = gpsDevice.getPosition();
-	return pos;
+        if (gpsDevice == null) {
+            return null;
+        }
+        GpsPosition pos = gpsDevice.getPosition();
+        return pos;
     }
 
     /** Exit application */
     public void exit() {
-	saveWaypoints();
+        saveWaypoints();
 
-	midlet.notifyDestroyed();
+        midlet.notifyDestroyed();
     }
 
     /** Get settings */
     public RecorderSettings getSettings() {
-	return settings;
+        return settings;
     }
 
     public String getGpsUrl() {
-	if (gpsDevice != null) {
-	    return gpsDevice.getAddress();
-	} else {
-	    return "-";
-	}
+        if (gpsDevice != null) {
+            return gpsDevice.getAddress();
+        } else {
+            return "-";
+        }
     }
 
     /** Show trail */
     public void showTrail() {
-	display.setCurrent(getTrailCanvas());
+        display.setCurrent(getTrailCanvas());
     }
 
     private TrailCanvas getTrailCanvas() {
-	if (trailCanvas == null) {
-	    GpsPosition initialPosition = null;
-	    try {
-		initialPosition = this.recorder.getPositionFromRMS();
-	    } catch (Exception anyException) {/* discard */
-	    }
-	    trailCanvas = new TrailCanvas(this, initialPosition);
-	}
-	return trailCanvas;
+        if (trailCanvas == null) {
+            GpsPosition initialPosition = null;
+            try {
+                initialPosition = this.recorder.getPositionFromRMS();
+            } catch (Exception anyException) {/* discard */
+            }
+            trailCanvas = new TrailCanvas(this, initialPosition);
+        }
+        return trailCanvas;
     }
 
     /** Show splash canvas */
     public void showSplash() {
-	display.setCurrent(getSplashCanvas());
+        display.setCurrent(getSplashCanvas());
     }
 
     /** Show export settings */
     public void showExportSettings() {
-	display.setCurrent(getExportSettingsForm());
+        display.setCurrent(getExportSettingsForm());
     }
 
     /** Show export settings form */
     private ExportSettingsForm getExportSettingsForm() {
-	if (exportSettingsForm == null) {
-	    exportSettingsForm = new ExportSettingsForm(this);
-	}
-	return exportSettingsForm;
+        if (exportSettingsForm == null) {
+            exportSettingsForm = new ExportSettingsForm(this);
+        }
+        return exportSettingsForm;
     }
 
     /** Get instance of splash screen */
     private SplashCanvas getSplashCanvas() {
-	if (splashCanvas == null) {
-	    splashCanvas = new SplashCanvas(this);
-	}
-	return splashCanvas;
+        if (splashCanvas == null) {
+            splashCanvas = new SplashCanvas(this);
+        }
+        return splashCanvas;
     }
 
     public void showAboutScreen() {
-	if (aboutScreen == null) {
-	    aboutScreen = new AboutScreen(this, this.getCurrentScreen()
-		    .getWidth());
-	}
-	display.setCurrent(aboutScreen);
+        if (aboutScreen == null) {
+            aboutScreen = new AboutScreen(this, this.getCurrentScreen()
+                    .getWidth());
+        }
+        display.setCurrent(aboutScreen);
     }
 
     public void showSettings() {
-	display.setCurrent(getSettingsList());
+        display.setCurrent(getSettingsList());
     }
 
     /** Get instance of settings list */
     private SettingsList getSettingsList() {
-	if (settingsList == null) {
-	    settingsList = new SettingsList(this);
-	}
-	return settingsList;
+        if (settingsList == null) {
+            settingsList = new SettingsList(this);
+        }
+        return settingsList;
     }
 
     /** Show waypoint list */
     public void showWaypointList() {
-	if (waypointList == null) {
-	    waypointList = new WaypointList(this);
-	}
-	waypointList.setWaypoints(waypoints);
-	display.setCurrent(waypointList);
+        if (waypointList == null) {
+            waypointList = new WaypointList(this);
+        }
+        waypointList.setWaypoints(waypoints);
+        display.setCurrent(waypointList);
     }
 
     /** Show device list */
     public void showDevices() {
-	if (deviceList == null) {
-	    deviceList = new DeviceList(this);
-	}
-	display.setCurrent(deviceList);
+        if (deviceList == null) {
+            deviceList = new DeviceList(this);
+        }
+        display.setCurrent(deviceList);
     }
 
     /** Show error */
     public void showError(String message) {
-	Alert newAlert = new Alert("Error", message, null, AlertType.ERROR);
-	newAlert.setTimeout(5000);
-	display.setCurrent(newAlert, trailCanvas);
+        Alert newAlert = new Alert("Error", message, null, AlertType.ERROR);
+        newAlert.setTimeout(5000);
+        display.setCurrent(newAlert, trailCanvas);
     }
 
     /** Update selected waypoint */
     public void updateWaypoint(String m_oldWaypointName, Waypoint newWaypoint) {
-	Enumeration waypointEnum = waypoints.elements();
-	while (waypointEnum.hasMoreElements()) {
-	    Waypoint wp = (Waypoint) waypointEnum.nextElement();
-	    String currentName = wp.getName();
-	    if (currentName.equals(m_oldWaypointName)) {
-		int updateIndex = waypoints.indexOf(wp);
-		waypoints.setElementAt(newWaypoint, updateIndex);
-		return;
-	    }
-	}
+        Enumeration waypointEnum = waypoints.elements();
+        while (waypointEnum.hasMoreElements()) {
+            Waypoint wp = (Waypoint) waypointEnum.nextElement();
+            String currentName = wp.getName();
+            if (currentName.equals(m_oldWaypointName)) {
+                int updateIndex = waypoints.indexOf(wp);
+                waypoints.setElementAt(newWaypoint, updateIndex);
+                return;
+            }
+        }
     }
 
     /** Save waypoints to persistent storage */
     private void saveWaypoints() {
-	settings.setWaypoints(waypoints);
+        settings.setWaypoints(waypoints);
     }
 
     /** Remove selected waypoint */
     public void removeWaypoint(Waypoint wp) {
-	waypoints.removeElement(wp);
+        waypoints.removeElement(wp);
     }
 
     /** Display recording settings form */
     public void showRecordingSettings() {
-	if (recordingSettingsForm == null) {
-	    recordingSettingsForm = new RecordingSettingsForm(this);
-	}
-	display.setCurrent(recordingSettingsForm);
+        if (recordingSettingsForm == null) {
+            recordingSettingsForm = new RecordingSettingsForm(this);
+        }
+        display.setCurrent(recordingSettingsForm);
     }
 
     /** Set recording interval */
     public void saveRecordingInterval(int interval) {
-	settings.setRecordingInterval(interval);
-	recorder.setInterval(interval);
+        settings.setRecordingInterval(interval);
+        recorder.setInterval(interval);
     }
 
     /** Display display settings form */
     public void showDisplaySettings() {
-	if (displaySettingsForm == null) {
-	    displaySettingsForm = new DisplaySettingsForm(this);
-	}
-	display.setCurrent(displaySettingsForm);
+        if (displaySettingsForm == null) {
+            displaySettingsForm = new DisplaySettingsForm(this);
+        }
+        display.setCurrent(displaySettingsForm);
     }
 
     /** Set recording marker step */
     public void saveRecordingMarkerStep(int newStep) {
-	settings.setRecordingMarkerInterval(newStep);
-	recorder.setIntervalForMarkers(newStep);
+        settings.setRecordingMarkerInterval(newStep);
+        recorder.setIntervalForMarkers(newStep);
     }
 
     /** Get recorded track */
     public Track getTrack() {
-	return recorder.getTrack();
+        return recorder.getTrack();
     }
 
     public Displayable getCurrentScreen() {
-	return this.display.getCurrent();
+        return this.display.getCurrent();
     }
 
 }

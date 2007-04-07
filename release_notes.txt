@@ -18,6 +18,7 @@ v1.5 ????
 + MTE now remembers last position on startup (Issue 17)
 + About/Help Screen (Issue 23)
 + Fixed Bluetooth Device List refresh exception (Issue 22)
++ Controls in the setting forms will be re-initialized when pressing "Cancel" (Issue 27)
 
 v1.4 (March 27th 2007)
 + Compass

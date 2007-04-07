@@ -64,7 +64,10 @@
 	<property name="api.fileIO" value="${install.api.lib}/jsr75.jar" />
 	<!-- <property name="api.junit-10" value="${lib.dir}/JMUnit4CLDC10.jar" /> -->
 	<property name="api.junit-11" value="${lib.dir}/jmunit4cldc11-1.0.1.jar" />
-	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-11}" />
+	<property name="api.nokia" value="${lib.dir}/nokiaext.jar" />
+	<property name="api.siemens" value="${lib.dir}/SiemensAPI.jar" />
+	<property name="api.samsung" value="${lib.dir}/SamsungAPI.jar" />
+	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-11};${api.nokia};${api.siemens};${api.samsung}" />
 	
 	
 	<!-- Setup the project build, create required folders, and copy accross required files. -->

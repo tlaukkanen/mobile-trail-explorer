@@ -115,6 +115,7 @@ public class Track {
         String dateStamp = DateUtil.getCurrentDateStamp();
         FileConnection connection;
         try {
+            folder = folder + (folder.endsWith("/") ? "" : "/");
             connection = (FileConnection)
                     Connector.open("file:///" + folder + "track_" + dateStamp + extension, Connector.WRITE );
         } catch(Exception ex) {
@@ -125,6 +126,7 @@ public class Track {
             // Create file
             connection.create();
         } catch(Exception ex) {
+            connection.close();
             throw new Exception("writeToFile: Check and create: " + ex.toString());
         }
         
@@ -134,6 +136,7 @@ public class Track {
         try{
             out = connection.openOutputStream();
         } catch(Exception ex) {
+            connection.close();
             throw new Exception("writeToFile: Open output stream: " + ex.toString());
         }
         PrintStream output = new PrintStream( out );
