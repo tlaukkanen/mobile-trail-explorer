@@ -32,9 +32,11 @@ import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.tracker.view.AboutScreen;
+import com.substanceofcode.tracker.view.BaseCanvas;
 import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.DisplaySettingsForm;
 import com.substanceofcode.tracker.view.ExportSettingsForm;
+import com.substanceofcode.tracker.view.InformationCanvas;
 import com.substanceofcode.tracker.view.RecordingSettingsForm;
 import com.substanceofcode.tracker.view.SettingsList;
 import com.substanceofcode.tracker.view.SplashCanvas;
@@ -72,10 +74,10 @@ public class Controller {
     private Backlight backlight;
 
     /** Screens and Forms */
+    private MIDlet midlet;
     private TrailCanvas trailCanvas;
     private SplashCanvas splashCanvas;
     private DeviceList deviceList;
-    private MIDlet midlet;
     private AboutScreen aboutScreen;
     private SettingsList settingsList;
     private RecordingSettingsForm recordingSettingsForm;
@@ -83,9 +85,13 @@ public class Controller {
     private DisplaySettingsForm displaySettingsForm;
     private WaypointForm waypointForm;
     private WaypointList waypointList;
+    private InformationCanvas informationCanvas;
 
     /** Display device */
     private Display display;
+    private BaseCanvas[] screens;
+    
+    private int currentDisplayIndex;
 
     private String error;
 
@@ -102,10 +108,12 @@ public class Controller {
             gpsDevice = new GpsDevice(dev);
         }
         recorder = new GpsRecorder(this);
+        
 
-        /** Initialize forms */
-        // aboutForm = new AboutForm(this);
-        this.display = display;
+	/** Initialize forms */
+	// aboutForm = new AboutForm(this);
+        currentDisplayIndex = 0;
+	this.display = display;
 
         /** Waypoints */
         waypoints = settings.getWaypoints();
@@ -318,7 +326,6 @@ public class Controller {
     /** Exit application */
     public void exit() {
         saveWaypoints();
-
         midlet.notifyDestroyed();
     }
 
@@ -378,6 +385,7 @@ public class Controller {
         return splashCanvas;
     }
 
+    /** Set about screens as current display */
     public void showAboutScreen() {
         if (aboutScreen == null) {
             aboutScreen = new AboutScreen(this, this.getCurrentScreen()
@@ -386,6 +394,7 @@ public class Controller {
         display.setCurrent(aboutScreen);
     }
 
+    /** Show settings list */
     public void showSettings() {
         display.setCurrent(getSettingsList());
     }
@@ -481,6 +490,31 @@ public class Controller {
 
     public Displayable getCurrentScreen() {
         return this.display.getCurrent();
+    }
+
+    public void switchDisplay() {
+        if(screens==null) {
+            screens = new BaseCanvas[2];
+            screens[0] = getTrailCanvas();
+            screens[1] = getInformationCanvas();
+        }
+        
+        currentDisplayIndex++;
+        if(currentDisplayIndex>1) {
+            currentDisplayIndex = 0;
+        }
+        
+        BaseCanvas nextCanvas = screens[currentDisplayIndex];
+        if( nextCanvas!=null ) {
+            display.setCurrent( screens[currentDisplayIndex] );
+        }
+    }
+
+    private BaseCanvas getInformationCanvas() {
+        if(informationCanvas==null) {
+            informationCanvas = new InformationCanvas(this);
+        }
+        return informationCanvas;
     }
 
 }

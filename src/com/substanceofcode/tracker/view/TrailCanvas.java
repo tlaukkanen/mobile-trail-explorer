@@ -52,7 +52,7 @@ import javax.microedition.lcdui.game.Sprite;
  *
  * @author Tommi Laukkanen
  */
-public class TrailCanvas extends Canvas implements Runnable, CommandListener {
+public class TrailCanvas extends BaseCanvas implements Runnable {
     
     private Controller controller;
     private GpsPosition lastPosition;
@@ -62,13 +62,6 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     private int counter;
     private boolean refresh;
     private String error;
-    
-    /** Commands */
-    private Command startStopCommand;
-    private Command settingsCommand;
-    private Command exitCommand;
-    private Command markWaypointCommand;
-    private Command editWaypointsCommand;
     
     /** Trail drawing helpers */
     private int center;
@@ -86,9 +79,9 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
     
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller, GpsPosition initialPosition) {
+        super(controller);
         this.controller = controller;
         this.lastPosition = initialPosition;
-        setFullScreenMode( true );
         
         positionTrail = new Vector();
         
@@ -96,9 +89,6 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
         thread = new Thread(this);
         thread.start();
         counter=0;
-        
-        initializeCommands();
-        setCommandListener(this);
         
         center = this.getWidth()/2;
         middle = this.getHeight()/2;
@@ -137,31 +127,6 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             compassArrows = new Sprite(tempCompassArrows, 11, 11);
             compassArrows.setPosition(this.getWidth() - 22, 11);
         }
-        
-    }
-    
-    /** Initialize commands */
-    private void initializeCommands() {
-        
-        // Edit waypoints command for listing existing waypoints
-        editWaypointsCommand = new Command("Edit waypoints", Command.SCREEN, 4);
-        addCommand(editWaypointsCommand);
-        
-        // Start/Stop command for toggling recording
-        startStopCommand = new Command("Start/Stop recording", Command.ITEM, 1);
-        addCommand(startStopCommand);
-        
-        // Settings command for showing settings list
-        settingsCommand = new Command("Settings", Command.SCREEN, 5);
-        addCommand(settingsCommand);
-        
-        // Mark a new waypoint command
-        markWaypointCommand = new Command("Mark waypoint", Command.SCREEN, 3);
-        addCommand(markWaypointCommand);
-        
-        // Exit command
-        exitCommand = new Command("Exit", Command.EXIT, 10);
-        addCommand(exitCommand);
         
     }
     
@@ -597,7 +562,10 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
                 horizontalZoomFactor /= 2;
                 break;
                 
-                /** We could handle arrow key presses here for panning the view */
+            case( KEY_NUM0 ):
+                // Change screen
+                controller.switchDisplay();
+                break;
                 
             default:
         }
@@ -629,38 +597,8 @@ public class TrailCanvas extends Canvas implements Runnable, CommandListener {
             verticalMovement = 0;
             horizontalMovement = 0;
         }
-        
     }
     
-    /** Handle commands */
-    public void commandAction(Command command, Displayable displayable) {
-        if( command == startStopCommand ) {
-            controller.startStop();
-        }
-        if( command == markWaypointCommand ) {
-            
-            String latString = "";
-            String lonString = "";
-            if(lastPosition!=null) {
-                double lat = lastPosition.latitude;
-                latString = getDegreeString(lat);
-                
-                double lon = lastPosition.longitude;
-                lonString = getDegreeString(lon);
-            }
-            
-            controller.markWaypoint(latString, lonString);
-        }
-        if( command == settingsCommand ) {
-            controller.showSettings();
-        }
-        if( command == exitCommand ) {
-            controller.exit();
-        }
-        if( command == editWaypointsCommand ) {
-            controller.showWaypointList();
-        }
-        
-    }
+
     
 }

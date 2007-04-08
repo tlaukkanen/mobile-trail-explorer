@@ -30,7 +30,7 @@ import java.util.Date;
 
 /**
  * <p>All the information representing a single GPS position</p>
- * 
+ *
  * A GPSPosition stores the following information:
  * <ul>
  *   <li>Latitude
@@ -46,14 +46,14 @@ import java.util.Date;
  */
 public final class GpsPosition {
     
-	/*#***********************************************************
-	 * 
-	 *  Because all the local variables are FINAL they can be 
-	 *  allowed the 'public' access modifier.
-	 * 
-	 *************************************************************/
-	
-	/** The 'raw' GPS data, as recieved from the GPS Device */
+    /************************************************************
+     *
+     *  Because all the local variables are FINAL they can be
+     *  allowed the 'public' access modifier.
+     *
+     *************************************************************/
+    
+    /** The 'raw' GPS data, as recieved from the GPS Device */
     public final String rawData;
     /** The longitude at this GpsPosition */
     public final double longitude;
@@ -65,13 +65,13 @@ public final class GpsPosition {
     public final short course;
     /** The altitude at this GpsPosition */
     public final double altitude;
-
+    
     /** A timestamp for this GpsPosition */
     public final Date date;
     
     /**
      * Creates a new instance of GpsPosition
-     * 
+     *
      * @param rawData the 'raw' GPS data String, as recieved from the GPS device.
      * @param course the course/direction at this GpsPosition
      * @param longitudeDouple the longitude at this GpsPosition
@@ -80,63 +80,63 @@ public final class GpsPosition {
      * @param altitude the altitude at this GpsPosition
      */
     public GpsPosition(
-            String rawData,
-            short course,
-            double longitudeDouple,
-            double latitudeDouple,
-            double speed,
-            double altitude) {
-        this.rawData = rawData;
-        this.course = course;
-        this.date = new Date(System.currentTimeMillis());
-        this.longitude = longitudeDouple;
-        this.latitude = latitudeDouple;
-        this.speed = speed;
-        this.altitude = altitude;
+	    String rawData,
+	    short course,
+	    double longitudeDouple,
+	    double latitudeDouple,
+	    double speed,
+	    double altitude) {
+	this.rawData = rawData;
+	this.course = course;
+	this.date = new Date(System.currentTimeMillis());
+	this.longitude = longitudeDouple;
+	this.latitude = latitudeDouple;
+	this.speed = speed;
+	this.altitude = altitude;
     }
     
     /**
-	 * <p>Reads 'All' the informatino about this GpsPosition from the DataInputStream parameter</p>
-	 * 
-	 * This method should be the exact opposite of {@link GpsPosition#serialize(DataOutputStream)}.<br>
-	 * i.e. This method should ALWAYS read the same number of bytes as {@link GpsPosition#serialize(DataOutputStream)} wrote.<br>
-	 * 
-	 * @param dis The DataInputStream to read the data from
-	 * 
-	 * @throws IOException if there is a problem reading from the DataInputStream
-	 * 
-	 * @see GpsPosition#serialize(DataOutputStream)
-	 */
+     * <p>Reads 'All' the informatino about this GpsPosition from the DataInputStream parameter</p>
+     *
+     * This method should be the exact opposite of {@link GpsPosition#serialize(DataOutputStream)}.<br>
+     * i.e. This method should ALWAYS read the same number of bytes as {@link GpsPosition#serialize(DataOutputStream)} wrote.<br>
+     *
+     * @param dis The DataInputStream to read the data from
+     *
+     * @throws IOException if there is a problem reading from the DataInputStream
+     *
+     * @see GpsPosition#serialize(DataOutputStream)
+     */
     public GpsPosition(DataInputStream dis) throws IOException{
-		if(dis.readBoolean()){
-			rawData = dis.readUTF();
-		}else{
-			rawData = null;
-		}
-		
-		longitude = dis.readDouble();
-		latitude = dis.readDouble();
-		speed = dis.readDouble();
-		course = dis.readShort();
-		altitude = dis.readDouble();
-		date = new Date( dis.readLong() );
+	if(dis.readBoolean()){
+	    rawData = dis.readUTF();
+	}else{
+	    rawData = null;
+	}
+	
+	longitude = dis.readDouble();
+	latitude = dis.readDouble();
+	speed = dis.readDouble();
+	course = dis.readShort();
+	altitude = dis.readDouble();
+	date = new Date( dis.readLong() );
     }
     
     /**
      * <p>Compare to another GpsPosition<p>
-     * 
+     *
      * Positions are considered to be equal IF both their latitudes AND their longitudes are exactly equal.
      */
     public boolean equals(GpsPosition position) {
-    	// FIXME: what is going on here, are we converting to a string just to compare SURELY
-    	// (longitude == position.longitude && latitude == position.latitude)
-    	// would be the same  ( AND MUCH BETTER )?????
-        if( String.valueOf(longitude).equals( String.valueOf(position.longitude) ) == true &&
-                String.valueOf(latitude).equals( String.valueOf(position.latitude) ) == true ) {
-            return true;
-        } else {
-            return false;
-        }
+	// FIXME: what is going on here, are we converting to a string just to compare SURELY
+	// (longitude == position.longitude && latitude == position.latitude)
+	// would be the same  ( AND MUCH BETTER )?????
+	if( String.valueOf(longitude).equals( String.valueOf(position.longitude) ) == true &&
+		String.valueOf(latitude).equals( String.valueOf(position.latitude) ) == true ) {
+	    return true;
+	} else {
+	    return false;
+	}
     }
     
     /**
@@ -144,30 +144,30 @@ public final class GpsPosition {
      * @return the 'raw' GPS string as recieved from the GPS device.
      */
     public String getRawString() {
-        return rawData;
+	return rawData;
     }
     
     
     
     /** Get heading in string format. Example N, NE, S
-     * @return the heading in string format 
+     * @return the heading in string format
      */
     public String getHeadingString() {
-
-        double sector= 22.5; //  = 360 degrees / 16 sectors
-        String[] compass = {
-            "N","NE","NE","E",
-            "E","SE","SE","S",
-            "S","SW","SW","W",
-            "W","NW","NW","N"};
-        String  heading = "";
-        
-        int directionIndex = (int)Math.floor(course / sector);
-        heading = compass[directionIndex];
-        return heading;
+	
+	double sector= 22.5; //  = 360 degrees / 16 sectors
+	String[] compass = {
+	    "N","NE","NE","E",
+	    "E","SE","SE","S",
+	    "S","SW","SW","W",
+	    "W","NW","NW","N"};
+	String  heading = "";
+	
+	int directionIndex = (int)Math.floor(course / sector);
+	heading = compass[directionIndex];
+	return heading;
     }
-
-    /** <p>Get heading as index(0-15)</P> 
+    
+    /** <p>Get heading as index(0-15)</P>
      * <u>I.E.</u><br>
      * <table>
      *   <tr>
@@ -195,64 +195,64 @@ public final class GpsPosition {
      *     <td>15 = NNW</td>
      *   </tr>
      * </table>
-     * 
+     *
      * @return The heading as an index from 0 - 15.
      */
     public int getHeadingIndex() {
-
-        final double sector= 22.5; //  = 360 degrees / 16 sectors
-        final int[] compass = {
-            1 /* NNE */, 2 /* NE */, 3 /* ENE */, 4 /* E */,
-            5 /* ESE */, 6 /* SE */, 7 /* SSE */, 8 /* S */,
-            9 /* SSW */, 10 /* SW */, 11 /* WSW */, 12 /* W */,
-            13 /* WNW */, 14 /* NW */, 15 /* NNW */, 0 /* N */};
-        int heading = 0;
-        
-        final int directionIndex = (int)Math.floor(course / sector);
-        heading = compass[directionIndex];
-        return heading;
+	
+	final double sector= 22.5; //  = 360 degrees / 16 sectors
+	final int[] compass = {
+	    1 /* NNE */, 2 /* NE */, 3 /* ENE */, 4 /* E */,
+	    5 /* ESE */, 6 /* SE */, 7 /* SSE */, 8 /* S */,
+	    9 /* SSW */, 10 /* SW */, 11 /* WSW */, 12 /* W */,
+	    13 /* WNW */, 14 /* NW */, 15 /* NNW */, 0 /* N */};
+	int heading = 0;
+	
+	final int directionIndex = (int)Math.floor(course / sector);
+	heading = compass[directionIndex];
+	return heading;
     }
-
-    /** 
+    
+    /**
      * <p>Calculate distance from given position.</p>
      * Using formula from: http://williams.best.vwh.net/avform.htm#Dist
      */
     public double getDistanceFromPosition(GpsPosition position) {
-        double lat1 = (Math.PI/180.0)*this.latitude;
-        double lon1 = (Math.PI/180.0)*this.longitude;
-        double lat2 = (Math.PI/180.0)*position.latitude;
-        double lon2 = (Math.PI/180.0)*position.longitude;
-        double distance = 2*MathUtil.asin( Math.sqrt( MathUtil.pow(Math.sin((lat1-lat2)/2),2) + 
-                 Math.cos(lat1)*Math.cos(lat2)*MathUtil.pow(Math.sin((lon1-lon2)/2),2)));
-        return distance*6371.0;
+	double lat1 = (Math.PI/180.0)*this.latitude;
+	double lon1 = (Math.PI/180.0)*this.longitude;
+	double lat2 = (Math.PI/180.0)*position.latitude;
+	double lon2 = (Math.PI/180.0)*position.longitude;
+	double distance = 2*MathUtil.asin( Math.sqrt( MathUtil.pow(Math.sin((lat1-lat2)/2),2) +
+		Math.cos(lat1)*Math.cos(lat2)*MathUtil.pow(Math.sin((lon1-lon2)/2),2)));
+	return distance*6371.0;
     }
-
+    
     /**
      * <p>Writes 'All' the information about the GpsPosition to the DataOutputStream parameter.</p>
-     * 
+     *
      * This method should be the exact opposite of {@link GpsPosition#unserialize(DataInputStream)}..
-     * 
+     *
      * @param dos The DataOutputStream to write all the data to.
-     * 
+     *
      * @throws IOException if there is a problem writing to the DataOutputStream.
-     * 
+     *
      * @see GpsPosition#unserialize(DataInputStream)
      */
-	public void serialize(DataOutputStream dos) throws IOException {
-		
-		if(rawData == null){
-			dos.writeBoolean(false);
-		}else{
-			dos.writeBoolean(true);
-			dos.writeUTF(rawData);
-		}
-		
-		dos.writeDouble(longitude);
-		dos.writeDouble(latitude);
-		dos.writeDouble(speed);
-		dos.writeShort(course);
-		dos.writeDouble(altitude);
-		dos.writeLong(date.getTime());
+    public void serialize(DataOutputStream dos) throws IOException {
+	
+	if(rawData == null){
+	    dos.writeBoolean(false);
+	}else{
+	    dos.writeBoolean(true);
+	    dos.writeUTF(rawData);
 	}
+	
+	dos.writeDouble(longitude);
+	dos.writeDouble(latitude);
+	dos.writeDouble(speed);
+	dos.writeShort(course);
+	dos.writeDouble(altitude);
+	dos.writeLong(date.getTime());
+    }
     
 }
