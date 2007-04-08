@@ -62,7 +62,7 @@ public final class AboutScreen extends Canvas {
     private static final Font DEFAULT_SIMPLE_FONT = Font.getDefaultFont();
 
     private static final String[] aboutText = { "Mobile Trail Explorer,",
-	    "Version: 1.5  beta", "Copyright (C) 2005-2006", "Tommi Laukkanen",
+	    "Version: 1.5  beta", "Copyright (C) 2005-2007", "Tommi Laukkanen",
 	    "", "Licensed under the GPL", "", "For more information visit:",
 	    "www.substanceofcode.com" };
 
@@ -148,22 +148,22 @@ public final class AboutScreen extends Canvas {
     }
 
     /**
-         * <p>
-         * Takes an array of messages and a 'Screen-width' and returns the same
-         * messages, but any string in that that is wider than 'width' will be
-         * split up into 2 or more Strings that will fit on the screen
-         * </p>
-         * 
-         * 'Spliting' up a String is done on the basis of Words, so if a single
-         * WORD is longer than 'width' it will be on a Line on it's own, but
-         * that line WILL be WIDER than 'width'
-         * 
-         * @param message
-         * @param width
-         *                the maximum width a string may be before being split
-         *                up.
-         * @return
-         */
+     * <p>
+     * Takes an array of messages and a 'Screen-width' and returns the same
+     * messages, but any string in that that is wider than 'width' will be
+     * split up into 2 or more Strings that will fit on the screen
+     * </p>
+     * 
+     * 'Spliting' up a String is done on the basis of Words, so if a single
+     * WORD is longer than 'width' it will be on a Line on it's own, but
+     * that line WILL be WIDER than 'width'
+     * 
+     * @param message
+     * @param width
+     *                the maximum width a string may be before being split
+     *                up.
+     * @return
+     */
     private String[] formatMessage(String[] message, int width) {
 	Vector result = new Vector(message.length);
 	for (int i = 0; i < message.length; i++) {
