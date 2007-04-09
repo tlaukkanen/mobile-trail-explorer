@@ -20,6 +20,7 @@ v1.5 ????
 + Fixed Bluetooth Device List refresh exception (Issue 22)
 + Controls in the setting forms will be re-initialized when pressing "Cancel" (Issue 27)
 + Added zoom scale bar (Issue 28)
++ Separate information view (Issue 15)
 
 v1.4 (March 27th 2007)
 + Compass
