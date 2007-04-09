@@ -34,11 +34,9 @@ import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Vector;
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
+
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
@@ -71,11 +69,12 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
     private int horizontalMovement;
     private int verticalZoomFactor;
     private int horizontalZoomFactor;
+    private Hashtable zoomScaleBarDefinition;
     
     private Image redDotImage;
     private Image compass;
     private Sprite compassArrows;
-    private boolean largeCompass;
+    private boolean largeDisplay;
     
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller, GpsPosition initialPosition) {
@@ -98,20 +97,40 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
         verticalZoomFactor = 2048;
         horizontalZoomFactor = 1024;
         
-        redDotImage = ImageUtil.loadImage("/images/red-dot.png");
-        // Set backlight always on when building with Nokia UI API
-        /*
-        int backLightIndex = 0;
-        int backLightLevel = 100;
-        //DeviceControl.setLights(backLightIndex, backLightLevel);
+        /* Pre-defined settings for the scale bar in each zoom level
+         * The key of the Hashtable is the horizontal zoom factor
+         * The value is an array of double values with the following meaning:
+         * First value is the range of zoom scale in metres
+         * Second value tells in how many parts the complete scale bar should be divided
+         * Third value is the factor which is used to calculate the scale bar
+         * length in pixels, e.g. 50000 metres (=50km) should be shown and scale
+         * is 50000/640 pixels long, means ~ 78 Pixels
          */
+        zoomScaleBarDefinition = new Hashtable();
+        zoomScaleBarDefinition.put("16", new double[] { 400000, 4, 5120});
+        zoomScaleBarDefinition.put("32", new double[] { 200000, 4, 2560});
+        zoomScaleBarDefinition.put("64", new double[] { 100000, 5, 1280});
+        zoomScaleBarDefinition.put("128", new double[] { 50000, 5, 640});
+        zoomScaleBarDefinition.put("256", new double[] { 20000, 4, 320});
+        zoomScaleBarDefinition.put("512", new double[] { 10000, 5, 160});
+        zoomScaleBarDefinition.put("1024", new double[] { 8000, 4, 80});
+        zoomScaleBarDefinition.put("2048", new double[] { 4000, 4, 40});
+        zoomScaleBarDefinition.put("4096", new double[] { 2000, 4, 20});
+        zoomScaleBarDefinition.put("8192", new double[] { 1000, 5, 10});
+        zoomScaleBarDefinition.put("16384", new double[] { 500, 5, 5});
+        zoomScaleBarDefinition.put("32768", new double[] { 200, 4, 2.5});
+        zoomScaleBarDefinition.put("65536", new double[] { 100, 5, 1.25});
+        zoomScaleBarDefinition.put("131072", new double[] { 50, 5, 0.625});
+        zoomScaleBarDefinition.put("262144", new double[] { 25, 5, 0.3125});
+        
+        redDotImage = ImageUtil.loadImage("/images/red-dot.png");
         
         Image tempCompassArrows = ImageUtil.loadImage("/images/compass-arrows.png");
         compass = ImageUtil.loadImage("/images/compass.png");
         // Check for high resolution (eg. N80 352x416)
         if(this.getWidth()>250) {
             // Double the compass size
-            largeCompass = true;
+            largeDisplay = true;
             compass = ImageUtil.scale(
                     compass,
                     compass.getWidth()*2,
@@ -123,7 +142,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             compassArrows = new Sprite(tempCompassArrows, 22, 22);
             compassArrows.setPosition(this.getWidth() - 44, 22);
         } else {
-            largeCompass = false;
+            largeDisplay = false;
             compassArrows = new Sprite(tempCompassArrows, 11, 11);
             compassArrows.setPosition(this.getWidth() - 22, 11);
         }
@@ -150,6 +169,9 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
         
         /** Draw compass */
         drawCompass(g);
+        
+        /** Draw zoom scale bar */
+        drawZoomScaleBar(g);
     }
     
     /** Draw waypoints */
@@ -263,13 +285,56 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
     private void drawCompass(Graphics g) {
         if(lastPosition != null) {
             int fix = 10;
-            if(largeCompass) {
+            if(largeDisplay) {
                 fix = 20;
             }
             g.drawImage(compass, compassArrows.getX() - fix, compassArrows.getY() - fix, 0);
             compassArrows.setFrame(lastPosition.getHeadingIndex());
             compassArrows.paint(g);
         }
+    }
+
+    /** Draw zoom scale bar */
+    private void drawZoomScaleBar(Graphics g) {
+        /* Get pre-defined settings for current horizontal zoom factor */
+        double scale[] = (double[])zoomScaleBarDefinition.get(Integer.toString(horizontalZoomFactor));
+        if (scale == null || lastPosition == null) {
+            /* If there are no pre-defined settings for this zoom factor or recording
+             * didn't start yet, we don't display the scale bar */
+            return;
+        }
+        
+        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+        int fontHeight = g.getFont().getHeight();
+        final int MARGIN_LEFT = 2;    // left margin of the complete zoom scale bar
+        int scaleLength = (int)(scale[0] / scale[2]);
+        
+        g.setColor(0, 0, 0);    // black color
+        g.drawLine(MARGIN_LEFT, getHeight() - fontHeight - 5,
+                   MARGIN_LEFT + scaleLength, getHeight() - fontHeight - 5);
+        g.drawLine(MARGIN_LEFT, getHeight() - fontHeight - 5,
+                   MARGIN_LEFT, getHeight() - fontHeight - 8);
+        g.drawLine(MARGIN_LEFT + scaleLength, getHeight() - fontHeight - 5,
+                   MARGIN_LEFT + scaleLength, getHeight() - fontHeight - 8);
+
+        /* Divide the complete scale bar into smaller parts */
+        int scalePartLength = (int)(scaleLength / scale[1]);
+        for (int i = 1; i < scale[1]; i++) {
+            g.drawLine(MARGIN_LEFT + scalePartLength * i, getHeight() - fontHeight - 5,
+                       MARGIN_LEFT + scalePartLength * i, getHeight() - fontHeight - 7);
+        }
+
+        /* Build text for the right end of the scale bar and get width of this text */
+        String text = scale[0] >= 1000 ? Integer.toString((int) (scale[0] / 1000)) 
+                                       : Integer.toString((int) scale[0]);
+        int textWidth = g.getFont().stringWidth(text);
+        
+        g.drawString("0", MARGIN_LEFT - 1, getHeight() - fontHeight - 7,
+                     Graphics.BOTTOM|Graphics.LEFT);
+        g.drawString(text + (scale[0] >= 1000 ? "km" : "m"),
+                     MARGIN_LEFT + scaleLength - textWidth / 2,
+                     getHeight() - fontHeight - 7,
+                     Graphics.BOTTOM|Graphics.LEFT); 
     }
     
     /** Draw status bar */
@@ -453,9 +518,9 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             	}
                 g.drawString(
                         "Last refresh:", 1,
-                        height - (fontHeight*4 + 2),
+                        height - (fontHeight*4 + 6),
                         Graphics.TOP|Graphics.LEFT );
-                g.drawString(timeSinceLastPosition + " ago.",1, height - (fontHeight*3 + 2),
+                g.drawString(timeSinceLastPosition + " ago.",1, height - (fontHeight*3 + 6),
                         Graphics.TOP|Graphics.LEFT );
             }
             
