@@ -106,14 +106,14 @@ public class InformationCanvas extends BaseCanvas implements Runnable {
                 dst = lengthFormatter.getLengthString(currentTrack.getDistance(), true);            
             }
         }
-        int infoPos = bigFont.stringWidth("LAT ");
-        g.setColor(0,128,0);
-        g.drawString("LAT ", 1, 1+charHeight*0, Graphics.TOP|Graphics.LEFT);
-        g.drawString("LON ", 1, 1+charHeight*1, Graphics.TOP|Graphics.LEFT);
-        g.drawString("SPD ", 1, 2+charHeight*2, Graphics.TOP|Graphics.LEFT);
-        g.drawString("HEA ", 1, 3+charHeight*3, Graphics.TOP|Graphics.LEFT);
-        g.drawString("ALT ", 1, 4+charHeight*4, Graphics.TOP|Graphics.LEFT);
-        g.drawString("DST ", 1, 5+charHeight*5, Graphics.TOP|Graphics.LEFT);        
+        int infoPos = bigFont.stringWidth("LAT:_:");
+        g.setColor(32,128,32);
+        g.drawString("LAT: ", 1, 1+charHeight*0, Graphics.TOP|Graphics.LEFT);
+        g.drawString("LON: ", 1, 1+charHeight*1, Graphics.TOP|Graphics.LEFT);
+        g.drawString("SPD: ", 1, 2+charHeight*2, Graphics.TOP|Graphics.LEFT);
+        g.drawString("HEA: ", 1, 3+charHeight*3, Graphics.TOP|Graphics.LEFT);
+        g.drawString("ALT: ", 1, 4+charHeight*4, Graphics.TOP|Graphics.LEFT);
+        g.drawString("DST: ", 1, 5+charHeight*5, Graphics.TOP|Graphics.LEFT);        
         
         g.setColor(0,0,0);
         g.drawString(lat, infoPos, 1+charHeight*0, Graphics.TOP|Graphics.LEFT);

@@ -1,7 +1,7 @@
 /*
  * TrailCanvas.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2007 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Created on August 14th 2006

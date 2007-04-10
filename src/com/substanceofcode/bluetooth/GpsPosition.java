@@ -218,13 +218,20 @@ public final class GpsPosition {
      * Using formula from: http://williams.best.vwh.net/avform.htm#Dist
      */
     public double getDistanceFromPosition(GpsPosition position) {
+        return getDistanceFromPosition(position.latitude, position.longitude);
+    }
+    
+    /** 
+     * Calculate distance from given coordinates 
+     */    
+    public double getDistanceFromPosition(double latitude, double longitude) {
 	double lat1 = (Math.PI/180.0)*this.latitude;
 	double lon1 = (Math.PI/180.0)*this.longitude;
-	double lat2 = (Math.PI/180.0)*position.latitude;
-	double lon2 = (Math.PI/180.0)*position.longitude;
+	double lat2 = (Math.PI/180.0)*latitude;
+	double lon2 = (Math.PI/180.0)*longitude;
 	double distance = 2*MathUtil.asin( Math.sqrt( MathUtil.pow(Math.sin((lat1-lat2)/2),2) +
 		Math.cos(lat1)*Math.cos(lat2)*MathUtil.pow(Math.sin((lon1-lon2)/2),2)));
-	return distance*6371.0;
+	return distance*6371.0;        
     }
     
     /**

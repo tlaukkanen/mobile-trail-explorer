@@ -41,6 +41,7 @@ import com.substanceofcode.tracker.view.RecordingSettingsForm;
 import com.substanceofcode.tracker.view.SettingsList;
 import com.substanceofcode.tracker.view.SplashCanvas;
 import com.substanceofcode.tracker.view.TrailCanvas;
+import com.substanceofcode.tracker.view.WaypointCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
 import com.substanceofcode.tracker.view.WaypointList;
 
@@ -494,13 +495,14 @@ public class Controller {
 
     public void switchDisplay() {
         if(screens==null) {
-            screens = new BaseCanvas[2];
+            screens = new BaseCanvas[3];
             screens[0] = getTrailCanvas();
-            screens[1] = getInformationCanvas();
+            screens[1] = new InformationCanvas( this );
+            screens[2] = new WaypointCanvas( this );
         }
         
         currentDisplayIndex++;
-        if(currentDisplayIndex>1) {
+        if(currentDisplayIndex>2) {
             currentDisplayIndex = 0;
         }
         
@@ -508,13 +510,6 @@ public class Controller {
         if( nextCanvas!=null ) {
             display.setCurrent( screens[currentDisplayIndex] );
         }
-    }
-
-    private BaseCanvas getInformationCanvas() {
-        if(informationCanvas==null) {
-            informationCanvas = new InformationCanvas(this);
-        }
-        return informationCanvas;
     }
 
 }
