@@ -29,6 +29,11 @@ package com.substanceofcode.tracker.model;
  */
 public class UnitConverter {
     
+    public static final double MILES_IN_A_KILOMETER = 0.621371192;
+    public static final double KILOMETERS_IN_A_MILE = 1.609344;
+    public static final double FEET_IN_A_METER = 3.2808399;
+    public static final double METERS_IN_A_FOOT = 0.3048;
+    
     public static final int KILOMETERS_PER_HOUR = 1;
     public static final int MILES_PER_HOUR = 2;
     public static final int METERS = 3;
@@ -52,12 +57,12 @@ public class UnitConverter {
         /** Check for km/h to mph conversion */
         if( originalUnits==KILOMETERS_PER_HOUR && 
             convertedUnits == MILES_PER_HOUR ) {
-            return originalSpeed * 0.621371192;
+            return originalSpeed * MILES_IN_A_KILOMETER;
         }
         /** Check for mph to km/h conversion */
         if( originalUnits==MILES_PER_HOUR && 
             convertedUnits == KILOMETERS_PER_HOUR ) {
-            return originalSpeed * 1.609344;
+            return originalSpeed * KILOMETERS_IN_A_MILE;
         }
         /** Return original speed by default */
         return originalSpeed;             
@@ -75,17 +80,17 @@ public class UnitConverter {
         /** Check for meters to feets conversion */
         if( originalUnits == METERS && 
             convertedUnits == FEETS ) {
-            return originalLength * 3.2808399;
+            return originalLength * FEET_IN_A_METER;
         }
         /** Check for feets to meters conversion */
         if( originalUnits == FEETS && 
             convertedUnits == METERS ) {
-            return originalLength * 0.3048;
+            return originalLength * METERS_IN_A_FOOT;
         }
         /** Check for feets to meters conversion */
         if( originalUnits == KILOMETERS && 
             convertedUnits == MILES ) {
-            return originalLength * 0.621371192;
+            return originalLength * MILES_IN_A_KILOMETER;
         }        
         /** Return original speed by default */
         return originalLength;  

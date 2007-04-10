@@ -100,28 +100,31 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
         /* Pre-defined settings for the scale bar in each zoom level
          * The key of the Hashtable is the horizontal zoom factor
          * The value is an array of double values with the following meaning:
-         * First value is the range of zoom scale in metres
-         * Second value tells in how many parts the complete scale bar should be divided
-         * Third value is the factor which is used to calculate the scale bar
+         * - Value 1 is the range of zoom scale in meters
+         * - Value 2 tells in how many parts the complete scale bar should be divided
+         * - Value 3 is the factor which is used to calculate the scale bar
          * length in pixels, e.g. 50000 metres (=50km) should be shown and scale
          * is 50000/640 pixels long, means ~ 78 Pixels
+         * - Value 4 is the range of zoom scale in meters (only if unit is set to "miles")
+         * - Value 5 tells in how many parts the complete scale bar should be
+         * divided (only if unit is set to "miles")
          */
         zoomScaleBarDefinition = new Hashtable();
-        zoomScaleBarDefinition.put("16", new double[] { 400000, 4, 5120});
-        zoomScaleBarDefinition.put("32", new double[] { 200000, 4, 2560});
-        zoomScaleBarDefinition.put("64", new double[] { 100000, 5, 1280});
-        zoomScaleBarDefinition.put("128", new double[] { 50000, 5, 640});
-        zoomScaleBarDefinition.put("256", new double[] { 20000, 4, 320});
-        zoomScaleBarDefinition.put("512", new double[] { 10000, 5, 160});
-        zoomScaleBarDefinition.put("1024", new double[] { 8000, 4, 80});
-        zoomScaleBarDefinition.put("2048", new double[] { 4000, 4, 40});
-        zoomScaleBarDefinition.put("4096", new double[] { 2000, 4, 20});
-        zoomScaleBarDefinition.put("8192", new double[] { 1000, 5, 10});
-        zoomScaleBarDefinition.put("16384", new double[] { 500, 5, 5});
-        zoomScaleBarDefinition.put("32768", new double[] { 200, 4, 2.5});
-        zoomScaleBarDefinition.put("65536", new double[] { 100, 5, 1.25});
-        zoomScaleBarDefinition.put("131072", new double[] { 50, 5, 0.625});
-        zoomScaleBarDefinition.put("262144", new double[] { 25, 5, 0.3125});
+        zoomScaleBarDefinition.put("16", new double[] { 400000, 4, 5120, 482803.2, 3});
+        zoomScaleBarDefinition.put("32", new double[] { 200000, 4, 2560, 241402.6, 3});
+        zoomScaleBarDefinition.put("64", new double[] { 100000, 5, 1280, 128747.52, 4});
+        zoomScaleBarDefinition.put("128", new double[] { 50000, 5, 640, 48280.4, 3});
+        zoomScaleBarDefinition.put("256", new double[] { 20000, 4, 320, 24140.17, 3});
+        zoomScaleBarDefinition.put("512", new double[] { 10000, 5, 160, 16093.45, 4});
+        zoomScaleBarDefinition.put("1024", new double[] { 8000, 4, 80, 8046.73, 5});
+        zoomScaleBarDefinition.put("2048", new double[] { 4000, 4, 40, 3218.69, 4});
+        zoomScaleBarDefinition.put("4096", new double[] { 2000, 4, 20, 1609.35, 4});
+        zoomScaleBarDefinition.put("8192", new double[] { 1000, 5, 10, 914.4, 5});
+        zoomScaleBarDefinition.put("16384", new double[] { 500, 5, 5, 457.2, 3});
+        zoomScaleBarDefinition.put("32768", new double[] { 200, 4, 2.5, 243.84, 4});
+        zoomScaleBarDefinition.put("65536", new double[] { 100, 5, 1.25, 121.92, 4});
+        zoomScaleBarDefinition.put("131072", new double[] { 50, 5, 0.625, 60.96, 4});
+        zoomScaleBarDefinition.put("262144", new double[] { 25, 5, 0.3125, 30.48, 5});
         
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
         
@@ -304,36 +307,56 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             return;
         }
         
+        RecorderSettings settings = controller.getSettings();
+        
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-        int fontHeight = g.getFont().getHeight();
         final int MARGIN_LEFT = 2;    // left margin of the complete zoom scale bar
-        int scaleLength = (int)(scale[0] / scale[2]);
+        final int MARGIN_BOTTOM = 3;  // bottom margin of the complete zoom scale bar
+        
+        int scaleLength;
+        int scaleParts;
+        if (settings.getUnitsAsKilometers()) {
+            scaleLength = (int)(scale[0] / scale[2]);
+            scaleParts = (int)scale[1];
+        } else {
+            scaleLength = (int)(scale[3] / scale[2]);
+            scaleParts = (int)scale[4];
+        }
         
         g.setColor(0, 0, 0);    // black color
-        g.drawLine(MARGIN_LEFT, getHeight() - fontHeight - 5,
-                   MARGIN_LEFT + scaleLength, getHeight() - fontHeight - 5);
-        g.drawLine(MARGIN_LEFT, getHeight() - fontHeight - 5,
-                   MARGIN_LEFT, getHeight() - fontHeight - 8);
-        g.drawLine(MARGIN_LEFT + scaleLength, getHeight() - fontHeight - 5,
-                   MARGIN_LEFT + scaleLength, getHeight() - fontHeight - 8);
+        g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM,
+                   MARGIN_LEFT + scaleLength, getHeight() - MARGIN_BOTTOM);
+        g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM,
+                   MARGIN_LEFT, getHeight() - MARGIN_BOTTOM - 3);
+        g.drawLine(MARGIN_LEFT + scaleLength, getHeight() - MARGIN_BOTTOM,
+                   MARGIN_LEFT + scaleLength, getHeight() - MARGIN_BOTTOM - 3);
 
         /* Divide the complete scale bar into smaller parts */
-        int scalePartLength = (int)(scaleLength / scale[1]);
-        for (int i = 1; i < scale[1]; i++) {
-            g.drawLine(MARGIN_LEFT + scalePartLength * i, getHeight() - fontHeight - 5,
-                       MARGIN_LEFT + scalePartLength * i, getHeight() - fontHeight - 7);
+        int scalePartLength = (int)(scaleLength / scaleParts);
+        for (int i = 1; i < scaleParts; i++) {
+            g.drawLine(MARGIN_LEFT + scalePartLength * i, getHeight() - MARGIN_BOTTOM,
+                       MARGIN_LEFT + scalePartLength * i, getHeight() - MARGIN_BOTTOM - 2);
         }
 
         /* Build text for the right end of the scale bar and get width of this text */
-        String text = scale[0] >= 1000 ? Integer.toString((int) (scale[0] / 1000)) 
-                                       : Integer.toString((int) scale[0]);
+        String text = "", unit = "";
+        if (settings.getUnitsAsKilometers()) {
+            text = scale[0] >= 1000 ? Integer.toString((int) (scale[0] / 1000)) 
+                                    : Integer.toString((int) scale[0]);
+            unit = scale[0] >= 1000 ? "km" : "m";
+        } else {
+            text = scale[3] >= 1600 ? Integer.toString((int) (scale[3] / 
+                                      UnitConverter.KILOMETERS_IN_A_MILE / 1000)) 
+                                    : Integer.toString((int) (scale[3] / UnitConverter.METERS_IN_A_FOOT));
+            unit = scale[3] >= 1600 ? "ml" : "ft";
+        }
         int textWidth = g.getFont().stringWidth(text);
         
-        g.drawString("0", MARGIN_LEFT - 1, getHeight() - fontHeight - 7,
+        g.drawString("0", MARGIN_LEFT - 1, getHeight() - MARGIN_BOTTOM - 2,
                      Graphics.BOTTOM|Graphics.LEFT);
-        g.drawString(text + (scale[0] >= 1000 ? "km" : "m"),
+        g.drawString(text + unit,
                      MARGIN_LEFT + scaleLength - textWidth / 2,
-                     getHeight() - fontHeight - 7,
+                     getHeight() - MARGIN_BOTTOM - 2,
                      Graphics.BOTTOM|Graphics.LEFT); 
     }
     
@@ -551,8 +574,8 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
         /** Draw recorded position count */
         int positionCount = controller.getRecordedPositionCount();
         int markerCount = controller.getRecordedMarkerCount();
-        String posCount = "Positions recorded: " + positionCount + "/" + markerCount;
-        g.drawString(posCount, 1, height - (fontHeight + 2), Graphics.TOP|Graphics.LEFT);
+        String posCount = positionCount + "/" + markerCount;
+        g.drawString(posCount, getWidth() - 2, height - (fontHeight + 2), Graphics.TOP|Graphics.RIGHT);
         
         /** Draw GPS address */
         /*
