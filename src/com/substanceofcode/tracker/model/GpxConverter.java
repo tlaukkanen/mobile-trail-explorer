@@ -44,12 +44,12 @@ public class GpxConverter implements TrackConverter {
             Vector waypoints, 
             boolean includeWaypoints, 
             boolean includeMarkers) {
-        String gpx = "";
-        gpx += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\r\n";
-        gpx += "<gpx version=\"1.0\" creator=\"Mobile Trail Explorer\" xmlns=\"http://www.topografix.com/GPX/1/0\">\r\n";
+        StringBuffer gpx = new StringBuffer();
+        gpx.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\r\n");
+        gpx.append("<gpx version=\"1.0\" creator=\"Mobile Trail Explorer\" xmlns=\"http://www.topografix.com/GPX/1/0\">\r\n");
         
         // Create trail
-        gpx += "<trk>\r\n<trkseg>\r\n";
+        gpx.append("<trk>\r\n<trkseg>\r\n");
        
         Enumeration posEnum = track.getTrailPoints().elements();
         while(posEnum.hasMoreElements()==true) {
@@ -57,20 +57,20 @@ public class GpxConverter implements TrackConverter {
             String lat = String.valueOf( pos.latitude );
             String lon = String.valueOf( pos.longitude );
             //String alt = String.valueOf( pos.altitude );
-            gpx += "<trkpt lat=\"" + lat + "\" lon=\"" + lon + "\">\r\n";
+            gpx.append("<trkpt lat=\"").append(lat).append("\" lon=\"").append(lon).append("\">\r\n");
             
             // Create time stamp
             Date date = pos.date;
             String universalDateStamp = DateUtil.getUniversalDateStamp( date );
-            gpx += "<time>" + universalDateStamp + "</time>\r\n"; 
+            gpx.append("<time>").append(universalDateStamp).append("</time>\r\n"); 
             
-            gpx += "</trkpt>\r\n";
+            gpx.append("</trkpt>\r\n");
         }
-        gpx += "</trkseg>\r\n</trk>\r\n";
+        gpx.append("</trkseg>\r\n</trk>\r\n");
         
         // Finalize the GPX
-        gpx += "</gpx>\r\n";
-        return gpx;        
+        gpx.append("</gpx>\r\n");
+        return gpx.toString();
     }
     
 }
