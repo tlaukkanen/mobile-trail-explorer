@@ -49,6 +49,7 @@ import javax.microedition.lcdui.game.Sprite;
  * recording status and current position.
  *
  * @author Tommi Laukkanen
+ * @author Mario Sansone
  */
 public class TrailCanvas extends BaseCanvas implements Runnable {
     
@@ -196,8 +197,9 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             double lon = waypoint.getLongitude();
             CanvasPoint point = convertPosition(lat, lon);
             if(point!=null) {
-                g.drawString(waypoint.getName(), point.X, point.Y,
-                        Graphics.BOTTOM|Graphics.HCENTER);
+                g.drawString(waypoint.getName(), point.X + 2, point.Y - 1,
+                        Graphics.BOTTOM|Graphics.LEFT);
+                g.drawRect(point.X - 1, point.Y - 1, 2, 2);
             }   
         }
     }
@@ -391,14 +393,16 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                 
                 double latitude = lastPosition.latitude;
                 g.drawString(
-                        getDegreeString( latitude ),
+                        /* Get degrees in string format (with five decimals) */
+                        StringUtil.valueOf(latitude, 5),
                         positionAdd,
                         fontHeight,
                         Graphics.TOP|Graphics.LEFT );
                 
                 double longitude = lastPosition.longitude;
                 g.drawString(
-                        getDegreeString( longitude ),
+                        /* Get degrees in string format (with five decimals) */
+                        StringUtil.valueOf(longitude, 5),
                         positionAdd,
                         fontHeight*2,
                         Graphics.TOP|Graphics.LEFT );
@@ -585,18 +589,6 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                 height - (fontHeight + 2),
                 Graphics.TOP|Graphics.LEFT );
          */
-    }
-    
-    /** Get degrees in string format (with five decimals) */
-    private String getDegreeString(double latitude) {
-        int latitudeInteger = (int)latitude;
-        long latitudeDecimals = (int)((latitude-latitudeInteger)*100000);
-        
-        String latDecString = String.valueOf(latitudeDecimals);
-        while(latDecString.length()<5) {
-            latDecString = "0" + latDecString;
-        }
-        return String.valueOf(latitudeInteger) + "." + latDecString;
     }
     
     /** Thread for getting current position */

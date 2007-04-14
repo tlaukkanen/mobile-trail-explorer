@@ -1,7 +1,7 @@
 /*
  * WaypointForm.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2007 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,8 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Waypoint;
+
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -35,6 +37,7 @@ import javax.microedition.lcdui.TextField;
  * information. 
  *
  * @author Tommi Laukkanen
+ * @author Mario Sansone
  */
 public class WaypointForm extends Form implements CommandListener {
     
@@ -120,8 +123,17 @@ public class WaypointForm extends Form implements CommandListener {
         if( command == okCommand ) {
             // Save waypoint
             String name = nameField.getString();
-            double latitude = Double.parseDouble( latitudeField.getString() );
-            double longitude = Double.parseDouble( longitudeField.getString() );
+            double latitude;
+            double longitude;
+            try {
+                latitude = Double.parseDouble(latitudeField.getString());
+                longitude = Double.parseDouble(longitudeField.getString());
+            } catch (NumberFormatException nfe) {
+                controller.showError("Error while parsing latitude or longitude. " +
+                                     "Valid format for latitude and longitude is:\n" +
+                                     "[-]xxx.xxxxx", Alert.FOREVER, this);
+                return;
+            }
             Waypoint waypoint = new Waypoint( name, latitude, longitude );
             
             if(editing==false) {

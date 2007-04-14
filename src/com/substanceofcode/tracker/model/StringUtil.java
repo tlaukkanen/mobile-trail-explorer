@@ -1,7 +1,7 @@
 /*
  * StringUtil.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2007 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@ import javax.microedition.lcdui.Font;
  *
  * @author Tommi Laukkanen
  * @author barryred
+ * @author Mario Sansone
  */
 public class StringUtil {
 
@@ -45,26 +46,26 @@ public class StringUtil {
      * @return              Splitted string array
      */
     static public String[] split(String original, String separator) {
-	Vector nodes = new Vector();
+        Vector nodes = new Vector();
 
-	// Parse nodes into vector
-	int index = original.indexOf(separator);
-	while (index >= 0) {
-	    nodes.addElement(original.substring(0, index));
-	    original = original.substring(index + separator.length());
-	    index = original.indexOf(separator);
-	}
-	// Get the last node
-	nodes.addElement(original);
+        // Parse nodes into vector
+        int index = original.indexOf(separator);
+        while (index >= 0) {
+            nodes.addElement(original.substring(0, index));
+            original = original.substring(index + separator.length());
+            index = original.indexOf(separator);
+        }
+        // Get the last node
+        nodes.addElement(original);
 
-	// Create splitted string array
-	String[] result = new String[nodes.size()];
-	if (nodes.size() > 0) {
-	    for (int loop = 0; loop < nodes.size(); loop++) {
-		result[loop] = (String) nodes.elementAt(loop);
-	    }
-	}
-	return result;
+        // Create splitted string array
+        String[] result = new String[nodes.size()];
+        if (nodes.size() > 0) {
+            for (int loop = 0; loop < nodes.size(); loop++) {
+                result[loop] = (String) nodes.elementAt(loop);
+            }
+        }
+        return result;
     }
 
     /**
@@ -85,55 +86,54 @@ public class StringUtil {
      * @return The chopped up Strings, each smaller than 'width'
      */
     public static String[] chopStrings(String origional, String separator,
-	    Font font, int width) {
-	final String[] words = split(origional, separator);
-	final Vector result = new Vector();
-	final StringBuffer currentLine = new StringBuffer();
-	String currentToken;
+            Font font, int width) {
+        final String[] words = split(origional, separator);
+        final Vector result = new Vector();
+        final StringBuffer currentLine = new StringBuffer();
+        String currentToken;
 
-	int currentWidth = 0;
-	for (int i = 0; i < words.length; i++) {
-	    currentToken = words[i];
-	    System.out.println(currentToken);
-	    if (currentWidth == 0
-		    || currentWidth + font.stringWidth(" " + currentToken) <= width) {
-		if (currentWidth == 0) {
-		    currentLine.append(currentToken);
-		    currentWidth += font.stringWidth(currentToken);
-		} else {
-		    currentLine.append(' ').append(currentToken);
-		    currentWidth += font.stringWidth(" " + currentToken);
-		}
-	    } else {
-		result.addElement(currentLine.toString());
-		currentLine.delete(0, currentLine.length());
-		currentLine.append(currentToken);
-		currentWidth = font.stringWidth(currentToken);
-	    }
-	}
-	if (currentLine.length() != 0) {
-	    result.addElement(currentLine.toString());
-	}
+        int currentWidth = 0;
+        for (int i = 0; i < words.length; i++) {
+            currentToken = words[i];
+            System.out.println(currentToken);
+            if (currentWidth == 0
+                    || currentWidth + font.stringWidth(" " + currentToken) <= width) {
+                if (currentWidth == 0) {
+                    currentLine.append(currentToken);
+                    currentWidth += font.stringWidth(currentToken);
+                } else {
+                    currentLine.append(' ').append(currentToken);
+                    currentWidth += font.stringWidth(" " + currentToken);
+                }
+            } else {
+                result.addElement(currentLine.toString());
+                currentLine.delete(0, currentLine.length());
+                currentLine.append(currentToken);
+                currentWidth = font.stringWidth(currentToken);
+            }
+        }
+        if (currentLine.length() != 0) {
+            result.addElement(currentLine.toString());
+        }
 
-	String[] finalResult = new String[result.size()];
-	for (int i = 0; i < finalResult.length; i++) {
-	    finalResult[i] = (String) result.elementAt(i);
-	}
+        String[] finalResult = new String[result.size()];
+        for (int i = 0; i < finalResult.length; i++) {
+            finalResult[i] = (String) result.elementAt(i);
+        }
 
-	return finalResult;
+        return finalResult;
     }
 
-    /** Get degrees in string format (with five decimals) */
+    /** Get a double value in string format */
     public static String valueOf(double value, int decimalCount) {
-	int integerValue = (int) value;
-	long decimals = (int) ((value - integerValue) * MathUtil.pow(10,
-		decimalCount));
+        int integerValue = (int) value;
+        long decimals = Math.abs((long)((value - integerValue) * MathUtil.pow(10, decimalCount)));
 
-	String valueString = String.valueOf(decimals);
-	while (valueString.length() < decimalCount) {
-	    valueString = "0" + valueString;
-	}
-	return String.valueOf(integerValue) + "." + valueString;
+        String valueString = String.valueOf(decimals);
+        while (valueString.length() < decimalCount) {
+            valueString = "0" + valueString;
+        }
+        return String.valueOf(integerValue) + "." + valueString;
     }
 
 }

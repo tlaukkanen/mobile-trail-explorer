@@ -1,7 +1,7 @@
 /*
  * Controller.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2007 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,6 +58,7 @@ import javax.microedition.midlet.MIDlet;
  * Controller contains methods for the application flow.
  * 
  * @author Tommi Laukkanen
+ * @author Mario Sansone
  */
 public class Controller {
 
@@ -86,7 +87,6 @@ public class Controller {
     private DisplaySettingsForm displaySettingsForm;
     private WaypointForm waypointForm;
     private WaypointList waypointList;
-    private InformationCanvas informationCanvas;
 
     /** Display device */
     private Display display;
@@ -111,10 +111,10 @@ public class Controller {
         recorder = new GpsRecorder(this);
         
 
-	/** Initialize forms */
-	// aboutForm = new AboutForm(this);
+        /** Initialize forms */
+        // aboutForm = new AboutForm(this);
         currentDisplayIndex = 0;
-	this.display = display;
+        this.display = display;
 
         /** Waypoints */
         waypoints = settings.getWaypoints();
@@ -217,11 +217,8 @@ public class Controller {
                 recorder.startRecording();
                 status = STATUS_RECORDING;
             } catch (Exception ex) {
-                Alert saveAlert = new Alert("Error");
-                saveAlert.setTimeout(Alert.FOREVER);
-                saveAlert.setString("Error while connection to GPS: "
-                        + ex.toString());
-                display.setCurrent(saveAlert, getTrailCanvas());
+                showError("Error while connection to GPS: " + ex.toString(),
+                          Alert.FOREVER, getTrailCanvas());
             }
         } else {
 
@@ -236,21 +233,15 @@ public class Controller {
                         useKilometers, exportFormat);
             } catch (Exception ex) {
                 setError(ex.toString());
-                Alert saveAlert = new Alert("Error");
-                saveAlert.setTimeout(Alert.FOREVER);
-                saveAlert.setString(ex.toString());
-                display.setCurrent(saveAlert, getTrailCanvas());
+                showError(ex.toString(), Alert.FOREVER, getTrailCanvas());
             }
 
             try {
                 // Disconnect from GPS
                 gpsDevice.disconnect();
             } catch (Exception e) {
-                Alert saveAlert = new Alert("Error");
-                saveAlert.setTimeout(Alert.FOREVER);
-                saveAlert.setString("Error while disconnecting from "
-                        + "GPS device: " + e.toString());
-                display.setCurrent(saveAlert, getTrailCanvas());
+                showError("Error while disconnecting from GPS device: " + 
+                          e.toString(), Alert.FOREVER, getTrailCanvas());
             }
 
             status = STATUS_STOPPED;
@@ -425,11 +416,19 @@ public class Controller {
         display.setCurrent(deviceList);
     }
 
-    /** Show error */
-    public void showError(String message) {
-        Alert newAlert = new Alert("Error", message, null, AlertType.ERROR);
-        newAlert.setTimeout(5000);
-        display.setCurrent(newAlert, trailCanvas);
+    /**
+     * Show error message to the user
+     * @param message Message which should shown to the user
+     * @param seconds Tells how long (in seconds) the message will be displayed.
+     *                0 or Alert.FOREVER will show the message with no timeout, means
+     *                user has to confirm the message
+     * @param displayable This Displayable (e.g any Canvas) will be displayed after
+     *                    timeout or after confirmation from user
+     */
+    public void showError(String message, int seconds, Displayable displayable) {
+        Alert alert = new Alert("Error", message, null, AlertType.ERROR);
+        alert.setTimeout(seconds == 0 || seconds == Alert.FOREVER ? Alert.FOREVER : seconds * 1000);
+        display.setCurrent(alert, displayable);
     }
 
     /** Update selected waypoint */
