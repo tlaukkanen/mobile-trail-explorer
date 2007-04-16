@@ -22,9 +22,7 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.StringUtil;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -42,8 +40,12 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     private Command startStopCommand;
     private Command settingsCommand;
     private Command exitCommand;
+    private Command manageTrailsCommand;
+    private Command manageWaypointsCommand;
+    /*
     private Command markWaypointCommand;
     private Command editWaypointsCommand;    
+    */
     
     /** Creates a new instance of BaseCanvas */
     public BaseCanvas(Controller controller) {
@@ -55,22 +57,31 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     
     /** Initialize commands */
     private void initializeCommands() {
-        
+        /*
         // Edit waypoints command for listing existing waypoints
         editWaypointsCommand = new Command("Edit waypoints", Command.SCREEN, 4);
         addCommand(editWaypointsCommand);
         
+        // Mark a new waypoint command
+        markWaypointCommand = new Command("Mark waypoint", Command.SCREEN, 3);
+        addCommand(markWaypointCommand);
+        */
+        
         // Start/Stop command for toggling recording
         startStopCommand = new Command("Start/Stop recording", Command.ITEM, 1);
         addCommand(startStopCommand);
+
+        // Waypoints command
+        manageWaypointsCommand = new Command("Manage Waypoints", Command.ITEM, 2);
+        addCommand(manageWaypointsCommand);
+        
+        // Trails command
+        manageTrailsCommand = new Command("Manage Trails", Command.ITEM, 3);
+        addCommand(manageTrailsCommand);
         
         // Settings command for showing settings list
         settingsCommand = new Command("Settings", Command.SCREEN, 5);
         addCommand(settingsCommand);
-        
-        // Mark a new waypoint command
-        markWaypointCommand = new Command("Mark waypoint", Command.SCREEN, 3);
-        addCommand(markWaypointCommand);
         
         // Exit command
         exitCommand = new Command("Exit", Command.EXIT, 10);
@@ -82,8 +93,8 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     public void commandAction(Command command, Displayable displayable) {
         if( command == startStopCommand ) {
             controller.startStop();
-        }
-        if( command == markWaypointCommand ) {
+        /*
+        }else if( command == markWaypointCommand ) {
             
             String latString = "";
             String lonString = "";
@@ -98,14 +109,20 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
             
             controller.markWaypoint(latString, lonString);
         }
+        if( command == editWaypointsCommand ) {
+            controller.showWaypointList();
+        }
+        */
+        }else if(command == manageTrailsCommand ){
+            controller.showTrailsList();
+        }else if(command == manageWaypointsCommand){
+            controller.showWaypointList();
+        }
         if( command == settingsCommand ) {
             controller.showSettings();
         }
         if( command == exitCommand ) {
             controller.exit();
-        }
-        if( command == editWaypointsCommand ) {
-            controller.showWaypointList();
         }
     }    
     

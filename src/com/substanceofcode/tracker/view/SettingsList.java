@@ -66,11 +66,11 @@ public class SettingsList extends List implements CommandListener {
 	this.append("About/Help", null);
 
 	// Commands
-	selectCommand = new Command("Select", Command.ITEM, 1);
+	selectCommand = new Command("Select", Command.OK, 1);
 	addCommand(selectCommand);
 	setSelectCommand(selectCommand);
 
-	backCommand = new Command("Back", Command.SCREEN, 4);
+	backCommand = new Command("Back", Command.BACK, 4);
 	addCommand(backCommand);
 
 	setCommandListener(this);

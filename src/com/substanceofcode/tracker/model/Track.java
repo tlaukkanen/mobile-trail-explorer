@@ -23,6 +23,13 @@
 package com.substanceofcode.tracker.model;
 
 import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.data.FileIOException;
+import com.substanceofcode.data.FileSystem;
+import com.substanceofcode.data.Serializable;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Vector;
@@ -33,9 +40,13 @@ import javax.microedition.io.file.FileConnection;
  *
  * @author Tommi
  */
-public class Track {
+public class Track implements Serializable{
     
+    public static final String TRACK_MIME_TYPE = "Mobile Trail Trail";
+
+    /** A Vector of {@link GpsPosition}s representing this 'Trails' route. */
     private Vector trailPoints;
+    /** A Vector of {@link GpsPosition}s representing this 'Trails' Markers or WayPoints. */
     private Vector markers;
     private double distance;
     
@@ -44,6 +55,10 @@ public class Track {
         trailPoints = new Vector();
         markers = new Vector();
         distance = 0.0;
+    }
+    
+    public Track(DataInputStream dis) throws IOException{
+        this.unserialize(dis);
     }
     
     /** Add new trail point */
@@ -165,7 +180,7 @@ public class Track {
     }
 
     /** Get the first position */
-    GpsPosition getStartPosition() {
+    public GpsPosition getStartPosition() {
         if(trailPoints.size()>0) {
             return (GpsPosition)trailPoints.firstElement();
         } else {
@@ -174,12 +189,46 @@ public class Track {
     }
 
     /** Get the last position */
-    GpsPosition getEndPosition() {
+    public GpsPosition getEndPosition() {
         if(trailPoints.size()>0) {
             return (GpsPosition)trailPoints.lastElement();
         } else {
             return null;
         }
+    }
+
+    public void saveToRMS() throws FileIOException{
+        final String filename = DateUtil.getCurrentDateStamp();
+        FileSystem.getFileSystem().saveFile(filename, Track.TRACK_MIME_TYPE, this, false);
+    }
+
+    public void serialize(DataOutputStream dos) throws IOException {
+        final int numPoints = trailPoints.size();
+        dos.writeInt(numPoints);
+        for(int i = 0; i < numPoints; i++){
+            ((GpsPosition)trailPoints.elementAt(i)).serialize(dos);
+        }
+        final int numMarkers = markers.size();
+        dos.writeInt(numMarkers);
+        for(int i = 0; i < numMarkers; i++){
+            ((GpsPosition)markers.elementAt(i)).serialize(dos);
+        }
+        dos.writeDouble(distance);
+    }
+
+    public void unserialize(DataInputStream dos) throws IOException {
+        final int numPoints = dos.readInt();
+        trailPoints = new Vector(numPoints);
+        for(int i = 0; i < numPoints; i++){
+            trailPoints.addElement(new GpsPosition(dos));
+        }
+        
+        final int numMarkers = dos.readInt();
+        markers = new Vector(numMarkers);
+        for(int i = 0; i < numMarkers; i++){
+            markers.addElement(new GpsPosition(dos));
+        }
+        distance = dos.readDouble();   
     }
   
     

@@ -22,7 +22,9 @@
 
 package com.substanceofcode.tracker.view;
 
+import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.StringUtil;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -40,8 +42,9 @@ public class WaypointList extends List implements CommandListener {
     private Controller controller;
     
     private Command editCommand;
-    private Command deleteCommand;
-    private Command backCommand;
+    private final Command deleteCommand;
+    private final Command backCommand;
+    private final Command newWaypointCommand;
     
     private static final String TITLE = "Waypoints";
     
@@ -53,15 +56,12 @@ public class WaypointList extends List implements CommandListener {
         super(TITLE, List.IMPLICIT);        
         this.controller = controller;
         
-        editCommand = new Command("Edit", Command.SCREEN, 1);
-        this.addCommand( editCommand );
-        setSelectCommand( editCommand );
+        this.addCommand( editCommand = new Command("Edit", Command.OK, 1) );
+        this.addCommand( deleteCommand = new Command("Remove", Command.SCREEN, 2) );
+        this.addCommand( newWaypointCommand = new Command("Add new waypoint", Command.ITEM, 4));
+        this.addCommand( backCommand = new Command("Back", Command.BACK, 10) );
 
-        deleteCommand = new Command("Remove", Command.SCREEN, 2);
-        this.addCommand( deleteCommand );
-        
-        backCommand = new Command("Back", Command.SCREEN, 3);
-        this.addCommand( backCommand );
+        setSelectCommand( editCommand );
         
         this.setCommandListener( this );
     }
@@ -95,6 +95,21 @@ public class WaypointList extends List implements CommandListener {
             controller.removeWaypoint(wp);
             int selectedIndex = this.getSelectedIndex();
             this.delete( selectedIndex );
+        }
+        
+        if( command == newWaypointCommand ){
+            String latString = "";
+            String lonString = "";
+            GpsPosition lastPosition = controller.getPosition();
+            if(lastPosition!=null) {
+                double lat = lastPosition.latitude;
+                latString = StringUtil.valueOf(lat,5);
+                
+                double lon = lastPosition.longitude;
+                lonString = StringUtil.valueOf(lon,5);
+            }
+            
+            controller.markWaypoint(latString, lonString);
         }
     }
     

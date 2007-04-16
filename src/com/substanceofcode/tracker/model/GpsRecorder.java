@@ -86,6 +86,11 @@ public class GpsRecorder implements Runnable{
         return recordedTrack;
     }
     
+    public void setTrack(Track track){
+        this.stopRecording();
+        this.recordedTrack = track;
+    }
+    
     /** Start recording positions */
     public void startRecording() {
         recording = true;

@@ -26,25 +26,11 @@ import com.substanceofcode.bluetooth.BluetoothDevice;
 import com.substanceofcode.bluetooth.BluetoothUtility;
 import com.substanceofcode.bluetooth.GpsDevice;
 import com.substanceofcode.bluetooth.GpsPosition;
-import com.substanceofcode.tracker.model.Backlight;
-import com.substanceofcode.tracker.model.GpsRecorder;
-import com.substanceofcode.tracker.model.RecorderSettings;
-import com.substanceofcode.tracker.model.Track;
-import com.substanceofcode.tracker.model.Waypoint;
-import com.substanceofcode.tracker.view.AboutScreen;
-import com.substanceofcode.tracker.view.BaseCanvas;
-import com.substanceofcode.tracker.view.DeviceList;
-import com.substanceofcode.tracker.view.DisplaySettingsForm;
-import com.substanceofcode.tracker.view.ExportSettingsForm;
-import com.substanceofcode.tracker.view.InformationCanvas;
-import com.substanceofcode.tracker.view.RecordingSettingsForm;
-import com.substanceofcode.tracker.view.SettingsList;
-import com.substanceofcode.tracker.view.SplashCanvas;
-import com.substanceofcode.tracker.view.TrailCanvas;
-import com.substanceofcode.tracker.view.WaypointCanvas;
-import com.substanceofcode.tracker.view.WaypointForm;
-import com.substanceofcode.tracker.view.WaypointList;
+import com.substanceofcode.data.FileIOException;
+import com.substanceofcode.tracker.model.*;
+import com.substanceofcode.tracker.view.*;
 
+import java.io.IOException;
 import java.lang.Exception;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -87,6 +73,7 @@ public class Controller {
     private DisplaySettingsForm displaySettingsForm;
     private WaypointForm waypointForm;
     private WaypointList waypointList;
+    private TrailsList trailsList;
 
     /** Display device */
     private Display display;
@@ -262,6 +249,16 @@ public class Controller {
         waypoints.addElement(waypoint);
     }
 
+    public void saveTrail(){
+        try {
+            recorder.getTrack().saveToRMS();
+        } catch (FileIOException e) {
+            showError("ERROR!     An Exception was thrown when attempting to save " +
+                        "the Trail to the RMS!  " +  e.toString(), 5, this.getCurrentScreen());
+            e.printStackTrace();
+        }
+    }
+    
     /** Mark new waypoint */
     public void markWaypoint(String lat, String lon) {
         if (waypointForm == null) {
@@ -407,6 +404,31 @@ public class Controller {
         waypointList.setWaypoints(waypoints);
         display.setCurrent(waypointList);
     }
+    
+    public void showTrailsList() {
+        if (trailsList == null){
+            trailsList = new TrailsList(this);
+        }else{
+            trailsList.refresh();
+        }
+        display.setCurrent(trailsList);
+    }
+    
+    public void laodTrack(Track track){
+        if(track != null){
+            this.recorder.setTrack(track);
+            this.trailCanvas.setLastPosition(track.getEndPosition());
+            this.trailCanvas.setPositionTrail(track);
+        }
+    }
+    
+    public void showTrailDetails(String trailName){
+        try {
+            display.setCurrent(new TrailDetailsScreen(this, trailName));
+        } catch (IOException e) {
+            showError("ERROR!    An error occured when trying to retrieve the trail from the RMS!" + e.toString(), 5, this.getCurrentScreen());
+        }
+    }
 
     /** Show device list */
     public void showDevices() {
@@ -510,5 +532,6 @@ public class Controller {
             display.setCurrent( screens[currentDisplayIndex] );
         }
     }
+
 
 }

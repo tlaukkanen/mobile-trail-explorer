@@ -26,12 +26,7 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.ImageUtil;
-import com.substanceofcode.tracker.model.RecorderSettings;
-import com.substanceofcode.tracker.model.StringUtil;
-import com.substanceofcode.tracker.model.Track;
-import com.substanceofcode.tracker.model.UnitConverter;
-import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.model.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
@@ -176,6 +171,15 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
         
         /** Draw zoom scale bar */
         drawZoomScaleBar(g);
+    }
+    
+
+    public void setLastPosition(GpsPosition position) {
+        this.lastPosition = position;
+    }
+
+    public void setPositionTrail(Track track) {
+        this.positionTrail = track.getTrailPoints();
     }
     
     /** Draw waypoints */
