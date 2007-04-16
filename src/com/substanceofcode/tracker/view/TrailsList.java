@@ -1,4 +1,4 @@
-package com.substanceofcode.tracker.view;
+     package com.substanceofcode.tracker.view;
 
 import java.io.IOException;
 import java.util.Vector;
@@ -36,7 +36,7 @@ public class TrailsList extends List implements CommandListener{
         
         showDetailsCommand = new Command("Show Details", Command.ITEM, 1);
         loadCommand = new Command("Load", Command.OK, 2);
-        if(this.size() != 0){
+        if(trailsFound){
             this.addCommand(showDetailsCommand);
             this.addCommand(loadCommand);
             this.setSelectCommand(this.showDetailsCommand);
