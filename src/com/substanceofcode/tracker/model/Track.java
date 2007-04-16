@@ -197,9 +197,19 @@ public class Track implements Serializable{
         }
     }
 
-    public void saveToRMS() throws FileIOException{
-        final String filename = DateUtil.getCurrentDateStamp();
-        FileSystem.getFileSystem().saveFile(filename, Track.TRACK_MIME_TYPE, this, false);
+    /**
+     * 
+     * @throws FileIOException if there is a problem saving to the FileSystem
+     * @throws IllegalStateException if this trail is empty
+     */
+    public void saveToRMS() throws FileIOException, IllegalStateException{
+        if(this.markers.size() == 0 && this.trailPoints.size() == 0){
+           // May not save an empty trail.
+            throw new IllegalStateException("Can not save \"Empty\" Trail. must record at least 1 point");
+        }else{
+            final String filename = DateUtil.getCurrentDateStamp();
+            FileSystem.getFileSystem().saveFile(filename, Track.TRACK_MIME_TYPE, this, false);
+        }
     }
 
     public void serialize(DataOutputStream dos) throws IOException {

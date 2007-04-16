@@ -252,8 +252,10 @@ public class Controller {
     public void saveTrail(){
         try {
             recorder.getTrack().saveToRMS();
-        } catch (FileIOException e) {
-            showError("ERROR!     An Exception was thrown when attempting to save " +
+        }catch (IllegalStateException e){
+          showError("Can not save \"Empty\" Trail. must record at least 1 point", 5, this.getCurrentScreen());  
+        }catch (FileIOException e) {
+            showError("An Exception was thrown when attempting to save " +
                         "the Trail to the RMS!  " +  e.toString(), 5, this.getCurrentScreen());
             e.printStackTrace();
         }

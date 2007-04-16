@@ -6,7 +6,6 @@ import java.util.Vector;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.List;
 
 import com.substanceofcode.data.FileSystem;
@@ -20,9 +19,6 @@ public class TrailsList extends List implements CommandListener{
     private final Command showDetailsCommand;
     private final Command backCommand;
     
-    // private final Command renameCommand;
-    
-    private final Image icon;
     
     private final Controller controller;
     
@@ -32,37 +28,33 @@ public class TrailsList extends List implements CommandListener{
         super("Load Trail", List.IMPLICIT);
         this.controller = controller;
         
-        icon = getIcon();
 
-        this.addCommand(showDetailsCommand = new Command("Show Details", Command.ITEM, 1));
-        this.addCommand(loadCommand = new Command("Load", Command.OK, 2));
+        this.refresh();
+
         this.addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
         this.addCommand(backCommand = new Command("Cancel", Command.BACK, 5));
-        this.setSelectCommand(this.showDetailsCommand);
+        
+        showDetailsCommand = new Command("Show Details", Command.ITEM, 1);
+        loadCommand = new Command("Load", Command.OK, 2);
+        if(this.size() != 0){
+            this.addCommand(showDetailsCommand);
+            this.addCommand(loadCommand);
+            this.setSelectCommand(this.showDetailsCommand);
+        }
         this.setCommandListener(this);
         
-        this.refresh();
     }
     
     public void refresh(){
         this.deleteAll();
         Vector files = FileSystem.getFileSystem().listFiles(Track.TRACK_MIME_TYPE);
-        if(files.size() == 0){
+        this.trailsFound = files.size() != 0;
+        if( ! trailsFound){
             this.append("No Trails Found", null);
-            this.trailsFound = false;
         }
         
         for(int i = 0; i < files.size(); i++){
-            this.append((String)files.elementAt(i), icon);
-        }
-    }
-    
-    private Image getIcon(){
-        try {
-            return Image.createImage("/images/explorer.png");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            this.append((String)files.elementAt(i), null);
         }
     }
 
@@ -86,14 +78,9 @@ public class TrailsList extends List implements CommandListener{
             }else if(command == showDetailsCommand){
                 final String selectedTrailName = this.getString(this.getSelectedIndex());
                 controller.showTrailDetails(selectedTrailName);
-            /*}else if(command == renameCommand){
-                if(this.trailsFound){
-                    // TODO: need a way of getting to a 'TextBox' and getting the input back.
-                }else{
-                    // Do nothing. Well, perhaps this should "go-back", hmmmm, conundrum.
-                }*/
             }else if(command == saveCurrentCommand){
                 controller.saveTrail();
+                this.refresh();
             }else if(command == this.backCommand){
                 controller.showTrail();
             }
