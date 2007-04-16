@@ -97,7 +97,7 @@ public class SplashCanvas extends Canvas implements Runnable {
 
     /**
      * This is the run() method for the thread, it simply exits the SplashCanvas to 
-     * the Trail Screen after 'dispalyTime' miliseconds have passed.
+     * the Trail Screen after 'dispalyTime' milliseconds have passed.
      */
     public void run() {
         long waitMiliSeconds = this.displayTime;

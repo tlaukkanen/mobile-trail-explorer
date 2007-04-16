@@ -615,8 +615,10 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                     if(counter%5==0 && stopped==false) {
                         positionTrail.addElement( lastPosition );
                         lastRecordedPosition = currentPosition;
-                        while(positionTrail.size()>120) {
-                            positionTrail.removeElement( positionTrail.firstElement() );
+                        while(positionTrail.size()>150) {
+                            for(int removeIndex=1; removeIndex<150; removeIndex+=2){
+                                positionTrail.removeElementAt(removeIndex);
+                            }
                         }
                     }
                 }

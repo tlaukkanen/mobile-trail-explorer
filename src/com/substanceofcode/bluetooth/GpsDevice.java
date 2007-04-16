@@ -23,6 +23,7 @@ package com.substanceofcode.bluetooth;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
@@ -33,6 +34,8 @@ import javax.microedition.io.StreamConnection;
 public class GpsDevice extends BluetoothDevice implements Runnable {
     
     private PositionBuffer lastPosition;
+    private int lastSatelliteCount;
+    private Vector satellites;
     
     private static final long BREAK = 2000;
     private static final int LINE_DELIMITER = 13;
@@ -47,6 +50,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
         // Initialize base class
         super(device.getAddress(), device.getAlias());
         lastPosition = new PositionBuffer();
+        lastSatelliteCount = 0;
     }
     
     /** Connect to bluetooth device */
@@ -78,7 +82,17 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
         return lastPosition.getPosition();
     }
     
-    /**  */
+    /** Get satellites in view count */
+    public int getSatelliteCount() {
+        return lastSatelliteCount;
+    }
+    
+    /** Get satellites */
+    public Vector getSatellites() {
+        return satellites;
+    }
+    
+    /** Parse GPS data */
     public void run() {
         while (Thread.currentThread() == thread) {
             try {
@@ -94,6 +108,8 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                 output = output.substring(1, output.length() - 1);
                 
                 GpsPosition pos = GpsPositionParser.parse(output);
+                lastSatelliteCount = GpsPositionParser.getSatelliteCount();
+                satellites = GpsPositionParser.getSatellites();
                 if(pos!=null) {
                     lastPosition.setPosition(pos);
                 }

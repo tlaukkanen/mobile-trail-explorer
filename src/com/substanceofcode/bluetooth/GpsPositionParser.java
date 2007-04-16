@@ -22,6 +22,7 @@
 package com.substanceofcode.bluetooth;
 
 import com.substanceofcode.tracker.model.StringUtil;
+import java.util.Vector;
 
 /**
  *
@@ -33,6 +34,7 @@ public class GpsPositionParser {
     
     private static double lastAltitude;
     private static short satelliteCount;
+    private static Vector satellites = new Vector();
     
     /** Creates a new instance of GpsPositionParser */
     public GpsPositionParser() {
@@ -43,8 +45,47 @@ public class GpsPositionParser {
         return satelliteCount;
     }
     
+    /** Get satellites */
+    public static Vector getSatellites() {
+        return satellites;
+    }
+    
     /** Parse GPS position */
     public static GpsPosition parse(String record) {
+        if(record.startsWith("$GPGSV")==true) {
+            /**
+             * Satellite information
+             * $GPGSV,2,1,08,01,40,083,46,02,17,308,41,12,07,344,39,14,22,228,45*75
+             *
+             * Where:
+             *    GSV          Satellites in view
+             *      2            Number of sentences for full data
+             *      1            sentence 1 of 2
+             *      08           Number of satellites in view
+             *      01           Satellite PRN number
+             *      40           Elevation, degrees
+             *      083          Azimuth, degrees
+             *      46           SNR - higher is better
+             *           for up to 4 satellites per sentence
+             *      *75          the checksum data, always begins with *            
+             */
+             String[] values = StringUtil.split(record, DELIMETER);
+             short satellitesInView = Short.parseShort( values[3] );
+             
+             if(satellitesInView>0) {
+                 satellites.removeAllElements();
+                 try{
+                     short satelliteNumber = Short.parseShort( values[4] );
+                     short satelliteSnr = Short.parseShort( values[7] );
+                     GpsSatellite sat = new GpsSatellite(satelliteNumber, satelliteSnr);
+                     satellites.addElement(sat);
+                 } catch(Exception ex) {
+                     ex.printStackTrace();
+                 }
+             }
+        
+        }
+        
         if(record.startsWith("$GPGGA")==true) {
             /** 
              * Parse altitude information
@@ -52,9 +93,9 @@ public class GpsPositionParser {
              * $GPGGA,170834,4124.8963,N,08151.6838,W,1,05,1.5,280.2,M,-34.0,M,,,*75
              */
             String[] values = StringUtil.split(record, DELIMETER);
+            satelliteCount = Short.parseShort( values[ 7 ] );
             short isFixed = Short.parseShort( values[ 6 ] );
             if(isFixed>0) {
-                satelliteCount = Short.parseShort( values[ 7 ] );
                 lastAltitude = Double.parseDouble( values[9] );
             }
         }

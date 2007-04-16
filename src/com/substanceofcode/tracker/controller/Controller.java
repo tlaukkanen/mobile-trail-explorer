@@ -511,6 +511,24 @@ public class Controller {
     public Track getTrack() {
         return recorder.getTrack();
     }
+    
+    /** Get current satellite count */
+    public int getSatelliteCount() {
+        if(gpsDevice!=null) {
+            return gpsDevice.getSatelliteCount();
+        } else {
+            return 0;
+        }
+    }
+    
+    /** Get current satellites */
+    public Vector getSatellites() {
+        if(gpsDevice!=null) {
+            return gpsDevice.getSatellites();
+        } else {
+            return null;
+        }
+    }
 
     public Displayable getCurrentScreen() {
         return this.display.getCurrent();
@@ -518,14 +536,15 @@ public class Controller {
 
     public void switchDisplay() {
         if(screens==null) {
-            screens = new BaseCanvas[3];
+            screens = new BaseCanvas[4];
             screens[0] = getTrailCanvas();
             screens[1] = new InformationCanvas( this );
             screens[2] = new WaypointCanvas( this );
+            screens[3] = new SatelliteCanvas( this );
         }
         
         currentDisplayIndex++;
-        if(currentDisplayIndex>2) {
+        if(currentDisplayIndex>3) {
             currentDisplayIndex = 0;
         }
         
