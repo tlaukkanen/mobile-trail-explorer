@@ -3,5 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="J2MELIB"/>
 	<classpathentry kind="lib" path="lib/jmunit4cldc11-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/nokiaext.jar"/>
+	<classpathentry kind="lib" path="lib/SamsungAPI.jar"/>
+	<classpathentry kind="lib" path="lib/SiemensAPI.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
