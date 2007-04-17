@@ -22,6 +22,7 @@ v1.5 ????
 + Added zoom scale bar (Issue 28)
 + Separate information view (Issue 15)
 + Separate waypoints view (Issue 15)
++ Fixed "Unable to save waypoints" problem (Issue 26)
 
 v1.4 (March 27th 2007)
 + Compass

@@ -16,6 +16,7 @@ public class TrailsList extends List implements CommandListener{
 
     private final Command saveCurrentCommand;
     private final Command loadCommand;
+    private final Command deleteCommand;
     private final Command showDetailsCommand;
     private final Command backCommand;
     
@@ -25,22 +26,17 @@ public class TrailsList extends List implements CommandListener{
     private boolean trailsFound = true;
     
     public TrailsList(Controller controller) {
-        super("Load Trail", List.IMPLICIT);
+        super("Trails List", List.IMPLICIT);
         this.controller = controller;
-        
-
-        this.refresh();
 
         this.addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
-        this.addCommand(backCommand = new Command("Cancel", Command.BACK, 5));
+        this.addCommand(backCommand = new Command("Cancel", Command.ITEM, 5));
+        this.addCommand(showDetailsCommand = new Command("Show Details", Command.ITEM, 1));
+        this.addCommand(loadCommand = new Command("Load", Command.OK, 2));
+        this.addCommand(deleteCommand = new Command("Delete", Command.ITEM, 3));
+
+        this.refresh();
         
-        showDetailsCommand = new Command("Show Details", Command.ITEM, 1);
-        loadCommand = new Command("Load", Command.OK, 2);
-        if(trailsFound){
-            this.addCommand(showDetailsCommand);
-            this.addCommand(loadCommand);
-            this.setSelectCommand(this.showDetailsCommand);
-        }
         this.setCommandListener(this);
         
     }
@@ -51,6 +47,15 @@ public class TrailsList extends List implements CommandListener{
         this.trailsFound = files.size() != 0;
         if( ! trailsFound){
             this.append("No Trails Found", null);
+            this.removeCommand(showDetailsCommand);
+            this.removeCommand(loadCommand);
+            this.removeCommand(deleteCommand);
+            this.setSelectCommand(null);
+        } else {
+            this.addCommand(showDetailsCommand);
+            this.addCommand(loadCommand);
+            this.addCommand(deleteCommand);
+            this.setSelectCommand(this.showDetailsCommand);
         }
         
         for(int i = 0; i < files.size(); i++){
@@ -83,6 +88,14 @@ public class TrailsList extends List implements CommandListener{
                 this.refresh();
             }else if(command == this.backCommand){
                 controller.showTrail();
+            }else if(command == this.deleteCommand){
+                try {
+                    FileSystem.getFileSystem().deleteFile(this.getString(this.getSelectedIndex()));
+                } catch (IOException e) {
+                    controller.showError("ERROR! An Exception was thrown when attempting to delete " +
+                            "the Trail from the RMS!  " +  e.toString(), 5, this);
+                }
+                this.refresh();
             }
         }
         
