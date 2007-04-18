@@ -28,13 +28,24 @@ package com.substanceofcode.bluetooth;
  */
 public class GpsSatellite {
     
+    public static final short UNKNOWN = -1;
+    
+    /** GPS Satellite Number */
     private int number;
+    
+    /** Signal to Noise Ratio? */
     private int snr;
     
+    private int elevation;
+    
+    private int azimuth;
+    
     /** Creates a new instance of GpsSatellite */
-    public GpsSatellite(int number, int snr) {
+    public GpsSatellite(int number, int snr, int elevation, int azimuth) {
         this.number = number;
         this.snr = snr;
+        this.elevation = elevation;
+        this.azimuth = azimuth;
     }
     
     public int getNumber() {
@@ -43,6 +54,14 @@ public class GpsSatellite {
     
     public int getSnr() {
         return snr;
+    }
+    
+    public int getElevation(){
+        return elevation;
+    }
+    
+    public int getAzimuth(){
+        return azimuth;
     }
     
 }

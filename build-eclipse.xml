@@ -167,9 +167,9 @@
 	<target name="R03-SonyEricsson_K750_Emu"  description="R03" depends="B03-SonyEricsson_K750_Emu,run"></target>
 	
 	<!-- Build target for Deployment! With obfustication for minimum jar size,and maximum performance (Hard to debug...)-->
-	<target name="D01-Default Deployment"    description="D01" depends="Default Build,setup,build_with_obfustication,run"></target>
-	<target name="D02-Default_Color_Phone"  description="D02" depends="Default_Color_Phone,setup,build_with_obfustication,run"></target>
-	<target name="D03-SonyEricsson_K750_Emu"  description="D03" depends="SonyEricsson_K750_Emu,setup,build_with_obfustication,run"></target>
+	<target name="D01-Default Deployment"    description="D01" depends="Default Build,setup,build_with_obfustication"></target>
+	<target name="D02-Default_Color_Phone"  description="D02" depends="Default_Color_Phone,setup,build_with_obfustication"></target>
+	<target name="D03-SonyEricsson_K750_Emu"  description="D03" depends="SonyEricsson_K750_Emu,setup,build_with_obfustication"></target>
 
 	
 </project>

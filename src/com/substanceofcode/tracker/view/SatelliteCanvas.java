@@ -31,22 +31,19 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 /**
- *
+ * 
  * @author Tommi
  */
 public class SatelliteCanvas extends BaseCanvas implements Runnable {
     
-    private Controller controller;
-    
-    private Font titleFont;
-    private Font rowFont;
+    private final Font titleFont;
+    private final Font rowFont;
     
     private Thread refreshThread;
     
     /** Creates a new instance of SatelliteCanvas */
     public SatelliteCanvas(Controller controller) {
         super( controller );
-        this.controller = controller;
         
         titleFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
@@ -56,14 +53,14 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
     }
     
     protected void paint(Graphics g) {
-        g.setColor(255,255,255);
+        g.setColor(COLOR_WHITE);
         g.fillRect(0,0,getWidth(),getHeight());
         
         g.setColor(0,128,0);
         g.setFont(titleFont);
         g.drawString("Satellites", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
         
-        g.setColor(0,0,0);
+        g.setColor(COLOR_BLACK);
         g.setFont(rowFont);
         g.drawString(
             "Satellite count ",
@@ -78,25 +75,32 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
                 1+titleFont.getHeight(),
                 Graphics.TOP|Graphics.RIGHT);
             
-            //drawSatelliteData(g);
+            // drawSatelliteData(g);
         } catch(Exception ex) {
             controller.showError(
                 "Exception while painting satellite count: " + ex.toString(),
                 10,
                 controller.getCurrentScreen());
         }
+        this.drawSatelliteData(g, 1+titleFont.getHeight()+rowFont.getHeight());
     }
     
-    public void drawSatelliteData(Graphics g) {
+    private void drawSatelliteData(Graphics g, int yPos) {
         Vector satellites = controller.getSatellites();
+        g.setFont(rowFont);
+        g.setColor(COLOR_BLACK);
         if(satellites!=null) {
             int satelliteIndex = 0;
             Enumeration satelliteEnum = satellites.elements();
             while(satelliteEnum.hasMoreElements()) {
                 GpsSatellite satellite = (GpsSatellite)satelliteEnum.nextElement();
-                String id = "sat" + satellite.getNumber();
-                g.drawString( id, 5+satelliteIndex*20,40,Graphics.LEFT|Graphics.TOP);
+                String id = "sat " + satellite.getNumber();
+                g.drawString( id, 5,yPos + (satelliteIndex*g.getFont().getHeight()),Graphics.LEFT|Graphics.TOP);
+                satelliteIndex++;
             }
+        } else {
+            g.drawString("No Additional Satellite", 5, yPos, 0);
+            g.drawString("Information Available", 5, yPos + g.getFont().getHeight(), 0);
         }
     }
     

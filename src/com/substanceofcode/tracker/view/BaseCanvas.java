@@ -34,7 +34,10 @@ import javax.microedition.lcdui.Displayable;
  */
 public abstract class BaseCanvas extends Canvas implements CommandListener {
     
-    private Controller controller;
+    protected static final int COLOR_WHITE = 0xFFFFFF;
+    protected static final int COLOR_BLACK = 0x0;
+    
+    protected Controller controller;
     
     /** Commands */
     private Command startStopCommand;
@@ -93,26 +96,6 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     public void commandAction(Command command, Displayable displayable) {
         if( command == startStopCommand ) {
             controller.startStop();
-        /*
-        }else if( command == markWaypointCommand ) {
-            
-            String latString = "";
-            String lonString = "";
-            GpsPosition lastPosition = controller.getPosition();
-            if(lastPosition!=null) {
-                double lat = lastPosition.latitude;
-                latString = StringUtil.valueOf(lat,5);
-                
-                double lon = lastPosition.longitude;
-                lonString = StringUtil.valueOf(lon,5);
-            }
-            
-            controller.markWaypoint(latString, lonString);
-        }
-        if( command == editWaypointsCommand ) {
-            controller.showWaypointList();
-        }
-        */
         }else if(command == manageTrailsCommand ){
             controller.showTrailsList();
         }else if(command == manageWaypointsCommand){

@@ -157,7 +157,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
         if(command==selectCommand) {
             BluetoothDevice dev = getSelectedDevice();
             if(dev!=null) {
-                controller.setGpsDevice(dev);
+                controller.setGpsDevice(dev.getAddress(), dev.getAlias());
             }
             controller.showSettings();
         }

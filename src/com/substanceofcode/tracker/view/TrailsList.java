@@ -18,6 +18,7 @@ public class TrailsList extends List implements CommandListener{
     private final Command loadCommand;
     private final Command deleteCommand;
     private final Command showDetailsCommand;
+    private final Command newTrailCommand;
     private final Command backCommand;
     
     
@@ -29,11 +30,12 @@ public class TrailsList extends List implements CommandListener{
         super("Trails List", List.IMPLICIT);
         this.controller = controller;
 
-        this.addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
-        this.addCommand(backCommand = new Command("Cancel", Command.ITEM, 5));
         this.addCommand(showDetailsCommand = new Command("Show Details", Command.ITEM, 1));
         this.addCommand(loadCommand = new Command("Load", Command.OK, 2));
         this.addCommand(deleteCommand = new Command("Delete", Command.ITEM, 3));
+        this.addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
+        this.addCommand(newTrailCommand = new Command("New Trail", Command.ITEM, 5));
+        this.addCommand(backCommand = new Command("Cancel", Command.BACK, 10));
 
         this.refresh();
         
@@ -87,6 +89,9 @@ public class TrailsList extends List implements CommandListener{
                 controller.saveTrail();
                 this.refresh();
             }else if(command == this.backCommand){
+                controller.showTrail();
+            }else if(command == this.newTrailCommand){
+                controller.laodTrack(null);
                 controller.showTrail();
             }else if(command == this.deleteCommand){
                 try {

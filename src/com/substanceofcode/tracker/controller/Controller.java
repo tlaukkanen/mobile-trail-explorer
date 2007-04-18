@@ -22,13 +22,10 @@
 
 package com.substanceofcode.tracker.controller;
 
-import com.substanceofcode.bluetooth.BluetoothDevice;
-import com.substanceofcode.bluetooth.BluetoothUtility;
-import com.substanceofcode.bluetooth.GpsDevice;
-import com.substanceofcode.bluetooth.GpsPosition;
-import com.substanceofcode.data.FileIOException;
+import com.substanceofcode.bluetooth.*;
 import com.substanceofcode.tracker.model.*;
 import com.substanceofcode.tracker.view.*;
+import com.substanceofcode.data.FileIOException;
 
 import java.io.IOException;
 import java.lang.Exception;
@@ -48,6 +45,8 @@ import javax.microedition.midlet.MIDlet;
  */
 public class Controller {
 
+    private static Controller controller;
+    
     /** Status codes */
     public final static int STATUS_STOPPED = 0;
     public final static int STATUS_RECORDING = 1;
@@ -74,6 +73,7 @@ public class Controller {
     private WaypointForm waypointForm;
     private WaypointList waypointList;
     private TrailsList trailsList;
+    private DevelopmentMenu developmentMenu;
 
     /** Display device */
     private Display display;
@@ -87,13 +87,15 @@ public class Controller {
      * Creates a new instance of Controller
      */
     public Controller(MIDlet midlet, Display display) {
+        Controller.controller = this;
         this.midlet = midlet;
         status = STATUS_NOTCONNECTED;
         settings = new RecorderSettings(midlet);
         String gpsAddress = settings.getGpsDeviceConnectionString();
         if (gpsAddress.length() > 0) {
-            BluetoothDevice dev = new BluetoothDevice(gpsAddress, "GPS");
-            gpsDevice = new GpsDevice(dev);
+            gpsDevice = new GpsDevice(gpsAddress, "GPS");
+        }else{
+            showError("Please choose a bluetooth device from Settings->GPS");
         }
         recorder = new GpsRecorder(this);
         
@@ -118,6 +120,10 @@ public class Controller {
         }
     }
 
+    public static Controller getController(){
+        return Controller.controller;
+    }
+    
     /**
      * Tells this Controller if the Backlight class should keep the backlight
      * on or switch to phone's default behaviour
@@ -156,8 +162,8 @@ public class Controller {
     }
 
     /** Set GPS device */
-    public void setGpsDevice(BluetoothDevice device) {
-        gpsDevice = new GpsDevice(device);
+    public void setGpsDevice(String address, String alias) {
+        gpsDevice = new GpsDevice(address, alias);
         settings.setGpsDeviceConnectionString(gpsDevice.getAddress());
     }
 
@@ -197,43 +203,49 @@ public class Controller {
     public void startStop() {
 
         if (status != STATUS_RECORDING) {
-
+            Logger.getLogger().log("Starting Recording");
             // Connect to GPS device
             try {
                 gpsDevice.connect();
                 recorder.startRecording();
                 status = STATUS_RECORDING;
             } catch (Exception ex) {
+                Logger.getLogger().log("Error while connection to GPS: " + ex.toString());
                 showError("Error while connection to GPS: " + ex.toString(),
                           Alert.FOREVER, getTrailCanvas());
             }
         } else {
-
-            // Stop recording the track
-            recorder.stopRecording();
-            Track recordedTrack = recorder.getTrack();
-            try {
-                boolean useKilometers = settings.getUnitsAsKilometers();
-                String exportFolder = settings.getExportFolder();
-                int exportFormat = settings.getExportFormat();
-                recordedTrack.writeToFile(exportFolder, waypoints,
-                        useKilometers, exportFormat);
-            } catch (Exception ex) {
-                setError(ex.toString());
-                showError(ex.toString(), Alert.FOREVER, getTrailCanvas());
-            }
-
-            try {
-                // Disconnect from GPS
-                gpsDevice.disconnect();
-            } catch (Exception e) {
-                showError("Error while disconnecting from GPS device: " + 
-                          e.toString(), Alert.FOREVER, getTrailCanvas());
-            }
-
-            status = STATUS_STOPPED;
+            Logger.getLogger().log("Stoping Recording");
+            this.stop();
         }
 
+    }
+    
+    private void stop(){
+        // Stop recording the track
+        recorder.stopRecording();
+        Track recordedTrack = recorder.getTrack();
+        try {
+            boolean useKilometers = settings.getUnitsAsKilometers();
+            String exportFolder = settings.getExportFolder();
+            int exportFormat = settings.getExportFormat();
+            recordedTrack.writeToFile(exportFolder, waypoints,
+                    useKilometers, exportFormat);
+        } catch (Exception ex) {
+            Logger.getLogger().log(ex.toString());
+            setError(ex.toString());
+            showError(ex.toString(), Alert.FOREVER, getTrailCanvas());
+        }
+
+        try {
+            // Disconnect from GPS
+            gpsDevice.disconnect();
+        } catch (Exception e) {
+            showError("Error while disconnecting from GPS device: " + 
+                      e.toString(), Alert.FOREVER, getTrailCanvas());
+        }
+
+        status = STATUS_STOPPED;
     }
 
     /** Get waypoints */
@@ -310,12 +322,12 @@ public class Controller {
         if (gpsDevice == null) {
             return null;
         }
-        GpsPosition pos = gpsDevice.getPosition();
-        return pos;
+        return gpsDevice.getPosition();
     }
 
     /** Exit application */
     public void exit() {
+        this.stop();
         saveWaypoints();
         midlet.notifyDestroyed();
     }
@@ -389,7 +401,7 @@ public class Controller {
     public void showSettings() {
         display.setCurrent(getSettingsList());
     }
-
+    
     /** Get instance of settings list */
     private SettingsList getSettingsList() {
         if (settingsList == null) {
@@ -406,6 +418,19 @@ public class Controller {
         waypointList.setWaypoints(waypoints);
         display.setCurrent(waypointList);
     }
+
+
+
+    public void showDevelopmentMenu() {
+        if(developmentMenu == null){
+            developmentMenu = new DevelopmentMenu();
+        }
+        display.setCurrent(developmentMenu);
+    }
+
+    public void showDisplayable(Displayable displayable){
+        display.setCurrent(displayable);
+    }
     
     public void showTrailsList() {
         if (trailsList == null){
@@ -420,7 +445,11 @@ public class Controller {
         if(track != null){
             this.recorder.setTrack(track);
             this.trailCanvas.setLastPosition(track.getEndPosition());
-            this.trailCanvas.setPositionTrail(track);
+            //this.trailCanvas.setPositionTrail(track);
+        }else{
+            this.recorder.clearTrack();
+            this.trailCanvas.setLastPosition(null);
+            //this.trailCanvas.setPositionTrail(null);
         }
     }
     
@@ -449,10 +478,21 @@ public class Controller {
      * @param displayable This Displayable (e.g any Canvas) will be displayed after
      *                    timeout or after confirmation from user
      */
-    public void showError(String message, int seconds, Displayable displayable) {
-        Alert alert = new Alert("Error", message, null, AlertType.ERROR);
+    public void showError(final String message, final int seconds, final Displayable displayable) {
+        final Alert alert = new Alert("Error", message, null, AlertType.ERROR);
         alert.setTimeout(seconds == 0 || seconds == Alert.FOREVER ? Alert.FOREVER : seconds * 1000);
-        display.setCurrent(alert, displayable);
+        // Put it into a thread as 2 calls to this method in quick succession would otherwise fail... miserably.
+        final Thread t = new Thread(new Runnable(){
+            public void run(){
+                display.setCurrent(alert, displayable);   
+            }
+        });
+        t.start();
+        
+    }
+    
+    public void showError(String message){
+        this.showError(message, Alert.FOREVER, this.getCurrentScreen());
     }
 
     /** Update selected waypoint */
@@ -553,6 +593,7 @@ public class Controller {
             display.setCurrent( screens[currentDisplayIndex] );
         }
     }
+
 
 
 }
