@@ -92,13 +92,14 @@ public class Controller {
         status = STATUS_NOTCONNECTED;
         settings = new RecorderSettings(midlet);
         String gpsAddress = settings.getGpsDeviceConnectionString();
+        
+        recorder = new GpsRecorder(this);
         if (gpsAddress.length() > 0) {
             gpsDevice = new GpsDevice(gpsAddress, "GPS");
         }else{
-            showError("Please choose a bluetooth device from Settings->GPS");
+            // Causes exception since getcurrentScreen returns null at this point in time.
+            //showError("Please choose a bluetooth device from Settings->GPS");
         }
-        recorder = new GpsRecorder(this);
-        
 
         /** Initialize forms */
         // aboutForm = new AboutForm(this);
