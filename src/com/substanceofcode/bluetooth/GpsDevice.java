@@ -125,8 +125,8 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                         output.append((char) input);
                     }
 
-                    // Trim start and end of any NON-Displayable characters.
                     try{
+                        // Trim start and end of any NON-Displayable characters.
                         while (output.charAt(0) < '!' || output.charAt(0) > '~') {
                             output.deleteCharAt(0);
                         }
@@ -134,9 +134,13 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                                 || output.charAt(output.length() - 1) > '~') {
                             output.deleteCharAt(output.length() - 1);
                         }
-                        parser.parse(output.toString());
                     }catch(IndexOutOfBoundsException e){
-                        logger.log("Caught IndexOutOfBoundsException in GpsDevice.run()");
+                        // Ignore but don't bother trying to parse, just loop around to the next iteration;
+                        continue;
+                    }
+                    // only parse items begining with '$', such as "$GPRMC,..." and "$GPGSA,..." etc...
+                    if(output.length() > 1 && output.charAt(0) == '$'){
+                        parser.parse(output.toString());
                     }
 
 
@@ -149,6 +153,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                     final Controller controller = Controller.getController();
                     controller.showError("IOException occured in GpsDevice.run()", 5, controller
                             .getCurrentScreen());
+                    logger.log("IOException occured in GpsDevice.run()");
                     try {
                         Thread.sleep(BREAK);
                     } catch (InterruptedException e) {

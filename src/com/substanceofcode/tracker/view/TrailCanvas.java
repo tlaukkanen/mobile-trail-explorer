@@ -258,10 +258,35 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
 
             // Draw trail with red color
             g.setColor(222, 0, 0);
+            
+            final int increment = controller.getSettings().getDrawingIncrement();
+            final int numPositions = controller.getSettings().getNumberOfPositionToDraw();
             // FIXME : if you only want to draw a limited number of points, this is where it should be done.
             // Draw every 5th position. 
-            for (int positionIndex = positionTrail.size() - 1; positionIndex >= 0; positionIndex-=5) {
-
+            /*
+             * If we're drawing every 5th position, , when we record the 15the item,
+             * we must draw 15, 10, 5, 0
+             * BUT THE NEXT TIME(16), we must draw 15, 10, 5, 0
+             * AND again(17), and again(18), and again(19), and only on 20 do we draw another position...
+             * Alternativly, we can draw 15, 10, 5, 0, 
+             * then 16, 15, 10, 5, 0, 
+             * then 17, 15, 10, 5, 0
+             * then 18, 15, 10, 5, 0
+             * then 19, 15, 10, 5, 0
+             * then 20, 15, 10, 5, 0
+             * then 21, 20, 10, 5, 0. 
+             * otherwise the track will look very JUMPY.
+             */
+            final int lowerLimit;
+            if(positionTrail.size() - numPositions < 0){
+                lowerLimit = 0;
+            }else{
+                lowerLimit = positionTrail.size() - numPositions;
+            }
+            for (int positionIndex = positionTrail.size() - 1; positionIndex >= lowerLimit; positionIndex--) {
+                if(positionIndex != positionTrail.size() && positionIndex % increment != 0){
+                    break;
+                }
                 GpsPosition pos = (GpsPosition) positionTrail.elementAt(positionIndex);
 
                 double lat = pos.latitude;

@@ -29,6 +29,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.TextField;
 
 /**
  * Settings form for displayable items.
@@ -50,6 +51,10 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     private ChoiceGroup unitGroup;
 
     private ChoiceGroup displayGroup;
+    
+    private TextField incrementField;
+    
+    private TextField drawingLimitField;
 
     private ChoiceGroup backlightGroup;
 
@@ -74,6 +79,27 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         if (command == okCommand) {
             /** Save settings and go back to settings menu */
             
+            /** Check all fields have valid values before storing ANYTHING */
+            try{
+                if(Integer.parseInt(incrementField.getString()) < 1){ 
+                    controller.showError("The Value in \"Drawing Increment\" field must be >= 1, your settings have NOT been saved. Please fix this and try again");
+                    return;
+                }
+            }catch(NumberFormatException e){
+                controller.showError("There was a problem evaluating the value in \"Drawing Increment\" field must be numeric, your settings have NOT been saved. This is probably a bug, please reprot if you think it is or fix this and try again");
+                return;
+            }
+            try{
+                if(Integer.parseInt(drawingLimitField.getString()) < 1){
+                    controller.showError("The Value in \"Max Positions To Draw\" field must be >= 1, your settings have NOT been saved. Please fix this and try again");
+                    return;
+                }
+            }catch(NumberFormatException e){
+                controller.showError("There was a problem evaluating the value in \"Max Positions To Draw\" field must be numeric, your settings have NOT been saved. This is probably a bug, please reprot if you think it is or fix this and try again");
+                return;
+            }
+            
+            
             RecorderSettings settings = controller.getSettings();
             
             /** 1. Save used units */
@@ -92,7 +118,9 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             settings.setDisplayValue(RecorderSettings.DISPLAY_ALTITUDE, showAltitude);
             settings.setDisplayValue(RecorderSettings.DISPLAY_DISTANCE, showDistance);
 
-            /** 3. Save the Backlight property */
+            /** 5. Save the increment and drawingLimits */
+            
+            /** 4. Save the Backlight property */
             boolean backlightOn = backlightGroup.isSelected(1);
             if (settings.getBacklightOn() != backlightOn) {
                 settings.setBacklightOn(backlightOn);
@@ -146,6 +174,12 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         displayGroup.setSelectedIndex(4, showDistance);
 
         this.append(displayGroup);
+        
+        incrementField = new TextField("Drawing Increment", "" + settings.getDrawingIncrement(), 10, TextField.NUMERIC);
+        this.append(incrementField);
+        
+        drawingLimitField = new TextField("Max Position To Draw", "" + settings.getNumberOfPositionToDraw(), 10, TextField.NUMERIC);
+        this.append(drawingLimitField);
 
         String[] backlight = { "Phones Default" /* Allow Off */,
                 "Attempt to Force On" };

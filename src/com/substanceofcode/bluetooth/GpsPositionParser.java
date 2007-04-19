@@ -120,19 +120,39 @@ public class GpsPositionParser {
     }
 
     /** Parse GPS position */
-    public synchronized void parse(String record)  throws IndexOutOfBoundsException {
+    public synchronized void parse(String record){
         recordMetrics(record);
         if (record.startsWith("$GPRMC")) {
-            parseGPRMC(record);
+            try{
+                parseGPRMC(record);
+            }catch(IndexOutOfBoundsException e){
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()");
+            }
         }else if(record.startsWith("$GPGSA")){
-            parseGPGSA(record);
+            try{
+                parseGPGSA(record);
+            }catch(IndexOutOfBoundsException e){
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()");
+            }
         } else if (record.startsWith("$GPGGA")) {
-            parseGPGGA(record);
+            try{
+                parseGPGGA(record);
+            }catch(IndexOutOfBoundsException e){
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()");
+            }
         } else if (record.startsWith("$GPGSV")) {
-            parseGPGSV(record);
+            try{
+                parseGPGSV(record);
+            }catch(IndexOutOfBoundsException e){
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()");
+            }
         } else {
-            final String type = record.substring(1, 7);
-            logger.log("Parse Error: Unknowen Type: (" + type + ")");
+            try{
+                final String type = record.substring(1, 7);
+                logger.log("Parse Error: Unknowen Type: (" + type + ")");
+            }catch(IndexOutOfBoundsException e){
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parse(){...else...}: " + record);
+            }
         }
 
         /**
@@ -405,10 +425,6 @@ public class GpsPositionParser {
 
     }
 
-    
-
-    private short currentCyclePosition = 0;
-    private short numberOfItemsInCycle = -1;
     private Vector tempSatellites = new Vector();
     /**
      * <h2>$GPGSV</h2>
@@ -447,31 +463,28 @@ public class GpsPositionParser {
         String[] values = StringUtil.split(record, DELIMETER);
         this.satelliteCount = Short.parseShort(values[3]);
 
-        short numItems = Short.parseShort(values[1]);
-        short cyclePos = Short.parseShort(values[2]);
-        logger.log("Parsing GPGSV " + cyclePos + " of " + numItems);
+        final short cyclePos = Short.parseShort(values[2]);
         if (cyclePos == 1) {
             // New cycle started, copy over last cycles satellites and blank.
-            if (this.tempSatellites != null) {
-                logger.log("$GPGSV: coppying satellites accross");
-                copyLastCycleSatellitesAndClear();
-            }
-            this.numberOfItemsInCycle = numItems;
+            copyLastCycleSatellitesAndClear();
         }
     
         for (int i = 0; i < 4; i++) {
             int start = 4 * (i + 1);
-            short satelliteNumber = parseShort(values[start], GpsSatellite.UNKNOWN);
-            short elevation = parseShort(values[start + 1], GpsSatellite.UNKNOWN);
-            short azimuth = parseShort(values[start + 2], GpsSatellite.UNKNOWN);
-            short satelliteSnr = parseShort(values[start + 3], GpsSatellite.UNKNOWN);
-            if(satelliteNumber != GpsSatellite.UNKNOWN){
-                GpsSatellite sat = new GpsSatellite(satelliteNumber, satelliteSnr, elevation,
-                    azimuth);
-                this.tempSatellites.addElement(sat);
+            try{
+                short satelliteNumber = parseShort(values[start], GpsSatellite.UNKNOWN);
+                short elevation = parseShort(values[start + 1], GpsSatellite.UNKNOWN);
+                short azimuth = parseShort(values[start + 2], GpsSatellite.UNKNOWN);
+                short satelliteSnr = parseShort(values[start + 3], GpsSatellite.UNKNOWN);
+                if(satelliteNumber != GpsSatellite.UNKNOWN){
+                    GpsSatellite sat = new GpsSatellite(satelliteNumber, satelliteSnr, elevation,
+                        azimuth);
+                    this.tempSatellites.addElement(sat);
+                }
+            }catch(IndexOutOfBoundsException e){
+                logger.log("IOBE @ " + i + " = [" + (4*(i+1)) + " - " +((4*(i+1))+3) + "] of " + values.length);
             }
         }       
-        this.currentCyclePosition = cyclePos;
     }
 
     /**
@@ -506,6 +519,9 @@ public class GpsPositionParser {
     }
 
     private void copyLastCycleSatellitesAndClear() {
+        if(this.tempSatellites == null){
+            return;
+        }
         Enumeration e = tempSatellites.elements();
         this.satellites.removeAllElements();
         while (e.hasMoreElements()) {
