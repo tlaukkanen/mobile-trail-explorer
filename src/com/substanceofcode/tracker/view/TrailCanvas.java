@@ -266,8 +266,8 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             /*
              * If we're drawing every 5th position, , when we record the 15the item,
              * we must draw 15, 10, 5, 0
-             * BUT THE NEXT TIME(16), we must draw 15, 10, 5, 0
-             * AND again(17), and again(18), and again(19), and only on 20 do we draw another position...
+             * BUT THE NEXT TIME(16), we must also draw 15, 10, 5, 0
+             * AND again(17), and again(18), and again(19), and only on 20 do we draw another position...i.e. 20, 15, 10, 5, 0
              * Alternativly, we can draw 15, 10, 5, 0, 
              * then 16, 15, 10, 5, 0, 
              * then 17, 15, 10, 5, 0
@@ -278,14 +278,14 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
              * otherwise the track will look very JUMPY.
              */
             final int lowerLimit;
-            if(positionTrail.size() - numPositions < 0){
+            if(positionTrail.size() - (numPositions*increment) < 0){
                 lowerLimit = 0;
             }else{
-                lowerLimit = positionTrail.size() - numPositions;
+                lowerLimit = positionTrail.size() - (numPositions*increment);
             }
             for (int positionIndex = positionTrail.size() - 1; positionIndex >= lowerLimit; positionIndex--) {
-                if(positionIndex != positionTrail.size() && positionIndex % increment != 0){
-                    break;
+                if(positionIndex % increment != 0){
+                    continue;
                 }
                 GpsPosition pos = (GpsPosition) positionTrail.elementAt(positionIndex);
 
