@@ -54,7 +54,6 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
 
     private Thread thread;
     private int counter;
-    private boolean refresh;
     private String error;
 
     /** Trail drawing helpers */
@@ -80,7 +79,6 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
 
         //positionTrail = new Vector();
 
-        refresh = true;
         thread = new Thread(this);
         thread.start();
         counter = 0;
@@ -573,9 +571,13 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
     /** Thread for getting current position */
     public void run() {
         //GpsPosition lastRecordedPosition = null;
-        while (refresh == true) {
+        while (true) {
             try {
                 Thread.sleep(1000);
+                if(controller.getStatusCode() != Controller.STATUS_RECORDING){
+                    this.repaint();
+                    continue;
+                }
                 final GpsPosition temp = controller.getPosition();
                 if(temp != null){
                     this.lastPosition = controller.getPosition();   

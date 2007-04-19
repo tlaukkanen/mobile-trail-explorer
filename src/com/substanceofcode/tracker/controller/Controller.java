@@ -217,27 +217,26 @@ public class Controller {
             }
         } else {
             Logger.getLogger().log("Stoping Recording");
-            this.stop();
+//          Stop recording the track
+            recorder.stopRecording();
+            Track recordedTrack = recorder.getTrack();
+            try {
+                boolean useKilometers = settings.getUnitsAsKilometers();
+                String exportFolder = settings.getExportFolder();
+                int exportFormat = settings.getExportFormat();
+                recordedTrack.writeToFile(exportFolder, waypoints,
+                        useKilometers, exportFormat);
+            } catch (Exception ex) {
+                Logger.getLogger().log(ex.toString());
+                setError(ex.toString());
+                showError(ex.toString(), Alert.FOREVER, getTrailCanvas());
+            }
+            this.disconnect();
         }
 
     }
     
-    private void stop(){
-        // Stop recording the track
-        recorder.stopRecording();
-        Track recordedTrack = recorder.getTrack();
-        try {
-            boolean useKilometers = settings.getUnitsAsKilometers();
-            String exportFolder = settings.getExportFolder();
-            int exportFormat = settings.getExportFormat();
-            recordedTrack.writeToFile(exportFolder, waypoints,
-                    useKilometers, exportFormat);
-        } catch (Exception ex) {
-            Logger.getLogger().log(ex.toString());
-            setError(ex.toString());
-            showError(ex.toString(), Alert.FOREVER, getTrailCanvas());
-        }
-
+    private void disconnect(){
         try {
             // Disconnect from GPS
             gpsDevice.disconnect();
@@ -328,7 +327,7 @@ public class Controller {
 
     /** Exit application */
     public void exit() {
-        this.stop();
+        this.disconnect();
         saveWaypoints();
         midlet.notifyDestroyed();
     }
