@@ -119,6 +119,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             settings.setDisplayValue(RecorderSettings.DISPLAY_DISTANCE, showDistance);
 
             /** 5. Save the increment and drawingLimits */
+            settings.setDrawingIncrement(Integer.parseInt(incrementField.getString()));
+            settings.setNumberOfPositionToDraw(Integer.parseInt(drawingLimitField.getString()));
             
             /** 4. Save the Backlight property */
             boolean backlightOn = backlightGroup.isSelected(1);
