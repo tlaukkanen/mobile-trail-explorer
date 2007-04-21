@@ -52,8 +52,6 @@ public class DisplaySettingsForm extends Form implements CommandListener {
 
     private ChoiceGroup displayGroup;
     
-    private TextField incrementField;
-    
     private TextField drawingLimitField;
 
     private ChoiceGroup backlightGroup;
@@ -80,15 +78,6 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             /** Save settings and go back to settings menu */
             
             /** Check all fields have valid values before storing ANYTHING */
-            try{
-                if(Integer.parseInt(incrementField.getString()) < 1){ 
-                    controller.showError("The Value in \"Drawing Increment\" field must be >= 1, your settings have NOT been saved. Please fix this and try again");
-                    return;
-                }
-            }catch(NumberFormatException e){
-                controller.showError("There was a problem evaluating the value in \"Drawing Increment\" field must be numeric, your settings have NOT been saved. This is probably a bug, please reprot if you think it is or fix this and try again");
-                return;
-            }
             try{
                 if(Integer.parseInt(drawingLimitField.getString()) < 1){
                     controller.showError("The Value in \"Max Positions To Draw\" field must be >= 1, your settings have NOT been saved. Please fix this and try again");
@@ -118,8 +107,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             settings.setDisplayValue(RecorderSettings.DISPLAY_ALTITUDE, showAltitude);
             settings.setDisplayValue(RecorderSettings.DISPLAY_DISTANCE, showDistance);
 
-            /** 5. Save the increment and drawingLimits */
-            settings.setDrawingIncrement(Integer.parseInt(incrementField.getString()));
+            /** 5. Save the number of position to draw value. */
             settings.setNumberOfPositionToDraw(Integer.parseInt(drawingLimitField.getString()));
             
             /** 4. Save the Backlight property */
@@ -176,9 +164,6 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         displayGroup.setSelectedIndex(4, showDistance);
 
         this.append(displayGroup);
-        
-        incrementField = new TextField("Drawing Increment", "" + settings.getDrawingIncrement(), 10, TextField.NUMERIC);
-        this.append(incrementField);
         
         drawingLimitField = new TextField("Max Position To Draw", "" + settings.getNumberOfPositionToDraw(), 10, TextField.NUMERIC);
         this.append(drawingLimitField);

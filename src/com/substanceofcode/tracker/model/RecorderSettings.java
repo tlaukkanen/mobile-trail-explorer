@@ -42,7 +42,6 @@ public class RecorderSettings {
     private static final String WAYPOINTS = "waypoints";
     private static final String UNITS = "units";
     private static final String BACKLIGHT = "backlight";
-    private static final String DRAWING_INCREMENT = "drawing-increment";
     private static final String POSITIONS_TO_DRAW = "number-of-position-to-draw";
     
     /** Exporting setting keys */
@@ -194,18 +193,6 @@ public class RecorderSettings {
     /** Set units */
     public void setUnitsAsKilometers(boolean value) {
         settings.setBooleanProperty(UNITS, value);
-        saveSettings();
-    }
-    
-    public int getDrawingIncrement() {
-        return settings.getIntProperty(DRAWING_INCREMENT, 5);
-    }
-    
-    public void setDrawingIncrement(int value){
-        if(value < 1){
-            throw new IllegalArgumentException("Settings.setDrawingIncrement may not be 0, or negitive (" + value + ")");
-        }
-        settings.setIntProperty(DRAWING_INCREMENT, value);
         saveSettings();
     }
 

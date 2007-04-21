@@ -257,9 +257,10 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             // Draw trail with red color
             g.setColor(222, 0, 0);
             
-            final int increment = controller.getSettings().getDrawingIncrement();
+            // FIXME: This should be gotten rid of altogether
+            final int increment = 1;
+            // TODO: implement the drawing based soely on numPositions. 
             final int numPositions = controller.getSettings().getNumberOfPositionToDraw();
-            // FIXME : if you only want to draw a limited number of points, this is where it should be done.
             // Draw every 5th position. 
             /*
              * If we're drawing every 5th position, , when we record the 15the item,
@@ -307,7 +308,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             g.setColor(255, 0, 0);
             g.drawString("ERR: " + ex.toString(), 1, 120, Graphics.TOP | Graphics.LEFT);
 
-            System.err.println("Exception occured while drawing trail: " + ex.toString());
+            Logger.getLogger().log("Exception occured while drawing trail: " + ex.toString());
         }
     }
 
@@ -609,7 +610,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                 this.repaint(); 
                 */
             } catch (Exception ex) {
-                System.err.println("Error in TrailCanvas.run: " + ex.toString());
+                Logger.getLogger().log("Error in TrailCanvas.run: " + ex.toString());
                 error = ex.toString();
             }
         }

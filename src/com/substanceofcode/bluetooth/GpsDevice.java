@@ -182,10 +182,19 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                         }
                     }
 
+                } catch (Exception e) {
+                    logger.log("UNEXPECTED EXCEPTION Caught in GpsDevice.run(), attempting to continue: " + e.toString());
                 }
             }
-        } catch (Exception e) {
-            logger.log("UNEXPECTED EXCEPTION Caught in GpsDevice.run(): " + e.toString());
+        } catch (Throwable e) {
+            if(e instanceof Error){
+                logger.log("UNEXPECTED ERROR! Caught in GpsDevice.run() : " + e.toString());
+            }else if(e instanceof Exception){
+                logger.log("UNEXPECTED Exception! Caught in GpsDevice.run() : " + e.toString());
+            }else{
+                // Should never reach here, but.... never say never??
+                logger.log("UNEXPECTED " + e.getClass().getName() + "! Caught in GpsDevice.run() : " + e.toString());
+            }
         }
         logger.log("Thread GpsDevice.run() finished.");
     }

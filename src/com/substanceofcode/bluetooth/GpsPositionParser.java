@@ -482,7 +482,10 @@ public class GpsPositionParser {
                     this.tempSatellites.addElement(sat);
                 }
             }catch(IndexOutOfBoundsException e){
-                logger.log("IOBE @ " + i + " = [" + (4*(i+1)) + " - " +((4*(i+1))+3) + "] of " + values.length);
+                //logger.log("IOBE @ " + i + " = [" + (4*(i+1)) + " - " +((4*(i+1))+3) + "] of " + values.length);
+                // Ignore this Exception as it is ... expected, but we should break, since if we are out of bounds now
+                // we will certinally be out of bounds on the next itteration.
+                break;
             }
         }       
     }
