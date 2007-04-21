@@ -128,11 +128,7 @@ public final class GpsPosition {
      * Positions are considered to be equal IF both their latitudes AND their longitudes are exactly equal.
      */
     public boolean equals(GpsPosition position) {
-	// FIXME: what is going on here, are we converting to a string just to compare SURELY
-	// (longitude == position.longitude && latitude == position.latitude)
-	// would be the same  ( AND MUCH BETTER )?????
-	if( String.valueOf(longitude).equals( String.valueOf(position.longitude) ) == true &&
-		String.valueOf(latitude).equals( String.valueOf(position.latitude) ) == true ) {
+	if( longitude == position.longitude && latitude == position.latitude ) {
 	    return true;
 	} else {
 	    return false;
