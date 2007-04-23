@@ -148,6 +148,10 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                 // disconnect, and reconnect... to be sure to be sure.
                 catch (IOException ie) {
                     final Controller controller = Controller.getController();
+                    boolean isRecording = (controller.getStatusCode()!=Controller.STATUS_STOPPED);
+                    if(isRecording==false) {
+                        return;
+                    }
                     controller.showError("IOException occured in GpsDevice.run()", 5, controller
                         .getCurrentScreen());
                     logger.log("IOException occured in GpsDevice.run()");
@@ -163,7 +167,6 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                         .getCurrentScreen());
                     int count = 0;
                     // Try to reconnect if we are still recording
-                    boolean isRecording = (controller.getStatusCode()!=Controller.STATUS_STOPPED);
                     while (isRecording && !connected) {
                         try {
                             this.connect();
