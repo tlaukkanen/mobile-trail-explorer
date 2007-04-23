@@ -433,7 +433,8 @@ public class GpsPositionParser {
         String[] values = StringUtil.split(record, DELIMETER);
         short isFixed = Short.parseShort(values[6]);
         if (isFixed > 0) {
-            lastAltitude = Double.parseDouble(values[9]);
+            satelliteCount = Short.parseShort( values[7] );
+            lastAltitude = Double.parseDouble( values[9] );
         }
 
     }
