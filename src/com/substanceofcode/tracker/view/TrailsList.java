@@ -1,4 +1,4 @@
-     package com.substanceofcode.tracker.view;
+    package com.substanceofcode.tracker.view;
 
 import java.io.IOException;
 import java.util.Vector;

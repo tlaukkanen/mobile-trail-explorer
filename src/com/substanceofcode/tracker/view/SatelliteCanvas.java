@@ -38,6 +38,7 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
     
     private final Font titleFont;
     private final Font rowFont;
+    private final Font smallRowFont;
     
     private Thread refreshThread;
     
@@ -47,6 +48,7 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
         
         titleFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
+        smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         
         refreshThread = new Thread(this);
         refreshThread.start();
@@ -87,7 +89,7 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
     
     private void drawSatelliteData(Graphics g, int yPos) {
         Vector satellites = controller.getSatellites();
-        g.setFont(rowFont);
+        g.setFont(smallRowFont);
         g.setColor(COLOR_BLACK);
         if(satellites!=null) {
             int satelliteIndex = 0;
