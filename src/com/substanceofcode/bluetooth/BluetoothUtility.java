@@ -1,7 +1,7 @@
 /**
  * BluetoothUtility.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2007 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This library is free software; you can redistribute it and/or
@@ -93,18 +93,29 @@ public class BluetoothUtility implements DiscoveryListener {
     }
 
     public void deviceDiscovered(RemoteDevice remoteDevice, DeviceClass deviceClass) {
-        try {
-            // same device may found several times during single search
-            if (devices.indexOf(deviceClass) == -1) {
-                String address = remoteDevice.getBluetoothAddress();
-                String name = remoteDevice.getFriendlyName(false);
-                BluetoothDevice dev = new BluetoothDevice(address, name);
-                devices.addElement(dev);
-            }            
-            System.out.println("Devide found:" + remoteDevice.getFriendlyName(false));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+
+        // same device may found several times during single search
+        if (devices.indexOf(deviceClass) == -1) {
+            String address = remoteDevice.getBluetoothAddress();
+            String name = null;
+            try {
+                name = remoteDevice.getFriendlyName(false);
+            } catch (IOException ioe) {}
+            // On Nokia 6230 the bluetooth stack is buggy and so it could be
+            // that getFriendlyName() fails. In this case we show at least
+            // the bluetooth address in the device list instead of a friendly name
+            if (name == null || name.trim().length() == 0) {
+                try {
+                    name = remoteDevice.getFriendlyName(true);
+                } catch (IOException ioe) {}
+                if (name == null || name.trim().length() == 0) {
+                    name = address;
+                }
+            }
+            System.out.println("Device found: " + name + " (" + address + ")");
+            BluetoothDevice dev = new BluetoothDevice(address, name);
+            devices.addElement(dev);
+        }            
     }
 
     public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {

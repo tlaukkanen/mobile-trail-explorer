@@ -1,7 +1,7 @@
 /*
  * DeviceList.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2007 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -130,7 +130,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
                 
                 /** Search is complete */
                 Vector devices = controller.getDevices();
-                if(devices!=null) {
+                if(devices != null && devices.size() > 0) {
                     this.set(0, "Found " + devices.size() + " device(s)", null);
                     for(int deviceIndex = 0; deviceIndex < devices.size(); deviceIndex++) {
                         BluetoothDevice device = (BluetoothDevice)devices.elementAt(deviceIndex);

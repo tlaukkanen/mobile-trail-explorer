@@ -1,3 +1,25 @@
+/*
+ * GpsParsingMetricsScreen.java
+ *
+ * Copyright (C) 2005-2007 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.tracker.view;
 
 import javax.microedition.lcdui.Command;
@@ -24,7 +46,7 @@ public class GpsParsingMetricsScreen extends Form implements CommandListener{
     public void refresh()throws NullPointerException, IllegalArgumentException{
         String[] details = GpsPositionParser.getPositionParser().getMetrics();
         if(details.length % 2 != 0){
-            throw new IllegalArgumentException("The String Arrary Passed to .refrest() must have a length which is a multiple of 2.");
+            throw new IllegalArgumentException("The string array passed to .refresh() must have a length which is a multiple of 2.");
         }
         
         this.deleteAll();
@@ -38,7 +60,7 @@ public class GpsParsingMetricsScreen extends Form implements CommandListener{
     public void commandAction(Command command, Displayable disp) {
         if(disp == this){
             if(command == this.exitCommand){
-                Controller.getController().showSettings();
+                Controller.getController().showDevelopmentMenu();
             }
         }
         
