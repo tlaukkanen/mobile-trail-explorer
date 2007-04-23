@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -31,26 +31,24 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 
 /**
- * 
+ *
  * @author Tommi
  */
 public class GpsDevice extends BluetoothDevice implements Runnable {
-
+    
     private final Logger logger = Logger.getLogger();
     
     // private PositionBuffer lastPosition;
     private GpsPositionParser parser;
-    // private int lastSatelliteCount;
-    // private Vector satellites;
-
+    
     private static final long BREAK = 2000;
     private static final int LINE_DELIMITER = 13;
-
+    
     private StreamConnection connection;
     private InputStreamReader reader;
     private Thread thread;
-
-
+    
+    
     /** Creates a new instance of GpsDevice */
     public GpsDevice(String address, String alias) {
         super(address, alias);
@@ -58,16 +56,16 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
         parser = GpsPositionParser.getPositionParser();
         // lastSatelliteCount = 0;
     }
-
+    
     /** Connect to bluetooth device */
     public synchronized void connect() throws IOException {
         connection = (StreamConnection) Connector.open("btspp://" + this.getAddress() + ":1",
-                Connector.READ);
+            Connector.READ);
         reader = new InputStreamReader(connection.openInputStream());
         thread = new Thread(this);
         thread.start();
     }
-
+    
     /** Disconnect from bluetooth device */
     public synchronized void disconnect() {
         try {
@@ -88,29 +86,28 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
         connection = null;
         thread = null;
     }
-
+    
     /** Get current position from GPS unit */
     public GpsPosition getPosition() {
         return parser.getGpsPosition();
     }
-
+    
     /** Get satellites in view count */
     public int getSatelliteCount() {
-        // return lastSatelliteCount;
         return parser.getSatelliteCount();
     }
-
+    
     /** Get satellites */
     public Vector getSatellites() {
         // return satellites;
         return parser.getSatellites();
     }
-
+    
     public String[] getParserMetrics() {
         return parser.getMetrics();
     }
-
-
+    
+    
     /** Parse GPS data */
     public void run() {
         try {
@@ -118,20 +115,20 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
             while (Thread.currentThread() == thread) {
                 try {
                     StringBuffer output = new StringBuffer();
-
+                    
                     // Read one line and try to parse it.
                     int input;
                     while ((input = reader.read()) != LINE_DELIMITER) {
                         output.append((char) input);
                     }
-
+                    
                     try{
                         // Trim start and end of any NON-Displayable characters.
                         while (output.charAt(0) < '!' || output.charAt(0) > '~') {
                             output.deleteCharAt(0);
                         }
                         while (output.charAt(output.length() - 1) < '!'
-                                || output.charAt(output.length() - 1) > '~') {
+                            || output.charAt(output.length() - 1) > '~') {
                             output.deleteCharAt(output.length() - 1);
                         }
                     }catch(IndexOutOfBoundsException e){
@@ -142,8 +139,8 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                     if(output.length() > 1 && output.charAt(0) == '$'){
                         parser.parse(output.toString());
                     }
-
-
+                    
+                    
                 }
                 // Most severe type of exception. Either thrown while connecting
                 // or
@@ -152,7 +149,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                 catch (IOException ie) {
                     final Controller controller = Controller.getController();
                     controller.showError("IOException occured in GpsDevice.run()", 5, controller
-                            .getCurrentScreen());
+                        .getCurrentScreen());
                     logger.log("IOException occured in GpsDevice.run()");
                     try {
                         Thread.sleep(BREAK);
@@ -163,9 +160,11 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                     this.disconnect();
                     boolean connected = false;
                     controller.showError("Attempting To Reconnect:", 5, controller
-                            .getCurrentScreen());
+                        .getCurrentScreen());
                     int count = 0;
-                    while (!connected) {
+                    // Try to reconnect if we are still recording
+                    boolean isRecording = (controller.getStatusCode()!=Controller.STATUS_STOPPED);
+                    while (isRecording && !connected) {
                         try {
                             this.connect();
                             connected = true;
@@ -173,7 +172,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                         } catch (IOException e) {
                             count++;
                             controller.showError("Failed To Reconnect on attempt " + count, 10,
-                                    controller.getCurrentScreen());
+                                controller.getCurrentScreen());
                             this.disconnect();
                             try {
                                 Thread.sleep(BREAK);
@@ -181,7 +180,6 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                             }
                         }
                     }
-
                 } catch (Exception e) {
                     logger.log("UNEXPECTED EXCEPTION Caught in GpsDevice.run(), attempting to continue: " + e.toString());
                 }
@@ -198,5 +196,5 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
         }
         logger.log("Thread GpsDevice.run() finished.");
     }
-
+    
 }
