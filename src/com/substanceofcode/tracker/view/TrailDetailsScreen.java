@@ -60,7 +60,6 @@ public class TrailDetailsScreen extends Form implements CommandListener{
         StringItem markersItem = new StringItem("Number of Markers recorded: ", "" + trail.getMarkerCount());
         this.append(markersItem);
         
-        // TODO Auto-generated constructor stub
     }
 
     public void commandAction(Command command, Displayable disp) {

@@ -43,7 +43,16 @@ public class GpsPositionParser {
     private GpsPosition currentPosition;
     private double lastAltitude;
     private short satelliteCount;
-    private Vector satellites;
+    private final Vector satellites;
+    
+    /**
+     * A temporary Vector of GpsSatellites which gets coppied over to the variable 'satellites' every
+     * time all the GPGSV strings in the sequence has finished.
+     * 
+     * Only gets initialized once, and then cleared rather than creating a new one to reduce Object creation
+     * overheads.
+     */
+    final private Vector tempSatellites = new Vector();
 
     public static GpsPositionParser getPositionParser(){
         if (gpsPositionParser == null){
@@ -87,7 +96,7 @@ public class GpsPositionParser {
     private void recordMetrics(String record){
         try{
             lastParsedString = record;
-            String start = record.substring(0, 6);
+            final String start = record.substring(0, 6);
             int i;
             if (metricstable.containsKey(start)) {
                 i = ((Integer) metricstable.get(start)).intValue();
@@ -146,14 +155,18 @@ public class GpsPositionParser {
             }catch(IndexOutOfBoundsException e){
                 logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()");
             }
-        } else {
+        } 
+        // Don't know the type, ignore and don't bother trying to parse, it'll still be logged in the Metrics, 
+        // so we can know if there's a type that is being recieved but not parsed.
+        /*else {
             try{
-                final String type = record.substring(1, 7);
+                final String type = record.substring(0, 6);
                 logger.log("Parse Error: Unknowen Type: (" + type + ")");
             }catch(IndexOutOfBoundsException e){
                 logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parse(){...else...}: " + record);
             }
         }
+        */
 
         /**
          * RMC 15 GGA 5 GSA 5
@@ -424,8 +437,7 @@ public class GpsPositionParser {
         }
 
     }
-
-    private Vector tempSatellites = new Vector();
+    
     /**
      * <h2>$GPGSV</h2>
      * <p>
@@ -461,31 +473,23 @@ public class GpsPositionParser {
      */
     private synchronized void parseGPGSV(String record) {
         String[] values = StringUtil.split(record, DELIMETER);
-        this.satelliteCount = Short.parseShort(values[3]);
-
+        
         final short cyclePos = Short.parseShort(values[2]);
         if (cyclePos == 1) {
             // New cycle started, copy over last cycles satellites and blank.
             copyLastCycleSatellitesAndClear();
         }
     
-        for (int i = 0; i < 4; i++) {
-            int start = 4 * (i + 1);
-            try{
-                short satelliteNumber = parseShort(values[start], GpsSatellite.UNKNOWN);
-                short elevation = parseShort(values[start + 1], GpsSatellite.UNKNOWN);
-                short azimuth = parseShort(values[start + 2], GpsSatellite.UNKNOWN);
-                short satelliteSnr = parseShort(values[start + 3], GpsSatellite.UNKNOWN);
-                if(satelliteNumber != GpsSatellite.UNKNOWN){
-                    GpsSatellite sat = new GpsSatellite(satelliteNumber, satelliteSnr, elevation,
-                        azimuth);
-                    this.tempSatellites.addElement(sat);
-                }
-            }catch(IndexOutOfBoundsException e){
-                //logger.log("IOBE @ " + i + " = [" + (4*(i+1)) + " - " +((4*(i+1))+3) + "] of " + values.length);
-                // Ignore this Exception as it is ... expected, but we should break, since if we are out of bounds now
-                // we will certinally be out of bounds on the next itteration.
-                break;
+        int index = 4;
+        while(index+3 < values.length){
+            short satelliteNumber = parseShort(values[index++], GpsSatellite.UNKNOWN);
+            short elevation = parseShort(values[index++], GpsSatellite.UNKNOWN);
+            short azimuth = parseShort(values[index++], GpsSatellite.UNKNOWN);
+            short satelliteSnr = parseShort(values[index++], GpsSatellite.UNKNOWN);
+            if(satelliteNumber != GpsSatellite.UNKNOWN){
+                final GpsSatellite sat = new GpsSatellite(satelliteNumber, satelliteSnr, elevation,
+                    azimuth);
+                this.tempSatellites.addElement(sat);
             }
         }       
     }
@@ -518,7 +522,7 @@ public class GpsPositionParser {
      */
     private void parseGPGSA(String record) {
         //String[] values = StringUtil.split(record, DELIMETER);
-        // TODO: implement this.
+        // TODO: implement parsing of $GPGSA records.
     }
 
     private void copyLastCycleSatellitesAndClear() {
