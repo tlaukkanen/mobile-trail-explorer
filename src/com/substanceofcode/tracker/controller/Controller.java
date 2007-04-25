@@ -28,7 +28,6 @@ import com.substanceofcode.tracker.view.*;
 import com.substanceofcode.data.FileIOException;
 
 import java.io.IOException;
-import java.lang.Exception;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Alert;
@@ -74,6 +73,7 @@ public class Controller {
     private WaypointList waypointList;
     private TrailsList trailsList;
     private DevelopmentMenu developmentMenu;
+    private TrailActionsForm trailActionsForm;
 
     /** Display device */
     private Display display;
@@ -89,6 +89,7 @@ public class Controller {
     public Controller(MIDlet midlet, Display display) {
         Controller.controller = this;
         this.midlet = midlet;
+        this.display = display;
         status = STATUS_NOTCONNECTED;
         settings = new RecorderSettings(midlet);
         String gpsAddress = settings.getGpsDeviceConnectionString();
@@ -100,11 +101,7 @@ public class Controller {
             // Causes exception since getcurrentScreen returns null at this point in time.
             //showError("Please choose a bluetooth device from Settings->GPS");
         }
-
-        /** Initialize forms */
-        // aboutForm = new AboutForm(this);
         currentDisplayIndex = 0;
-        this.display = display;
 
         /** Waypoints */
         waypoints = settings.getWaypoints();
@@ -217,21 +214,15 @@ public class Controller {
             }
         } else {
             Logger.getLogger().log("Stoping Recording");
-//          Stop recording the track
+            // Stop recording the track
             recorder.stopRecording();
-            Track recordedTrack = recorder.getTrack();
-            try {
-                boolean useKilometers = settings.getUnitsAsKilometers();
-                String exportFolder = settings.getExportFolder();
-                int exportFormat = settings.getExportFormat();
-                recordedTrack.writeToFile(exportFolder, waypoints,
-                        useKilometers, exportFormat);
-            } catch (Exception ex) {
-                Logger.getLogger().log(ex.toString());
-                setError(ex.toString());
-                showError(ex.toString(), Alert.FOREVER, getTrailCanvas());
-            }
+            // Disconnect from GPS device
             this.disconnect();
+            // Show trail actions screen
+            if (trailActionsForm == null) {
+                trailActionsForm = new TrailActionsForm(this);
+            }
+            display.setCurrent(trailActionsForm);
         }
 
     }
@@ -484,7 +475,7 @@ public class Controller {
         // Put it into a thread as 2 calls to this method in quick succession would otherwise fail... miserably.
         final Thread t = new Thread(new Runnable(){
             public void run(){
-                display.setCurrent(alert, displayable);   
+                Display.getDisplay(Controller.getController().midlet).setCurrent(alert, displayable);   
             }
         });
         t.start();

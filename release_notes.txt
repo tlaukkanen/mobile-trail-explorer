@@ -14,15 +14,17 @@ Release Notes:
 v1.5 ????
 + Autosuggest waypoint name (Issue 12)
 + Added ability to 'Force' screen's backlight to stay on (Issue 21)
-+ Improved speed of KmlConverter ??
++ Improved speed of KmlConverter and GpxConverter
 + MTE now remembers last position on startup (Issue 17)
 + About/Help Screen (Issue 23)
 + Fixed Bluetooth Device List refresh exception (Issue 22)
 + Controls in the setting forms will be re-initialized when pressing "Cancel" (Issue 27)
 + Added zoom scale bar (Issue 28)
-+ Separate information view (Issue 15)
-+ Separate waypoints view (Issue 15)
++ Separate information, waypoints and satellites view (Issue 15)
 + Fixed "Unable to save waypoints" problem (Issue 26)
++ Added "Trail Actions" screen when stopping recording, where user can export
+  the trail to multiple formats and/or save trail to phone memory (Issue 18)
++ Fixed bluetooth problem seen on Nokia 6230 (Thanks Patrick)
 
 v1.4 (March 27th 2007)
 + Compass
