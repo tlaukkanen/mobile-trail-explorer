@@ -308,7 +308,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             g.setColor(255, 0, 0);
             g.drawString("ERR: " + ex.toString(), 1, 120, Graphics.TOP | Graphics.LEFT);
 
-            Logger.getLogger().log("Exception occured while drawing trail: " + ex.toString());
+            Logger.getLogger().log("Exception occured while drawing trail: " + ex.toString(), Logger.WARNING);
         }
     }
 
@@ -610,7 +610,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                 this.repaint(); 
                 */
             } catch (Exception ex) {
-                Logger.getLogger().log("Error in TrailCanvas.run: " + ex.toString());
+                Logger.getLogger().log("Error in TrailCanvas.run(): " + ex.toString(), Logger.WARNING);
                 error = ex.toString();
             }
         }

@@ -110,7 +110,7 @@ public class TrailActionsForm extends Form implements CommandListener {
             String exportFolder = settings.getExportFolder();
             recordedTrack.writeToFile(exportFolder, waypoints, useKilometers, exportFormat);
         } catch (Exception ex) {
-            Logger.getLogger().log(ex.toString());
+            Logger.getLogger().log(ex.toString(), Logger.WARNING);
             controller.showError(ex.toString(), Alert.FOREVER, this);
         }
     }

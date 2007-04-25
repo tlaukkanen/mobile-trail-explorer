@@ -45,6 +45,7 @@ import javax.microedition.midlet.MIDlet;
 public class Controller {
 
     private static Controller controller;
+    private final Logger logger;
     
     /** Status codes */
     public final static int STATUS_STOPPED = 0;
@@ -92,6 +93,8 @@ public class Controller {
         this.display = display;
         status = STATUS_NOTCONNECTED;
         settings = new RecorderSettings(midlet);
+        // Initialize Logger, as it must have an instance of RecorderSettings on it's first call.
+        logger = Logger.getLogger(settings);
         String gpsAddress = settings.getGpsDeviceConnectionString();
         
         recorder = new GpsRecorder(this);
@@ -201,19 +204,19 @@ public class Controller {
     public void startStop() {
 
         if (status != STATUS_RECORDING) {
-            Logger.getLogger().log("Starting Recording");
+            logger.log("Starting Recording", Logger.FINE);
             // Connect to GPS device
             try {
                 gpsDevice.connect();
                 recorder.startRecording();
                 status = STATUS_RECORDING;
             } catch (Exception ex) {
-                Logger.getLogger().log("Error while connection to GPS: " + ex.toString());
+                Logger.getLogger().log("Error while connection to GPS: " + ex.toString(), Logger.WARNING);
                 showError("Error while connection to GPS: " + ex.toString(),
                           Alert.FOREVER, getTrailCanvas());
             }
         } else {
-            Logger.getLogger().log("Stoping Recording");
+            Logger.getLogger().log("Stoping Recording", Logger.FINE);
             // Stop recording the track
             recorder.stopRecording();
             // Disconnect from GPS device

@@ -90,13 +90,32 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
     private void drawSatelliteData(Graphics g, int yPos) {
         Vector satellites = controller.getSatellites();
         g.setFont(smallRowFont);
-        g.setColor(COLOR_BLACK);
         if(satellites!=null) {
             int satelliteIndex = 0;
             Enumeration satelliteEnum = satellites.elements();
             while(satelliteEnum.hasMoreElements()) {
-                GpsSatellite satellite = (GpsSatellite)satelliteEnum.nextElement();
-                String id = "sat " + satellite.getNumber();
+                final GpsSatellite satellite = (GpsSatellite)satelliteEnum.nextElement();
+                final String id = "sat " + satellite.getNumber();
+                // Change the line color based on the Signal Strength from the satellite
+                final int snr = satellite.getSnr();
+                int lineColor = 0x0; // Default Color is Black
+                if(snr < 0){//(snr == GpsSatellite.UNKNOWN){
+                    // Do nothing, I don't think it should ever be UNKNOWN,(or less than 0) but.... perhaps log it, and I can deal with it again, perhaps not...
+                    // Leave line color to BLACK (to indicate an Error);
+                }else if(snr < 33){
+                    // Color line RED
+                    lineColor = 0xFF0000;
+                }else if(snr < 66){
+                    // Color line Orange
+                    lineColor = 0xFB9924;
+                }else if(snr < 100){
+                    // Color line Green
+                    lineColor = 0x00FF00;
+                }else{
+                    // snr >= 100, again don't think it should ever be so, but just 
+                    // leave the line Black to indicate an error.
+                }
+                g.setColor(lineColor);
                 g.drawString( id, 5,yPos + (satelliteIndex*g.getFont().getHeight()),Graphics.LEFT|Graphics.TOP);
                 satelliteIndex++;
             }

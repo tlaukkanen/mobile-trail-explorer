@@ -18,8 +18,8 @@ public class DevelopmentMenu extends List implements CommandListener{
     private Logger loggerScreen;
     
     private static final int METRICS = 0;
-    
     private static final int LOGGER = 1;
+    
 
     public DevelopmentMenu() {
         super("Developers Menu", List.IMPLICIT);

@@ -26,6 +26,8 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 
+import com.substanceofcode.tracker.view.Logger;
+
 /**
  * RecorderSettings contains all settings for the Trail Explorer application.
  * Current settings are:
@@ -43,6 +45,7 @@ public class RecorderSettings {
     private static final String UNITS = "units";
     private static final String BACKLIGHT = "backlight";
     private static final String POSITIONS_TO_DRAW = "number-of-position-to-draw";
+    private static final String LOGGING_LEVEL = "logger-recording-level";
     
     /** Exporting setting keys */
     private static final String EXPORT_FOLDER = "export-folder";
@@ -181,6 +184,15 @@ public class RecorderSettings {
     public void setDisplayValue(String displayItem, boolean value) {
         settings.setBooleanProperty(displayItem, value);
         saveSettings();
+    }
+    
+
+    public byte getLoggingLevel() {
+        return (byte)settings.getIntProperty(LOGGING_LEVEL, Logger.OFF);
+    }
+    
+    public void setLoggingLevel(byte level){
+        settings.setIntProperty(LOGGING_LEVEL, level);
     }
     
     /** Do we use kilometers as units? 
