@@ -26,6 +26,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Screen;
 import javax.microedition.lcdui.StringItem;
 
 import com.substanceofcode.bluetooth.GpsPositionParser;
@@ -33,11 +34,15 @@ import com.substanceofcode.tracker.controller.Controller;
 
 public class GpsParsingMetricsScreen extends Form implements CommandListener{
 
-    private final Command exitCommand;
+    private final Command refreshCommand;
+    private final Command backCommand;
+    
+    private Screen previousScreen;
     
     public GpsParsingMetricsScreen() {
         super("GPS Parsing Metrics");
-        this.addCommand(exitCommand = new Command("BACK", Command.BACK, 0));
+        this.addCommand(refreshCommand = new Command("Refresh", Command.OK, 0));
+        this.addCommand(backCommand = new Command("BACK", Command.BACK, 1));
         this.setCommandListener(this);
         
         this.refresh();
@@ -56,11 +61,21 @@ public class GpsParsingMetricsScreen extends Form implements CommandListener{
         
     }
     
+    public void setPreviousScreen(Screen screen){
+        this.previousScreen = screen;
+    }
+    
     
     public void commandAction(Command command, Displayable disp) {
         if(disp == this){
-            if(command == this.exitCommand){
-                Controller.getController().showDevelopmentMenu();
+            if(command == this.refreshCommand){
+                this.refresh();
+            }else if(command == this.backCommand){
+                if(this.previousScreen == null){
+                    Controller.getController().showDevelopmentMenu();
+                }else{
+                    Controller.getController().showDisplayable(previousScreen);
+                }
             }
         }
         

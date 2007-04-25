@@ -35,6 +35,7 @@ public class DevelopmentMenu extends List implements CommandListener{
     private void showGPSParsingMetrics() {
         if(gpsParsingMetricsScreen == null){
             gpsParsingMetricsScreen = new GpsParsingMetricsScreen();
+            gpsParsingMetricsScreen.setPreviousScreen(this);
         }else{
             gpsParsingMetricsScreen.refresh();
         }

@@ -191,6 +191,10 @@ public class Logger extends Form implements CommandListener, Serializable{
         settings.setLoggingLevel(level);
         this.loggingLevel = level;
     }
+    
+    public byte getLoggingLevel(){
+        return this.loggingLevel;
+    }
 
     public void serialize(DataOutputStream dos) throws IOException {
         dos.writeUTF(buffer.toString());
