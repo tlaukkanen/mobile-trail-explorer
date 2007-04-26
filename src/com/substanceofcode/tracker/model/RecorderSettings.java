@@ -49,7 +49,7 @@ public class RecorderSettings {
     
     /** Exporting setting keys */
     private static final String EXPORT_FOLDER = "export-folder";
-    private static final String EXPORT_FORMAT = "export-format";
+    //private static final String EXPORT_FORMAT = "export-format";
     public static final int EXPORT_FORMAT_KML = 0;
     public static final int EXPORT_FORMAT_GPX = 1;
     
@@ -233,18 +233,6 @@ public class RecorderSettings {
      */
     public void setBacklightOn(boolean value){
     	settings.setBooleanProperty(BACKLIGHT, value);
-        saveSettings();
-    }
-    
-    
-    /** Get export format */
-    public int getExportFormat() {
-        return settings.getIntProperty(EXPORT_FORMAT,0);
-    }
-    
-    /** Set export format */
-    public void setExportFormat( int format ) {
-        settings.setIntProperty(EXPORT_FORMAT, format);
         saveSettings();
     }
     

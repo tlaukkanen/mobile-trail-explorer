@@ -44,7 +44,6 @@ public class ExportSettingsForm extends Form implements CommandListener {
     private Command cancelCommand;
 
     private TextField exportFolderField;
-    private ChoiceGroup exportFormatGroup;
     
     /** Creates a new instance of ExportSettingsForm */
     public ExportSettingsForm(Controller controller) {
@@ -70,10 +69,6 @@ public class ExportSettingsForm extends Form implements CommandListener {
             String exportFolder = exportFolderField.getString();
             RecorderSettings settings = controller.getSettings();
             settings.setExportFolder( exportFolder );
-            
-            // Save export format
-            int selectedFormat = exportFormatGroup.getSelectedIndex();
-            settings.setExportFormat( selectedFormat );
             
             controller.showSettings();
         }
@@ -106,17 +101,6 @@ public class ExportSettingsForm extends Form implements CommandListener {
                 50, 
                 TextField.ANY);
         this.append(exportFolderField);
-        
-        // Initialize format group
-        String[] formats = {"KML, Google Earth", "GPX, GPS eXchange Format"};
-        exportFormatGroup = new ChoiceGroup(
-                "Format",
-                ChoiceGroup.EXCLUSIVE, 
-                formats, 
-                null);
-        int selectedFormat = settings.getExportFormat();
-        exportFormatGroup.setSelectedIndex(selectedFormat, true);
-        this.append( exportFormatGroup );
     }
     
 }
