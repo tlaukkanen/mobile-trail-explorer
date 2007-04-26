@@ -143,6 +143,9 @@
 		
 	</target>
 
+	<target name="run_only_setup">
+		<property name="release.name" value="${midlet.name}_${midlet.version}" />
+	</target>
 	
 	<target name="run">
 		<wtkrun jad="${bin.dir}/${release.name}.jad" device="${buildtype}" emulator="${install.api.bin}/emulator.exe" />
@@ -170,6 +173,8 @@
 	<target name="D01-Default Deployment"    description="D01" depends="Default Build,setup,build_with_obfustication"></target>
 	<target name="D02-Default_Color_Phone"  description="D02" depends="Default_Color_Phone,setup,build_with_obfustication"></target>
 	<target name="D03-SonyEricsson_K750_Emu"  description="D03" depends="SonyEricsson_K750_Emu,setup,build_with_obfustication"></target>
+	
+	<target name="Run only" description="RO1" depends="Default_Color_Phone,run_only_setup,run" />
 
 	
 </project>
