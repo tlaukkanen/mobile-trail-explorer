@@ -47,19 +47,27 @@ public class MathUtil {
      * @author Mario Sansone
      */
     public static int pow(int base, int exponent) {
+        boolean reciprocal = false;
+        if(exponent < 0){
+            reciprocal = true;
+        }
         int result = 1;
         while (exponent-- > 0) {
             result *= base;
         }
-        return result;
+        return reciprocal?1/result:result;
     }
     
     public static double pow(double base, int exponent) {
+        boolean reciprocal = false;
+        if(exponent < 0){
+            reciprocal = true;
+        }
         double result = 1;
         while (exponent-- > 0) {
             result *= base;
         }
-        return result;
+        return reciprocal?1/result:result;
     }
     
     
