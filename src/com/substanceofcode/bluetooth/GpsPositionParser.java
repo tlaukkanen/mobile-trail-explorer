@@ -65,7 +65,7 @@ public class GpsPositionParser {
         this.satellites = new Vector();
         this.currentPosition = null;
         this.lastAltitude = 0;
-        this.satelliteCount = -1;
+        this.satelliteCount = 0;
     }
 
     private synchronized double getLastAltitude() {
@@ -432,8 +432,8 @@ public class GpsPositionParser {
     private synchronized void parseGPGGA(String record) {
         String[] values = StringUtil.split(record, DELIMETER);
         short isFixed = Short.parseShort(values[6]);
+        satelliteCount = Short.parseShort( values[7] );
         if (isFixed > 0) {
-            satelliteCount = Short.parseShort( values[7] );
             lastAltitude = Double.parseDouble( values[9] );
         }
 

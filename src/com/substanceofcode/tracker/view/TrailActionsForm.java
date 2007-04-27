@@ -96,6 +96,9 @@ public class TrailActionsForm extends Form implements CommandListener {
                 ChoiceGroup.MULTIPLE, 
                 actions, 
                 null);
+        // Set default both KML and GPX exporting as default
+        boolean[] selectedFlags = {true, true, false};
+        actionsGroup.setSelectedFlags( selectedFlags );
 
         this.append(actionsGroup);
     }
