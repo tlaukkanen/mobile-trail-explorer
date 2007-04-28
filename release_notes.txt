@@ -11,7 +11,7 @@ Dave Walsh
 
 Release Notes:
 
-v1.5 ????
+v1.5 (April 28th 2007)
 + Autosuggest waypoint name (Issue 12)
 + Added ability to 'Force' screen's backlight to stay on (Issue 21)
 + Improved speed of KmlConverter and GpxConverter
