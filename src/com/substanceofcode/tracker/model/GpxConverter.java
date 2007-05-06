@@ -31,6 +31,7 @@ import java.util.Vector;
  * GpxConverter writes track data in GPX format.
  *
  * @author Tommi Laukkanen
+ * @author Mario Sansone
  */
 public class GpxConverter implements TrackConverter {
     
@@ -54,8 +55,8 @@ public class GpxConverter implements TrackConverter {
         Enumeration posEnum = track.getTrailPoints().elements();
         while(posEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)posEnum.nextElement();
-            String lat = String.valueOf( pos.latitude );
-            String lon = String.valueOf( pos.longitude );
+            String lat = formatDegrees(pos.latitude);
+            String lon = formatDegrees(pos.longitude);
             //String alt = String.valueOf( pos.altitude );
             gpx.append("<trkpt lat=\"").append(lat).append("\" lon=\"").append(lon).append("\">\r\n");
             
@@ -71,6 +72,11 @@ public class GpxConverter implements TrackConverter {
         // Finalize the GPX
         gpx.append("</gpx>\r\n");
         return gpx.toString();
+    }
+    
+    /** Formats the degrees with maximal 6 digits after the decimal point */
+    private String formatDegrees(double degrees) {
+        return String.valueOf(((int)(degrees * 1000000)) / 1000000.0);
     }
     
 }

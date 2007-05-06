@@ -57,9 +57,9 @@ public class DateUtil {
         if(hour.length()==1) { hour = "0" + hour; }
         String minute = String.valueOf( cal.get(Calendar.MINUTE) );
         if(minute.length()==1) { minute = "0" + minute; }
-        String seconds = String.valueOf( cal.get(Calendar.SECOND) );
-        if(seconds.length()==1) { seconds = "0" + minute; }
-        String dateStamp = hour + ":" + minute + ":" + seconds;
+        String second = String.valueOf( cal.get(Calendar.SECOND) );
+        if(second.length()==1) { second = "0" + second; }
+        String dateStamp = hour + ":" + minute + ":" + second;
         return dateStamp;        
     }
     
@@ -82,7 +82,7 @@ public class DateUtil {
         if(minute.length()==1) { minute = "0" + minute; }
         String second = String.valueOf( cal.get(Calendar.SECOND) );
         if(second.length()==1) { second = "0" + second; }
-        String dateStamp = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":00Z";
+        String dateStamp = year + "-" + month + "-" + day + "T" + hour + ":" + minute + ":" + second + "Z";
         return dateStamp;        
     }
     

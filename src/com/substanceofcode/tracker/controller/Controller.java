@@ -231,6 +231,11 @@ public class Controller {
     }
     
     private void disconnect(){
+        // First, we have to set the status to "STOPPED", because otherwise
+        // the GpsDevice thread tries to reconnect when gpsDevice.disconnect()
+        // is called
+        status = STATUS_STOPPED;
+        
         try {
             // Disconnect from GPS
             gpsDevice.disconnect();
@@ -238,8 +243,6 @@ public class Controller {
             showError("Error while disconnecting from GPS device: " + 
                       e.toString(), Alert.FOREVER, getTrailCanvas());
         }
-
-        status = STATUS_STOPPED;
     }
 
     /** Get waypoints */
@@ -253,6 +256,8 @@ public class Controller {
             waypoints = new Vector();
         }
         waypoints.addElement(waypoint);
+        
+        saveWaypoints();  // Save waypoints immediately to RMS
     }
 
     public void saveTrail(){
@@ -501,6 +506,7 @@ public class Controller {
                 return;
             }
         }
+        saveWaypoints();  // Save waypoints immediately to RMS
     }
 
     /** Save waypoints to persistent storage */

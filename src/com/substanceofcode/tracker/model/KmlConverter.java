@@ -1,7 +1,7 @@
 /*
  * KmlConverter.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2007 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@ import java.util.Vector;
  *
  * @author Tommi Laukkanen
  * @author barryred
+ * @author Mario Sansone
  */
 public class KmlConverter implements TrackConverter {
     
@@ -85,7 +86,7 @@ public class KmlConverter implements TrackConverter {
         Enumeration trackEnum = track.getTrailPoints().elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
-            trackString.append(String.valueOf(pos.longitude)).append(",").append(String.valueOf(pos.latitude)).append("\r\n");
+            trackString.append(formatDegrees(pos.longitude)).append(",").append(formatDegrees(pos.latitude)).append("\r\n");
         }
         trackString.append("</coordinates>\r\n");
         
@@ -116,7 +117,7 @@ public class KmlConverter implements TrackConverter {
             waypointString.append("<Placemark>\r\n");
             waypointString.append("<name>").append(wp.getName()).append("</name>\r\n");
             waypointString.append("<Point><coordinates>\r\n");
-            waypointString.append(String.valueOf(wp.getLongitude())).append(",").append(String.valueOf(wp.getLatitude())).append(",0\r\n");
+            waypointString.append(formatDegrees(wp.getLongitude())).append(",").append(formatDegrees(wp.getLatitude())).append(",0\r\n");
             waypointString.append("</coordinates></Point>\r\n");
             waypointString.append("</Placemark>\r\n");
         }
@@ -158,7 +159,7 @@ public class KmlConverter implements TrackConverter {
             markerString.append("</Icon>\r\n");
             markerString.append("</IconStyle>\r\n");
             markerString.append("<Point><coordinates>\r\n");
-            markerString.append(String.valueOf(pos.longitude)).append(",").append(String.valueOf(pos.latitude)).append(",0\r\n");
+            markerString.append(formatDegrees(pos.longitude)).append(",").append(formatDegrees(pos.latitude)).append(",0\r\n");
             markerString.append("</coordinates></Point>\r\n");
             markerString.append("</Placemark>\r\n");
         }
@@ -189,7 +190,7 @@ public class KmlConverter implements TrackConverter {
         markerString.append("</IconStyle>\r\n");
         markerString.append("</Style>\r\n");
         markerString.append("<Point><coordinates>\r\n");
-        markerString.append(String.valueOf(startPosition.longitude)).append(",").append(String.valueOf(startPosition.latitude)).append(",0\r\n");
+        markerString.append(formatDegrees(startPosition.longitude)).append(",").append(formatDegrees(startPosition.latitude)).append(",0\r\n");
         markerString.append("</coordinates></Point>\r\n");
         markerString.append("</Placemark>\r\n");
         
@@ -224,13 +225,18 @@ public class KmlConverter implements TrackConverter {
         markerString.append("</IconStyle>\r\n");
         markerString.append("</Style>\r\n");
         markerString.append("<Point><coordinates>\r\n");
-        markerString.append(String.valueOf(endPosition.longitude)).append(",").append(String.valueOf(endPosition.latitude)).append(",0\r\n");
+        markerString.append(formatDegrees(endPosition.longitude)).append(",").append(formatDegrees(endPosition.latitude)).append(",0\r\n");
         markerString.append("</coordinates></Point>\r\n");
         markerString.append("</Placemark>\r\n");
         
         // Close the start/end folder
         markerString.append("</Folder>\r\n");
         return markerString;
+    }
+    
+    /** Formats the degrees with maximal 6 digits after the decimal point */
+    private String formatDegrees(double degrees) {
+        return String.valueOf(((int)(degrees * 1000000)) / 1000000.0);
     }
     
 }
