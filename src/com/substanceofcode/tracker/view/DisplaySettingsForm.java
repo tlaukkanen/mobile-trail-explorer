@@ -101,11 +101,13 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             boolean showHeading = displayGroup.isSelected(2);
             boolean showAltitude = displayGroup.isSelected(3);
             boolean showDistance = displayGroup.isSelected(4);
+            boolean showTime = displayGroup.isSelected(5);
             settings.setDisplayValue(RecorderSettings.DISPLAY_COORDINATES, showCoordinates);
             settings.setDisplayValue(RecorderSettings.DISPLAY_SPEED, showSpeed);
             settings.setDisplayValue(RecorderSettings.DISPLAY_HEADING, showHeading);
             settings.setDisplayValue(RecorderSettings.DISPLAY_ALTITUDE, showAltitude);
             settings.setDisplayValue(RecorderSettings.DISPLAY_DISTANCE, showDistance);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_TIME, showTime);
 
             /** 5. Save the number of position to draw value. */
             settings.setNumberOfPositionToDraw(Integer.parseInt(drawingLimitField.getString()));
@@ -142,8 +144,9 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         }
         this.append(unitGroup);
 
-        String[] displayItems = { "Coordinates", "Speed", "Heading",
-                "Altitude", "Distance" };
+        String[] displayItems = { 
+            "Coordinates", "Speed", "Heading",
+            "Altitude", "Distance", "Time" };
         displayGroup = new ChoiceGroup("Display the following",
                 ChoiceGroup.MULTIPLE, displayItems, null);
 
@@ -162,6 +165,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         boolean showDistance = settings
                 .getDisplayValue(RecorderSettings.DISPLAY_DISTANCE);
         displayGroup.setSelectedIndex(4, showDistance);
+        boolean showTime = settings
+                .getDisplayValue(RecorderSettings.DISPLAY_TIME);
 
         this.append(displayGroup);
         

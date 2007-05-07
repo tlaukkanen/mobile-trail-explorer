@@ -11,6 +11,9 @@ Dave Walsh
 
 Release Notes:
 
+v1.6 (??? 2007)
++ Display current time (Issue 37)
+
 v1.5 (April 28th 2007)
 + Autosuggest waypoint name (Issue 12)
 + Added ability to 'Force' screen's backlight to stay on (Issue 21)

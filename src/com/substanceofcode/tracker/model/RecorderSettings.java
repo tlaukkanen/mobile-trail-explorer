@@ -60,6 +60,7 @@ public class RecorderSettings {
     /** Display setting keys */
     public static final String DISPLAY_COORDINATES = "display-coordinates";
     public static final String DISPLAY_SPEED = "display-speed";
+    public static final String DISPLAY_TIME = "display-time";
     public static final String DISPLAY_HEADING = "display-heading";
     public static final String DISPLAY_ALTITUDE = "display-altitude";
     public static final String DISPLAY_DISTANCE = "display-distance";

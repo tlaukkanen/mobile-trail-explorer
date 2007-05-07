@@ -408,11 +408,16 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             int displayRow = 1;
 
             RecorderSettings settings = controller.getSettings();
+            
+            Date now = Calendar.getInstance().getTime();
+            
+            /** Draw current time */
+
 
             /** Draw coordinates information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES) == true) {
                 g.drawString("LAT:", 1, fontHeight, Graphics.TOP | Graphics.LEFT);
-                g.drawString("LON:", 1, fontHeight * 2, Graphics.TOP | Graphics.LEFT);
+                g.drawString("LON:", 1, fontHeight*2, Graphics.TOP | Graphics.LEFT);
 
                 double latitude = lastPosition.latitude;
                 g.drawString(
@@ -428,6 +433,14 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
 
                 displayRow += 2;
             }
+
+            /** Draw current time */
+            if( settings.getDisplayValue(RecorderSettings.DISPLAY_TIME) == true) {
+                String timeStamp = DateUtil.convertToTimeStamp(now);
+                g.drawString("TME:", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(timeStamp, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                displayRow++;
+            }            
 
             /** Draw speed information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_SPEED) == true) {
@@ -501,7 +514,6 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                 displayRow++;
             }
 
-            Date now = Calendar.getInstance().getTime();
             long secondsSinceLastPosition;
             secondsSinceLastPosition = (now.getTime() - lastPosition.date.getTime()) / 1000;
             if (secondsSinceLastPosition > 5) {
