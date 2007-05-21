@@ -60,6 +60,9 @@ public class GpxConverter implements TrackConverter {
             //String alt = String.valueOf( pos.altitude );
             gpx.append("<trkpt lat=\"").append(lat).append("\" lon=\"").append(lon).append("\">\r\n");
             
+            // Create altitude
+            gpx.append("<ele>").append(String.valueOf(pos.altitude)).append("</ele>\r\n");
+            
             // Create time stamp
             Date date = pos.date;
             String universalDateStamp = DateUtil.getUniversalDateStamp( date );

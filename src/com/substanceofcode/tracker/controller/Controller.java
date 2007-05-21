@@ -59,6 +59,7 @@ public class Controller {
     private Vector waypoints;
     private RecorderSettings settings;  
     private Backlight backlight;
+    private Track ghostTrail;
 
     /** Screens and Forms */
     private MIDlet midlet;
@@ -594,6 +595,15 @@ public class Controller {
         }
     }
 
+    /** Get ghost trail */
+    public Track getGhostTrail() {
+        return ghostTrail;
+    }
+    
+    /** Set ghost trail */
+    public void setGhostTrail(Track ghostTrail) {
+        this.ghostTrail = ghostTrail;
+    }
 
 
 }

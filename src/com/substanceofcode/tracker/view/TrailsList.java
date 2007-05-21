@@ -20,7 +20,7 @@ public class TrailsList extends List implements CommandListener{
     private final Command showDetailsCommand;
     private final Command newTrailCommand;
     private final Command backCommand;
-    
+    private final Command useAsGhostTrailCommand;    
     
     private final Controller controller;
     
@@ -35,6 +35,7 @@ public class TrailsList extends List implements CommandListener{
         this.addCommand(deleteCommand = new Command("Delete", Command.ITEM, 3));
         this.addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
         this.addCommand(newTrailCommand = new Command("New Trail", Command.ITEM, 5));
+        this.addCommand(useAsGhostTrailCommand = new Command("Use as ghost trail", Command.ITEM, 6));
         this.addCommand(backCommand = new Command("Cancel", Command.BACK, 10));
 
         this.refresh();
@@ -85,6 +86,7 @@ public class TrailsList extends List implements CommandListener{
             }else if(command == showDetailsCommand){
                 final String selectedTrailName = this.getString(this.getSelectedIndex());
                 controller.showTrailDetails(selectedTrailName);
+                
             }else if(command == saveCurrentCommand){
                 controller.saveTrail();
                 this.refresh();
@@ -101,6 +103,18 @@ public class TrailsList extends List implements CommandListener{
                             "the Trail from the RMS!  " +  e.toString(), 5, this);
                 }
                 this.refresh();
+            }else if(command ==  this.useAsGhostTrailCommand) {
+                try {
+                    String selectedTrailName = this.getString(this.getSelectedIndex());
+                    Track selectedTrail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
+                    if(selectedTrail!=null) {
+                        controller.setGhostTrail(selectedTrail);
+                    }
+                    controller.showTrail();
+                } catch(IOException e) {
+                    controller.showError("ERROR! An Exception was thrown when attempting to set ghost " +
+                            "trail from the RMS!  " +  e.toString(), 5, this);
+                }
             }
         }
         

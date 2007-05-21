@@ -156,6 +156,9 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
         /** Draw waypoints */
         drawWaypoints(g);
 
+        /** Draw ghost trail */
+        drawGhostTrail(g);
+        
         /** Draw trail */
         drawTrail(g);
 
@@ -230,6 +233,51 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
 
         CanvasPoint point = new CanvasPoint(x, y);
         return point;
+    }
+    
+    /** Draw ghost trail */
+    private void drawGhostTrail(Graphics g) {
+        try {
+            Track ghostTrail = controller.getGhostTrail();
+            if(ghostTrail==null) {
+                return;
+            }
+            
+            g.setColor(180,180,180);
+            
+            // TODO: implement the drawing based soely on numPositions. 
+            final int numPositions = controller.getSettings().getNumberOfPositionToDraw();
+            
+            int positionCount = ghostTrail.getTrailPoints().size();
+            int increment = (int)positionCount/numPositions;
+            if(increment<1) {
+                increment = 1;
+            }
+            Vector points = ghostTrail.getTrailPoints();
+            double lastLatitude = ghostTrail.getStartPosition().latitude;
+            double lastLongitude = ghostTrail.getStartPosition().longitude;
+            for(int index=1; index<points.size(); index+=increment) {
+                GpsPosition pos = (GpsPosition) points.elementAt(index);
+                
+                double lat = pos.latitude;
+                double lon = pos.longitude;
+                CanvasPoint point1 = convertPosition(lat, lon);
+                CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
+
+                g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
+
+                lastLatitude = pos.latitude;
+                lastLongitude = pos.longitude;                
+            }
+            
+            
+            
+            
+            
+            
+        } catch(Exception ex) {
+            Logger.getLogger().log("Exception occured while drawing ghost trail: " + ex.toString(), Logger.WARNING);
+        }
     }
 
     /** Draw trail */

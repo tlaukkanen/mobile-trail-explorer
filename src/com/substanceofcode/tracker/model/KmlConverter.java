@@ -86,7 +86,12 @@ public class KmlConverter implements TrackConverter {
         Enumeration trackEnum = track.getTrailPoints().elements();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
-            trackString.append(formatDegrees(pos.longitude)).append(",").append(formatDegrees(pos.latitude)).append("\r\n");
+            trackString.append(formatDegrees(pos.longitude))
+                .append(",")
+                .append(formatDegrees(pos.latitude))
+                .append(",")
+                .append((int)pos.altitude)
+                .append("\r\n");
         }
         trackString.append("</coordinates>\r\n");
         
