@@ -62,7 +62,7 @@ public final class AboutScreen extends Canvas {
     private static final Font DEFAULT_SIMPLE_FONT = Font.getDefaultFont();
 
     private static final String[] aboutText = { "Mobile Trail Explorer,",
-	    "Version: 1.6", "Copyright (C) 2005-2007", "Tommi Laukkanen",
+	    "Version: 1.6 Beta 1", "Copyright (C) 2005-2007", "Tommi Laukkanen",
 	    "", "Licensed under the GPL", "", "For more information visit:",
 	    "www.substanceofcode.com" };
 

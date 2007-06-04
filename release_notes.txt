@@ -11,8 +11,11 @@ Dave Walsh
 
 Release Notes:
 
-v1.6 (??? 2007)
+v1.6 (June ??th 2007)
 + Display current time (Issue 37)
++ Fix for invalid KML (Issue 38)
++ Display ghost trail (Issue 33)
++ Altitude is exported to both KML and GPX files (Issue 34)
 
 v1.5 (April 28th 2007)
 + Autosuggest waypoint name (Issue 12)

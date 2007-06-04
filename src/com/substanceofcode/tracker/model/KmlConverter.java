@@ -59,12 +59,6 @@ public class KmlConverter implements TrackConverter {
         trackString.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
         trackString.append("<kml xmlns=\"http://earth.google.com/kml/2.0\">\r\n");
         
-        /** Define styles */
-        trackString.append("<Style id=\"startpoint\">\r\n");
-        trackString.append("</Style>\r\n");
-        trackString.append("<Style id=\"endpoint\">\r\n");
-        trackString.append("</Style>\r\n");
-        
         trackString.append("<Folder>\r\n");
         trackString.append("<name>").append(dateStamp).append("</name>\r\n");
         trackString.append("<Style id=\"style\">\r\n");

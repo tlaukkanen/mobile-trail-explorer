@@ -93,6 +93,8 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
         if(satellites!=null) {
             int satelliteIndex = 0;
             Enumeration satelliteEnum = satellites.elements();
+            int lineStartPos = smallRowFont.stringWidth("sat 000");
+            
             while(satelliteEnum.hasMoreElements()) {
                 final GpsSatellite satellite = (GpsSatellite)satelliteEnum.nextElement();
                 final String id = "sat " + satellite.getNumber();
@@ -115,8 +117,12 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
                     // snr >= 100, again don't think it should ever be so, but just 
                     // leave the line Black to indicate an error.
                 }
-                g.setColor(lineColor);
+                
+                double signal = (this.getWidth() - (5+lineStartPos)) * (snr/100.0);
+                
+                g.setColor(lineColor);                
                 g.drawString( id, 5,yPos + (satelliteIndex*g.getFont().getHeight()),Graphics.LEFT|Graphics.TOP);
+                g.fillRect( 5 + lineStartPos, yPos+(satelliteIndex*g.getFont().getHeight()), (int)signal, smallRowFont.getHeight());
                 satelliteIndex++;
             }
         } else {
