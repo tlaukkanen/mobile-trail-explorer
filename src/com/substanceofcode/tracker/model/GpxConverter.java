@@ -72,6 +72,9 @@ public class GpxConverter implements TrackConverter {
         }
         gpx.append("</trkseg>\r\n</trk>\r\n");
         
+        // Create waypoints
+        gpx.append( createWaypoints(waypoints) );
+        
         // Finalize the GPX
         gpx.append("</gpx>\r\n");
         return gpx.toString();
@@ -80,6 +83,25 @@ public class GpxConverter implements TrackConverter {
     /** Formats the degrees with maximal 6 digits after the decimal point */
     private String formatDegrees(double degrees) {
         return String.valueOf(((int)(degrees * 1000000)) / 1000000.0);
+    }
+
+    /** Export waypoints to GPX format */
+    private String createWaypoints(Vector waypoints) {
+        StringBuffer gpx = new StringBuffer();
+        
+        Enumeration waypointEnum = waypoints.elements();
+        while( waypointEnum.hasMoreElements() ) {
+            Waypoint wp = (Waypoint)waypointEnum.nextElement();
+            String lat = formatDegrees( wp.getLatitude() );
+            String lon = formatDegrees( wp.getLongitude() );
+            String name = wp.getName();
+            
+            gpx.append("<wpt lat=\"").append(lat).append("\" lon=\"").append(lon).append("\">");
+            gpx.append("<name>").append(name).append("</name>");
+            gpx.append("</wpt>");
+        }
+        
+        return gpx.toString();
     }
     
 }

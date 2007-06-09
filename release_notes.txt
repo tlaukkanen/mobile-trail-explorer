@@ -16,6 +16,7 @@ v1.6 (June ??th 2007)
 + Fix for invalid KML (Issue 38)
 + Display ghost trail (Issue 33)
 + Altitude is exported to both KML and GPX files (Issue 34)
++ Waypoints are exported to GPX files (Issue 34)
 
 v1.5 (April 28th 2007)
 + Autosuggest waypoint name (Issue 12)

@@ -133,11 +133,8 @@ public class StringUtil {
         while (valueString.length() < decimalCount) {
             valueString = "0" + valueString;
         }
-        String stringValue = String.valueOf(integerValue) + "." + valueString;
-        if( value<0 ) {
-            stringValue = "-" + stringValue;
-        }
-        return stringValue;
+        return (value < 0 ? "-" : "") + 
+            String.valueOf(Math.abs(integerValue)) + "." + valueString;
     }
 
 }
