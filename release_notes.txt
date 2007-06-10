@@ -11,7 +11,7 @@ Dave Walsh
 
 Release Notes:
 
-v1.6 (June ??th 2007)
+v1.6 (June 10th 2007)
 + Display current time (Issue 37)
 + Fix for invalid KML (Issue 38)
 + Display ghost trail (Issue 33)
