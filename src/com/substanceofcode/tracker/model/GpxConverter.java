@@ -46,8 +46,11 @@ public class GpxConverter implements TrackConverter {
             boolean includeWaypoints, 
             boolean includeMarkers) {
         StringBuffer gpx = new StringBuffer();
-        gpx.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\r\n");
-        gpx.append("<gpx version=\"1.0\" creator=\"Mobile Trail Explorer\" xmlns=\"http://www.topografix.com/GPX/1/0\">\r\n");
+        gpx.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        gpx.append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\" creator=\"Mobile Trail Explorer\">\r\n");
+
+        // Create waypoints
+        gpx.append( createWaypoints(waypoints) );
         
         // Create trail
         gpx.append("<trk>\r\n<trkseg>\r\n");
@@ -72,9 +75,6 @@ public class GpxConverter implements TrackConverter {
         }
         gpx.append("</trkseg>\r\n</trk>\r\n");
         
-        // Create waypoints
-        gpx.append( createWaypoints(waypoints) );
-        
         // Finalize the GPX
         gpx.append("</gpx>\r\n");
         return gpx.toString();
@@ -96,9 +96,10 @@ public class GpxConverter implements TrackConverter {
             String lon = formatDegrees( wp.getLongitude() );
             String name = wp.getName();
             
-            gpx.append("<wpt lat=\"").append(lat).append("\" lon=\"").append(lon).append("\">");
-            gpx.append("<name>").append(name).append("</name>");
-            gpx.append("</wpt>");
+            gpx.append("<wpt lat=\"").append(lat).append("\" lon=\"").append(lon).append("\">\r\n");
+            gpx.append(" <name>").append(name).append("</name>\r\n");
+            gpx.append(" <sym>Waypoint</sym>\r\n");
+            gpx.append("</wpt>\r\n");
         }
         
         return gpx.toString();
