@@ -47,8 +47,7 @@ import javax.microedition.lcdui.game.Sprite;
  * @author Mario Sansone
  */
 public class TrailCanvas extends BaseCanvas implements Runnable {
-
-    private Controller controller;
+	
     private GpsPosition lastPosition;
     //private Vector positionTrail;
 
@@ -74,7 +73,6 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(Controller controller, GpsPosition initialPosition) {
         super(controller);
-        this.controller = controller;
         this.lastPosition = initialPosition;
 
         //positionTrail = new Vector();
@@ -173,16 +171,6 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
     public void setLastPosition(GpsPosition position) {
         this.lastPosition = position;
     }
-
-    /*
-     public void setPositionTrail(Track track) {
-     if(track != null){
-     this.positionTrail = track.getTrailPoints();
-     }else{
-     this.positionTrail = new Vector();
-     }
-     }
-     */
 
     /** Draw waypoints */
     private void drawWaypoints(Graphics g) {
@@ -361,7 +349,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
     }
 
     /** Draw compass */
-    private void drawCompass(Graphics g) {
+    protected void drawCompass(Graphics g) {
         if (lastPosition != null) {
             int fix = 10;
             if (largeDisplay) {
@@ -635,6 +623,10 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
         while (true) {
             try {
                 Thread.sleep(1000);
+            	if(controller.getCurrentScreen() != this){
+            		// Not currently being displayed, so do nothing.
+            		continue;
+            	}
                 if(controller.getStatusCode() != Controller.STATUS_RECORDING){
                     this.repaint();
                     continue;
@@ -644,31 +636,6 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                     this.lastPosition = controller.getPosition();   
                 }
                 this.repaint();
-
-                //counter++;
-                // GpsPosition currentPosition = controller.getPosition();
-
-                /*
-                 if(currentPosition!=null) {
-                 boolean stopped = false;
-                 if( lastRecordedPosition!=null ) {
-                 stopped = currentPosition.equals( lastRecordedPosition );
-                 }
-                 lastPosition = currentPosition;
-                 
-                 /** Create trail if user have moved *
-                 if(counter%5==0 && !stopped) {
-                 positionTrail.addElement( lastPosition );
-                 lastRecordedPosition = currentPosition;
-                 while(positionTrail.size()>150) {
-                 for(int removeIndex=1; removeIndex<150; removeIndex+=2){
-                 positionTrail.removeElementAt(removeIndex);
-                 }
-                 }
-                 } *
-                 } 
-                this.repaint(); 
-                */
             } catch (Exception ex) {
                 Logger.getLogger().log("Error in TrailCanvas.run(): " + ex.toString(), Logger.WARNING);
                 error = ex.toString();

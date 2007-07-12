@@ -64,6 +64,7 @@ public class Controller {
     /** Screens and Forms */
     private MIDlet midlet;
     private TrailCanvas trailCanvas;
+    private ElevationCanvas elevationCanvas;
     private SplashCanvas splashCanvas;
     private DeviceList deviceList;
     private AboutScreen aboutScreen;
@@ -350,7 +351,7 @@ public class Controller {
         display.setCurrent(getTrailCanvas());
     }
 
-    private TrailCanvas getTrailCanvas() {
+    public TrailCanvas getTrailCanvas() {
         if (trailCanvas == null) {
             GpsPosition initialPosition = null;
             try {
@@ -360,6 +361,18 @@ public class Controller {
             trailCanvas = new TrailCanvas(this, initialPosition);
         }
         return trailCanvas;
+    }
+    
+    private ElevationCanvas getElevationCanvas() {
+    	if(elevationCanvas == null) {
+    		GpsPosition initialPosition = null;
+    		try{
+    			initialPosition = this.recorder.getPositionFromRMS();
+    		}catch(Exception anyException){ /* discard */
+    		}
+    		elevationCanvas = new ElevationCanvas(this, initialPosition);
+    	}
+    	return elevationCanvas;
     }
 
     /** Show splash canvas */
@@ -445,6 +458,7 @@ public class Controller {
         if(track != null){
             this.recorder.setTrack(track);
             this.trailCanvas.setLastPosition(track.getEndPosition());
+            this.elevationCanvas.setLastPosition(track.getEndPosition());
             //this.trailCanvas.setPositionTrail(track);
         }else{
             this.recorder.clearTrack();
@@ -571,21 +585,26 @@ public class Controller {
         }
     }
 
+    public void setCurrentScreen(Displayable displayable){
+    	display.setCurrent(displayable);
+    }
+    
     public Displayable getCurrentScreen() {
         return this.display.getCurrent();
     }
 
     public void switchDisplay() {
         if(screens==null) {
-            screens = new BaseCanvas[4];
+            screens = new BaseCanvas[5];
             screens[0] = getTrailCanvas();
-            screens[1] = new InformationCanvas( this );
-            screens[2] = new WaypointCanvas( this );
-            screens[3] = new SatelliteCanvas( this );
+            screens[1] = getElevationCanvas();
+            screens[2] = new InformationCanvas( this );
+            screens[3] = new WaypointCanvas( this );
+            screens[4] = new SatelliteCanvas( this );
         }
         
         currentDisplayIndex++;
-        if(currentDisplayIndex>3) {
+        if(currentDisplayIndex>4) {
             currentDisplayIndex = 0;
         }
         

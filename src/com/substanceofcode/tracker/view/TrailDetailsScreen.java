@@ -22,6 +22,7 @@ public class TrailDetailsScreen extends Form implements CommandListener{
     private final Command deleteCommand;
     private final Command saveCommand;
     private final Command loadCommand;
+    private final Command exportCommand;
     
     private final TextField titleBox;
     
@@ -35,7 +36,8 @@ public class TrailDetailsScreen extends Form implements CommandListener{
         this.addCommand(saveCommand = new Command("Save", Command.OK, 1));
         this.addCommand(deleteCommand = new Command("Delete", Command.ITEM, 2));
         this.addCommand(loadCommand = new Command("Load", Command.ITEM, 3));
-        this.addCommand(backCommand = new Command("Back", Command.BACK, 4));
+        this.addCommand(exportCommand = new Command("Export Track", Command.ITEM, 4));
+        this.addCommand(backCommand = new Command("Back", Command.BACK, 10));
         this.setCommandListener(this);
 
         trail = new Track(FileSystem.getFileSystem().getFile(trailName));
@@ -96,6 +98,18 @@ public class TrailDetailsScreen extends Form implements CommandListener{
                             "the Trail from the RMS!  " +  e.toString(), 5, this);
                     e.printStackTrace();
                 }
+            }else if(command == exportCommand ){
+                final String selectedTrailName = this.getTitle();
+            	try {
+					final Track trail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
+					final TrailActionsForm taf = new TrailActionsForm(controller, trail, this.getTitle());
+					controller.setCurrentScreen(taf);
+					
+				} catch (IOException e) {
+					controller.showError("ERROR! An Exception was thrown when attempting to export " +
+                            "the Trail from the RMS!  " +  e.toString(), 5, this);
+                    e.printStackTrace();
+				}
             }
         }
     }

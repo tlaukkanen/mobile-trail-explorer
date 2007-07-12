@@ -24,7 +24,6 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
-import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;

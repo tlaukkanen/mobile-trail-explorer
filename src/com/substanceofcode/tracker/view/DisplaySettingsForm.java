@@ -167,7 +167,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         displayGroup.setSelectedIndex(4, showDistance);
         boolean showTime = settings
                 .getDisplayValue(RecorderSettings.DISPLAY_TIME);
-
+        displayGroup.setSelectedIndex(5, showTime);
+        
         this.append(displayGroup);
         
         drawingLimitField = new TextField("Max Position To Draw", "" + settings.getNumberOfPositionToDraw(), 10, TextField.NUMERIC);

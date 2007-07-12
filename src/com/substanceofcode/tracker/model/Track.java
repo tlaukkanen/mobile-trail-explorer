@@ -114,7 +114,7 @@ public class Track implements Serializable{
             String folder, 
             Vector waypoints,
             boolean useKilometers,
-            int exportFormat) 
+            int exportFormat, String filename) 
             throws Exception {
                 
         TrackConverter converter = null;
@@ -127,12 +127,14 @@ public class Track implements Serializable{
             extension = ".gpx";
         }
         
-        String dateStamp = DateUtil.getCurrentDateStamp();
+        if(filename == null){
+        	filename = DateUtil.getCurrentDateStamp();
+        }
         FileConnection connection;
         try {
             folder = folder + (folder.endsWith("/") ? "" : "/");
             connection = (FileConnection)
-                    Connector.open("file:///" + folder + "track_" + dateStamp + extension, Connector.WRITE );
+                    Connector.open("file:///" + folder + "track_" + filename + extension, Connector.WRITE );
         } catch(Exception ex) {
             throw new Exception("writeToFile: Open Connector: " + ex.toString());
         }

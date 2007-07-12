@@ -65,6 +65,12 @@ public class RecorderSettings {
     public static final String DISPLAY_ALTITUDE = "display-altitude";
     public static final String DISPLAY_DISTANCE = "display-distance";
     
+    /** Trail Saving Keys */
+    public static final String EXPORT_TO_KML = "export-to-kml";
+    public static final String EXPORT_TO_GPX = "export-to-gpx";
+    public static final String EXPORT_TO_SAVE = "export-to-save";
+    
+    
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
         try {
@@ -235,6 +241,33 @@ public class RecorderSettings {
     public void setBacklightOn(boolean value){
     	settings.setBooleanProperty(BACKLIGHT, value);
         saveSettings();
+    }
+    
+    public boolean getExportToKML(){
+    	return settings.getBooleanProperty(EXPORT_TO_KML, true);
+    }
+    
+    public void setExportToKML(boolean value){
+    	settings.setBooleanProperty(EXPORT_TO_KML, value);
+    	saveSettings();
+    }
+    
+    public boolean getExportToGPX(){
+    	return settings.getBooleanProperty(EXPORT_TO_GPX, true);
+    }
+    
+    public void setExportToGPX(boolean value){
+    	settings.setBooleanProperty(EXPORT_TO_GPX, value);
+    	saveSettings();
+    }
+    
+    public boolean getExportToSave(){
+    	return settings.getBooleanProperty(EXPORT_TO_SAVE, false);
+    }
+    
+    public void setExportToSave(boolean value){
+    	settings.setBooleanProperty(EXPORT_TO_SAVE, value);
+    	saveSettings();
     }
     
     /** Save settings */

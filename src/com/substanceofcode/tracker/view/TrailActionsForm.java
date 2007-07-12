@@ -40,31 +40,94 @@ import com.substanceofcode.tracker.model.Track;
  * This dialog is used to ask the user which actions should be performed
  * for the current recorded trail.
  *
+ * This will also be showen when user wants to export a 'saved' trail, but without 
+ * the 'save' option.
+ *
  * @author Mario Sansone
  */
 public class TrailActionsForm extends Form implements CommandListener {
     
+	private static final String[] ALL_ACTIONS = {"Export to KML", "Export to GPX", "Save Trail"}; 
+	
     private Controller controller;
     
     private Command okCommand;
 
     private ChoiceGroup actionsGroup;
     
+    private final boolean saveIsAnOption;
+    
+    private final Track track;
+    private final String trackName;
+    
     /** Creates a new instance of TrailActionsForm */
     public TrailActionsForm(Controller controller) {
         super("Trail Actions");
-        this.controller = controller;
-        initializeCommands();        
-        initializeControls();
-        this.setCommandListener(this);
+        this.saveIsAnOption = true;
+        this.track = null;
+        this.trackName = null;
+        this.initialize(controller);
+    }
+    
+    /** 
+     * Creates a new instance of TrailActionForm for when
+     * exporting from a 'saved' Trail.
+     */
+    public TrailActionsForm(Controller controller, Track track, String trackName){
+    	super("Trail Actions");
+    	this.saveIsAnOption = false;
+    	this.track = track;
+    	this.trackName = trackName;
+    	this.initialize(controller);
+    }
+    
+    /**
+     * The common core function for initializing all TrailActionForms
+     *
+     */
+    private void initialize(Controller controller){
+    	this.controller = controller;
+    	this.initializeCommands();
+    	this.initializeControls();
+    	this.setCommandListener(this);
     }
 
     /** Initialize commands */
     private void initializeCommands() {
-        okCommand = new Command("OK", Command.SCREEN, 1);
-        this.addCommand( okCommand );
+        this.addCommand( okCommand = new Command("OK", Command.SCREEN, 1));
     }
+    
+    /** Initialize form controls */
+    private void initializeControls() {
+        final int numActions;
+        if(saveIsAnOption){
+        	numActions = 3;
+        }else{
+        	numActions = 2;
+        }
+        final String[] actions = new String[numActions];
+        final boolean kml = Controller.getController().getSettings().getExportToKML();
+        final boolean gpx = Controller.getController().getSettings().getExportToGPX();
+        final boolean save = Controller.getController().getSettings().getExportToSave();
+        final boolean[] allSelectedFlags = {kml, gpx, save};
+        boolean[] selectedFlags = new boolean[numActions];
+        for(int i = 0; i < actions.length; i++){
+        	actions[i] = ALL_ACTIONS[i];
+        	selectedFlags[i] = allSelectedFlags[i];
+        }
+       
+        actionsGroup = new ChoiceGroup(
+                "Please select the next actions for the current trail. Multiple " +
+                "actions are possible:",
+                ChoiceGroup.MULTIPLE, 
+                actions, 
+                null);
+        
+        actionsGroup.setSelectedFlags( selectedFlags );
 
+        this.append(actionsGroup);
+    }
+    
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
         if(command == okCommand) {     
@@ -78,44 +141,40 @@ public class TrailActionsForm extends Form implements CommandListener {
             if (actionsGroup.isSelected(1)) {
                 exportTrail(RecorderSettings.EXPORT_FORMAT_GPX);
             }
-            if (actionsGroup.isSelected(2)) {
+            if (saveIsAnOption && actionsGroup.isSelected(2)) {
                 controller.saveTrail();
             }
-
-            // After doing all actions, we return to the normal Trail screen
-            controller.showTrail();
+            
+            // After doing all actions, we return to the normal previous Screen
+            goBack();
         }
-    }
-
-    /** Initialize form controls */
-    private void initializeControls() {
-        String[] actions = {"Export to KML", "Export to GPX", "Save Trail"};
-        actionsGroup = new ChoiceGroup(
-                "Please select the next actions for the current trail. Multiple " +
-                "actions are possible:",
-                ChoiceGroup.MULTIPLE, 
-                actions, 
-                null);
-        // Set default both KML and GPX exporting as default
-        boolean[] selectedFlags = {true, true, false};
-        actionsGroup.setSelectedFlags( selectedFlags );
-
-        this.append(actionsGroup);
     }
     
     /** Export the current recorded trail to a file with the specified format */
     private void exportTrail(int exportFormat) {
         try {
             RecorderSettings settings = controller.getSettings();
-            Track recordedTrack = controller.getTrack();
+            final Track recordedTrack;
+            if(saveIsAnOption){
+            	recordedTrack = controller.getTrack();
+            }else{
+            	recordedTrack = track;
+            }
             Vector waypoints = controller.getWaypoints();
             boolean useKilometers = settings.getUnitsAsKilometers();
             String exportFolder = settings.getExportFolder();
-            recordedTrack.writeToFile(exportFolder, waypoints, useKilometers, exportFormat);
+            recordedTrack.writeToFile(exportFolder, waypoints, useKilometers, exportFormat, trackName);
         } catch (Exception ex) {
             Logger.getLogger().log(ex.toString(), Logger.WARNING);
             controller.showError(ex.toString(), Alert.FOREVER, this);
         }
     }
     
+    private void goBack(){
+    	if(saveIsAnOption){
+    		controller.showTrail();
+    	}else{
+    		controller.showTrailsList();
+    	}
+    }
 }
