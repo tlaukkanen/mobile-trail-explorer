@@ -130,16 +130,24 @@ public class TrailActionsForm extends Form implements CommandListener {
     
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if(command == okCommand) {     
+        if(command == okCommand) {
+            
+            Track recordedTrack;
+            if(saveIsAnOption){
+            	recordedTrack = controller.getTrack();
+            }else{
+            	recordedTrack = track;
+            }
+            
             // Do specified actions for this trail:
             // 0 = Export trail to KML file
             // 1 = Export trail to GPX file
             // 2 = Save trail to the RMS
             if (actionsGroup.isSelected(0)) {
-                exportTrail(RecorderSettings.EXPORT_FORMAT_KML);
+                controller.exportTrail(recordedTrack, RecorderSettings.EXPORT_FORMAT_KML, trackName);
             }
             if (actionsGroup.isSelected(1)) {
-                exportTrail(RecorderSettings.EXPORT_FORMAT_GPX);
+                controller.exportTrail(recordedTrack, RecorderSettings.EXPORT_FORMAT_GPX, trackName);
             }
             if (saveIsAnOption && actionsGroup.isSelected(2)) {
                 controller.saveTrail();
@@ -147,26 +155,6 @@ public class TrailActionsForm extends Form implements CommandListener {
             
             // After doing all actions, we return to the normal previous Screen
             goBack();
-        }
-    }
-    
-    /** Export the current recorded trail to a file with the specified format */
-    private void exportTrail(int exportFormat) {
-        try {
-            RecorderSettings settings = controller.getSettings();
-            final Track recordedTrack;
-            if(saveIsAnOption){
-            	recordedTrack = controller.getTrack();
-            }else{
-            	recordedTrack = track;
-            }
-            Vector waypoints = controller.getWaypoints();
-            boolean useKilometers = settings.getUnitsAsKilometers();
-            String exportFolder = settings.getExportFolder();
-            recordedTrack.writeToFile(exportFolder, waypoints, useKilometers, exportFormat, trackName);
-        } catch (Exception ex) {
-            Logger.getLogger().log(ex.toString(), Logger.WARNING);
-            controller.showError(ex.toString(), Alert.FOREVER, this);
         }
     }
     

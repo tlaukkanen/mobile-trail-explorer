@@ -1,5 +1,6 @@
     package com.substanceofcode.tracker.view;
 
+import com.substanceofcode.data.FileIOException;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -22,6 +23,7 @@ public class TrailsList extends List implements CommandListener{
     private final Command backCommand;
     private final Command useAsGhostTrailCommand;    
     private final Command importTrailCommand;
+    private final Command exportTrailCommand;
     
     private final Controller controller;
     
@@ -38,6 +40,7 @@ public class TrailsList extends List implements CommandListener{
         this.addCommand(newTrailCommand = new Command("New Trail", Command.ITEM, 5));
         this.addCommand(useAsGhostTrailCommand = new Command("Use as ghost trail", Command.ITEM, 6));
         this.addCommand(importTrailCommand = new Command("Import a trail", Command.ITEM, 7));
+        this.addCommand(exportTrailCommand = new Command("Export trail", Command.ITEM, 8));
         this.addCommand(backCommand = new Command("Cancel", Command.BACK, 10));
 
         this.refresh();
@@ -117,11 +120,30 @@ public class TrailsList extends List implements CommandListener{
                     controller.showError("ERROR! An Exception was thrown when attempting to set ghost " +
                             "trail from the RMS!  " +  e.toString(), 5, this);
                 }
-            }else if(command  == importTrailCommand){
+            }else if(command == importTrailCommand){
             	//FIXME:
+            }else if(command == exportTrailCommand){
+                String selectedTrailName = this.getString(this.getSelectedIndex());
+                Track selectedTrail = getSelectedTrack();
+                if(selectedTrail!=null) {
+                    controller.showTrailActionsForm(selectedTrail, selectedTrailName);
+                }                
             }
         }
         
+    }
+    
+    /** Get selected track */
+    private Track getSelectedTrack() {
+        try {
+            String selectedTrailName = this.getString(this.getSelectedIndex());
+            Track selectedTrail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
+            return selectedTrail;
+        } catch (Exception ex) {
+            Logger.getLogger().log("Unable to load selected trail: " + ex.getMessage(), Logger.WARNING);
+            controller.showError("Unable to load selected trail: " + ex.getMessage(), 5, this);
+            return null;
+        }
     }
     
 

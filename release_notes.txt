@@ -7,9 +7,16 @@ Contributors:
 Mario Sansone
 Barry Redmond
 Dave Walsh
+Anthony McCormack
 
 
 Release Notes:
+
+v1.7 (August ?th 2007)
++ Satellite sky view (Issue 51)
++ Track elevation view (Issue 31)
++ Export saved trail (Issue 50)
+...
 
 v1.6 (June 10th 2007)
 + Display current time (Issue 37)

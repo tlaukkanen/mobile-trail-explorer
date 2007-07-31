@@ -21,6 +21,7 @@
 
 package com.substanceofcode.bluetooth;
 
+import com.substanceofcode.tracker.view.Logger;
 import java.io.IOException;
 import java.util.Vector;
 import javax.bluetooth.BluetoothStateException;
@@ -87,7 +88,9 @@ public class BluetoothUtility implements DiscoveryListener {
         	discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
             searchComplete = false;
         } catch (BluetoothStateException ex) {
-            System.err.println("Error in BluetoothUtility.findDevices: " + ex.toString());
+            Logger.getLogger().log(
+                "Error in BluetoothUtility.findDevices: " + ex.toString(), 
+                Logger.SEVERE);
             ex.printStackTrace();
         }
     }
@@ -112,7 +115,9 @@ public class BluetoothUtility implements DiscoveryListener {
                     name = address;
                 }
             }
-            System.out.println("Device found: " + name + " (" + address + ")");
+            Logger.getLogger().log(
+                "Device found: " + name + " (" + address + ")", 
+                Logger.INFO);
             BluetoothDevice dev = new BluetoothDevice(address, name);
             devices.addElement(dev);
         }            
@@ -125,7 +130,7 @@ public class BluetoothUtility implements DiscoveryListener {
     }
 
     public void serviceSearchCompleted(int transID, int respCode) {
-        System.out.println("Service search completed.");
+        Logger.getLogger().log("Service search completed.", Logger.INFO);
     }
 
     public void inquiryCompleted(int i) {

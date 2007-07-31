@@ -454,6 +454,11 @@ public class Controller {
         display.setCurrent(trailsList);
     }
     
+    public void showTrailActionsForm(Track trail, String trailName) {
+        TrailActionsForm form = new TrailActionsForm(this, trail, trailName);
+        
+    }
+    
     public void laodTrack(Track track){
         if(track != null){
             this.recorder.setTrack(track);
@@ -595,16 +600,17 @@ public class Controller {
 
     public void switchDisplay() {
         if(screens==null) {
-            screens = new BaseCanvas[5];
+            screens = new BaseCanvas[6];
             screens[0] = getTrailCanvas();
             screens[1] = getElevationCanvas();
             screens[2] = new InformationCanvas( this );
             screens[3] = new WaypointCanvas( this );
             screens[4] = new SatelliteCanvas( this );
+            screens[5] = new SkyCanvas( this );
         }
         
         currentDisplayIndex++;
-        if(currentDisplayIndex>4) {
+        if(currentDisplayIndex>5) {
             currentDisplayIndex = 0;
         }
         
@@ -624,5 +630,17 @@ public class Controller {
         this.ghostTrail = ghostTrail;
     }
 
+    /** Export the current recorded trail to a file with the specified format */
+    public void exportTrail(Track recordedTrack, int exportFormat, String trackName) {
+        try {
+            boolean useKilometers = settings.getUnitsAsKilometers();
+            String exportFolder = settings.getExportFolder();
+            recordedTrack.writeToFile(exportFolder, waypoints, useKilometers, exportFormat, trackName);
+        } catch (Exception ex) {
+            Logger.getLogger().log(ex.toString(), Logger.WARNING);
+            showError(ex.getMessage());
+        }
+    }    
+    
 
 }
