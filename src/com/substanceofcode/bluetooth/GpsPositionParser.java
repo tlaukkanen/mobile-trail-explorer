@@ -135,25 +135,25 @@ public class GpsPositionParser {
             try{
                 parseGPRMC(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()", Logger.WARNING);
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()", Logger.INFO2);
             }
         }else if(record.startsWith("$GPGSA")){
             try{
                 parseGPGSA(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()", Logger.WARNING);
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()", Logger.INFO2);
             }
         } else if (record.startsWith("$GPGGA")) {
             try{
                 parseGPGGA(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()", Logger.WARNING);
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()", Logger.INFO2);
             }
         } else if (record.startsWith("$GPGSV")) {
             try{
                 parseGPGSV(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()", Logger.WARNING);
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()", Logger.INFO2);
             }
         } 
         // Don't know the type, ignore and don't bother trying to parse, it'll still be logged in the Metrics, 
@@ -273,7 +273,7 @@ public class GpsPositionParser {
                 latitudeDouble = -latitudeDouble;
             }
         }else{
-            logger.log("Error with lat or long", Logger.WARNING);
+            logger.log("Error with lat or long", Logger.INFO2);
             return;
         }
 
@@ -302,7 +302,7 @@ public class GpsPositionParser {
                     latitudeDouble, speed, getLastAltitude());
             this.setGpsPosition(pos);
         } else {
-            logger.log("$GPRMC: Warning NOT A, so no position written: (" + warning + ")", Logger.FINE);
+            logger.log("$GPRMC: Warning NOT A, so no position written: (" + warning + ")", Logger.DEBUG);
         }
     }
 

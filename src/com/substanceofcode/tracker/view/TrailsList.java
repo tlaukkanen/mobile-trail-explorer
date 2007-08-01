@@ -14,6 +14,8 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Track;
 
 public class TrailsList extends List implements CommandListener{
+    
+    private ImportTrailScreen importTrailScreen;
 
     private final Command saveCurrentCommand;
     private final Command loadCommand;
@@ -51,7 +53,7 @@ public class TrailsList extends List implements CommandListener{
     
     public void refresh(){
         this.deleteAll();
-        Vector files = FileSystem.getFileSystem().listFiles(Track.TRACK_MIME_TYPE);
+        Vector files = FileSystem.getFileSystem().listFiles(new Track().getMimeType());
         this.trailsFound = files.size() != 0;
         if( ! trailsFound){
             this.append("No Trails Found", null);
@@ -121,7 +123,10 @@ public class TrailsList extends List implements CommandListener{
                             "trail from the RMS!  " +  e.toString(), 5, this);
                 }
             }else if(command == importTrailCommand){
-            	//FIXME:
+                if(importTrailScreen == null){
+                    importTrailScreen = new ImportTrailScreen(this);
+                }
+            	controller.setCurrentScreen(importTrailScreen);
             }else if(command == exportTrailCommand){
                 String selectedTrailName = this.getString(this.getSelectedIndex());
                 Track selectedTrail = getSelectedTrack();
@@ -140,7 +145,7 @@ public class TrailsList extends List implements CommandListener{
             Track selectedTrail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
             return selectedTrail;
         } catch (Exception ex) {
-            Logger.getLogger().log("Unable to load selected trail: " + ex.getMessage(), Logger.WARNING);
+            Logger.getLogger().log("Unable to load selected trail: " + ex.getMessage(), Logger.ERROR);
             controller.showError("Unable to load selected trail: " + ex.getMessage(), 5, this);
             return null;
         }

@@ -23,8 +23,13 @@
 package com.substanceofcode.tracker.model;
 
 import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.tracker.view.Logger;
+
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import java.util.Vector;
+
+import org.kxml2.io.KXmlParser;
 
 /**
  * Class to convert a Track to KML (google-earth) format.
@@ -33,7 +38,7 @@ import java.util.Vector;
  * @author barryred
  * @author Mario Sansone
  */
-public class KmlConverter implements TrackConverter {
+public class KmlConverter extends TrackConverter {
     
     private boolean useKilometers;
     
@@ -77,7 +82,7 @@ public class KmlConverter implements TrackConverter {
         trackString.append("<extrude>0</extrude>\r\n");
         trackString.append("<altitudeMode>clampToGround</altitudeMode>\r\n");
         trackString.append("<coordinates>\r\n");
-        Enumeration trackEnum = track.getTrailPoints().elements();
+        Enumeration trackEnum = track.getTrackPointsEnumeration();
         while(trackEnum.hasMoreElements()==true) {
             GpsPosition pos = (GpsPosition)trackEnum.nextElement();
             trackString.append(formatDegrees(pos.longitude))
@@ -94,7 +99,7 @@ public class KmlConverter implements TrackConverter {
         
         trackString.append(generateWaypointData( waypoints ));
         
-        trackString.append(generateMarkers( track.getMarkers() ));
+        trackString.append(generateMarkers( track.getTrackMarkersEnumeration() ));
         
         trackString.append(generateEndpoints( track ));
         
@@ -106,6 +111,9 @@ public class KmlConverter implements TrackConverter {
     
     /** Generate waypoint data */
     private StringBuffer generateWaypointData(Vector waypoints) {
+        if(waypoints == null){
+            return new StringBuffer();
+        }
         StringBuffer waypointString = new StringBuffer();
         Enumeration waypointEnum = waypoints.elements();
         waypointString.append("<Folder>\r\n");
@@ -125,10 +133,9 @@ public class KmlConverter implements TrackConverter {
     }
     
     /** Export markers */
-    private StringBuffer generateMarkers(Vector markers) {
+    private StringBuffer generateMarkers(Enumeration markerEnum) {
         
         StringBuffer markerString = new StringBuffer();
-        Enumeration markerEnum = markers.elements();
         markerString.append("<Folder>\r\n");
         markerString.append("<name>Markers</name>\r\n");
         while(markerEnum.hasMoreElements()==true) {
@@ -173,61 +180,66 @@ public class KmlConverter implements TrackConverter {
         markerString.append("<Folder>\r\n");
         
         // Start position
-        String name = "";
-        GpsPosition startPosition = track.getStartPosition();
-        String timeStamp = DateUtil.convertToTimeStamp( startPosition.date );
-        name = timeStamp;
-        markerString.append("<name>Start/End</name>\r\n");
-        markerString.append("<Placemark>\r\n");
-        markerString.append("<name>" + name + "</name>\r\n");
-        markerString.append("<Style>\r\n");
-        markerString.append("<IconStyle>\r\n");
-        markerString.append("<scale>0.6</scale>\r\n");
-        markerString.append("<Icon>\r\n");
-        markerString.append("<href>http://maps.google.com/mapfiles/kml/pal5/icon18l.png</href>\r\n");
-        markerString.append("</Icon>\r\n");
-        markerString.append("</IconStyle>\r\n");
-        markerString.append("</Style>\r\n");
-        markerString.append("<Point><coordinates>\r\n");
-        markerString.append(formatDegrees(startPosition.longitude)).append(",").append(formatDegrees(startPosition.latitude)).append(",0\r\n");
-        markerString.append("</coordinates></Point>\r\n");
-        markerString.append("</Placemark>\r\n");
-        
-        // End position
-        GpsPosition endPosition = track.getEndPosition();
-        timeStamp = DateUtil.convertToTimeStamp( endPosition.date );
-        name = timeStamp;
-        
-        String units;
-        String distance;
-        if( useKilometers==true ) {
-            units = " km";
-            distance = StringUtil.valueOf(track.getDistance(), 2);
-        } else {
-            double mileDistance = UnitConverter.convertLength(
-                    track.getDistance(),
-                    UnitConverter.KILOMETERS,
-                    UnitConverter.MILES );
-            distance = StringUtil.valueOf(mileDistance, 2);
-            units = " ml";
+        //String name = "";
+        try{
+            GpsPosition startPosition = track.getStartPosition();
+            String timeStamp = DateUtil.convertToTimeStamp( startPosition.date );
+            markerString.append("<name>Start/End</name>\r\n");
+            markerString.append("<Placemark>\r\n");
+            markerString.append("<name>" + timeStamp + "</name>\r\n");
+            markerString.append("<Style>\r\n");
+            markerString.append("<IconStyle>\r\n");
+            markerString.append("<scale>0.6</scale>\r\n");
+            markerString.append("<Icon>\r\n");
+            markerString.append("<href>http://maps.google.com/mapfiles/kml/pal5/icon18l.png</href>\r\n");
+            markerString.append("</Icon>\r\n");
+            markerString.append("</IconStyle>\r\n");
+            markerString.append("</Style>\r\n");
+            markerString.append("<Point><coordinates>\r\n");
+            markerString.append(formatDegrees(startPosition.longitude)).append(",").append(formatDegrees(startPosition.latitude)).append(",0\r\n");
+            markerString.append("</coordinates></Point>\r\n");
+            markerString.append("</Placemark>\r\n");
+        }catch(NoSuchElementException e){
+            Logger.getLogger().log("No StartPosition found when trying to generate Endpoints in KML export function", Logger.DEBUG);
         }
         
-        markerString.append("<Placemark>\r\n");
-        markerString.append("<name>").append(name).append("</name>\r\n");
-        markerString.append("<description>Distance ").append(distance).append(units).append("</description>");
-        markerString.append("<Style>\r\n");
-        markerString.append("<IconStyle>\r\n");
-        markerString.append("<scale>0.6</scale>\r\n");
-        markerString.append("<Icon>\r\n");
-        markerString.append("<href>http://maps.google.com/mapfiles/kml/pal5/icon52l.png</href>\r\n");
-        markerString.append("</Icon>\r\n");
-        markerString.append("</IconStyle>\r\n");
-        markerString.append("</Style>\r\n");
-        markerString.append("<Point><coordinates>\r\n");
-        markerString.append(formatDegrees(endPosition.longitude)).append(",").append(formatDegrees(endPosition.latitude)).append(",0\r\n");
-        markerString.append("</coordinates></Point>\r\n");
-        markerString.append("</Placemark>\r\n");
-        
+        // End position
+        try{
+            GpsPosition endPosition = track.getEndPosition();
+            String timeStamp = DateUtil.convertToTimeStamp( endPosition.date );
+            
+            String units;
+            String distance;
+            if( useKilometers==true ) {
+                units = " km";
+                distance = StringUtil.valueOf(track.getDistance(), 2);
+            } else {
+                double mileDistance = UnitConverter.convertLength(
+                        track.getDistance(),
+                        UnitConverter.KILOMETERS,
+                        UnitConverter.MILES );
+                distance = StringUtil.valueOf(mileDistance, 2);
+                units = " ml";
+            }
+            
+            markerString.append("<Placemark>\r\n");
+            markerString.append("<name>").append(timeStamp).append("</name>\r\n");
+            markerString.append("<description>Distance ").append(distance).append(units).append("</description>");
+            markerString.append("<Style>\r\n");
+            markerString.append("<IconStyle>\r\n");
+            markerString.append("<scale>0.6</scale>\r\n");
+            markerString.append("<Icon>\r\n");
+            markerString.append("<href>http://maps.google.com/mapfiles/kml/pal5/icon52l.png</href>\r\n");
+            markerString.append("</Icon>\r\n");
+            markerString.append("</IconStyle>\r\n");
+            markerString.append("</Style>\r\n");
+            markerString.append("<Point><coordinates>\r\n");
+            markerString.append(formatDegrees(endPosition.longitude)).append(",").append(formatDegrees(endPosition.latitude)).append(",0\r\n");
+            markerString.append("</coordinates></Point>\r\n");
+            markerString.append("</Placemark>\r\n");
+        }catch(NoSuchElementException e){
+            Logger.getLogger().log("No EndPosition found when trying to generate Endpoints in KML export function", Logger.DEBUG);
+        }
         // Close the start/end folder
         markerString.append("</Folder>\r\n");
         return markerString;
@@ -237,5 +249,11 @@ public class KmlConverter implements TrackConverter {
     private String formatDegrees(double degrees) {
         return String.valueOf(((int)(degrees * 1000000)) / 1000000.0);
     }
+
+	public Track importTrack(KXmlParser trackDescription) {
+		Logger.getLogger().log("Starting to parse KML track from file", Logger.DEBUG);
+		// TODO Auto-generated method stub
+		return null;
+	}
     
 }

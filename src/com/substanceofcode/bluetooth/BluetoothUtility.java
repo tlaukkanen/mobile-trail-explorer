@@ -90,7 +90,7 @@ public class BluetoothUtility implements DiscoveryListener {
         } catch (BluetoothStateException ex) {
             Logger.getLogger().log(
                 "Error in BluetoothUtility.findDevices: " + ex.toString(), 
-                Logger.SEVERE);
+                Logger.ERROR);
             ex.printStackTrace();
         }
     }
@@ -117,7 +117,7 @@ public class BluetoothUtility implements DiscoveryListener {
             }
             Logger.getLogger().log(
                 "Device found: " + name + " (" + address + ")", 
-                Logger.INFO);
+                Logger.INFO2);
             BluetoothDevice dev = new BluetoothDevice(address, name);
             devices.addElement(dev);
         }            
@@ -130,7 +130,7 @@ public class BluetoothUtility implements DiscoveryListener {
     }
 
     public void serviceSearchCompleted(int transID, int respCode) {
-        Logger.getLogger().log("Service search completed.", Logger.INFO);
+        Logger.getLogger().log("Service search completed.", Logger.INFO2);
     }
 
     public void inquiryCompleted(int i) {

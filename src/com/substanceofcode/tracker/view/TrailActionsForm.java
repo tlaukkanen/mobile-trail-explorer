@@ -52,6 +52,7 @@ public class TrailActionsForm extends Form implements CommandListener {
     private Controller controller;
     
     private Command okCommand;
+    private Command cancelCommand;
 
     private ChoiceGroup actionsGroup;
     
@@ -95,6 +96,7 @@ public class TrailActionsForm extends Form implements CommandListener {
     /** Initialize commands */
     private void initializeCommands() {
         this.addCommand( okCommand = new Command("OK", Command.SCREEN, 1));
+        this.addCommand(cancelCommand = new Command("Cancel", Command.BACK, 100));
     }
     
     /** Initialize form controls */
@@ -131,30 +133,53 @@ public class TrailActionsForm extends Form implements CommandListener {
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
         if(command == okCommand) {
-            
-            Track recordedTrack;
+            // do IO operations in another thread to prevent UI freezing.
+            new Thread(new Runnable(){
+                public void run(){
+//                  Do specified actions for this trail:
+                    // 0 = Export trail to KML file
+                    // 1 = Export trail to GPX file
+                    // 2 = Save trail to the RMS
+                    if (actionsGroup.isSelected(0)) {
+                        exportTrail(RecorderSettings.EXPORT_FORMAT_KML);
+                    }
+                    if (actionsGroup.isSelected(1)) {
+                        exportTrail(RecorderSettings.EXPORT_FORMAT_GPX);
+                    }
+                    if (saveIsAnOption && actionsGroup.isSelected(2)) {
+                        controller.saveTrail();
+                    }
+                               
+                    // After doing all actions, we return to the normal previous Screen
+                    if(TrailActionsForm.this.isShown()){
+                        TrailActionsForm.this.goBack();
+                    }
+                }
+            }).start();
+        }else if(command == cancelCommand){
+            this.goBack();
+        }
+    }
+    
+    /** Export the current recorded trail to a file with the specified format */
+    private void exportTrail(int exportFormat) {
+        try {
+            RecorderSettings settings = controller.getSettings();
+            final Track recordedTrack;
+            final Vector waypoints;
             if(saveIsAnOption){
-            	recordedTrack = controller.getTrack();
+                recordedTrack = controller.getTrack();
+                waypoints = controller.getWaypoints();
             }else{
-            	recordedTrack = track;
+                recordedTrack = track;
+                waypoints = null;
             }
-            
-            // Do specified actions for this trail:
-            // 0 = Export trail to KML file
-            // 1 = Export trail to GPX file
-            // 2 = Save trail to the RMS
-            if (actionsGroup.isSelected(0)) {
-                controller.exportTrail(recordedTrack, RecorderSettings.EXPORT_FORMAT_KML, trackName);
-            }
-            if (actionsGroup.isSelected(1)) {
-                controller.exportTrail(recordedTrack, RecorderSettings.EXPORT_FORMAT_GPX, trackName);
-            }
-            if (saveIsAnOption && actionsGroup.isSelected(2)) {
-                controller.saveTrail();
-            }
-            
-            // After doing all actions, we return to the normal previous Screen
-            goBack();
+            boolean useKilometers = settings.getUnitsAsKilometers();
+            String exportFolder = settings.getExportFolder();
+            recordedTrack.writeToFile(exportFolder, waypoints, useKilometers, exportFormat, trackName);
+        } catch (Exception ex) {
+            Logger.getLogger().log("Exception caught when trying to export trail: "  + ex.toString(), Logger.ERROR);
+            controller.showError(ex.toString(), Alert.FOREVER, this);
         }
     }
     
@@ -165,4 +190,6 @@ public class TrailActionsForm extends Form implements CommandListener {
     		controller.showTrailsList();
     	}
     }
+
 }
+

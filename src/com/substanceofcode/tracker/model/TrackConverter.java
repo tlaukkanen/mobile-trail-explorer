@@ -22,7 +22,16 @@
 
 package com.substanceofcode.tracker.model;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Vector;
+
+import javax.microedition.io.file.FileConnection;
+
+import org.kxml2.io.KXmlParser;
+
+import com.substanceofcode.tracker.view.Logger;
 
 /**
  * TrackConverter interface is used when track positions are exported to 
@@ -30,13 +39,50 @@ import java.util.Vector;
  *
  * @author Tommi Laukkanen
  */
-public interface TrackConverter {
+// FIXME: it would make sense for this to extend KXmlParser.( I think anyway)
+public abstract class TrackConverter {
     
     /** Convert track to specific format */
-    public String convert(
+    public abstract String convert(
             Track track, 
             Vector waypoints,
             boolean includeWaypoints, 
             boolean includeMarkers);
+    
+    public abstract Track importTrack(KXmlParser trackDescription);
+
+	public Track importTrack(FileConnection connection){
+		Track result = null;
+		try{
+			/* Make sure file exists and can be read */
+	        if(!connection.exists()){
+	        	Logger.getLogger().log("FileConnection does not exist, Track Import aborted", Logger.WARN);
+	        	return null;
+	        }    
+	        if(!connection.canRead()){
+	        	Logger.getLogger().log("FileConnection can not be read exist, Track Import aborted", Logger.WARN);
+	        	return null;
+	        }
+	        
+	        InputStream is = connection.openInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+
+			KXmlParser parser = new KXmlParser();
+			parser.setInput(isr);
+
+	        result = importTrack(parser);
+	        
+	        try{
+	        	isr.close();
+	        }catch(IOException e){}
+	        try{
+	        	is.close();
+	        }catch(IOException e){}
+		}catch(Exception e){
+			Logger.getLogger().log("Exception caught trying to importTrack :" + e.toString(), Logger.WARN);
+			e.printStackTrace();
+		}
+        return result;
+	}
     
 }

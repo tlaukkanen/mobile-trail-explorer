@@ -29,6 +29,7 @@ import com.substanceofcode.data.FileIOException;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.AlertType;
@@ -65,7 +66,6 @@ public class Controller {
     private MIDlet midlet;
     private TrailCanvas trailCanvas;
     private ElevationCanvas elevationCanvas;
-    private SplashCanvas splashCanvas;
     private DeviceList deviceList;
     private AboutScreen aboutScreen;
     private SettingsList settingsList;
@@ -121,6 +121,15 @@ public class Controller {
         if (settings.getBacklightOn()) {
             backlight.backlightOn();
         }
+        
+        /** Initialize the screens */
+        screens = new BaseCanvas[5];
+        screens[0] = getTrailCanvas();
+        screens[1] = getElevationCanvas();
+        screens[2] = new InformationCanvas( this );
+        screens[3] = new WaypointCanvas( this );
+        screens[4] = new SatelliteCanvas( this );
+        currentDisplayIndex = 0;
     }
 
     public static Controller getController(){
@@ -206,19 +215,19 @@ public class Controller {
     public void startStop() {
 
         if (status != STATUS_RECORDING) {
-            logger.log("Starting Recording", Logger.FINE);
+            logger.log("Starting Recording", Logger.INFO2);
             // Connect to GPS device
             try {
                 gpsDevice.connect();
                 recorder.startRecording();
                 status = STATUS_RECORDING;
             } catch (Exception ex) {
-                Logger.getLogger().log("Error while connection to GPS: " + ex.toString(), Logger.WARNING);
+                Logger.getLogger().log("Error while connection to GPS: " + ex.toString(), Logger.ERROR);
                 showError("Error while connection to GPS: " + ex.toString(),
                           Alert.FOREVER, getTrailCanvas());
             }
         } else {
-            Logger.getLogger().log("Stoping Recording", Logger.FINE);
+            Logger.getLogger().log("Stoping Recording", Logger.INFO2);
             // Stop recording the track
             recorder.stopRecording();
             // Disconnect from GPS device
@@ -377,7 +386,7 @@ public class Controller {
 
     /** Show splash canvas */
     public void showSplash() {
-        display.setCurrent(getSplashCanvas());
+        display.setCurrent(new SplashAndUpdateCanvas());
     }
 
     /** Show export settings */
@@ -391,14 +400,6 @@ public class Controller {
             exportSettingsForm = new ExportSettingsForm(this);
         }
         return exportSettingsForm;
-    }
-
-    /** Get instance of splash screen */
-    private SplashCanvas getSplashCanvas() {
-        if (splashCanvas == null) {
-            splashCanvas = new SplashCanvas(this);
-        }
-        return splashCanvas;
     }
 
     /** Set about screens as current display */
@@ -456,19 +457,24 @@ public class Controller {
     
     public void showTrailActionsForm(Track trail, String trailName) {
         TrailActionsForm form = new TrailActionsForm(this, trail, trailName);
-        
+        display.setCurrent(form);
     }
     
     public void laodTrack(Track track){
-        if(track != null){
-            this.recorder.setTrack(track);
-            this.trailCanvas.setLastPosition(track.getEndPosition());
-            this.elevationCanvas.setLastPosition(track.getEndPosition());
-            //this.trailCanvas.setPositionTrail(track);
-        }else{
+        if(track == null){
             this.recorder.clearTrack();
             this.trailCanvas.setLastPosition(null);
-            //this.trailCanvas.setPositionTrail(null);
+        }else{
+            this.recorder.setTrack(track);
+            GpsPosition pos;
+            try{
+                pos = track.getEndPosition();
+            }catch(NoSuchElementException e){
+                Logger.getLogger().log("No EndPosition found when trying to call Controller.loadTrack(Track). Setting to null", Logger.DEBUG);
+                pos = null;
+            }
+            this.trailCanvas.setLastPosition(pos);
+            this.elevationCanvas.setLastPosition(pos);
         }
     }
     
@@ -599,23 +605,13 @@ public class Controller {
     }
 
     public void switchDisplay() {
-        if(screens==null) {
-            screens = new BaseCanvas[6];
-            screens[0] = getTrailCanvas();
-            screens[1] = getElevationCanvas();
-            screens[2] = new InformationCanvas( this );
-            screens[3] = new WaypointCanvas( this );
-            screens[4] = new SatelliteCanvas( this );
-            screens[5] = new SkyCanvas( this );
-        }
-        
         currentDisplayIndex++;
         if(currentDisplayIndex>5) {
             currentDisplayIndex = 0;
         }
         
         BaseCanvas nextCanvas = screens[currentDisplayIndex];
-        if( nextCanvas!=null ) {
+        if( nextCanvas != null ) {
             display.setCurrent( screens[currentDisplayIndex] );
         }
     }
@@ -637,7 +633,7 @@ public class Controller {
             String exportFolder = settings.getExportFolder();
             recordedTrack.writeToFile(exportFolder, waypoints, useKilometers, exportFormat, trackName);
         } catch (Exception ex) {
-            Logger.getLogger().log(ex.toString(), Logger.WARNING);
+            Logger.getLogger().log(ex.toString(), Logger.ERROR);
             showError(ex.getMessage());
         }
     }    

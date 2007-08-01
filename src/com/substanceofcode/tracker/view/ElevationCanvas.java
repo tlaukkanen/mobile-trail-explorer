@@ -2,7 +2,6 @@ package com.substanceofcode.tracker.view;
 
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
@@ -11,6 +10,7 @@ import javax.microedition.lcdui.Image;
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.ImageUtil;
+import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.DateTimeUtil;
 
 public class ElevationCanvas extends BaseCanvas {
@@ -63,7 +63,7 @@ public class ElevationCanvas extends BaseCanvas {
 			this.maxAltitude = this.minAltitude = lastPosition.altitude;
 		}
 		try{
-			Enumeration positionTrail = controller.getTrack().getTrailPoints().elements();
+			Enumeration positionTrail = controller.getTrack().getTrackPointsEnumeration();
 			while(positionTrail.hasMoreElements()){
 				double altitude = ((GpsPosition)positionTrail.nextElement()).altitude;
 				if(altitude > maxAltitude){
@@ -236,43 +236,43 @@ public class ElevationCanvas extends BaseCanvas {
             double lastAltitude = currentAltitude;
             Date lastTime = currentTime;
 
-            Vector positionTrail = controller.getTrack().getTrailPoints();
-            //int trailPositionCount =  positionTrail.size();
+            final Track track = controller.getTrack();
+            final int numPositions;
+            synchronized(track){
+                /* Synchronized so that no element can be added or removed between getting
+                the number of elements and getting the elements themselfs. */
+                numPositions = track.getPositionCount(); 
 
-            // Draw trail with red color
-            g.setColor(0, 0, 222);
-            
-            // FIXME: This should be gotten rid of altogether
-            final int increment = 1;
-            // TODO: implement the drawing based soely on numPositions. 
-            final int numPositions = controller.getSettings().getNumberOfPositionToDraw();
-           
-            final int lowerLimit;
-            if(positionTrail.size() - (numPositions*increment) < 0){
-                lowerLimit = 0;
-            }else{
-                lowerLimit = positionTrail.size() - (numPositions*increment);
-            }
-            for (int positionIndex = positionTrail.size() - 1; positionIndex >= lowerLimit; positionIndex--) {
-                if(positionIndex % increment != 0){
-                    continue;
+                // Draw trail with blue color
+                g.setColor(0, 0, 222);
+                
+                final int numPositionsToDraw = controller.getSettings().getNumberOfPositionToDraw();
+               
+                final int lowerLimit;
+                if(numPositions - numPositionsToDraw < 0){
+                    lowerLimit = 0;
+                }else{
+                    lowerLimit = numPositions - numPositionsToDraw;
                 }
-                GpsPosition pos = (GpsPosition) positionTrail.elementAt(positionIndex);
-
-                double lat = pos.latitude;
-                double lon = pos.longitude;
-                double alt = pos.altitude;
-                Date time = pos.date;
-                CanvasPoint point1 = convertPosition(lat, lon, alt, time, top, bottom);
-
-                CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude, lastAltitude, lastTime, top, bottom);
-
-                g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
-
-                lastLatitude = pos.latitude;
-                lastLongitude = pos.longitude;
-                lastAltitude = pos.altitude;
-                lastTime = pos.date;
+                for (int positionIndex = numPositions - 1; positionIndex >= lowerLimit; positionIndex--) {
+                    
+                    GpsPosition pos = (GpsPosition) track.getPosition(positionIndex);
+    
+                    double lat = pos.latitude;
+                    double lon = pos.longitude;
+                    double alt = pos.altitude;
+                    Date time = pos.date;
+                    CanvasPoint point1 = convertPosition(lat, lon, alt, time, top, bottom);
+    
+                    CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude, lastAltitude, lastTime, top, bottom);
+    
+                    g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
+    
+                    lastLatitude = pos.latitude;
+                    lastLongitude = pos.longitude;
+                    lastAltitude = pos.altitude;
+                    lastTime = pos.date;
+                }
             }
 
             int height = getYPos(lastPosition.altitude, top, bottom);
@@ -285,7 +285,7 @@ public class ElevationCanvas extends BaseCanvas {
             g.setColor(255, 0, 0);
             g.drawString("ERR: " + ex.toString(), 1, 120, Graphics.TOP | Graphics.LEFT);
 
-            Logger.getLogger().log("Exception occured while drawing elevation: " + ex.toString(), Logger.WARNING);
+            Logger.getLogger().log("Exception occured while drawing elevation: " + ex.toString(), Logger.ERROR);
         }
 	}
 	

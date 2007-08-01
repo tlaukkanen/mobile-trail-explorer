@@ -61,7 +61,6 @@ public class InformationCanvas extends BaseCanvas implements Runnable {
             }
             try{
                 Thread.sleep(1000);
-                System.out.println("info");
             }catch(Exception ex) {
                 ex.printStackTrace();
             }

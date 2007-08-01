@@ -111,7 +111,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
     /** Parse GPS data */
     public void run() {
         try {
-            logger.log("Starting GpsDevice.run()", Logger.FINE);
+            logger.log("Starting GpsDevice.run()", Logger.INFO2);
             while (Thread.currentThread() == thread) {
                 try {
                     StringBuffer output = new StringBuffer();
@@ -154,7 +154,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                     }
                     controller.showError("IOException occured in GpsDevice.run()", 5, controller
                         .getCurrentScreen());
-                    logger.log("IOException occured in GpsDevice.run()", Logger.WARNING);
+                    logger.log("IOException occured in GpsDevice.run()", Logger.ERROR);
                     try {
                         Thread.sleep(BREAK);
                     } catch (InterruptedException e) {
@@ -184,20 +184,20 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                         }
                     }
                 } catch (Exception e) {
-                    logger.log("UNEXPECTED EXCEPTION Caught in GpsDevice.run(), attempting to continue: " + e.toString(), Logger.WARNING);
+                    logger.log("UNEXPECTED EXCEPTION Caught in GpsDevice.run(), attempting to continue: " + e.toString(), Logger.WARN);
                 }
             }
         } catch (Throwable e) {
             if(e instanceof Error){
-                logger.log("UNEXPECTED ERROR! Caught in GpsDevice.run() : " + e.toString(), Logger.SEVERE);
+                logger.log("UNEXPECTED ERROR! Caught in GpsDevice.run() : " + e.toString(), Logger.FATAL);
             }else if(e instanceof Exception){
-                logger.log("UNEXPECTED Exception! Caught in GpsDevice.run() : " + e.toString(), Logger.SEVERE);
+                logger.log("UNEXPECTED Exception! Caught in GpsDevice.run() : " + e.toString(), Logger.FATAL);
             }else{
                 // Should never reach here, but.... never say never??
-                logger.log("UNEXPECTED " + e.getClass().getName() + "! Caught in GpsDevice.run() : " + e.toString(), Logger.SEVERE);
+                logger.log("UNEXPECTED " + e.getClass().getName() + "! Caught in GpsDevice.run() : " + e.toString(), Logger.FATAL);
             }
         }
-        logger.log("Thread GpsDevice.run() finished.", Logger.FINE);
+        logger.log("Thread GpsDevice.run() finished.", Logger.INFO2);
     }
     
 }

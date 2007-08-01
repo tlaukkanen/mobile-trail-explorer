@@ -74,7 +74,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
     public TrailCanvas(Controller controller, GpsPosition initialPosition) {
         super(controller);
         this.lastPosition = initialPosition;
-
+        
         //positionTrail = new Vector();
 
         thread = new Thread(this);
@@ -234,37 +234,39 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             g.setColor(180,180,180);
             
             // TODO: implement the drawing based soely on numPositions. 
-            final int numPositions = controller.getSettings().getNumberOfPositionToDraw();
+            final int numPositionsToDraw = controller.getSettings().getNumberOfPositionToDraw();
             
-            int positionCount = ghostTrail.getTrailPoints().size();
-            int increment = (int)positionCount/numPositions;
-            if(increment<1) {
-                increment = 1;
-            }
-            Vector points = ghostTrail.getTrailPoints();
-            double lastLatitude = ghostTrail.getStartPosition().latitude;
-            double lastLongitude = ghostTrail.getStartPosition().longitude;
-            for(int index=1; index<points.size(); index+=increment) {
-                GpsPosition pos = (GpsPosition) points.elementAt(index);
+            final int numPositions;
+            synchronized(ghostTrail){
+                /* Synchronized so that no element can be added or removed between getting
+                the number of elements and getting the elements themselfs. */
+                numPositions = ghostTrail.getPositionCount();
                 
-                double lat = pos.latitude;
-                double lon = pos.longitude;
-                CanvasPoint point1 = convertPosition(lat, lon);
-                CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
-
-                g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
-
-                lastLatitude = pos.latitude;
-                lastLongitude = pos.longitude;                
+                int increment = (int)numPositions/numPositionsToDraw;
+                if(increment<1) {
+                    increment = 1;
+                }
+                
+                
+               // Vector points = ghostTrail.getTrailPoints();
+                double lastLatitude = ghostTrail.getStartPosition().latitude;
+                double lastLongitude = ghostTrail.getStartPosition().longitude;
+                for(int index=1; index<numPositions; index+=increment) {
+                    GpsPosition pos = ghostTrail.getPosition(index);
+                    
+                    double lat = pos.latitude;
+                    double lon = pos.longitude;
+                    CanvasPoint point1 = convertPosition(lat, lon);
+                    CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
+    
+                    g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
+    
+                    lastLatitude = pos.latitude;
+                    lastLongitude = pos.longitude;                
+                }
             }
-            
-            
-            
-            
-            
-            
         } catch(Exception ex) {
-            Logger.getLogger().log("Exception occured while drawing ghost trail: " + ex.toString(), Logger.WARNING);
+            Logger.getLogger().log("Exception occured while drawing ghost trail: " + ex.toString(), Logger.WARN);
         }
     }
 
@@ -287,53 +289,42 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             double lastLatitude = currentLatitude;
             double lastLongitude = currentLongitude;
 
-            Vector positionTrail = controller.getTrack().getTrailPoints();
-            //int trailPositionCount =  positionTrail.size();
-
-            // Draw trail with red color
-            g.setColor(222, 0, 0);
-            
-            // FIXME: This should be gotten rid of altogether
-            final int increment = 1;
-            // TODO: implement the drawing based soely on numPositions. 
-            final int numPositions = controller.getSettings().getNumberOfPositionToDraw();
-            // Draw every 5th position. 
-            /*
-             * If we're drawing every 5th position, , when we record the 15the item,
-             * we must draw 15, 10, 5, 0
-             * BUT THE NEXT TIME(16), we must also draw 15, 10, 5, 0
-             * AND again(17), and again(18), and again(19), and only on 20 do we draw another position...i.e. 20, 15, 10, 5, 0
-             * Alternativly, we can draw 15, 10, 5, 0, 
-             * then 16, 15, 10, 5, 0, 
-             * then 17, 15, 10, 5, 0
-             * then 18, 15, 10, 5, 0
-             * then 19, 15, 10, 5, 0
-             * then 20, 15, 10, 5, 0
-             * then 21, 20, 10, 5, 0. 
-             * otherwise the track will look very JUMPY.
-             */
-            final int lowerLimit;
-            if(positionTrail.size() - (numPositions*increment) < 0){
-                lowerLimit = 0;
-            }else{
-                lowerLimit = positionTrail.size() - (numPositions*increment);
-            }
-            for (int positionIndex = positionTrail.size() - 1; positionIndex >= lowerLimit; positionIndex--) {
-                if(positionIndex % increment != 0){
-                    continue;
+            //Vector positionTrail = controller.getTrack().getTrailPoints();
+            final Track track = controller.getTrack();
+            final int numPositions;
+            synchronized(track){
+                /* Synchronized so that no element can be added or removed between getting
+                the number of elements and getting the elements themselfs. */
+                numPositions = track.getPositionCount();
+                
+    
+                // Draw trail with red color
+                g.setColor(222, 0, 0);
+                
+                // TODO: implement the drawing based soely on numPositions. 
+                final int numPositionsToDraw = controller.getSettings().getNumberOfPositionToDraw();
+                
+                final int lowerLimit;
+                if(numPositions - numPositionsToDraw < 0){
+                    lowerLimit = 0;
+                }else{
+                    lowerLimit = numPositions - numPositionsToDraw;
                 }
-                GpsPosition pos = (GpsPosition) positionTrail.elementAt(positionIndex);
-
-                double lat = pos.latitude;
-                double lon = pos.longitude;
-                CanvasPoint point1 = convertPosition(lat, lon);
-
-                CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
-
-                g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
-
-                lastLatitude = pos.latitude;
-                lastLongitude = pos.longitude;
+                for (int positionIndex = numPositions - 1; positionIndex >= lowerLimit; positionIndex--) {
+                    
+                    GpsPosition pos = track.getPosition(positionIndex);
+    
+                    double lat = pos.latitude;
+                    double lon = pos.longitude;
+                    CanvasPoint point1 = convertPosition(lat, lon);
+    
+                    CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
+    
+                    g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
+    
+                    lastLatitude = pos.latitude;
+                    lastLongitude = pos.longitude;
+                }
             }
 
             // Draw red dot on current location
@@ -344,7 +335,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
             g.setColor(255, 0, 0);
             g.drawString("ERR: " + ex.toString(), 1, 120, Graphics.TOP | Graphics.LEFT);
 
-            Logger.getLogger().log("Exception occured while drawing trail: " + ex.toString(), Logger.WARNING);
+            Logger.getLogger().log("Exception occured while drawing trail: " + ex.toString(), Logger.WARN);
         }
     }
 
@@ -533,6 +524,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                 String altitude;
                 String units;
                 double altitudeInMeters = lastPosition.altitude;
+
                 if (settings.getUnitsAsKilometers() == false) {
                     /** Altitude in feets */
                     double altitudeInFeets = UnitConverter.convertLength(altitudeInMeters,
@@ -549,9 +541,12 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                         | Graphics.LEFT);
                 displayRow++;
             }
+            
+            long secondsSinceLastPosition = -1;
+            if(lastPosition.date != null){
+                secondsSinceLastPosition = (now.getTime() - lastPosition.date.getTime()) / 1000;
+            }
 
-            long secondsSinceLastPosition;
-            secondsSinceLastPosition = (now.getTime() - lastPosition.date.getTime()) / 1000;
             if (secondsSinceLastPosition > 5) {
                 String timeSinceLastPosition;
                 if (secondsSinceLastPosition > 60) {
@@ -560,12 +555,14 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                      * to the second if under an hour, 
                      * to the minute if under a day
                      * to the hour if over a day. */
+
                     final long days = secondsSinceLastPosition / 86400;
                     secondsSinceLastPosition -= days * 86400;
                     final long hours = secondsSinceLastPosition / 3600;
                     secondsSinceLastPosition -= hours * 3600;
                     final long minutes = secondsSinceLastPosition / 60;
                     secondsSinceLastPosition -= minutes * 60;
+
                     if (days > 0) {
                         timeSinceLastPosition = days + " days " + hours + " hours ";
                     } else if (hours > 0) {
@@ -574,13 +571,18 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                         timeSinceLastPosition = minutes + " mins " + secondsSinceLastPosition
                                 + " seconds";
                     }
-                } else {
+
+                } else if(secondsSinceLastPosition == -1){
+                    timeSinceLastPosition = "No Time Info Available";
+                }else{
                     timeSinceLastPosition = secondsSinceLastPosition + " seconds";
                 }
+
                 g.drawString("Last refresh:", 1, height - (fontHeight * 4 + 6), Graphics.TOP
                         | Graphics.LEFT);
                 g.drawString(timeSinceLastPosition + " ago.", 1, height - (fontHeight * 3 + 6),
                         Graphics.TOP | Graphics.LEFT);
+
             }
 
         } else if (controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
@@ -637,7 +639,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                 }
                 this.repaint();
             } catch (Exception ex) {
-                Logger.getLogger().log("Error in TrailCanvas.run(): " + ex.toString(), Logger.WARNING);
+                Logger.getLogger().log("Error in TrailCanvas.run(): " + ex.toString(), Logger.WARN);
                 error = ex.toString();
             }
         }

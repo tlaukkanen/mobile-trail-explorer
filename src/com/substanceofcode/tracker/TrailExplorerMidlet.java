@@ -27,13 +27,14 @@ package com.substanceofcode.tracker;
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 import com.substanceofcode.tracker.controller.*;
+import com.substanceofcode.util.Version;
 
 /**
- *
  * @author  Tommi Laukkanen
- * @version
  */
 public class TrailExplorerMidlet extends MIDlet {
+    
+    public static final Version VERSION = new Version(1, 7, 0);
     
     private static Controller controller;
     
@@ -55,4 +56,5 @@ public class TrailExplorerMidlet extends MIDlet {
     
     public void destroyApp(boolean unconditional) {
     }
+    
 }

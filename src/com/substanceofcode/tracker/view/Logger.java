@@ -1,15 +1,10 @@
 package com.substanceofcode.tracker.view;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 
-import com.substanceofcode.data.Serializable;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
 
@@ -18,21 +13,37 @@ import com.substanceofcode.tracker.model.RecorderSettings;
  * 
  * @author Barry
  */
-public class Logger extends Form implements CommandListener, Serializable{
+public class Logger extends Form implements CommandListener{
     
     /**
      * Max 2000 characters logged at one time
      */
     private static final int DEFAULT_MAX_SIZE = 2000;
     
-    public static final byte OFF = 8;
-    public static final byte SEVERE =  7;
-    public static final byte WARNING =  6;
-    public static final byte INFO =  5;
-    public static final byte CONFIG =  4;
-    public static final byte FINE =  3;
-    public static final byte FINER =  2;
-    public static final byte FINEST =  1;
+    /**
+     * Severe errors that cause premature termination. Expect these to be immediately visible on a status console. 
+     */
+    public static final byte FATAL = 5;
+    /**
+     * Other runtime errors or unexpected conditions. Expect these to be immediately visible on a status console.
+     */
+    public static final byte ERROR = 4;
+    /**
+     * Use of deprecated APIs, poor use of API, 'almost' errors, other runtime situations that are undesirable or unexpected, but not necessarily "wrong". Expect these to be immediately visible on a status console.
+     */
+    public static final byte WARN = 3;
+    /**
+     * Interesting runtime events (startup/shutdown). Expect these to be immediately visible on a console, so be conservative and keep to a minimum.
+     */
+    public static final byte INFO2 = 2;
+    /**
+     * Detailed information on flow of through the system. Expect these to be written to logs only.
+     */
+    public static final byte DEBUG = 1;
+    
+
+    
+    public static final byte OFF = 6;
     public static final byte ALL =  0;
 
     private static Logger logger;
@@ -40,13 +51,11 @@ public class Logger extends Form implements CommandListener, Serializable{
     private final Command backCommand;
     private final Command refreshCommand;
     private final Command offCommand;
-    private final Command severeCommand;
-    private final Command warningCommand;
+    private final Command fatalCommand;
+    private final Command errorCommand;
+    private final Command warnCommand;
     private final Command infoCommand;
-    private final Command configCommand;
-    private final Command fineCommand;
-    private final Command finerCommand;
-    private final Command finestCommand;
+    private final Command debugCommand;
     
     
     private final RecorderSettings settings;
@@ -83,13 +92,11 @@ public class Logger extends Form implements CommandListener, Serializable{
         this.addCommand(refreshCommand = new Command("Refresh", Command.OK, 1));
         this.addCommand(backCommand = new Command("Back", Command.BACK, 2));
         this.addCommand(offCommand = new Command("Loggin Off", Command.ITEM, 3));
-        this.addCommand(severeCommand = new Command("Severe", Command.ITEM, 4));
-        this.addCommand(warningCommand = new Command("Warning++", Command.ITEM, 5));
-        this.addCommand(infoCommand = new Command("Info++", Command.ITEM, 6));
-        this.addCommand(configCommand = new Command("Config++", Command.ITEM, 7));
-        this.addCommand(fineCommand = new Command("Fine++", Command.ITEM, 8));
-        this.addCommand(finerCommand = new Command("Finer++", Command.ITEM, 9));
-        this.addCommand(finestCommand = new Command("Finest++", Command.ITEM, 10));
+        this.addCommand(fatalCommand = new Command("Fatal", Command.ITEM, 4));
+        this.addCommand(errorCommand = new Command("Error++", Command.ITEM, 5));
+        this.addCommand(warnCommand = new Command("Warn++", Command.ITEM, 6));
+        this.addCommand(infoCommand = new Command("Info++", Command.ITEM, 7));
+        this.addCommand(debugCommand = new Command("Debug++", Command.ITEM, 8));
         
         
         this.setCommandListener(this);
@@ -101,16 +108,20 @@ public class Logger extends Form implements CommandListener, Serializable{
     }
     
     private String lastMessage;
+    private byte lastMessageLevel = -1;
     private int numOfLastMessage;
     public void log(StringBuffer message, byte level){
-        if(level < FINEST || level > SEVERE){
-            throw new IllegalArgumentException("Logging level must be between FINEST(" + FINEST + ") and SEVERE(" + SEVERE + ")");
+    	System.out.println(level + ") " + message);
+        if(level < DEBUG || level > FATAL){
+            throw new IllegalArgumentException("Logging level must be between DEBUG(" + DEBUG + ") and FATAL(" + FATAL + ")");
         }
         if(level < loggingLevel){
             return;
         }
         synchronized(buffer){
-            if(message.toString().equals(this.lastMessage)){
+        	
+        	
+            if(level == lastMessageLevel && message.toString().equals(this.lastMessage)){
                 numOfLastMessage++;
                 if(numOfLastMessage == 2){
                     buffer.append("(x" + numOfLastMessage + ")");
@@ -125,6 +136,7 @@ public class Logger extends Form implements CommandListener, Serializable{
                 }
             }else{
                 lastMessage = message.toString();
+                lastMessageLevel = level;
                 numOfLastMessage = 1;
         
                 int messageLength = message.length();
@@ -165,20 +177,16 @@ public class Logger extends Form implements CommandListener, Serializable{
                 this.refresh();
             }else if(command == offCommand){
                 this.setLoggingLevel(Logger.OFF);
-            }else if(command == severeCommand){
-                this.setLoggingLevel(Logger.SEVERE);
-            }else if(command == warningCommand){
-                this.setLoggingLevel(Logger.WARNING);
+            }else if(command == fatalCommand){
+                this.setLoggingLevel(Logger.FATAL);
+            }else if(command == errorCommand){
+                this.setLoggingLevel(Logger.ERROR);
+            }else if(command == warnCommand){
+                this.setLoggingLevel(Logger.WARN);
             }else if(command == infoCommand){
-                this.setLoggingLevel(Logger.INFO);
-            }else if(command == configCommand){
-                this.setLoggingLevel(Logger.CONFIG);
-            }else if(command == fineCommand){
-                this.setLoggingLevel(Logger.FINE);
-            }else if(command == finerCommand){
-                this.setLoggingLevel(Logger.FINER);
-            }else if(command == finestCommand){
-                this.setLoggingLevel(Logger.FINEST);
+                this.setLoggingLevel(Logger.INFO2);
+            }else if(command == debugCommand){
+                this.setLoggingLevel(Logger.DEBUG);
             }
         }
         
@@ -194,15 +202,5 @@ public class Logger extends Form implements CommandListener, Serializable{
     
     public byte getLoggingLevel(){
         return this.loggingLevel;
-    }
-
-    public void serialize(DataOutputStream dos) throws IOException {
-        dos.writeUTF(buffer.toString());
-        
-    }
-
-    public void unserialize(DataInputStream dis) throws IOException {
-        this.buffer = new StringBuffer(dis.readUTF());
-    }
-    
+    } 
 }

@@ -209,7 +209,7 @@ public final class AboutScreen extends Canvas {
 		| Font.STYLE_UNDERLINED, Font.SIZE_LARGE);
 
 	/*
-         * FIXME: currently paints ALL the text, even if there is (a lot) more
+         * TODO: currently paints ALL the text, even if there is (a lot) more
          * than can fit on the screen. (must do this first time to assess
          * 'height', but shouldn't need to do it for any other repaint
          */

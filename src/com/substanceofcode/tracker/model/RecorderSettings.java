@@ -46,6 +46,10 @@ public class RecorderSettings {
     private static final String BACKLIGHT = "backlight";
     private static final String POSITIONS_TO_DRAW = "number-of-position-to-draw";
     private static final String LOGGING_LEVEL = "logger-recording-level";
+    private static final String VERSION_NUMBER = "version-number";
+    
+    /** Importing settings keys */
+    private static final String IMPORT_FILE = "import-file";
     
     /** Exporting setting keys */
     private static final String EXPORT_FOLDER = "export-folder";
@@ -94,6 +98,20 @@ public class RecorderSettings {
     public void setExportFolder(String exportFolder) {
         settings.setStringProperty(EXPORT_FOLDER, exportFolder);
         saveSettings();
+    }
+
+    /** Get import file. Default is E:/import.gpx */
+    public String getImportFile() {
+    	 String result = settings.getStringProperty(IMPORT_FILE, "");
+         if(result.length()==0) {
+             result = "root1/import.gpx";
+         }
+         return result;
+	}
+    
+    public void setImportFile(String value){
+    	settings.setStringProperty(IMPORT_FILE, value);
+    	saveSettings();
     }
     
     /** Get a GPS device connection string */
@@ -194,8 +212,13 @@ public class RecorderSettings {
     }
     
 
+    /**
+     * Get the Logger level. 
+     * Default is Logger.ERROR.
+     * @return currently set Logging Level.
+     */
     public byte getLoggingLevel() {
-        return (byte)settings.getIntProperty(LOGGING_LEVEL, Logger.OFF);
+        return (byte)settings.getIntProperty(LOGGING_LEVEL, Logger.ERROR);
     }
     
     public void setLoggingLevel(byte level){
@@ -268,6 +291,14 @@ public class RecorderSettings {
     public void setExportToSave(boolean value){
     	settings.setBooleanProperty(EXPORT_TO_SAVE, value);
     	saveSettings();
+    }
+    
+    public String getVersionNumber() {
+        return settings.getStringProperty(VERSION_NUMBER, null);
+    }
+    
+    public void setVersionNumber(String versionNumber){
+        settings.setStringProperty(VERSION_NUMBER, versionNumber);
     }
     
     /** Save settings */
