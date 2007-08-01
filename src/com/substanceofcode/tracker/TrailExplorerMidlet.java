@@ -34,6 +34,7 @@ import com.substanceofcode.util.Version;
  */
 public class TrailExplorerMidlet extends MIDlet {
     
+    // The current Version of this Mobile Trail Explorer. (Major, Minor, Build)
     public static final Version VERSION = new Version(1, 7, 0);
     
     private static Controller controller;

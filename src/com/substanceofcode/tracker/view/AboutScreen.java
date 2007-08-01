@@ -26,6 +26,7 @@ package com.substanceofcode.tracker.view;
 
 import java.util.Vector;
 
+import com.substanceofcode.tracker.TrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.ImageUtil;
 import com.substanceofcode.tracker.model.StringUtil;
@@ -62,7 +63,7 @@ public final class AboutScreen extends Canvas {
     private static final Font DEFAULT_SIMPLE_FONT = Font.getDefaultFont();
 
     private static final String[] aboutText = { "Mobile Trail Explorer,",
-	    "Version: 1.6", "Copyright (C) 2005-2007", "Tommi Laukkanen",
+	    "Version: " + TrailExplorerMidlet.VERSION.toString(), "Copyright (C) 2005-2007", "Tommi Laukkanen",
 	    "", "Licensed under the GPL", "", "For more information visit:",
 	    "www.substanceofcode.com" };
 
