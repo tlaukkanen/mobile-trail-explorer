@@ -100,6 +100,7 @@ public class Logger extends Form implements CommandListener{
         
         
         this.setCommandListener(this);
+        buffer.append("Logging at level: " + this.loggingLevel + " \n");
         this.refresh();
     }
     
@@ -198,6 +199,7 @@ public class Logger extends Form implements CommandListener{
         }
         settings.setLoggingLevel(level);
         this.loggingLevel = level;
+        buffer.append("Now logging at level: " + this.loggingLevel + " \n");
     }
     
     public byte getLoggingLevel(){

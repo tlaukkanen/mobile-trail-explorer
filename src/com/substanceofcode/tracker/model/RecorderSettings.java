@@ -27,6 +27,7 @@ import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.Version;
 
 /**
  * RecorderSettings contains all settings for the Trail Explorer application.
@@ -223,6 +224,7 @@ public class RecorderSettings {
     
     public void setLoggingLevel(byte level){
         settings.setIntProperty(LOGGING_LEVEL, level);
+        saveSettings();
     }
     
     /** Do we use kilometers as units? 
@@ -293,12 +295,22 @@ public class RecorderSettings {
     	saveSettings();
     }
     
-    public String getVersionNumber() {
-        return settings.getStringProperty(VERSION_NUMBER, null);
+    /**
+     * @since Version 1.7
+     * @return The <b>saved</b> Version number (i.e. the Version of the software that ran last)
+     */
+    public Version getVersionNumber() {
+        String versionString = settings.getStringProperty(VERSION_NUMBER, null);
+        if(versionString == null){
+            return null;
+        }else{
+            return new Version(versionString);
+        }
     }
     
-    public void setVersionNumber(String versionNumber){
-        settings.setStringProperty(VERSION_NUMBER, versionNumber);
+    public void setVersionNumber(Version version){
+        settings.setStringProperty(VERSION_NUMBER, version.toString());
+        saveSettings();
     }
     
     /** Save settings */

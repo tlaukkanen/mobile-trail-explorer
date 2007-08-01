@@ -22,11 +22,9 @@
 
 package com.substanceofcode.tracker.view;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Vector;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.data.FileSystem;
@@ -62,14 +60,9 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
     private long displayTime;
     
     /**
-     * Specifies wheather an update to the RMS/FileSystem is required
+     * Specifies wheather an update to the RMS/FileSystem or anything esle is required
      */
     private boolean updateRequired;
-    
-    /**
-     * Specifes wheather the updateProccess is finished.
-     */
-    private boolean updateFinished;
     
     /** Creates a new instance of SplashAndUpdateCanvas */
     public SplashAndUpdateCanvas() {
@@ -79,19 +72,14 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         // Set fullscreen
         setFullScreenMode( true );
         
-        final String versionString = Controller.getController().getSettings().getVersionNumber();
-        Version settingsVersion = null;
-        if(versionString != null){
-            settingsVersion = new Version(versionString);
-        }
+        Version settingsVersion = Controller.getController().getSettings().getVersionNumber();
         if(settingsVersion == null){
-            // No version, so either first install of MTE, or last version was pre 1.7 (i.e. 1.6 or earlier)
+            // The last version before a Version number was implemented was 1.6
             settingsVersion = new Version(1,6,0);
         }
         
         Version difference = TrailExplorerMidlet.VERSION.compareVersion(settingsVersion);
         this.updateRequired = difference.major > 0 || (difference.major == 0 && difference.minor > 0);
-        this.updateFinished = !this.updateRequired;
      
         
         if(updateRequired){
@@ -125,6 +113,11 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
             String title = "Trail Explorer";
             g.drawString(title, titleX, titleY, Graphics.HCENTER|Graphics.VCENTER);
         }
+        
+        if(updateRequired){
+            g.setColor(0xFF0000);
+            g.drawString("Updating MTE", getWidth()/2, getHeight()-5, Graphics.BOTTOM | Graphics.HCENTER);
+        }
     }
     
     /** Key pressed */
@@ -135,7 +128,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
 
     private void updateFinished(){
         this.updateRequired = false;
-        this.updateFinished = true;
+        this.repaint();
     }
     
     /**
@@ -157,7 +150,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
      */
     private void quitSplash(){
         // Can't quit the Splash untill the update is finished.
-        while(!updateFinished){
+        while(updateRequired){
             try{
                 Thread.sleep(50);
             }catch (InterruptedException ex) {
@@ -194,7 +187,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
             }
             
             
-            Controller.getController().getSettings().setVersionNumber(finalVersion.toString());
+            Controller.getController().getSettings().setVersionNumber(finalVersion);
             Logger.getLogger().log("Finished update proccess. Now at Version:" + finalVersion.toString(), Logger.DEBUG);
             SplashAndUpdateCanvas.this.updateFinished();
         }
