@@ -67,17 +67,21 @@ public final class AboutScreen extends Canvas {
 	    "", "Licensed under the GPL", "", "For more information visit:",
 	    "www.substanceofcode.com" };
 
-    private static final String[] paningText = {
+    private static final String[] trailScreenHelpText = {
 	    "Pan the Trail Screen using either the arrow keys, or", "2 for UP",
 	    "4 for LEFT", "5 for CENTRE", "6 for RIGHT", "8 for DOWN", "",
 	    "1 is Zoom In", "3 is Zoom Out" };
+    
+    private static final String[] elevationScreenHelpText = {
+            "Scroll the Elevation Diagram LEFT or RIGHT using the 4 and 6 keys respectivly.", "",
+            "The Time scale can be \"Zoomed\" using the 7 and 9 keys for ZOOM-OUT and ZOOM-IN respectivly.",
+            "", "N.B. Altitude accuracy on GPS is similar to location (i.e. ~10metres. However since most trails do not" +
+            " rise or fall very fast the altitude track displayed may seem very jumpy, and inaccurate."
+            };
 
     private static final String[] helpText = {
-	    "The 'Phone Backlight' option in the Display menu only works on SOME phones"
-		    + " on the rest it will simply make the screen flash every 5 seconds or so.",
-	    "",
-	    "You can comment on wheather this feature worked on your "
-		    + "phone or not at the above address, stating your phone model." };
+	    "Mobile Trail Explorer not quite perfect?", "", 
+            "You can comment current Features, bugs you find, or additional future development ideas at either the above site. ", "(www.substanceofcode.com)", "or at", "http://code.google.com/p/mobile-trail-explorer/" };
 
     /**
          * <p>
@@ -88,7 +92,7 @@ public final class AboutScreen extends Canvas {
          * Both {@link AboutScreen#TITLES} and {@link AboutScreen#MESSAGES} must
          * NOT be null, and must have the same number of elements.
          */
-    private static final String[] TITLES = { "About", "Useage", "Help" };
+    private static final String[] TITLES = { "About", "Trail Screen", "Elevation Screen", "Help" };
 
     /**
          * <p>
@@ -99,8 +103,8 @@ public final class AboutScreen extends Canvas {
          * Both {@link AboutScreen#TITLES} and {@link AboutScreen#MESSAGES} must
          * NOT be null, and must have the same number of elements.
          */
-    private static final String[][] MESSAGES = { aboutText, paningText,
-	    helpText };
+    private static final String[][] MESSAGES = { aboutText, trailScreenHelpText,
+	    elevationScreenHelpText, helpText };
 
     static {
 	if (TITLES == null || MESSAGES == null

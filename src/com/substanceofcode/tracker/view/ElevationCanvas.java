@@ -199,7 +199,7 @@ public class ElevationCanvas extends BaseCanvas {
 			DateTimeUtil.get24HourTime(this.lastPosition.date, false);//"By_Time";
 		}catch(Exception e){}
 		if(time == null){
-			time = "N/A";
+			time = ""; // "N/A";
 		}
 		
 		drawTimeDistanceBar(g, right, time, top, bottom);
@@ -374,10 +374,12 @@ public class ElevationCanvas extends BaseCanvas {
              */
         }
         if (gameKey == UP || keyCode == KEY_NUM2) {
-            verticalMovement += verticalMovementSize;
+            // Disable vertical-movement until the scales at the side reflect it properly 
+            // verticalMovement += verticalMovementSize;
         }
         if (gameKey == DOWN || keyCode == KEY_NUM8) {
-            verticalMovement -= verticalMovementSize;
+            // Disable vertical-movement until the scales at the side reflect it properly
+            // verticalMovement -= verticalMovementSize;
         }
         if (gameKey == LEFT || keyCode == KEY_NUM4) {
             horizontalMovement += horizontalMovementSize;
