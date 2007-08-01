@@ -123,12 +123,13 @@ public class Controller {
         }
         
         /** Initialize the screens */
-        screens = new BaseCanvas[5];
+        screens = new BaseCanvas[6];
         screens[0] = getTrailCanvas();
         screens[1] = getElevationCanvas();
         screens[2] = new InformationCanvas( this );
         screens[3] = new WaypointCanvas( this );
         screens[4] = new SatelliteCanvas( this );
+        screens[5] = new SkyCanvas( this );
         currentDisplayIndex = 0;
     }
 
