@@ -27,6 +27,8 @@ package com.substanceofcode.tracker;
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 import com.substanceofcode.tracker.controller.*;
+import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.Version;
 
 /**
@@ -50,12 +52,15 @@ public class TrailExplorerMidlet extends MIDlet {
     }
     
     public void startApp() {
+        Logger.getLogger().log("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.get24HourTime(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
     public void pauseApp() {
+        Logger.getLogger().log("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.get24HourTime(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
     public void destroyApp(boolean unconditional) {
+        Logger.getLogger().log("TrailExplorerMidlet.destroyApp() called @ " + DateTimeUtil.get24HourTime(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
 }

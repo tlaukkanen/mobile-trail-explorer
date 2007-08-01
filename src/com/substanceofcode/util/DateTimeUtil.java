@@ -5,20 +5,25 @@ import java.util.Date;
 
 public abstract class DateTimeUtil {
 
-	public static String get24HourTime(long time){
-		return get24HourTime(new Date(time));
+	public static String get24HourTime(long time, boolean showSeconds){
+		return get24HourTime(new Date(time), showSeconds);
 	}
 	
-	public static String get24HourTime(Date date){
+	public static String get24HourTime(Date date, boolean showSeconds){
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
-		return get24HourTime(c);
+		return get24HourTime(c, showSeconds);
 	}
 	
-	public static String get24HourTime(Calendar time){
+	public static String get24HourTime(Calendar time, boolean showSeconds){
 		int hours = time.get(Calendar.HOUR_OF_DAY);
 		int minutes = time.get(Calendar.MINUTE);
-		return hours + ":" + minutes;
+                if(showSeconds){
+                    int seconds = time.get(Calendar.SECOND);
+                    return hours + ":" + minutes + ":" + seconds;
+                }else{
+                    return hours + ":" + minutes;
+                }
 	}
 	
 }

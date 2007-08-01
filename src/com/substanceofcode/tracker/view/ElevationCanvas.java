@@ -169,7 +169,7 @@ public class ElevationCanvas extends BaseCanvas {
 		final int ACCURACY = 1;
 		StringBuffer result = new StringBuffer();
 		String altitudeAsString = Double.toString(altitude);
-		final int decimalLocation = altitudeAsString.indexOf('.');
+		// final int decimalLocation = altitudeAsString.indexOf('.');
 		
 		int accuracyReached = 0;
 		boolean reachedDecimal = false;
@@ -196,7 +196,7 @@ public class ElevationCanvas extends BaseCanvas {
 
 		String time = null;
 		try{
-			DateTimeUtil.get24HourTime(this.lastPosition.date);//"By_Time";
+			DateTimeUtil.get24HourTime(this.lastPosition.date, false);//"By_Time";
 		}catch(Exception e){}
 		if(time == null){
 			time = "N/A";
