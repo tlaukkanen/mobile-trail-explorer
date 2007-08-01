@@ -102,6 +102,9 @@ public class FileSystem{
 		return fileSystem;
 	}
 
+        public void saveFile(String filename, Serializable file, boolean overwrite) throws FileIOException{
+            this.saveFile(filename, file.getMimeType(), file, overwrite);
+        }
 	/**
 	 * Saves the specified 'file' to the RMS/FileSystem.
 	 * 
