@@ -111,7 +111,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
     /** Parse GPS data */
     public void run() {
         try {
-            logger.log("Starting GpsDevice.run()", Logger.INFO2);
+            logger.log("Starting GpsDevice.run()", Logger.INFO);
             while (Thread.currentThread() == thread) {
                 try {
                     StringBuffer output = new StringBuffer();
@@ -197,7 +197,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                 logger.log("UNEXPECTED " + e.getClass().getName() + "! Caught in GpsDevice.run() : " + e.toString(), Logger.FATAL);
             }
         }
-        logger.log("Thread GpsDevice.run() finished.", Logger.INFO2);
+        logger.log("Thread GpsDevice.run() finished.", Logger.INFO);
     }
     
 }

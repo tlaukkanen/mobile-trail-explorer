@@ -135,25 +135,25 @@ public class GpsPositionParser {
             try{
                 parseGPRMC(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()", Logger.INFO2);
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()", Logger.INFO);
             }
         }else if(record.startsWith("$GPGSA")){
             try{
                 parseGPGSA(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()", Logger.INFO2);
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()", Logger.INFO);
             }
         } else if (record.startsWith("$GPGGA")) {
             try{
                 parseGPGGA(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()", Logger.INFO2);
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()", Logger.INFO);
             }
         } else if (record.startsWith("$GPGSV")) {
             try{
                 parseGPGSV(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()", Logger.INFO2);
+                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()", Logger.INFO);
             }
         } 
         // Don't know the type, ignore and don't bother trying to parse, it'll still be logged in the Metrics, 
@@ -273,7 +273,7 @@ public class GpsPositionParser {
                 latitudeDouble = -latitudeDouble;
             }
         }else{
-            logger.log("Error with lat or long", Logger.INFO2);
+            logger.log("Error with lat or long", Logger.INFO);
             return;
         }
 

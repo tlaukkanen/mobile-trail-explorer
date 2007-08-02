@@ -35,11 +35,13 @@ public class Logger extends Form implements CommandListener{
     /**
      * Interesting runtime events (startup/shutdown). Expect these to be immediately visible on a console, so be conservative and keep to a minimum.
      */
-    public static final byte INFO2 = 2;
+    public static final byte INFO = 2;
     /**
      * Detailed information on flow of through the system. Expect these to be written to logs only.
      */
     public static final byte DEBUG = 1;
+    
+    private static final String[] LEVEL_NAMES = {"ALL", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF"}; 
     
 
     
@@ -86,7 +88,7 @@ public class Logger extends Form implements CommandListener{
         this.buffer = new StringBuffer();
         this.maxSize = DEFAULT_MAX_SIZE;
         this.settings = settings;
-        this.loggingLevel = settings.getLoggingLevel();
+        this.setLoggingLevel(settings.getLoggingLevel());
         
         // Form related setup;
         this.addCommand(refreshCommand = new Command("Refresh", Command.OK, 1));
@@ -100,7 +102,6 @@ public class Logger extends Form implements CommandListener{
         
         
         this.setCommandListener(this);
-        buffer.append("Logging at level: " + this.loggingLevel + " \n");
         this.refresh();
     }
     
@@ -185,7 +186,7 @@ public class Logger extends Form implements CommandListener{
             }else if(command == warnCommand){
                 this.setLoggingLevel(Logger.WARN);
             }else if(command == infoCommand){
-                this.setLoggingLevel(Logger.INFO2);
+                this.setLoggingLevel(Logger.INFO);
             }else if(command == debugCommand){
                 this.setLoggingLevel(Logger.DEBUG);
             }
@@ -199,7 +200,11 @@ public class Logger extends Form implements CommandListener{
         }
         settings.setLoggingLevel(level);
         this.loggingLevel = level;
-        buffer.append("Now logging at level: " + this.loggingLevel + " \n");
+        if(loggingLevel == OFF || loggingLevel == ALL){
+            this.setTitle("Logging " + LEVEL_NAMES[loggingLevel]);   
+        }else{
+            this.setTitle("Logging @ " + LEVEL_NAMES[loggingLevel]);
+        }
     }
     
     public byte getLoggingLevel(){

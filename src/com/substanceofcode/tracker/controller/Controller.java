@@ -216,7 +216,7 @@ public class Controller {
     public void startStop() {
 
         if (status != STATUS_RECORDING) {
-            logger.log("Starting Recording", Logger.INFO2);
+            logger.log("Starting Recording", Logger.INFO);
             // Connect to GPS device
             try {
                 gpsDevice.connect();
@@ -228,7 +228,7 @@ public class Controller {
                           Alert.FOREVER, getTrailCanvas());
             }
         } else {
-            Logger.getLogger().log("Stoping Recording", Logger.INFO2);
+            Logger.getLogger().log("Stoping Recording", Logger.INFO);
             // Stop recording the track
             recorder.stopRecording();
             // Disconnect from GPS device
