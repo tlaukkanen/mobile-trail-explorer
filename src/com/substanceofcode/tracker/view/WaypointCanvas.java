@@ -40,7 +40,6 @@ public class WaypointCanvas extends BaseCanvas implements Runnable {
     
     Controller controller;
     private static Font rowFont;
-    private static Font titleFont;
     private int firstRowIndex;
     private boolean allowScrollingDown;
     private Thread refreshThread;
@@ -52,7 +51,6 @@ public class WaypointCanvas extends BaseCanvas implements Runnable {
         firstRowIndex = 0;
         allowScrollingDown = false;
         
-        titleFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         
         refreshThread = new Thread( this );
@@ -66,7 +64,7 @@ public class WaypointCanvas extends BaseCanvas implements Runnable {
         g.fillRect(0,0,getWidth(),getHeight());
         
         /** Draw title */
-        g.setColor(0,128,0);
+        g.setColor(COLOR_TITLE);
         g.setFont(titleFont);
         g.drawString("Waypoints", getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
                 

@@ -36,7 +36,6 @@ import javax.microedition.lcdui.Graphics;
  */
 public class SkyCanvas extends BaseCanvas implements Runnable {
     
-    private final Font titleFont;
     private final Font rowFont;
     private final Font smallRowFont;
     
@@ -46,7 +45,6 @@ public class SkyCanvas extends BaseCanvas implements Runnable {
     public SkyCanvas(Controller controller) {
         super( controller );
         
-        titleFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         
@@ -59,7 +57,7 @@ public class SkyCanvas extends BaseCanvas implements Runnable {
         g.setColor(COLOR_WHITE);
         g.fillRect(0,0,getWidth(),getHeight());
         
-        g.setColor(0,128,0);
+        g.setColor(COLOR_TITLE);
         g.setFont(titleFont);
         g.drawString("Sky View", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
 

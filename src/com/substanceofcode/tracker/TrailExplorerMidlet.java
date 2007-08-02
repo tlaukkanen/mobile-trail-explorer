@@ -24,8 +24,6 @@
 
 package com.substanceofcode.tracker;
 
-import java.util.Date;
-
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 import com.substanceofcode.tracker.controller.*;

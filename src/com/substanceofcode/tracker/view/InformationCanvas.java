@@ -73,9 +73,15 @@ public class InformationCanvas extends BaseCanvas implements Runnable {
 	g.setColor(255,255,255);
 	g.fillRect(0,0,getWidth(),getHeight());
         
+        // Draw the title
+        g.setColor(COLOR_TITLE);
+        g.setFont(titleFont);
+        g.drawString("Information", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
+        
+        final int titleHeight = 2 + titleFont.getHeight();
+        
         GpsPosition position = controller.getPosition();
         
-        g.setColor(0,0,0);
         Font bigFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_LARGE);
         g.setFont(bigFont);
         
@@ -105,20 +111,20 @@ public class InformationCanvas extends BaseCanvas implements Runnable {
         }
         int infoPos = bigFont.stringWidth("LAT:_:");
         g.setColor(32,128,32);
-        g.drawString("LAT: ", 1, 1+charHeight*0, Graphics.TOP|Graphics.LEFT);
-        g.drawString("LON: ", 1, 1+charHeight*1, Graphics.TOP|Graphics.LEFT);
-        g.drawString("SPD: ", 1, 2+charHeight*2, Graphics.TOP|Graphics.LEFT);
-        g.drawString("HEA: ", 1, 3+charHeight*3, Graphics.TOP|Graphics.LEFT);
-        g.drawString("ALT: ", 1, 4+charHeight*4, Graphics.TOP|Graphics.LEFT);
-        g.drawString("DST: ", 1, 5+charHeight*5, Graphics.TOP|Graphics.LEFT);        
+        g.drawString("LAT: ", 1, titleHeight+1+charHeight*0, Graphics.TOP|Graphics.LEFT);
+        g.drawString("LON: ", 1, titleHeight+1+charHeight*1, Graphics.TOP|Graphics.LEFT);
+        g.drawString("SPD: ", 1, titleHeight+2+charHeight*2, Graphics.TOP|Graphics.LEFT);
+        g.drawString("HEA: ", 1, titleHeight+3+charHeight*3, Graphics.TOP|Graphics.LEFT);
+        g.drawString("ALT: ", 1, titleHeight+4+charHeight*4, Graphics.TOP|Graphics.LEFT);
+        g.drawString("DST: ", 1, titleHeight+5+charHeight*5, Graphics.TOP|Graphics.LEFT);        
         
         g.setColor(0,0,0);
-        g.drawString(lat, infoPos, 1+charHeight*0, Graphics.TOP|Graphics.LEFT);
-        g.drawString(lon, infoPos, 1+charHeight*1, Graphics.TOP|Graphics.LEFT);
-        g.drawString(spd, infoPos, 2+charHeight*2, Graphics.TOP|Graphics.LEFT);
-        g.drawString(hea, infoPos, 3+charHeight*3, Graphics.TOP|Graphics.LEFT);
-        g.drawString(alt, infoPos, 4+charHeight*4, Graphics.TOP|Graphics.LEFT);
-        g.drawString(dst, infoPos, 5+charHeight*5, Graphics.TOP|Graphics.LEFT);
+        g.drawString(lat, infoPos, titleHeight+1+charHeight*0, Graphics.TOP|Graphics.LEFT);
+        g.drawString(lon, infoPos, titleHeight+1+charHeight*1, Graphics.TOP|Graphics.LEFT);
+        g.drawString(spd, infoPos, titleHeight+2+charHeight*2, Graphics.TOP|Graphics.LEFT);
+        g.drawString(hea, infoPos, titleHeight+3+charHeight*3, Graphics.TOP|Graphics.LEFT);
+        g.drawString(alt, infoPos, titleHeight+4+charHeight*4, Graphics.TOP|Graphics.LEFT);
+        g.drawString(dst, infoPos, titleHeight+5+charHeight*5, Graphics.TOP|Graphics.LEFT);
         
 			
     }

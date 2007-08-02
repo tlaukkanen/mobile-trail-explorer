@@ -27,6 +27,7 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Font;
 
 /**
  *
@@ -36,6 +37,9 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     
     protected static final int COLOR_WHITE = 0xFFFFFF;
     protected static final int COLOR_BLACK = 0x0;
+    
+    protected static final int COLOR_TITLE = 0x008000;
+    protected static final Font titleFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
     
     protected Controller controller;
     

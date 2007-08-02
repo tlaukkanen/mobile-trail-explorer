@@ -109,8 +109,6 @@ public class ElevationCanvas extends BaseCanvas {
 		g.setColor(0xFFFFFF);
 		g.fillRect(0,0, this.getWidth(), this.getHeight());
 		
-		
-		g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_UNDERLINED, Font.SIZE_MEDIUM));
 		final int top = drawTitle(g, 0);
 
 		g.setFont(Font.getFont(Font.FACE_MONOSPACE, Font.STYLE_PLAIN, Font.SIZE_SMALL));
@@ -135,7 +133,8 @@ public class ElevationCanvas extends BaseCanvas {
 	 * @return
 	 */
 	private int drawTitle(Graphics g, int yPos){
-		g.setColor(0x00FF00);
+                g.setFont(titleFont);
+		g.setColor(COLOR_TITLE);
 		final String title = "Elevation";
 		g.drawString(title, this.getWidth()/2, yPos, Graphics.TOP | Graphics.HCENTER);
 		return yPos + g.getFont().getHeight();
