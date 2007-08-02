@@ -20,7 +20,7 @@
  *
  */
 
-package com.substanceofcode.tracker.model;
+package com.substanceofcode.util;
 
 import javax.microedition.lcdui.Image;
 

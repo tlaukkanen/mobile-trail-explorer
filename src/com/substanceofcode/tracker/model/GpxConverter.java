@@ -24,6 +24,7 @@ package com.substanceofcode.tracker.model;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.DateTimeUtil;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -76,7 +77,7 @@ public class GpxConverter extends TrackConverter {
 
 			// Create time stamp
 			Date date = pos.date;
-			String universalDateStamp = DateUtil.getUniversalDateStamp(date);
+			String universalDateStamp = DateTimeUtil.getUniversalDateStamp(date);
 			gpx.append("<time>").append(universalDateStamp).append(
 					"</time>\r\n");
 
@@ -260,13 +261,13 @@ public class GpxConverter extends TrackConverter {
 					final String name = parser.getName().toLowerCase();
 					if(name.equals("ele")){
 						eventType = parser.next();
-						if(eventType == parser.TEXT){
+						if(eventType == XmlPullParser.TEXT){
 							altitude = Double.parseDouble(parser.getText());
 						}
 						parser.next();
 					}else if(name.equals("time")){
 						eventType = parser.next();
-						if(eventType == parser.TEXT){
+						if(eventType == XmlPullParser.TEXT){
 							date = parseDate(parser.getText());
 						}	
 						parser.next();

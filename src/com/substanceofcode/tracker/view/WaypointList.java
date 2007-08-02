@@ -24,8 +24,9 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.StringUtil;
 import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.util.StringUtil;
+
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Command;

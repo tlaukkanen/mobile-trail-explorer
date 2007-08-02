@@ -27,6 +27,7 @@ import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.util.Version;
 
 /**

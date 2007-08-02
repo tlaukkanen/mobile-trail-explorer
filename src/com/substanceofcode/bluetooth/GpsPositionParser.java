@@ -21,8 +21,8 @@
 
 package com.substanceofcode.bluetooth;
 
-import com.substanceofcode.tracker.model.StringUtil;
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.StringUtil;
 
 import java.util.Enumeration;
 import java.util.Hashtable;

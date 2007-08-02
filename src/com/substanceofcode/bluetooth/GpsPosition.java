@@ -21,7 +21,7 @@
 
 package com.substanceofcode.bluetooth;
 
-import com.substanceofcode.tracker.model.MathUtil;
+import com.substanceofcode.util.MathUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

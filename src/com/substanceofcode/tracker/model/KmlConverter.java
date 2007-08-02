@@ -24,6 +24,8 @@ package com.substanceofcode.tracker.model;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.util.StringUtil;
 
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
@@ -53,7 +55,7 @@ public class KmlConverter extends TrackConverter {
             Vector waypoints,
             boolean includeWaypoints,
             boolean includeMarkers) {
-        String currentDateStamp = DateUtil.getCurrentDateStamp();
+        String currentDateStamp = DateTimeUtil.getCurrentDateStamp();
         String kmlContent = export(currentDateStamp, track, waypoints);
         return kmlContent;
     }
@@ -155,7 +157,7 @@ public class KmlConverter extends TrackConverter {
             }
             
             String name = "";
-            String timeStamp = DateUtil.convertToTimeStamp( pos.date );
+            String timeStamp = DateTimeUtil.convertToTimeStamp( pos.date );
             name = timeStamp + ", " + speed + units;
             markerString.append("<Placemark>\r\n");
             markerString.append("<name>" + name + "</name>\r\n");
@@ -183,7 +185,7 @@ public class KmlConverter extends TrackConverter {
         //String name = "";
         try{
             GpsPosition startPosition = track.getStartPosition();
-            String timeStamp = DateUtil.convertToTimeStamp( startPosition.date );
+            String timeStamp = DateTimeUtil.convertToTimeStamp( startPosition.date );
             markerString.append("<name>Start/End</name>\r\n");
             markerString.append("<Placemark>\r\n");
             markerString.append("<name>" + timeStamp + "</name>\r\n");
@@ -206,7 +208,7 @@ public class KmlConverter extends TrackConverter {
         // End position
         try{
             GpsPosition endPosition = track.getEndPosition();
-            String timeStamp = DateUtil.convertToTimeStamp( endPosition.date );
+            String timeStamp = DateTimeUtil.convertToTimeStamp( endPosition.date );
             
             String units;
             String distance;

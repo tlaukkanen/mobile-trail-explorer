@@ -154,7 +154,7 @@ public class Controller {
     public void searchDevices() {
         try {
             BluetoothUtility bt = new BluetoothUtility();
-            System.out.println("Initializing bluetooth utility");
+            logger.log("Initializing bluetooth utility", Logger.DEBUG);
             bt.initialize();
             System.out.println("Finding devices.");
             bt.findDevices();

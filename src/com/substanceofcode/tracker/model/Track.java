@@ -26,6 +26,7 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.data.Serializable;
+import com.substanceofcode.util.DateTimeUtil;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -205,7 +206,7 @@ public class Track implements Serializable {
         }
 
         if (filename == null) {
-            filename = DateUtil.getCurrentDateStamp();
+            filename = DateTimeUtil.getCurrentDateStamp();
         }
         FileConnection connection;
         try {
@@ -268,7 +269,7 @@ public class Track implements Serializable {
         } else {
             final String filename;
             if (this.name == null || this.name.length() == 0) {
-                filename = DateUtil.getCurrentDateStamp();
+                filename = DateTimeUtil.getCurrentDateStamp();
             } else {
                 filename = name;
             }

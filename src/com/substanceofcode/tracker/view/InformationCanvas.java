@@ -26,8 +26,9 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.SpeedFormatter;
-import com.substanceofcode.tracker.model.StringUtil;
 import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.util.StringUtil;
+
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;

@@ -10,9 +10,9 @@ import javax.microedition.lcdui.TextField;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.StringUtil;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
+import com.substanceofcode.util.StringUtil;
 
 public class TrailDetailsScreen extends Form implements CommandListener {
 

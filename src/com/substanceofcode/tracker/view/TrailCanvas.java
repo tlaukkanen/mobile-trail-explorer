@@ -27,6 +27,10 @@ package com.substanceofcode.tracker.view;
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.*;
+import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.util.ImageUtil;
+import com.substanceofcode.util.StringUtil;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
@@ -463,7 +467,7 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
 
             /** Draw current time */
             if( settings.getDisplayValue(RecorderSettings.DISPLAY_TIME) == true) {
-                String timeStamp = DateUtil.convertToTimeStamp(now);
+                String timeStamp = DateTimeUtil.convertToTimeStamp(now);
                 g.drawString("TME:", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 g.drawString(timeStamp, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;

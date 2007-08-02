@@ -9,9 +9,9 @@ import javax.microedition.lcdui.Image;
 
 import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.ImageUtil;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.util.ImageUtil;
 
 public class ElevationCanvas extends BaseCanvas {
 	
@@ -196,7 +196,7 @@ public class ElevationCanvas extends BaseCanvas {
 
 		String time = null;
 		try{
-			DateTimeUtil.get24HourTime(this.lastPosition.date, false);//"By_Time";
+			DateTimeUtil.convertToTimeStamp(this.lastPosition.date, false);//"By_Time";
 		}catch(Exception e){}
 		if(time == null){
 			time = ""; // "N/A";

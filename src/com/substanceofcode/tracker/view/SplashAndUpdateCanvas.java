@@ -30,8 +30,8 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.tracker.TrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.ImageUtil;
 import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.Version;
 
 import javax.microedition.lcdui.Canvas;

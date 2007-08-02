@@ -28,8 +28,8 @@ import java.util.Vector;
 
 import com.substanceofcode.tracker.TrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.ImageUtil;
-import com.substanceofcode.tracker.model.StringUtil;
+import com.substanceofcode.util.ImageUtil;
+import com.substanceofcode.util.StringUtil;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;

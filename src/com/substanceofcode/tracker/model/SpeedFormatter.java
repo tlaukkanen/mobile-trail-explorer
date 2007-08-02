@@ -22,6 +22,8 @@
 
 package com.substanceofcode.tracker.model;
 
+import com.substanceofcode.util.StringUtil;
+
 /**
  * SpeedFormatter class is used to format the speed to user specific string format.
  *

@@ -22,6 +22,8 @@
 
 package com.substanceofcode.tracker.model;
 
+import com.substanceofcode.util.StringUtil;
+
 /**
  * LengthFormatter is used to format the length to user specific string format.
  *

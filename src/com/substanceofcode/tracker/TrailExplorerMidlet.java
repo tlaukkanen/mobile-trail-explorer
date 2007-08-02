@@ -24,6 +24,8 @@
 
 package com.substanceofcode.tracker;
 
+import java.util.Date;
+
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 import com.substanceofcode.tracker.controller.*;
@@ -42,6 +44,9 @@ public class TrailExplorerMidlet extends MIDlet {
     private static Controller controller;
     
     public TrailExplorerMidlet() {
+        System.out.println("A: " + DateTimeUtil.convertToTimeStamp(new Date(System.currentTimeMillis())));
+        System.out.println("B: " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true));
+        System.out.println("C: " + DateTimeUtil.convertToDateStamp(new Date(System.currentTimeMillis())));
     	try{
 	        Display disp = Display.getDisplay(this);
 	        controller = new Controller(this, disp);
@@ -52,15 +57,15 @@ public class TrailExplorerMidlet extends MIDlet {
     }
     
     public void startApp() {
-        Logger.getLogger().log("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.get24HourTime(System.currentTimeMillis(), true), Logger.DEBUG);
+        Logger.getLogger().log("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
     public void pauseApp() {
-        Logger.getLogger().log("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.get24HourTime(System.currentTimeMillis(), true), Logger.DEBUG);
+        Logger.getLogger().log("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
     public void destroyApp(boolean unconditional) {
-        Logger.getLogger().log("TrailExplorerMidlet.destroyApp() called @ " + DateTimeUtil.get24HourTime(System.currentTimeMillis(), true), Logger.DEBUG);
+        Logger.getLogger().log("TrailExplorerMidlet.destroyApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
 }

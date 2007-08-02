@@ -20,11 +20,12 @@
  *
  */
 
-package com.substanceofcode.tracker.model;
+package com.substanceofcode.util;
 
 import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
+
 
 /**
  * StringUtil contains utility functions for manipulating strings.
