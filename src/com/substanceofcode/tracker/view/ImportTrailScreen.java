@@ -41,7 +41,7 @@ import javax.microedition.lcdui.TextField;
 /**
  * Import SettingsForm includes information about exporting trail.
  * 
- * @author Barryred
+ * @author Barry Redmond
  */
 
 public class ImportTrailScreen extends Form implements CommandListener {

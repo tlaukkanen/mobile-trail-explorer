@@ -43,7 +43,7 @@ import javax.microedition.lcdui.Image;
  * to the RMS or FileSystem which must occur between one Version and the next.
  *
  * @author Tommi Laukkanen
- * @author barryred
+ * @author Barry Redmond
  */
 public class SplashAndUpdateCanvas extends Canvas implements Runnable {
     

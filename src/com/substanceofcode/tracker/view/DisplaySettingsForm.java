@@ -35,7 +35,7 @@ import javax.microedition.lcdui.TextField;
  * Settings form for displayable items.
  * 
  * @author Tommi Laukkanen
- * @author barryred
+ * @author Barry Redmond
  */
 public class DisplaySettingsForm extends Form implements CommandListener {
 

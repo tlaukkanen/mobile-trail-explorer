@@ -37,7 +37,7 @@ import org.kxml2.io.KXmlParser;
  * Class to convert a Track to KML (google-earth) format.
  *
  * @author Tommi Laukkanen
- * @author barryred
+ * @author Barry Redmond
  * @author Mario Sansone
  */
 public class KmlConverter extends TrackConverter {

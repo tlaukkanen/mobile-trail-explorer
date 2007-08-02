@@ -44,9 +44,6 @@ public class TrailExplorerMidlet extends MIDlet {
     private static Controller controller;
     
     public TrailExplorerMidlet() {
-        System.out.println("A: " + DateTimeUtil.convertToTimeStamp(new Date(System.currentTimeMillis())));
-        System.out.println("B: " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true));
-        System.out.println("C: " + DateTimeUtil.convertToDateStamp(new Date(System.currentTimeMillis())));
     	try{
 	        Display disp = Display.getDisplay(this);
 	        controller = new Controller(this, disp);

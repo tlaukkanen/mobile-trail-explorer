@@ -55,7 +55,7 @@ import javax.microedition.io.file.FileConnection;
  * point a and point b, then Tracks 'Distance' would be (|ab| + |bc| + |cd| + |de|)</small> 
  *  
  * @author Tommi
- * @author Barryred
+ * @author Barry Redmond
  */
 public class Track implements Serializable {
 

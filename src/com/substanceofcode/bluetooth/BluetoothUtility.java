@@ -1,4 +1,4 @@
-/**
+/*
  * BluetoothUtility.java
  *
  * Copyright (C) 2005-2007 Tommi Laukkanen

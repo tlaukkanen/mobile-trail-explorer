@@ -48,7 +48,7 @@ import javax.microedition.lcdui.Image;
  * Both the About and Useage sections consist of an underlined 'Title' followed
  * by multiple lines of text.
  * 
- * @author barryred
+ * @author Barry Redmond
  */
 public final class AboutScreen extends Canvas {
 

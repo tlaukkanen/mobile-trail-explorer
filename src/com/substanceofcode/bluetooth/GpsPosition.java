@@ -44,7 +44,7 @@ import java.util.Date;
  * </ul>
  * 
  * @author Tommi
- * @author barryred
+ * @author Barry Redmond
  */
 public final class GpsPosition {
 

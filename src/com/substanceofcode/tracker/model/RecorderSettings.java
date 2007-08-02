@@ -1,4 +1,4 @@
-/**
+/*
  * RecorderSettings.java
  *
  * Copyright (C) 2005-2006 Tommi Laukkanen

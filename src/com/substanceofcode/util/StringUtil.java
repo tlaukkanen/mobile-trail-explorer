@@ -31,7 +31,7 @@ import javax.microedition.lcdui.Font;
  * StringUtil contains utility functions for manipulating strings.
  *
  * @author Tommi Laukkanen
- * @author barryred
+ * @author Barry Redmond
  * @author Mario Sansone
  */
 public class StringUtil {
