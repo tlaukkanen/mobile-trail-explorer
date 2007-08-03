@@ -137,8 +137,8 @@ public final class AboutScreen extends Canvas {
     private String[][] formattedMessages;
 
     /** Creates a new instance of AboutScreen */
-    public AboutScreen(Controller controller, int screenWidth) {
-	this.controller = controller;
+    public AboutScreen() {
+	this.controller = Controller.getController();
 
 	this.setFullScreenMode(true);
 
@@ -148,7 +148,7 @@ public final class AboutScreen extends Canvas {
 
 	this.formattedMessages = new String[MESSAGES.length][];
 	for (int i = 0; i < MESSAGES.length; i++) {
-	    formattedMessages[i] = formatMessage(MESSAGES[i], screenWidth);
+	    formattedMessages[i] = formatMessage(MESSAGES[i], this.getWidth());
 	}
     }
 

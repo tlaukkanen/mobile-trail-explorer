@@ -89,6 +89,7 @@ public class DevelopmentMenu extends List implements CommandListener{
                         
                     case(LOGGER):
                         this.showLoggerScreen();
+                        Logger.getLogger().refresh();
                         break;
                 }
             }else if(command == backCommand){

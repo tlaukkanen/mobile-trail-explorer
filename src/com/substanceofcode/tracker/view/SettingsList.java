@@ -54,6 +54,27 @@ public class SettingsList extends List implements CommandListener {
     private final static int DEVELOPMENT_MENU = 4;
 
     private final static int ABOUT = 5;
+    
+    private final static int SMS = 6;
+    private final static boolean SMS_AVAILABLE;
+    
+    static{
+        SMS_AVAILABLE = smsAvailable();
+        if(!SMS_AVAILABLE){
+            Logger.getLogger().log("The API required to send Messages (SMS etc) is unavailable on this phone. SMS menu option has been disabled", Logger.DEBUG); 
+        }
+    }
+    private static boolean smsAvailable(){
+        boolean result;
+        try{
+            Class.forName("javax.wireless.messaging.TextMessage");
+            result = true;
+        }catch(ClassNotFoundException e){
+            result = false;
+        }
+        
+        return result;
+    }
 
     /** Creates a new instance of SettingsList */
     public SettingsList(Controller controller) {
@@ -67,6 +88,9 @@ public class SettingsList extends List implements CommandListener {
 	this.append("Display", null);
         this.append("Development Menu", null);
 	this.append("About/Help", null);
+        if(SMS_AVAILABLE){
+            this.append("SMS", null);
+        }
 
 	// Commands
 	selectCommand = new Command("Select", Command.OK, 1);
@@ -108,6 +132,9 @@ public class SettingsList extends List implements CommandListener {
 	    case (ABOUT):
 		controller.showAboutScreen();
 		break;
+            case(SMS):
+                controller.showSMSScreen();
+                break;
 
 	    default:
 	    }

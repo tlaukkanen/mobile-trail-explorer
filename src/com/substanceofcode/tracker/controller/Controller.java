@@ -77,6 +77,7 @@ public class Controller {
     private TrailsList trailsList;
     private DevelopmentMenu developmentMenu;
     private TrailActionsForm trailActionsForm;
+    private SmsScreen smsScreen;
 
     /** Display device */
     private Display display;
@@ -406,10 +407,16 @@ public class Controller {
     /** Set about screens as current display */
     public void showAboutScreen() {
         if (aboutScreen == null) {
-            aboutScreen = new AboutScreen(this, this.getCurrentScreen()
-                    .getWidth());
+            aboutScreen = new AboutScreen();
         }
         display.setCurrent(aboutScreen);
+    }
+    
+    public void showSMSScreen(){
+        if(smsScreen == null){
+            smsScreen = new SmsScreen();
+        }
+        display.setCurrent(smsScreen);
     }
 
     /** Show settings list */
@@ -510,7 +517,7 @@ public class Controller {
         // Put it into a thread as 2 calls to this method in quick succession would otherwise fail... miserably.
         final Thread t = new Thread(new Runnable(){
             public void run(){
-                Display.getDisplay(Controller.getController().midlet).setCurrent(alert, displayable);   
+                Display.getDisplay(midlet).setCurrent(alert, displayable);   
             }
         });
         t.start();
