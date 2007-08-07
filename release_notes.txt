@@ -14,6 +14,7 @@ Release Notes:
 
 v1.7 (August ?th 2007)
 + Changed Logging Levels to more "understandable" ones.
++ Logger now states what level it's currently logging at.
 + Changed How Trails & GpsPositions are serialized
 + Implemented a Version system, to allow for updates etc.
 + Implemented an update feature for version 1.6 and lower
@@ -21,6 +22,7 @@ v1.7 (August ?th 2007)
 + Satellite sky view (Issue 51)
 + Track elevation view (Issue 31)
 + Export saved trail (Issue 45/50)
++ Added Sms Ability to send a GpsPosition/Waypoint as an SMS! (Issue 52)
 
 v1.6 (June 10th 2007)
 + Display current time (Issue 37)
