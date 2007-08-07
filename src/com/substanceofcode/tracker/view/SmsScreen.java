@@ -117,13 +117,7 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         this.append(positionType);
         final int position = positionType.getSelectedIndex();
         if(position == EXISTING_WAYPOINT){
-            String waypointName;
-            try{
-                waypointName = ((Waypoint)Controller.getController().getWaypoints().elementAt(this.currentWaypointIndex)).getName();
-            }catch(IndexOutOfBoundsException e){
-                waypointName = "No Waypoints Found";
-            }
-            this.waypointNameText.setText(waypointName);
+            refreshWaypointName();
             this.append(waypointNameText);
         }else if(position == NEW_WAYPOINT){
             this.append(latField);
@@ -145,6 +139,16 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         if (this.typeChoice.getSelectedIndex() == TEXT_MESSAGE) {
             this.append(finalMessageText);
         }
+    }
+    
+    private void refreshWaypointName(){
+        String waypointName;
+        try{
+            waypointName = ((Waypoint)Controller.getController().getWaypoints().elementAt(this.currentWaypointIndex)).getName();
+        }catch(IndexOutOfBoundsException e){
+            waypointName = "No Waypoints Found";
+        }
+        this.waypointNameText.setText(waypointName);
     }
 
     public void commandAction(Command command, Displayable disp) {
@@ -307,7 +311,8 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
                     currentWaypointIndex = 0;
                 }
             }
-            this.refresh();
+            refreshWaypointName();
+            this.refreshMessage();
         }
     }
 
