@@ -39,33 +39,17 @@ import javax.microedition.lcdui.Graphics;
  *
  * @author Tommi Laukkanen
  */
-public class InformationCanvas extends BaseCanvas implements Runnable {
+public class InformationCanvas extends BaseCanvas{
     
     private Controller controller;    
-    
-    private Thread refreshThread;
+
     
     /** Creates a new instance of InformationCanvas */
     public InformationCanvas(Controller controller) {
         super(controller);
 	this.controller = controller;
         
-        refreshThread = new Thread(this);
         refreshThread.start();
-    }
-    
-    /** Refresh view in every second */
-    public void run() {
-        while(true) {
-            if(this.isShown()) {
-                repaint();
-            }
-            try{
-                Thread.sleep(1000);
-            }catch(Exception ex) {
-                ex.printStackTrace();
-            }
-        }
     }    
     
     /** Paint information canvas */

@@ -39,7 +39,6 @@ public class SkyCanvas extends BaseCanvas{
     private final Font rowFont;
     private final Font smallRowFont;
     
-    private Thread refreshThread;
     
     /** Creates a new instance of SatelliteCanvas */
     public SkyCanvas(Controller controller) {
@@ -48,7 +47,6 @@ public class SkyCanvas extends BaseCanvas{
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         
-        refreshThread = new Thread(this);
         refreshThread.start();
         
     }

@@ -55,7 +55,6 @@ public class TrailCanvas extends BaseCanvas {
     private GpsPosition lastPosition;
     //private Vector positionTrail;
 
-    private Thread thread;
     private int counter;
     private String error;
 
@@ -81,8 +80,7 @@ public class TrailCanvas extends BaseCanvas {
         
         //positionTrail = new Vector();
 
-        thread = new Thread(this);
-        thread.start();
+        refreshThread.start();
         counter = 0;
 
         center = this.getWidth() / 2;

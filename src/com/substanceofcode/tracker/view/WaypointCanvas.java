@@ -42,7 +42,6 @@ public class WaypointCanvas extends BaseCanvas {
     private static Font rowFont;
     private int firstRowIndex;
     private boolean allowScrollingDown;
-    private Thread refreshThread;
     
     /** Creates a new instance of WaypointCanvas */
     public WaypointCanvas(Controller controller) {
@@ -53,7 +52,6 @@ public class WaypointCanvas extends BaseCanvas {
         
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         
-        refreshThread = new Thread( this );
         refreshThread.start();
     }
 

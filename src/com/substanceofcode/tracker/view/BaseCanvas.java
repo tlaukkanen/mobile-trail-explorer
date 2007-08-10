@@ -45,6 +45,8 @@ public abstract class BaseCanvas extends Canvas implements CommandListener, Runn
     
     protected Controller controller;
     
+    protected Thread refreshThread;
+    
     /** Commands */
     private Command startStopCommand;
     private Command settingsCommand;
@@ -65,6 +67,8 @@ public abstract class BaseCanvas extends Canvas implements CommandListener, Runn
         this.setFullScreenMode(true);
         initializeCommands();
         setCommandListener(this);
+        
+        refreshThread = new Thread(this);
     }
     
     /** Initialize commands */

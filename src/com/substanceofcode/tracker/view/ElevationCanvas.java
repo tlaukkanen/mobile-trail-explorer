@@ -82,6 +82,8 @@ public class ElevationCanvas extends BaseCanvas {
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
 
         this.setMinMaxValues();
+        
+        refreshThread.start();
     }
 
     private void setMinMaxValues() {
