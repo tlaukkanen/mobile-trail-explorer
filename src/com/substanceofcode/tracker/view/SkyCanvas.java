@@ -34,7 +34,7 @@ import javax.microedition.lcdui.Graphics;
  * 
  * @author  Tommi Laukkanen & Anthony McCormack
  */
-public class SkyCanvas extends BaseCanvas implements Runnable {
+public class SkyCanvas extends BaseCanvas{
     
     private final Font rowFont;
     private final Font smallRowFont;
@@ -159,23 +159,6 @@ public class SkyCanvas extends BaseCanvas implements Runnable {
                 satelliteIndex++;
             }
         } else {
-        }
-    }
-    
- 
-    public void run() {
-        while(true) {
-            if(this.isShown()) {
-                repaint();
-            }
-            try {
-                Thread.sleep(2000);
-            }catch(Exception ex) {
-                controller.showError(
-                    "Exception while showing satellite information: " + ex.toString(),
-                    10,
-                    controller.getCurrentScreen());
-            }
         }
     }
     

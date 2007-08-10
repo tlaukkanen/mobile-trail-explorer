@@ -36,7 +36,7 @@ import javax.microedition.lcdui.Graphics;
  *
  * @author Tommi
  */
-public class WaypointCanvas extends BaseCanvas implements Runnable {
+public class WaypointCanvas extends BaseCanvas {
     
     Controller controller;
     private static Font rowFont;
@@ -139,18 +139,4 @@ public class WaypointCanvas extends BaseCanvas implements Runnable {
         }
     }
 
-    /** Refresh thread */
-    public void run() {
-        while(true) {
-            if(isShown()) {
-                repaint();
-            }
-            try{
-                Thread.sleep(5000);
-            }catch(Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
-    
 }

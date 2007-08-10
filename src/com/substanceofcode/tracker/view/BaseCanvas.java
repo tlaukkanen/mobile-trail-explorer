@@ -33,7 +33,9 @@ import javax.microedition.lcdui.Font;
  *
  * @author Tommi
  */
-public abstract class BaseCanvas extends Canvas implements CommandListener {
+public abstract class BaseCanvas extends Canvas implements CommandListener, Runnable {
+    
+    protected static final Logger logger = Logger.getLogger();
     
     protected static final int COLOR_WHITE = 0xFFFFFF;
     protected static final int COLOR_BLACK = 0x0;
@@ -49,6 +51,9 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     private Command exitCommand;
     private Command manageTrailsCommand;
     private Command manageWaypointsCommand;
+    
+    protected long threadSleepDelay = 2000;
+    
     /*
     private Command markWaypointCommand;
     private Command editWaypointsCommand;    
@@ -111,6 +116,23 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         if( command == exitCommand ) {
             controller.exit();
         }
-    }    
+    }  
     
+    public void run() {
+        while(true) {
+            if(this.isShown()) {
+                repaint();
+            }
+            try {
+                Thread.sleep(threadSleepDelay);
+            }catch(Exception ex) {
+                controller.showError(
+                    "Exception caught in BaseCanvasThread for class: " + this.getClass().getName() + " | " + ex.toString(),
+                    10,
+                    controller.getCurrentScreen());
+                logger.log("Exception caught in BaseCanvasThread for class: " + this.getClass().getName() + " | " + ex.toString(), Logger.ERROR);
+            }
+        }
+    }
+   
 }

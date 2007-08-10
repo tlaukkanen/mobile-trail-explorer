@@ -34,7 +34,7 @@ import javax.microedition.lcdui.Graphics;
  * 
  * @author Tommi
  */
-public class SatelliteCanvas extends BaseCanvas implements Runnable {
+public class SatelliteCanvas extends BaseCanvas {
     
     private final Font rowFont;
     private final Font smallRowFont;
@@ -126,22 +126,6 @@ public class SatelliteCanvas extends BaseCanvas implements Runnable {
         } else {
             g.drawString("No Additional Satellite", 5, yPos, 0);
             g.drawString("Information Available", 5, yPos + g.getFont().getHeight(), 0);
-        }
-    }
-    
-    public void run() {
-        while(true) {
-            if(this.isShown()) {
-                repaint();
-            }
-            try {
-                Thread.sleep(2000);
-            }catch(Exception ex) {
-                controller.showError(
-                    "Exception while showing satellite information: " + ex.toString(),
-                    10,
-                    controller.getCurrentScreen());
-            }
         }
     }
     

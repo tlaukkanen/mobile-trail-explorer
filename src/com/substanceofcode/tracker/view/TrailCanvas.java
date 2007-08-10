@@ -50,7 +50,7 @@ import javax.microedition.lcdui.game.Sprite;
  * @author Tommi Laukkanen
  * @author Mario Sansone
  */
-public class TrailCanvas extends BaseCanvas implements Runnable {
+public class TrailCanvas extends BaseCanvas {
 	
     private GpsPosition lastPosition;
     //private Vector positionTrail;
@@ -629,10 +629,10 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
         while (true) {
             try {
                 Thread.sleep(1000);
-            	if(controller.getCurrentScreen() != this){
-            		// Not currently being displayed, so do nothing.
-            		continue;
-            	}
+                if(!this.isShown()){
+                        // Not currently being displayed, so do nothing.
+                        continue;
+                }
                 if(controller.getStatusCode() != Controller.STATUS_RECORDING){
                     this.repaint();
                     continue;
@@ -647,7 +647,6 @@ public class TrailCanvas extends BaseCanvas implements Runnable {
                 error = ex.toString();
             }
         }
-
     }
 
     /** Handle key presses */
