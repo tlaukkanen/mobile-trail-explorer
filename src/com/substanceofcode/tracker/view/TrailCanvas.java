@@ -157,18 +157,26 @@ public class TrailCanvas extends BaseCanvas {
         drawWaypoints(g);
 
         /** Draw ghost trail */
-        drawGhostTrail(g);
+        Track ghostTrail = controller.getGhostTrail();
+        drawTrail(g, ghostTrail, 0xAAAAAA, true);
         
-        /** Draw trail */
-        drawTrail(g);
+        /** Draw current trail */
+        Track currentTrail = controller.getTrack();
+        RecorderSettings settings = controller.getSettings();
+        drawTrail(g, currentTrail, 0xDD0000, settings.getDrawWholeTrail());
 
+        /** Draw current location with red dot */
+        g.drawImage(redDotImage, 
+            center + horizontalMovement, 
+            middle + verticalMovement,
+            Graphics.VCENTER | Graphics.HCENTER);        
+        
         /** Draw compass */
         drawCompass(g);
 
         /** Draw zoom scale bar */
         drawZoomScaleBar(g);
     }
-
 
     public void setLastPosition(GpsPosition position) {
         this.lastPosition = position;
@@ -226,35 +234,39 @@ public class TrailCanvas extends BaseCanvas {
     }
     
     /** Draw ghost trail */
-    private void drawGhostTrail(Graphics g) {
+    private void drawTrail(Graphics g, Track trail, int color, boolean drawWholeTrail) {
         try {
-            Track ghostTrail = controller.getGhostTrail();
-            if(ghostTrail==null) {
+            if(trail==null) {
                 return;
             }
             
-            g.setColor(180,180,180);
+            g.setColor(color);
             
             // TODO: implement the drawing based soely on numPositions. 
             final int numPositionsToDraw = controller.getSettings().getNumberOfPositionToDraw();
             
             final int numPositions;
-            synchronized(ghostTrail){
+            synchronized(trail){
                 /* Synchronized so that no element can be added or removed between getting
                 the number of elements and getting the elements themselfs. */
-                numPositions = ghostTrail.getPositionCount();
+                numPositions = trail.getPositionCount();
                 
-                int increment = (int)numPositions/numPositionsToDraw;
-                if(increment<1) {
+                /** Set increment value */
+                int increment;
+                if(drawWholeTrail) {
+                    increment = numPositions/numPositionsToDraw;
+                    if(increment<1) {
+                        increment = 1;
+                    }                
+                } else {
                     increment = 1;
                 }
-                
-                
-               // Vector points = ghostTrail.getTrailPoints();
-                double lastLatitude = ghostTrail.getStartPosition().latitude;
-                double lastLongitude = ghostTrail.getStartPosition().longitude;
-                for(int index=1; index<numPositions; index+=increment) {
-                    GpsPosition pos = ghostTrail.getPosition(index);
+
+                int positionsDrawn = 0;
+                double lastLatitude = trail.getEndPosition().latitude;
+                double lastLongitude = trail.getEndPosition().longitude;
+                for(int index=numPositions-2; index>=0; index-=increment) {
+                    GpsPosition pos = trail.getPosition(index);
                     
                     double lat = pos.latitude;
                     double lon = pos.longitude;
@@ -264,11 +276,15 @@ public class TrailCanvas extends BaseCanvas {
                     g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
     
                     lastLatitude = pos.latitude;
-                    lastLongitude = pos.longitude;                
+                    lastLongitude = pos.longitude;  
+                    positionsDrawn++;
+                    if(!drawWholeTrail && positionsDrawn>numPositionsToDraw) {
+                        break;
+                    }
                 }
             }
         } catch(Exception ex) {
-            Logger.getLogger().log("Exception occured while drawing ghost trail: " + ex.toString(), Logger.WARN);
+            Logger.getLogger().log("Exception occured while drawing trail: " + ex.toString(), Logger.WARN);
         }
     }
 

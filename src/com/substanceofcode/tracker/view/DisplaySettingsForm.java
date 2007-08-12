@@ -54,6 +54,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     
     private TextField drawingLimitField;
 
+    private ChoiceGroup drawingStyleGroup;
+
     private ChoiceGroup backlightGroup;
 
     /** Creates a new instance of DisplaySettingsForm */
@@ -112,7 +114,10 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             /** 5. Save the number of position to draw value. */
             settings.setNumberOfPositionToDraw(Integer.parseInt(drawingLimitField.getString()));
             
-            /** 4. Save the Backlight property */
+            /** Save the drawing style */
+            settings.setDrawWholeTrail(drawingStyleGroup.isSelected(1));
+
+            /** 4. Save the Backlight property */;
             boolean backlightOn = backlightGroup.isSelected(1);
             if (settings.getBacklightOn() != backlightOn) {
                 settings.setBacklightOn(backlightOn);
@@ -171,8 +176,20 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         
         this.append(displayGroup);
         
+        /** How many positions to draw */
         drawingLimitField = new TextField("Max Position To Draw", "" + settings.getNumberOfPositionToDraw(), 10, TextField.NUMERIC);
         this.append(drawingLimitField);
+
+        /** How trail is drawn */
+        String[] drawingStyles = {"Draw end of the trail", "Draw the whole trail"};
+        drawingStyleGroup = new ChoiceGroup(
+                "Drawing style", ChoiceGroup.EXCLUSIVE, drawingStyles, null);
+        if(settings.getDrawWholeTrail()) {
+            drawingStyleGroup.setSelectedIndex(1, true);
+        } else {
+            drawingStyleGroup.setSelectedIndex(0, true);
+        }
+        this.append(drawingStyleGroup);
 
         String[] backlight = { "Phones Default" /* Allow Off */,
                 "Attempt to Force On" };

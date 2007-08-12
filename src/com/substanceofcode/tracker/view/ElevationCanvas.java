@@ -57,7 +57,6 @@ public class ElevationCanvas extends BaseCanvas {
     private final int verticalMovementSize, horizontalMovementSize;
     private int verticalMovement, horizontalMovement;
 
-    private final TrailCanvas trailCanvas;
     private GpsPosition lastPosition;
     private Image redDotImage;
     private int xScale, yScale;
@@ -76,8 +75,6 @@ public class ElevationCanvas extends BaseCanvas {
         this.xScale = X_SCALE_TIME | X_MAX_ZOOM;
 
         this.gridOn = true;
-
-        this.trailCanvas = controller.getTrailCanvas();
 
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
 
@@ -129,9 +126,6 @@ public class ElevationCanvas extends BaseCanvas {
         g.setClip(MARGIN, top, this.getWidth() - 2 * MARGIN, bottom);
         drawTrail(g, top, bottom);
         g.setClip(clip[0], clip[1], clip[2], clip[3]);
-
-        drawCompass(g);
-
     }
 
     /**
@@ -385,10 +379,6 @@ public class ElevationCanvas extends BaseCanvas {
         final double oneMetre = availableHeight / altitudeDiff;
         int pixels = (int) ((altitude - minAltitude) * oneMetre);
         return bottom - (MARGIN + pixels) + verticalMovement;
-    }
-
-    private void drawCompass(Graphics g) {
-        trailCanvas.drawCompass(g);
     }
 
     public void keyPressed(int keyCode) {

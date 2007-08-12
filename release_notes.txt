@@ -23,6 +23,7 @@ v1.7 (August ?th 2007)
 + Track elevation view (Issue 31)
 + Export saved trail (Issue 45/50)
 + Added Sms Ability to send a GpsPosition/Waypoint as an SMS! (Issue 52)
++ Drawing style options (draw whole the trail or end of the trail)
 
 v1.6 (June 10th 2007)
 + Display current time (Issue 37)

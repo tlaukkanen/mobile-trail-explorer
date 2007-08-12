@@ -47,6 +47,7 @@ public class RecorderSettings {
     private static final String UNITS = "units";
     private static final String BACKLIGHT = "backlight";
     private static final String POSITIONS_TO_DRAW = "number-of-position-to-draw";
+    private static final String DRAW_STYLE = "draw-style";
     private static final String LOGGING_LEVEL = "logger-recording-level";
     private static final String VERSION_NUMBER = "version-number";
     
@@ -253,6 +254,17 @@ public class RecorderSettings {
         saveSettings();
     }
     
+    /** Is the whole trail drawn */
+    public boolean getDrawWholeTrail() {
+        return settings.getBooleanProperty(DRAW_STYLE, false);
+    }
+
+    /** Set the drawing style */
+    public void setDrawWholeTrail(boolean value) {
+        settings.setBooleanProperty(DRAW_STYLE, value);
+        saveSettings();
+    }
+
     /**
      * Should the backlight always be on?
      * Default is false;
