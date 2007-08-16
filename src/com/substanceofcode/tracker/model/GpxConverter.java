@@ -304,7 +304,7 @@ public class GpxConverter extends TrackConverter {
 			final int minute = Integer.parseInt(dateString.substring(14,16));
 			final int second = Integer.parseInt(dateString.substring(17,19));
 			
-			final String reconstruct = year + "-" + (month < 10?"0":"") + month + "-" + (day < 10?"0":"") + day + "Z" + (hour < 10?"0":"") + hour + ":" + (minute < 10?"0":"") + minute + ":" + (second < 10?"0":"") + second + "Z";
+			final String reconstruct = year + "-" + (month < 10?"0":"") + month + "-" + (day < 10?"0":"") + day + "T" + (hour < 10?"0":"") + hour + ":" + (minute < 10?"0":"") + minute + ":" + (second < 10?"0":"") + second + "Z";
 			
 			if(dateString.toLowerCase().equals(reconstruct.toLowerCase())){
 				System.out.println("Same");
