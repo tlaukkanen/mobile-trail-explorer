@@ -23,7 +23,6 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.bluetooth.GpsPosition;
-import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Enumeration;
@@ -38,15 +37,13 @@ import javax.microedition.lcdui.Graphics;
  */
 public class WaypointCanvas extends BaseCanvas {
     
-    Controller controller;
     private static Font rowFont;
     private int firstRowIndex;
     private boolean allowScrollingDown;
     
     /** Creates a new instance of WaypointCanvas */
-    public WaypointCanvas(Controller controller) {
-        super(controller);
-        this.controller = controller;        
+    public WaypointCanvas() {
+        super();     
         firstRowIndex = 0;
         allowScrollingDown = false;
         

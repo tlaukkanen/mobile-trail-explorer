@@ -155,10 +155,10 @@ public class Controller {
 		screens = new BaseCanvas[6];
 		screens[0] = getTrailCanvas();
 		screens[1] = getElevationCanvas();
-		screens[2] = new InformationCanvas(this);
-		screens[3] = new WaypointCanvas(this);
-		screens[4] = new SatelliteCanvas(this);
-		screens[5] = new SkyCanvas(this);
+		screens[2] = new InformationCanvas();
+		screens[3] = new WaypointCanvas();
+		screens[4] = new SatelliteCanvas();
+		screens[5] = new SkyCanvas();
 		currentDisplayIndex = 0;
 	}
 
@@ -424,7 +424,7 @@ public class Controller {
 				initialPosition = this.recorder.getPositionFromRMS();
 			} catch (Exception anyException) {/* discard */
 			}
-			trailCanvas = new TrailCanvas(this, initialPosition);
+			trailCanvas = new TrailCanvas(initialPosition);
 		}
 		return trailCanvas;
 	}
@@ -436,7 +436,7 @@ public class Controller {
 				initialPosition = this.recorder.getPositionFromRMS();
 			} catch (Exception anyException) { /* discard */
 			}
-			elevationCanvas = new ElevationCanvas(this, initialPosition);
+			elevationCanvas = new ElevationCanvas(initialPosition);
 		}
 		return elevationCanvas;
 	}

@@ -23,7 +23,6 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.bluetooth.GpsSatellite;
-import com.substanceofcode.tracker.controller.Controller;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
@@ -41,8 +40,8 @@ public class SkyCanvas extends BaseCanvas{
     
     
     /** Creates a new instance of SatelliteCanvas */
-    public SkyCanvas(Controller controller) {
-        super( controller );
+    public SkyCanvas() {
+        super();
         
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);

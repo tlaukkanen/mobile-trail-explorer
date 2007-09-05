@@ -23,7 +23,6 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.bluetooth.GpsPosition;
-import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.SpeedFormatter;
 import com.substanceofcode.tracker.model.Track;
@@ -41,13 +40,9 @@ import javax.microedition.lcdui.Graphics;
  */
 public class InformationCanvas extends BaseCanvas{
     
-    private Controller controller;    
-
-    
     /** Creates a new instance of InformationCanvas */
-    public InformationCanvas(Controller controller) {
-        super(controller);
-	this.controller = controller;
+    public InformationCanvas() {
+        super();
         
         refreshThread.start();
     }    

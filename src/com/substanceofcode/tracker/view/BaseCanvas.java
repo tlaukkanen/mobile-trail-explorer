@@ -32,15 +32,27 @@ import javax.microedition.lcdui.Font;
 /**
  *
  * @author Tommi
+ * @author Barry Redmond
  */
 public abstract class BaseCanvas extends Canvas implements CommandListener, Runnable {
     
+    /** The Logger to log notable Events to. */
     protected static final Logger logger = Logger.getLogger();
     
+    /** The color White, in it's integer value form. */
     protected static final int COLOR_WHITE = 0xFFFFFF;
+    /** The color Black, in it's integer value form. */
     protected static final int COLOR_BLACK = 0x0;
+    /** The color Black, in it's integer value form. */
+    protected static final int COLOR_RED = 0xFF0000;
+    /** The color Black, in it's integer value form. */
+    protected static final int COLOR_GREEN = 0x00FF00;
+    /** The color Black, in it's integer value form. */
+    protected static final int COLOR_BLUE = 0x0000FF;
     
+    /** The color all BaseCanvas subclass titles should be. */
     protected static final int COLOR_TITLE = 0x008000;
+    /** The Font all CbasCanvas subclass titles should be. */
     protected static final Font titleFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
     
     protected Controller controller;
@@ -60,12 +72,10 @@ public abstract class BaseCanvas extends Canvas implements CommandListener, Runn
     private Command markWaypointCommand;
     private Command editWaypointsCommand;    
     */
-    public BaseCanvas(){
-    	
-    }
+    
     /** Creates a new instance of BaseCanvas */
-    public BaseCanvas(Controller controller) {
-        this.controller = controller;
+    public BaseCanvas() {
+        this.controller = Controller.getController();
         this.setFullScreenMode(true);
         initializeCommands();
         setCommandListener(this);
@@ -73,17 +83,9 @@ public abstract class BaseCanvas extends Canvas implements CommandListener, Runn
         refreshThread = new Thread(this);
     }
     
-    /** Initialize commands */
+    /* Initialize commands */
     private void initializeCommands() {
-        /*
-        // Edit waypoints command for listing existing waypoints
-        editWaypointsCommand = new Command("Edit waypoints", Command.SCREEN, 4);
-        addCommand(editWaypointsCommand);
         
-        // Mark a new waypoint command
-        markWaypointCommand = new Command("Mark waypoint", Command.SCREEN, 3);
-        addCommand(markWaypointCommand);
-        */
         
         // Start/Stop command for toggling recording
         startStopCommand = new Command("Start/Stop recording", Command.ITEM, 1);
@@ -109,18 +111,20 @@ public abstract class BaseCanvas extends Canvas implements CommandListener, Runn
     
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if( command == startStopCommand ) {
-            controller.startStop();
-        }else if(command == manageTrailsCommand ){
-            controller.showTrailsList();
-        }else if(command == manageWaypointsCommand){
-            controller.showWaypointList();
-        }
-        if( command == settingsCommand ) {
-            controller.showSettings();
-        }
-        if( command == exitCommand ) {
-            controller.exit();
+        if(displayable == this){
+            if( command == startStopCommand ) {
+                controller.startStop();
+            }else if(command == manageTrailsCommand ){
+                controller.showTrailsList();
+            }else if(command == manageWaypointsCommand){
+                controller.showWaypointList();
+            }
+            if( command == settingsCommand ) {
+                controller.showSettings();
+            }
+            if( command == exitCommand ) {
+                controller.exit();
+            }
         }
     }  
     

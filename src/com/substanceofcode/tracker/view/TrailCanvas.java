@@ -80,13 +80,11 @@ public class TrailCanvas extends BaseCanvas {
     private boolean largeDisplay;
 
     /** Creates a new instance of TrailCanvas */
-    public TrailCanvas(Controller controller, GpsPosition initialPosition) {
-        super(controller);
+    public TrailCanvas(GpsPosition initialPosition) {
+        super();
         this.lastPosition = initialPosition;
         
         //positionTrail = new Vector();
-
-        refreshThread.start();
         counter = 0;
 
         center = this.getWidth() / 2;
@@ -145,6 +143,7 @@ public class TrailCanvas extends BaseCanvas {
             compassArrows.setPosition(this.getWidth() - 22, 11);
         }
 
+        refreshThread.start();
     }
 
     /** Paint */

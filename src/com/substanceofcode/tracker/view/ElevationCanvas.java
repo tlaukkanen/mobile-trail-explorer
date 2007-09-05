@@ -64,8 +64,8 @@ public class ElevationCanvas extends BaseCanvas {
 
     private double minAltitude, maxAltitude;
 
-    public ElevationCanvas(Controller controller, GpsPosition initialPosition) {
-        super(controller);
+    public ElevationCanvas(GpsPosition initialPosition) {
+        super();
 
         this.lastPosition = initialPosition;
 
