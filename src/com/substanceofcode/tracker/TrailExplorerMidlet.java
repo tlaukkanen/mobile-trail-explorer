@@ -52,10 +52,14 @@ public class TrailExplorerMidlet extends MIDlet {
     }
     
     public void startApp() {
+    	if (controller.checkIfPaused()==true) {
+    		controller.unpause();    		
+    	}    	                                      
         Logger.getLogger().log("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
     public void pauseApp() {
+    	controller.pause();
         Logger.getLogger().log("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     

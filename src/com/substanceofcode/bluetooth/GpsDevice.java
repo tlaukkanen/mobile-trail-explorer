@@ -38,7 +38,6 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
     
     private final Logger logger = Logger.getLogger();
     
-    // private PositionBuffer lastPosition;
     private GpsPositionParser parser;
     
     private static final long BREAK = 2000;
@@ -48,6 +47,9 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
     private InputStreamReader reader;
     private Thread thread;
     
+    public GpsDevice(){
+    	
+    }
     
     /** Creates a new instance of GpsDevice */
     public GpsDevice(String address, String alias) {
@@ -90,6 +92,14 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
     /** Get current position from GPS unit */
     public GpsPosition getPosition() {
         return parser.getGpsPosition();
+    }
+    
+    public GpsGPGSA getGPGSA() {
+    	if (parser == null)
+    	{
+    		return null;
+    	}
+    	return parser.getGPGSA();
     }
     
     /** Get satellites in view count */
@@ -136,8 +146,9 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                         continue;
                     }
                     // only parse items begining with '$', such as "$GPRMC,..." and "$GPGSA,..." etc...
-                    if(output.length() > 1 && output.charAt(0) == '$'){
-                        parser.parse(output.toString());
+                    String nmeaString= output.toString();
+                    if(parser.isValidNMEASentence(nmeaString)){
+                        parser.parse(nmeaString);
                     }
                     
                     
@@ -146,12 +157,15 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                 // or
                 // while reading. Wait some time before continuing, then
                 // disconnect, and reconnect... to be sure to be sure.
+                // This happens quite often on my N80, and it spells death for the current trail
+                //
                 catch (IOException ie) {
                     final Controller controller = Controller.getController();
                     boolean isRecording = (controller.getStatusCode()!=Controller.STATUS_STOPPED);
                     if(isRecording==false) {
                         return;
                     }
+                    controller.pause();
                     controller.showError("IOException occured in GpsDevice.run()", 5, controller
                         .getCurrentScreen());
                     logger.log("IOException occured in GpsDevice.run()", Logger.ERROR);
@@ -200,4 +214,6 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
         logger.log("Thread GpsDevice.run() finished.", Logger.INFO);
     }
     
+    
+   
 }

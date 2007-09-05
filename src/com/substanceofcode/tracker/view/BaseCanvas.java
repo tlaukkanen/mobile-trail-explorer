@@ -60,7 +60,9 @@ public abstract class BaseCanvas extends Canvas implements CommandListener, Runn
     private Command markWaypointCommand;
     private Command editWaypointsCommand;    
     */
-    
+    public BaseCanvas(){
+    	
+    }
     /** Creates a new instance of BaseCanvas */
     public BaseCanvas(Controller controller) {
         this.controller = controller;

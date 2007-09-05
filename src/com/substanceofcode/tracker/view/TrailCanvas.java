@@ -24,22 +24,27 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.bluetooth.GpsPosition;
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.*;
-import com.substanceofcode.util.DateTimeUtil;
-import com.substanceofcode.util.ImageUtil;
-import com.substanceofcode.util.StringUtil;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
+
+import com.substanceofcode.bluetooth.GpsGPGSA;
+import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.tracker.model.UnitConverter;
+import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.util.ImageUtil;
+import com.substanceofcode.util.StringUtil;
 
 //import com.nokia.mid.ui.DeviceControl;
 
@@ -53,6 +58,7 @@ import javax.microedition.lcdui.game.Sprite;
 public class TrailCanvas extends BaseCanvas {
 	
     private GpsPosition lastPosition;
+    private GpsGPGSA gpgsa=null;
     //private Vector positionTrail;
 
     private int counter;
@@ -241,16 +247,16 @@ public class TrailCanvas extends BaseCanvas {
             }
             
             g.setColor(color);
-            
+         
             // TODO: implement the drawing based soely on numPositions. 
             final int numPositionsToDraw = controller.getSettings().getNumberOfPositionToDraw();
-            
+         
             final int numPositions;
             synchronized(trail){
                 /* Synchronized so that no element can be added or removed between getting
                 the number of elements and getting the elements themselfs. */
                 numPositions = trail.getPositionCount();
-                
+         
                 /** Set increment value */
                 int increment;
                 if(drawWholeTrail) {
@@ -261,13 +267,16 @@ public class TrailCanvas extends BaseCanvas {
                 } else {
                     increment = 1;
                 }
-
+         
                 int positionsDrawn = 0;
+                
+                try {
                 double lastLatitude = trail.getEndPosition().latitude;
                 double lastLongitude = trail.getEndPosition().longitude;
+
                 for(int index=numPositions-2; index>=0; index-=increment) {
                     GpsPosition pos = trail.getPosition(index);
-                    
+
                     double lat = pos.latitude;
                     double lon = pos.longitude;
                     CanvasPoint point1 = convertPosition(lat, lon);
@@ -282,77 +291,12 @@ public class TrailCanvas extends BaseCanvas {
                         break;
                     }
                 }
+                }
+                catch (NoSuchElementException nsee){
+                	//This occurs when there is no track so consume the error here
+                }
             }
         } catch(Exception ex) {
-            Logger.getLogger().log("Exception occured while drawing trail: " + ex.toString(), Logger.WARN);
-        }
-    }
-
-    /** Draw trail */
-    private void drawTrail(Graphics g) {
-
-        try {
-
-            // Exit if we don't have anything to draw
-            if (lastPosition == null) {
-                return;
-            }
-
-            int center = getWidth() / 2;
-            int middle = getHeight() / 2;
-
-            double currentLatitude = lastPosition.latitude;
-            double currentLongitude = lastPosition.longitude;
-
-            double lastLatitude = currentLatitude;
-            double lastLongitude = currentLongitude;
-
-            //Vector positionTrail = controller.getTrack().getTrailPoints();
-            final Track track = controller.getTrack();
-            final int numPositions;
-            synchronized(track){
-                /* Synchronized so that no element can be added or removed between getting
-                the number of elements and getting the elements themselfs. */
-                numPositions = track.getPositionCount();
-                
-    
-                // Draw trail with red color
-                g.setColor(222, 0, 0);
-                
-                // TODO: implement the drawing based soely on numPositions. 
-                final int numPositionsToDraw = controller.getSettings().getNumberOfPositionToDraw();
-                
-                final int lowerLimit;
-                if(numPositions - numPositionsToDraw < 0){
-                    lowerLimit = 0;
-                }else{
-                    lowerLimit = numPositions - numPositionsToDraw;
-                }
-                for (int positionIndex = numPositions - 1; positionIndex >= lowerLimit; positionIndex--) {
-                    
-                    GpsPosition pos = track.getPosition(positionIndex);
-    
-                    double lat = pos.latitude;
-                    double lon = pos.longitude;
-                    CanvasPoint point1 = convertPosition(lat, lon);
-    
-                    CanvasPoint point2 = convertPosition(lastLatitude, lastLongitude);
-    
-                    g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
-    
-                    lastLatitude = pos.latitude;
-                    lastLongitude = pos.longitude;
-                }
-            }
-
-            // Draw red dot on current location
-            g.drawImage(redDotImage, center + horizontalMovement, middle + verticalMovement,
-                    Graphics.VCENTER | Graphics.HCENTER);
-
-        } catch (Exception ex) {
-            g.setColor(255, 0, 0);
-            g.drawString("ERR: " + ex.toString(), 1, 120, Graphics.TOP | Graphics.LEFT);
-
             Logger.getLogger().log("Exception occured while drawing trail: " + ex.toString(), Logger.WARN);
         }
     }
@@ -560,6 +504,30 @@ public class TrailCanvas extends BaseCanvas {
                 displayRow++;
             }
             
+            /** Draw any other gps info */           
+            
+            if (gpgsa!=null){
+	            g.drawString("FIX:", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+	            g.drawString(""+gpgsa.getFixtype(), positionAdd, fontHeight * displayRow, Graphics.TOP
+	                    | Graphics.LEFT);
+	            displayRow++;
+	            
+	            g.drawString("PDOP:", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+	            g.drawString(""+gpgsa.getPdop(), positionAdd, fontHeight * displayRow, Graphics.TOP
+	                    | Graphics.LEFT);
+	          //  displayRow++;
+	            
+	           // g.drawString("HDOP:", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+	            //g.drawString(""+gpgsa.getHdop(), positionAdd, fontHeight * displayRow, Graphics.TOP
+	             //       | Graphics.LEFT);
+	            //displayRow++;
+	            
+	           // g.drawString("VDOP:", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+	           // g.drawString(""+gpgsa.getVdop(), positionAdd, fontHeight * displayRow, Graphics.TOP
+	             //       | Graphics.LEFT);
+	        //    displayRow++;
+            }
+            
             long secondsSinceLastPosition = -1;
             if(lastPosition.date != null){
                 secondsSinceLastPosition = (now.getTime() - lastPosition.date.getTime()) / 1000;
@@ -611,8 +579,7 @@ public class TrailCanvas extends BaseCanvas {
         /** Draw error texts */
         g.setColor(255, 0, 0);
         if (error != null) {
-            g
-                    .drawString("" + error, 1, height - (fontHeight * 3 + 2), Graphics.TOP
+            g.drawString("" + error, 1, height - (fontHeight * 3 + 2), Graphics.TOP
                             | Graphics.LEFT);
         }
         if (controller.getError() != null) {
@@ -652,9 +619,11 @@ public class TrailCanvas extends BaseCanvas {
                     continue;
                 }
                 final GpsPosition temp = controller.getPosition();
+                this.gpgsa=controller.getGPGSA();
                 if(temp != null){
                     this.lastPosition = controller.getPosition();   
                 }
+               
                 this.repaint();
             } catch (Exception ex) {
                 Logger.getLogger().log("Error in TrailCanvas.run(): " + ex.toString(), Logger.WARN);
@@ -662,10 +631,15 @@ public class TrailCanvas extends BaseCanvas {
             }
         }
     }
+    public TrailCanvas(){}
+    public static void main(String[] args) {
+		TrailCanvas tc= new TrailCanvas();
+		tc.run();
+	}
 
     /** Handle key presses */
     public void keyPressed(int keyCode) {
-
+    	System.out.println("key="+keyCode);
         /** Handle zooming keys */
         switch (keyCode) {
             case (KEY_NUM1):
@@ -686,6 +660,7 @@ public class TrailCanvas extends BaseCanvas {
                 break;
 
             default:
+            	
         }
 
         /** Handle panning keys */

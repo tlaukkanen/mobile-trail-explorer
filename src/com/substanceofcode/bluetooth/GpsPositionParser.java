@@ -34,15 +34,17 @@ import java.util.Vector;
  */
 public class GpsPositionParser {
 
-    private static final String DELIMETER = ",";
+    private static final String DELIMITER = ",";
 
     private static GpsPositionParser gpsPositionParser;
 
-    private final Logger logger = Logger.getLogger();
+   private final Logger logger = Logger.getLogger();
     
     private GpsPosition currentPosition;
+    private GpsGPGSA gpgsa;
     private double lastAltitude;
     private short satelliteCount;
+    private double maxSpeed;
     private final Vector satellites;
     
     /**
@@ -75,6 +77,14 @@ public class GpsPositionParser {
     public synchronized GpsPosition getGpsPosition() {
         return currentPosition;
     }
+    
+    public synchronized GpsGPGSA getGPGSA() {
+    	return gpgsa;
+    }
+   
+    private synchronized void setOtherInfo(GpsGPGSA gpgsa) {
+		this.gpgsa=gpgsa;
+	}
 
     private synchronized void setGpsPosition(GpsPosition pos) {
         this.currentPosition = pos;
@@ -131,6 +141,8 @@ public class GpsPositionParser {
     /** Parse GPS position */
     public synchronized void parse(String record){
         recordMetrics(record);
+        //Chop the checksum off, we don't want to parse it
+        record=record.substring(0,record.indexOf('*'));        
         if (record.startsWith("$GPRMC")) {
             try{
                 parseGPRMC(record);
@@ -232,7 +244,7 @@ public class GpsPositionParser {
      */
     private void parseGPRMC(String record) {
         
-        String[] values = StringUtil.split(record, DELIMETER);
+        String[] values = StringUtil.split(record, DELIMITER);
 
         // First value = $GPRMC
         // Date time of fix (eg. 041107.000)
@@ -242,10 +254,10 @@ public class GpsPositionParser {
         final String warning = values[2];
 
         // Lattitude (eg. 6131.2028)
-        final String lattitude = values[3];
+        final String latitude = values[3];
 
         // Lattitude direction (eg. N)
-        final String lattitudeDirection = values[4];
+        final String latitudeDirection = values[4];
 
         // Longitude (eg. 02356.8782)
         final String longitude = values[5];
@@ -262,18 +274,18 @@ public class GpsPositionParser {
         double longitudeDouble = 0.0;
         double latitudeDouble = 0.0;
         double speed = -2.0;
-        if (longitude.length() > 0 && lattitude.length() > 0) {
+        if (longitude.length() > 0 && latitude.length() > 0) {
             longitudeDouble = parseLatLongValue(longitude, true);
             if (longitudeDirection.equals("E") == false) {
                 longitudeDouble = -longitudeDouble;
             }
 
-            latitudeDouble = parseLatLongValue(lattitude, false);
-            if (lattitudeDirection.equals("N") == false) {
+            latitudeDouble = parseLatLongValue(latitude, false);
+            if (latitudeDirection.equals("N") == false) {
                 latitudeDouble = -latitudeDouble;
             }
         }else{
-            logger.log("Error with lat or long", Logger.INFO);
+           logger.log("Error with lat or long", Logger.INFO);
             return;
         }
 
@@ -291,7 +303,12 @@ public class GpsPositionParser {
         if (groundSpeed.length() > 0) {
             try {
                 // km/h = knots * 1.852
+            	
                 speed = (int) (Double.parseDouble(groundSpeed) * 1.852);
+                
+                if (speed <maxSpeed){
+                	maxSpeed=speed;
+                }
             } catch (Exception e) {
                 speed = -1;
             }
@@ -430,7 +447,7 @@ public class GpsPositionParser {
      * http://aprs.gids.nl/nmea/
      */
     private synchronized void parseGPGGA(String record) {
-        String[] values = StringUtil.split(record, DELIMETER);
+        String[] values = StringUtil.split(record, DELIMITER);
         short isFixed = Short.parseShort(values[6]);
         satelliteCount = Short.parseShort( values[7] );
         if (isFixed > 0) {
@@ -473,7 +490,7 @@ public class GpsPositionParser {
      * up to 4 satellites per sentence *75 the checksum data, always begins with *
      */
     private synchronized void parseGPGSV(String record) {
-        String[] values = StringUtil.split(record, DELIMETER);
+        String[] values = StringUtil.split(record, DELIMITER);
         
         final short cyclePos = Short.parseShort(values[2]);
         if (cyclePos == 1) {
@@ -521,11 +538,68 @@ public class GpsPositionParser {
      * 
      * @param record
      */
-    private void parseGPGSA(String record) {
-        //String[] values = StringUtil.split(record, DELIMETER);
-        // TODO: implement parsing of $GPGSA records.
+    private void parseGPGSA(String record) {    	
+        String[] values = StringUtil.split(record, DELIMITER);             
+        //String mode=values[1];
+          int fixtype=Short.parseShort(values[2]);
+          if (fixtype>1){
+          	int [] svid =new int[13];
+          	for(int i = 2;i<15;i++){        
+          		try{
+          		svid[i-2]=Short.parseShort(values[i]);
+          		}
+          		catch (NumberFormatException nfe){
+          			svid[i-2]=0;
+          		}
+          	}
+          	GpsGPGSA oi = new GpsGPGSA();
+          	oi.setFixtype(fixtype);
+          	oi.setPdop(values[15]);
+          	oi.setHdop(values[16]);
+          	oi.setVdop(values[17]);
+	        setOtherInfo(oi);
+          }
+  
     }
 
+    
+    /**
+	 * Track Made Good and Ground Speed.
+	 * 
+	 * eg1. $GPVTG,360.0,T,348.7,M,000.0,N,000.0,K*43 * eg2.
+	 * $GPVTG,054.7,T,034.4,M,005.5,N,010.2,K
+	 * 
+	 * 
+	 * 054.7,T True track made good 034.4,M Magnetic track made good 005.5,N
+	 * Ground speed, knots 010.2,K Ground speed, Kilometers per hour
+	 * 
+	 * 
+	 * eg3. $GPVTG,t,T,,,s.ss,N,s.ss,K*hh 1 = Track made good 2 = Fixed text 'T'
+	 * indicates that track made good is relative to true north 3 = not used 4 =
+	 * not used 5 = Speed over ground in knots 6 = Fixed text 'N' indicates that
+	 * speed over ground in in knots 7 = Speed over ground in kilometers/hour 8 =
+	 * Fixed text 'K' indicates that speed over ground is in kilometers/hour 9 =
+	 * Checksum
+	 * 
+	 * The actual track made good and speed relative to the ground.
+	 * 
+	 * $--VTG,x.x,T,x.x,M,x.x,N,x.x,K x.x,T = Track, degrees True x.x,M = Track,
+	 * degrees Magnetic x.x,N = Speed, knots x.x,K = Speed, Km/hr
+	 * 
+	 * http://aprs.gids.nl/nmea/
+	 */
+	private synchronized void parseGPVTG(String record) {
+		String[] values = StringUtil.split(record, DELIMITER);
+		String trackMadeGood= values[1];
+		boolean relTrueNorth = values[2]=="t"?true:false;
+		String notUsed1=values[3];
+		String notUsed2=values[4];
+		String groundSpeedKnots=values[5];
+		boolean speedinKnots=values[6]=="N"?true:false;
+		String groundSpeedKmph=values[7];
+		boolean speedinKmph=values[8]=="K"?true:false;
+	}
+	
     private void copyLastCycleSatellitesAndClear() {
         if(this.tempSatellites == null){
             return;
@@ -564,5 +638,30 @@ public class GpsPositionParser {
         double degrees = degreeInteger + degreeDecimals;
         return degrees;
     }
+    /**
+	 * Calculates the checksum for an NMEA sentence
+	 * 
+	 * @param n
+	 *            the sentence to calculate the checksum for
+	 * @return true if sentence checksum is good
+	 */
+	public boolean isValidNMEASentence(String n) {
+		boolean result = false;
+		byte[] bs = n.getBytes();
+	
+		if (n != null && n.length() > 0 && n.charAt(0) == '$'
+				&& n.charAt(n.length() - 3) == '*') {
+			String checksum = n.substring(n.indexOf('*') + 1, n.length());
+			byte cb = Byte.parseByte(checksum, 16);
+			byte c = 0;
+			for (int i = 1; i < bs.length - 3; i++) {
+				c ^= bs[i];
+			}
+			if (c == cb) {
+				result = true;
+			}
+		}
+		return result;
+	}
 
 }

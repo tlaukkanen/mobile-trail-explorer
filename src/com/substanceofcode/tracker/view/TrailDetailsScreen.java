@@ -113,7 +113,7 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                 final String selectedTrailName = this.getTitle();
                 try {
                     final Track trail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
-                    controller.laodTrack(trail);
+                    controller.loadTrack(trail);
                     controller.showTrail();
                 } catch (IOException e) {
                     controller.showError("ERROR! An Exception was thrown when attempting to load " + "the Trail from the RMS!  " + e.toString(), 5, this);

@@ -105,7 +105,7 @@ public class TrailsList extends List implements CommandListener{
                     final String selectedTrailName = this.getString(this.getSelectedIndex());
                     try {
                         final Track trail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
-                        controller.laodTrack(trail);
+                        controller.loadTrack(trail);
                         controller.showTrail();
                     } catch (IOException e) {
                         controller.showError("ERROR! An Exception was thrown when attempting to load " +
@@ -125,7 +125,7 @@ public class TrailsList extends List implements CommandListener{
             }else if(command == this.backCommand){
                 controller.showTrail();
             }else if(command == this.newTrailCommand){
-                controller.laodTrack(null);
+                controller.loadTrack(null);
                 controller.showTrail();
             }else if(command == this.deleteCommand){
                 try {

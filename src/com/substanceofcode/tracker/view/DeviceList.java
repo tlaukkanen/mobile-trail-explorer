@@ -49,6 +49,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
     private Command refreshCommand;
     private Command selectCommand;
     private Command cancelCommand;
+    private Command mockGpsCommand;
     
     /** Creates a new instance of DeviceList */
     public DeviceList(Controller controller) {
@@ -77,6 +78,8 @@ public class DeviceList extends List implements Runnable, CommandListener {
         setSelectCommand(selectCommand);
         cancelCommand = new Command("Cancel", Command.SCREEN, 3);
         addCommand(cancelCommand);
+     //   mockGpsCommand = new Command("MockGPS", Command.ITEM, 4);
+     //   addCommand(mockGpsCommand);
         
         setCommandListener(this);
     }
@@ -163,8 +166,11 @@ public class DeviceList extends List implements Runnable, CommandListener {
         }
         if(command==cancelCommand) {
             controller.showSettings();
-        }
-        
+        }        
+        if(command==mockGpsCommand) {
+            controller.setMockGpsDevice("Mock","MockGpsDevice");
+            controller.showSettings();
+        }        
     }
     
     

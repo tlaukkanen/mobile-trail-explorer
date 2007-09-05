@@ -27,8 +27,17 @@ package com.substanceofcode.bluetooth;
  */
 public class BluetoothDevice {
     
-    private String address;
-    private String alias;
+    protected String address;
+    protected String alias;
+   
+    /** 
+     * Explicit no arg constructor to allow for mock implementations
+     * of subclasses
+     *
+     */
+    public BluetoothDevice(){
+    	
+    }
     
     /** Creates a new instance of BluetoothDevice */
     public BluetoothDevice(String address, String alias) {

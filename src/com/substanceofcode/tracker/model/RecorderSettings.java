@@ -77,6 +77,9 @@ public class RecorderSettings {
     public static final String EXPORT_TO_GPX = "export-to-gpx";
     public static final String EXPORT_TO_SAVE = "export-to-save";
     
+    private static final int RECORDING_INTERVAL_DEFAULT = 1;
+    private static final int RECORDING_MARKER_INTERVAL_DEFAULT = 1;
+    
     
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
@@ -107,7 +110,7 @@ public class RecorderSettings {
     public String getImportFile() {
     	 String result = settings.getStringProperty(IMPORT_FILE, "");
          if(result.length()==0) {
-             result = "root1/import.gpx";
+             result = "E:/import.gpx";
          }
          return result;
 	}
@@ -179,7 +182,7 @@ public class RecorderSettings {
     
     /** Get recording interval */
     public int getRecordingInterval() {
-        int defaultInterval = 10; // Mark default as 10 seconds
+        int defaultInterval = RECORDING_INTERVAL_DEFAULT; // Mark default as 10 seconds
         int recordingInterval = settings.getIntProperty(
                 RECORDING_INTERVAL,
                 defaultInterval );
@@ -194,7 +197,7 @@ public class RecorderSettings {
     
     /** Get recording interval for markers */
     public int getRecordingMarkerInterval() {
-        return settings.getIntProperty(RECORDING_MARKER_INTERVAL, 10);
+        return settings.getIntProperty(RECORDING_MARKER_INTERVAL, RECORDING_MARKER_INTERVAL_DEFAULT);
     }
     
     /** Set recording interval for markers */

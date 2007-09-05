@@ -76,6 +76,8 @@ public class Track implements Serializable {
     /** The Tracks name */
     private String name = null;
 
+	public static final String PAUSEFILENAME="pause";
+
     /** Creates a new instance of Track */
     public Track() {
         trackPoints = new Vector();
@@ -277,6 +279,28 @@ public class Track implements Serializable {
                     getMimeType(), this, false);
         }
     }
+    
+    
+    /**
+     * Utility method to 'pause' the current track to the rms
+     * Not throwing any exceptions, pausing is done on a best effort basis,
+     * If it fails there is probably nothing that can be done about it 
+     * in the circumstances 
+     */
+    public void pause()  {
+        if (this.markers.size() == 0 && this.trackPoints.size() == 0) {            
+            return;
+        } else {
+            
+            try {
+				FileSystem.getFileSystem().saveFile(PAUSEFILENAME,
+				        getMimeType(), this, false);
+			} catch (FileIOException e) {		
+			}
+        }
+    }
+    
+        
 
     public void serialize(DataOutputStream dos) throws IOException {
         final int numPoints = trackPoints.size();
