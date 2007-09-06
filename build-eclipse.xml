@@ -1,7 +1,7 @@
 <!--
 	Description: Build script for the Mobile Trail Explorer
 	
-	Author: barryred
+	Author: Barry Redmond
 -->
 <!-- NOTES:
 	 ====== 
@@ -41,9 +41,9 @@
 	
 	<!-- MIDlet properties -->
 	<!-- midlet.name must not contain spaces -->
-	<property name="midlet.name" value="TrailExplorer" />
+	<property name="midlet.name" value="TrailExplorerMidlet" />
 	<property name="midlet.vendor" value="Tommi Laukkanen" />
-	<property name="midlet.version" value="1.5" />
+	<property name="midlet.version" value="1.7" />
 	<!-- This is the path to the MIDlet that is started when the Application is run -->
 	<property name="midlet.class" value="com.substanceofcode.tracker.TrailExplorerMidlet" /> 
 
@@ -67,7 +67,8 @@
 	<property name="api.nokia" value="${lib.dir}/nokiaext.jar" />
 	<property name="api.siemens" value="${lib.dir}/SiemensAPI.jar" />
 	<property name="api.samsung" value="${lib.dir}/SamsungAPI.jar" />
-	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-11};${api.nokia};${api.siemens};${api.samsung}" />
+	<property name="api.messaging" value="${lib.dir}/wma20.jar" />
+	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-11};${api.nokia};${api.siemens};${api.samsung};${api.messaging}" />
 	
 	
 	<!-- Setup the project build, create required folders, and copy accross required files. -->
@@ -83,7 +84,10 @@
 		</delete>
 		
 		<!-- Copy accross the image files -->
-		<copydir src="${src.dir}/images/" dest="${collated.dir}/images/" />
+		<copy todir="${collated.dir}/images/" >
+			 <fileset dir="${src.dir}/images/" includes="**/*" />
+		</copy>
+		
 
 		<!-- Copy accross the Mobile Trail Explorer icon -->
 		<copy file="${src.dir}/images/explorer.png" tofile="${collated.dir}/resources/icon.png" />
@@ -113,7 +117,7 @@
     		
 			<!-- MIDlet suites -->
 			<midlet name="${midlet.name}" class="${midlet.class}" icon="/resources/icon.png" />
-		
+
 		</wtk>
 	</target>
 	
@@ -141,6 +145,8 @@
 		
 		</wtk>
 		
+		
+		
 	</target>
 
 	<target name="run_only_setup">
@@ -149,6 +155,10 @@
 	
 	<target name="run">
 		<wtkrun jad="${bin.dir}/${release.name}.jad" device="${buildtype}" emulator="${install.api.bin}/emulator.exe" />
+	</target>
+	
+	<target name="run_Default_Color_Phone">
+		<wtkrun jad="${bin.dir}/${midlet.name}_${midlet.version}.jad" device="DefaultColorPhone" emulator="${install.api.bin}/emulator.exe" />
 	</target>
 	
 	<target name="Default_Color_Phone">
