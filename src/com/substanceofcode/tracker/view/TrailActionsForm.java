@@ -146,7 +146,7 @@ public class TrailActionsForm extends Form implements CommandListener, AlertList
                     if (actionsGroup.isSelected(0)) {
                         exportTrail(RecorderSettings.EXPORT_FORMAT_KML, lListen);
                     }
-                    if (actionsGroup.isSelected(1)) {
+                    if (actionsGroup.isSelected(1) || controller.getTrack().isStreaming()) {
                         exportTrail(RecorderSettings.EXPORT_FORMAT_GPX, lListen);
                     }
                     if (saveIsAnOption && actionsGroup.isSelected(2)) {

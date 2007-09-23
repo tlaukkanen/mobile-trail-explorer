@@ -34,6 +34,7 @@ import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.util.DateTimeUtil;
 
 /**
  * <p>Displays a list of Trails, and gives options as to what the user wants to do with the selected Trail.</p>
@@ -68,7 +69,7 @@ public class TrailsList extends List implements CommandListener{
         this.addCommand(deleteCommand = new Command("Delete", Command.ITEM, 3));
         this.addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
         this.addCommand(newTrailCommand = new Command("New Trail", Command.ITEM, 5));
-        this.addCommand(newStreamTrailCommand = new Command("New Trail (Stream to Disk)", Command.ITEM, 6));
+        this.addCommand(newStreamTrailCommand = new Command("New GPX Stream", Command.ITEM, 6));
         this.addCommand(useAsGhostTrailCommand = new Command("Use as ghost trail", Command.ITEM, 7));
         this.addCommand(importTrailCommand = new Command("Import a trail", Command.ITEM, 8));
         this.addCommand(exportTrailCommand = new Command("Export trail", Command.ITEM, 9));
@@ -166,7 +167,9 @@ public class TrailsList extends List implements CommandListener{
                 try {
                     String folder = controller.getSettings().getExportFolder();
                     folder += (folder.endsWith("/") ? "" : "/");
-                    String fullPath = "file:///" + folder + "stream.gpx";
+                    String timeStamp = DateTimeUtil.getCurrentDateStamp();
+                    String fullPath = "file:///" + folder + "stream_" + 
+                                      timeStamp + ".gpx";
                     Track streamTrack = new Track(fullPath);
                     controller.loadTrack(streamTrack);
                     controller.showTrail();

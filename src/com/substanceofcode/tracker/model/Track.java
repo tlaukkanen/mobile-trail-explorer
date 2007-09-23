@@ -144,6 +144,12 @@ public class Track implements Serializable {
     /*
      * Getter Methods
      */
+    /** Get whether this is a streaming trail */
+    public boolean isStreaming()
+    {
+        return isStreaming;
+    }
+    
     /** Get position count */
     public int getPositionCount() {
         int positionCount = trackPoints.size();
@@ -223,8 +229,17 @@ public class Track implements Serializable {
 
         trackPoints.addElement(pos);
         
+        //----------------------------------------------------------------------
+        // If this is a streaming track then we need to save the new position
+        // and possibly forget about some old points
+        //----------------------------------------------------------------------
         if (isStreaming)
         {
+            //------------------------------------------------------------------
+            // Store the new point
+            //------------------------------------------------------------------
+            Controller lController = Controller.getController();
+            RecorderSettings lSettings = lController.getSettings();
             StringBuffer gpxPos = new StringBuffer();
             GpxConverter.addPosition(pos, gpxPos);
             streamPrint.print(gpxPos);
@@ -232,11 +247,22 @@ public class Track implements Serializable {
             try
             {
               streamOut.flush();
+              
+              //----------------------------------------------------------------
+              // We only store in memory as many points as we are going to draw
+              //----------------------------------------------------------------
+              int maxNumPos = lSettings.getNumberOfPositionToDraw();
+              //----------------------------------------------------------------
+              // While we have to0 many points remove the oldest point
+              //----------------------------------------------------------------
+              while (trackPoints.size() > maxNumPos)
+              {
+                  trackPoints.removeElementAt(0);
+              }
             }
             catch (IOException e)
             {
-              Controller.getController().showError("Exception adding point : " + 
-                                                   e.toString());
+              lController.showError("Exception adding point : " + e.toString());
             }
         }
     }
@@ -244,6 +270,22 @@ public class Track implements Serializable {
     /** Add new marker */
     public void addMarker(GpsPosition marker) {
         markers.addElement(marker);
+        
+        //----------------------------------------------------------------------
+        // If this is a streaming trail remove old markers from memory
+        //----------------------------------------------------------------------
+        if (isStreaming)
+        {
+            Controller lController = Controller.getController();
+            RecorderSettings lSettings = lController.getSettings();
+            int maxNumPos = lSettings.getNumberOfPositionToDraw();
+            int markerInterval = lSettings.getRecordingMarkerInterval();
+            int maxNumMarkers = maxNumPos / markerInterval;
+            while (markers.size() > maxNumMarkers)
+            {
+                markers.removeElementAt(0);
+            }
+        }
     }
 
     /** Clears <b>all</b> of this Tracks Points AND Markers and resets the distance to 0.0 */

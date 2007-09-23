@@ -69,7 +69,7 @@ public class TrailDetailsScreen extends Form implements CommandListener {
         trail = new Track(FileSystem.getFileSystem().getFile(trailName));
         this.controller = controller;
 
-        titleBox = new TextField("Trial Name", trailName, 100, TextField.ANY);
+        titleBox = new TextField("Trail Name", trailName, 100, TextField.ANY);
         this.append(titleBox);
 
         final boolean kilometers = controller.getSettings().getUnitsAsKilometers();

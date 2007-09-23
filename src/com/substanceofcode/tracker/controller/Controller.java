@@ -318,6 +318,7 @@ public class Controller {
 		//--------------------------------------------------------------------------
 		if (status != STATUS_RECORDING) {
 			logger.log("Starting Recording", Logger.INFO);
+      // XXX : HACK(disabled)
       if (gpsDevice == null)
       {
           showError("Please select a GPS device first");
@@ -349,7 +350,7 @@ public class Controller {
 			// Disconnect from GPS device
 			this.disconnect();
 			// Show trail actions screen
-      // XXX : (Disabled)Debug hack
+      // XXX : HACK(disabled)
       //Track lTest = new Track();
       //lTest.addPosition(new GpsPosition((short)0,0,0,0,0,new Date()));
       //recorder.setTrack(lTest);
