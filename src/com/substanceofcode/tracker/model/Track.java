@@ -26,6 +26,7 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.data.Serializable;
+import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.util.DateTimeUtil;
 
 import java.io.DataInputStream;
@@ -111,6 +112,8 @@ public class Track implements Serializable {
             GpxConverter.addHeader(gpxHead);
             GpxConverter.addTrailStart(gpxHead);
             streamPrint.print(gpxHead.toString());
+            streamPrint.flush();
+            streamOut.flush();
         }
         catch (Exception e) {
             if (streamPrint != null) {
@@ -225,6 +228,16 @@ public class Track implements Serializable {
             StringBuffer gpxPos = new StringBuffer();
             GpxConverter.addPosition(pos, gpxPos);
             streamPrint.print(gpxPos);
+            streamPrint.flush();
+            try
+            {
+              streamOut.flush();
+            }
+            catch (IOException e)
+            {
+              Controller.getController().showError("Exception adding point : " + 
+                                                   e.toString());
+            }
         }
     }
 
