@@ -30,11 +30,22 @@ package com.substanceofcode.tracker.model;
  */
 public class Waypoint {
     
+    /**
+     * Name of waypoint
+     */
     private String name;
+    
+    /**
+     * Latitude of waypoint
+     */
     private double latitude;
+    
+    /** 
+     * Longitude of waypoint
+     */
     private double longitude;
     
-    /** Creates a new instance of WayPoint */
+    /** Constructor */
     public Waypoint(String name, double latitude, double longitude) {
         this.name = name;
         this.latitude = latitude;

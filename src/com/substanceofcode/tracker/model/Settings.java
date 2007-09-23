@@ -27,50 +27,60 @@ import javax.microedition.midlet.*;
 import javax.microedition.rms.*;
 
 /**
- * A class for storing and retrieving application settings and properties.
- * Class stores all settings into one Hashtable variable. Hashtable is loaded
- * from RecordStore at initialization and it is stored back to the RecordStore
- * with save method.
- *
- * @author  Tommi Laukkanen
+ * A class for storing and retrieving application settings and properties. Class
+ * stores all settings into one Hashtable variable. Hashtable is loaded from
+ * RecordStore at initialization and it is stored back to the RecordStore with
+ * save method.
+ * 
+ * @author Tommi Laukkanen
  * @version 1.0
  */
 public class Settings {
 
+	/**
+	 * Singleton instance
+	 */
 	private static Settings store;
 
+	/**
+	 * Reference to MIDlet
+	 */
 	private MIDlet midlet;
 
+	/**
+	 * State - whether or not changes have been made
+	 */
 	private boolean valuesChanged = false;
 
+	/**
+	 * Hashtable of Settings
+	 */
 	private Hashtable properties = new Hashtable();
 
 	/**
-	 * Singleton pattern is used to return 
-	 * only one instance of record store
-	 */
+   * Singleton pattern is used to return only one instance of record store
+   */
 	public static synchronized Settings getInstance(MIDlet midlet)
-			throws IOException, RecordStoreException {
+			                       throws IOException, RecordStoreException {
 		if (store == null) {
 			store = new Settings(midlet);
 		}
 		return store;
 	}
 
-	/** Constructor */
+	/** Private singleton Constructor */
 	private Settings(MIDlet midlet) throws IOException, RecordStoreException {
 		this.midlet = midlet;
 		load();
 	}
 
-	/* Method never called, so comment out.
-	 /** Return true if value exists in record store 
-	 private boolean exists( String name ) {
-	 return getProperty( name ) != null;
-	 }
-	 */
+	/*
+   * Method never called, so comment out. /** Return true if value exists in
+   * record store private boolean exists( String name ) { return getProperty(
+   * name ) != null; }
+   */
 
-	/** Get property from Hashtable*/
+	/** Get property from Hashtable */
 	private synchronized String getProperty(String name) {
 		String value = (String) properties.get(name);
 		if (value == null && midlet != null) {

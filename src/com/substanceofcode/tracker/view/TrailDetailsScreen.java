@@ -22,6 +22,8 @@
 package com.substanceofcode.tracker.view;
 
 import java.io.IOException;
+
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -75,7 +77,7 @@ public class TrailDetailsScreen extends Form implements CommandListener {
         if (kilometers) {
             dist = trail.getDistance();
         } else {
-            dist = UnitConverter.convertLength(trail.getDistance(), UnitConverter.KILOMETERS, UnitConverter.MILES);
+            dist = UnitConverter.convertLength(trail.getDistance(), UnitConverter.UNITS_KILOMETERS, UnitConverter.UNITS_MILES);
         }
         StringItem distanceItem = new StringItem("Distance", StringUtil.valueOf(dist, 3) + (kilometers ? "Km" : "Mi"));
         this.append(distanceItem);
@@ -97,7 +99,7 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                 try {
                     FileSystem.getFileSystem().renameFile(this.getTitle(), newTitle);
                 } catch (FileIOException e) {
-                    controller.showError("ERROR     An exception was caught when trying to rename the file: " + e.toString(), 5, this);
+                    controller.showError("An exception was caught when trying to rename the file: " + e.toString());
                 }
                 this.setTitle(newTitle);
             } else if (command == deleteCommand) {
@@ -106,7 +108,7 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                     FileSystem.getFileSystem().deleteFile(selectedTrailName);
                     controller.showTrailsList();
                 } catch (IOException e) {
-                    controller.showError("ERROR!   An Exception was thrown when attempting to load " + "the Trail from the RMS!  " + e.toString(), 5, this);
+                    controller.showAlert("ERROR!   An Exception was thrown when attempting to load " + "the Trail from the RMS!  " + e.toString(), 5, AlertType.ERROR);
                     e.printStackTrace();
                 }
             } else if (command == loadCommand) {
@@ -116,7 +118,7 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                     controller.loadTrack(trail);
                     controller.showTrail();
                 } catch (IOException e) {
-                    controller.showError("ERROR! An Exception was thrown when attempting to load " + "the Trail from the RMS!  " + e.toString(), 5, this);
+                    controller.showAlert("ERROR! An Exception was thrown when attempting to load " + "the Trail from the RMS!  " + e.toString(), 5, AlertType.ERROR);
                     e.printStackTrace();
                 }
             } else if (command == exportCommand) {
@@ -126,7 +128,7 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                     final TrailActionsForm taf = new TrailActionsForm(controller, trail, this.getTitle());
                     controller.setCurrentScreen(taf);
                 } catch (IOException e) {
-                    controller.showError("ERROR! An Exception was thrown when attempting to export " + "the Trail from the RMS!  " + e.toString(), 5, this);
+                    controller.showAlert("ERROR! An Exception was thrown when attempting to export " + "the Trail from the RMS!  " + e.toString(), 5, AlertType.ERROR);
                     e.printStackTrace();
                 }
             }

@@ -25,19 +25,23 @@ package com.substanceofcode.tracker.model;
 import com.substanceofcode.util.StringUtil;
 
 /**
- * SpeedFormatter class is used to format the speed to user specific string format.
+ * SpeedFormatter class is used to format the speed to user specific 
+ * string format.
  *
  * @author Tommi Laukkanen
  */
 public class SpeedFormatter {
-    
+
+    /**
+     * Settings object reference - this allows us to check what units to use
+     */
     RecorderSettings settings;
-        
+
     /** Creates a new instance of SpeedFormatter */
     public SpeedFormatter(RecorderSettings settings) {
-        this.settings = settings;        
+        this.settings = settings;
     }
-    
+
     /** 
      * Get speed string.
      *
@@ -47,18 +51,16 @@ public class SpeedFormatter {
     public String getSpeedString(double speed) {
         String units;
         String speedString;
-        if( settings.getUnitsAsKilometers()==true ) {
+        if (settings.getUnitsAsKilometers() == true) {
             units = " km/h";
             speedString = String.valueOf(speed);
         } else {
-            double mileSpeed = UnitConverter.convertSpeed(
-                    speed,
-                    UnitConverter.KILOMETERS_PER_HOUR,
-                    UnitConverter.MILES_PER_HOUR );
+            double mileSpeed = UnitConverter.convertSpeed(speed,
+                                              UnitConverter.UNITS_KPH,
+                                              UnitConverter.UNITS_MPH);
             speedString = StringUtil.valueOf(mileSpeed, 1);
             units = " mph";
-        }        
+        }
         return speedString + units;
     }
-    
 }

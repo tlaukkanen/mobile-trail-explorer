@@ -22,13 +22,16 @@
 
 package com.substanceofcode.tracker.view;
 
+import java.util.Date;
+import java.util.Vector;
+
+import javax.microedition.io.Connector;
+import javax.microedition.io.file.FileConnection;
+import javax.microedition.lcdui.*;
+
+import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.RecorderSettings;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.TextField;
+import com.substanceofcode.tracker.model.*;
 
 /**
  * ExportSettingsForm includes information about exporting trail.
@@ -36,19 +39,20 @@ import javax.microedition.lcdui.TextField;
  * @author Tommi Laukkanen
  */
 public class ExportSettingsForm extends Form implements CommandListener {
-    
+
     private Controller controller;
-    
+
     private Command okCommand;
+    private Command testpathCommand;
     private Command cancelCommand;
 
     private TextField exportFolderField;
-    
+
     /** Creates a new instance of ExportSettingsForm */
     public ExportSettingsForm(Controller controller) {
         super("Exporting");
         this.controller = controller;
-        initializeCommands();        
+        initializeCommands();
         initializeControls();
         this.setCommandListener(this);
     }
@@ -56,23 +60,101 @@ public class ExportSettingsForm extends Form implements CommandListener {
     /** Initialize commands */
     private void initializeCommands() {
         okCommand = new Command("OK", Command.SCREEN, 1);
-        this.addCommand( okCommand );
-        cancelCommand = new Command("Cancel", Command.SCREEN, 2);
-        this.addCommand( cancelCommand );
+        this.addCommand(okCommand);
+        testpathCommand = new Command("Test Export Folder", Command.SCREEN, 2);
+        this.addCommand(testpathCommand);
+        cancelCommand = new Command("Cancel", Command.SCREEN, 3);
+        this.addCommand(cancelCommand);
     }
 
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if(command==okCommand) {
+        if (command == okCommand) {
             // Save export folder
             String exportFolder = exportFolderField.getString();
             RecorderSettings settings = controller.getSettings();
-            settings.setExportFolder( exportFolder );
-            
+            settings.setExportFolder(exportFolder);
+
             controller.showSettings();
         }
-        
-        if(command==cancelCommand) {
+
+        //----------------------------------------------------------------------
+        // Test export path
+        //----------------------------------------------------------------------
+        if (command == testpathCommand) {
+            //------------------------------------------------------------------
+            // Construct a test Track
+            //------------------------------------------------------------------
+            final Track testTrack = new Track();
+            testTrack.addPosition(new GpsPosition((short) 0, 0, 0, 0, 0,new Date()));
+            
+            //------------------------------------------------------------------
+            // Construct a thread to perform the test
+            //------------------------------------------------------------------
+            final AlertHandler lListen = new AlertHandler(controller, this);
+            new Thread() {
+                public void run() {
+                    boolean noException = true;
+                    try {
+                        FileConnection connection = null;
+                        //------------------------------------------------------
+                        // Write to the file using the standard method
+                        //------------------------------------------------------
+                        String fullPath = 
+                            testTrack.writeToFile(exportFolderField.getString(),
+                                              new Vector(), 
+                                              true,
+                                              RecorderSettings.EXPORT_FORMAT_GPX, 
+                                              null, 
+                                              lListen);
+                        System.out.println("writeToFile returned");
+                        //------------------------------------------------------
+                        // Attempt to reconnect to the file and delete it
+                        //------------------------------------------------------
+                        try {
+                            System.out.println("Connecting to file");
+                            connection = (FileConnection)Connector.open(fullPath, 
+                                                                 Connector.WRITE);
+                            System.out.println("Deleting file");
+                            connection.delete();
+                            System.out.println("Done");
+                        }
+                        //------------------------------------------------------
+                        // In all cases if the connection exists we close it
+                        //------------------------------------------------------
+                        finally
+                        {
+                            if (connection != null)
+                            {
+                                System.out.println("Closing connection");
+                                connection.close();
+                                System.out.println("Closed.");
+                            }
+                        }
+                    }
+                    //----------------------------------------------------------
+                    // Throwable -> Test Failed
+                    //----------------------------------------------------------
+                    catch (Throwable e) {
+                        noException = false;
+                        lListen.notifyError("Path Test Failed", e);
+                    }
+                    //----------------------------------------------------------
+                    // noException -> Test Passed
+                    //----------------------------------------------------------
+                    if (noException)
+                    {
+                        System.out.println("Success");
+                        lListen.notifySuccess("Path Test Passed");
+                        System.out.println("Success finished");
+                    }
+                    
+                };
+            }.start();
+
+        }
+
+        if (command == cancelCommand) {
             // Reinitialize all controls
             this.deleteAll();
             this.initializeControls();
@@ -83,23 +165,19 @@ public class ExportSettingsForm extends Form implements CommandListener {
 
     /** Initialize form controls */
     private void initializeControls() {
-        
+
         RecorderSettings settings = controller.getSettings();
-        if(settings==null) {
+        if (settings == null) {
             return;
         }
-        
+
         // Initialize export folder field
         String exportFolder = settings.getExportFolder();
-        if(exportFolder==null) {
+        if (exportFolder == null) {
             exportFolder = "E:/";
         }
-        exportFolderField = new TextField(
-                "Export folder", 
-                exportFolder, 
-                50, 
+        exportFolderField = new TextField("Export Folder", exportFolder, 50,
                 TextField.ANY);
         this.append(exportFolderField);
     }
-    
 }

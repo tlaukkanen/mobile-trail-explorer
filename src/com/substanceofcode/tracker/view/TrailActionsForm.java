@@ -24,16 +24,10 @@ package com.substanceofcode.tracker.view;
 
 import java.util.Vector;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.ChoiceGroup;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.*;
 
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.RecorderSettings;
-import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.tracker.model.*;
 
 /**
  * TrailActionsForm will be shown when recording was stopped by user.
@@ -45,18 +39,24 @@ import com.substanceofcode.tracker.model.Track;
  *
  * @author Mario Sansone
  */
-public class TrailActionsForm extends Form implements CommandListener {
+public class TrailActionsForm extends Form implements CommandListener, AlertListener {
     
 	private static final String[] ALL_ACTIONS = {"Export to KML", "Export to GPX", "Save Trail"}; 
 	
     private Controller controller;
     
-    private Command okCommand;
+    private Command saveCommand;
     private Command cancelCommand;
 
     private ChoiceGroup actionsGroup;
     
+    /**
+     * State indicating whether save to RMS is an option - not applicable when
+     * exporting from a trail already saved in the RMS
+     */
     private final boolean saveIsAnOption;
+    
+    private boolean noSaveErrors = true;
     
     private final Track track;
     private final String trackName;
@@ -95,8 +95,8 @@ public class TrailActionsForm extends Form implements CommandListener {
 
     /** Initialize commands */
     private void initializeCommands() {
-        this.addCommand( okCommand = new Command("OK", Command.SCREEN, 1));
-        this.addCommand(cancelCommand = new Command("Cancel", Command.BACK, 100));
+        this.addCommand( saveCommand = new Command("Save", Command.SCREEN, 1));
+        this.addCommand( cancelCommand = new Command("Cancel", Command.BACK, 100));
     }
     
     /** Initialize form controls */
@@ -132,26 +132,33 @@ public class TrailActionsForm extends Form implements CommandListener {
     
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if(command == okCommand) {
+        if(command == saveCommand) {
+            final Displayable lThis = this;
             // do IO operations in another thread to prevent UI freezing.
             new Thread(new Runnable(){
                 public void run(){
-//                  Do specified actions for this trail:
+                    noSaveErrors = true;
+                    // Do specified actions for this trail:
                     // 0 = Export trail to KML file
                     // 1 = Export trail to GPX file
                     // 2 = Save trail to the RMS
+                    AlertHandler lListen = new AlertHandler(controller, lThis);
                     if (actionsGroup.isSelected(0)) {
-                        exportTrail(RecorderSettings.EXPORT_FORMAT_KML);
+                        exportTrail(RecorderSettings.EXPORT_FORMAT_KML, lListen);
                     }
                     if (actionsGroup.isSelected(1)) {
-                        exportTrail(RecorderSettings.EXPORT_FORMAT_GPX);
+                        exportTrail(RecorderSettings.EXPORT_FORMAT_GPX, lListen);
                     }
                     if (saveIsAnOption && actionsGroup.isSelected(2)) {
-                        controller.saveTrail();
+                        controller.saveTrail(lListen);
                     }
                                
+                    System.out.println("Finished save process");
+                    System.out.println("No Errors : " + noSaveErrors);
                     // After doing all actions, we return to the normal previous Screen
-                    if(TrailActionsForm.this.isShown()){
+                    if(noSaveErrors){
+                        System.out.println("goBack()");
+                        lListen.join();
                         TrailActionsForm.this.goBack();
                     }
                 }
@@ -162,7 +169,18 @@ public class TrailActionsForm extends Form implements CommandListener {
     }
     
     /** Export the current recorded trail to a file with the specified format */
-    private void exportTrail(int exportFormat) {
+    private void exportTrail(int exportFormat, AlertHandler xiListen) {
+        String lType = "";
+        switch(exportFormat)
+        {
+            case RecorderSettings.EXPORT_FORMAT_GPX:
+                lType = "GPX";
+                break;
+                
+            case RecorderSettings.EXPORT_FORMAT_KML:
+                lType = "KML";
+                break;
+        }
         try {
             RecorderSettings settings = controller.getSettings();
             final Track recordedTrack;
@@ -176,10 +194,20 @@ public class TrailActionsForm extends Form implements CommandListener {
             }
             boolean useKilometers = settings.getUnitsAsKilometers();
             String exportFolder = settings.getExportFolder();
-            recordedTrack.writeToFile(exportFolder, waypoints, useKilometers, exportFormat, trackName);
+            recordedTrack.writeToFile(exportFolder, 
+                                      waypoints, 
+                                      useKilometers, 
+                                      exportFormat, 
+                                      trackName, 
+                                      xiListen);
+            if (xiListen != null){
+                xiListen.notifySuccess(lType + " : Save Complete");
+            }
         } catch (Exception ex) {
             Logger.getLogger().log("Exception caught when trying to export trail: "  + ex.toString(), Logger.ERROR);
-            controller.showError(ex.toString(), Alert.FOREVER, this);
+            if (xiListen != null){
+                xiListen.notifyError(lType + " : Save Failed", ex);
+            }
         }
     }
     
@@ -189,6 +217,14 @@ public class TrailActionsForm extends Form implements CommandListener {
     	}else{
     		controller.showTrailsList();
     	}
+    }
+
+    /* (non-Javadoc)
+     * @see com.substanceofcode.tracker.model.AlertListener#notifyError()
+     */
+    public void notifyError() {
+        System.out.println("Error During Save");
+        noSaveErrors = false;
     }
 
 }

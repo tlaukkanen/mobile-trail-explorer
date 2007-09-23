@@ -31,6 +31,9 @@ import com.substanceofcode.util.StringUtil;
  */
 public class LengthFormatter {
     
+		/**
+	   * Reference to Settings object
+	   */
     RecorderSettings settings;
     
     /** Creates a new instance of LengthFormatter */
@@ -53,16 +56,16 @@ public class LengthFormatter {
                 /** Length in miles */
                 double lengthInMiles = UnitConverter.convertLength(
                     length,
-                    UnitConverter.KILOMETERS,
-                    UnitConverter.MILES);
+                    UnitConverter.UNITS_KILOMETERS,
+                    UnitConverter.UNITS_MILES);
                 lengthString = StringUtil.valueOf( lengthInMiles, 2 );
                 units = " ml";
             } else {
-                /** Length in feets */
+                /** Length in feet */
                 double lengthInFeets = UnitConverter.convertLength(
                         length,
-                        UnitConverter.METERS,
-                        UnitConverter.FEETS);
+                        UnitConverter.UNITS_METERS,
+                        UnitConverter.UNITS_FEET);
                 lengthString = StringUtil.valueOf( lengthInFeets, 2 );
                 units = " ft";
             }

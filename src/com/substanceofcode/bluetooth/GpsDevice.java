@@ -24,6 +24,7 @@ package com.substanceofcode.bluetooth;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Vector;
+
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
@@ -166,8 +167,7 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                         return;
                     }
                     controller.pause();
-                    controller.showError("IOException occured in GpsDevice.run()", 5, controller
-                        .getCurrentScreen());
+                    controller.showError("IOException occured in GpsDevice.run()");
                     logger.log("IOException occured in GpsDevice.run()", Logger.ERROR);
                     try {
                         Thread.sleep(BREAK);
@@ -177,19 +177,17 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
                     ie.printStackTrace();
                     this.disconnect();
                     boolean connected = false;
-                    controller.showError("Attempting To Reconnect:", 5, controller
-                        .getCurrentScreen());
+                    controller.showInfo("Attempting To Reconnect:");
                     int count = 0;
                     // Try to reconnect if we are still recording
                     while (isRecording && !connected) {
                         try {
                             this.connect();
                             connected = true;
-                            controller.showError("Reconnected!", 10, controller.getCurrentScreen());
+                            controller.showInfo("Reconnected!");
                         } catch (IOException e) {
                             count++;
-                            controller.showError("Failed To Reconnect on attempt " + count, 10,
-                                controller.getCurrentScreen());
+                            controller.showError("Failed To Reconnect on attempt " + count);
                             this.disconnect();
                             try {
                                 Thread.sleep(BREAK);

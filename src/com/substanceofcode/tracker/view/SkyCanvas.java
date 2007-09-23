@@ -25,6 +25,8 @@ package com.substanceofcode.tracker.view;
 import com.substanceofcode.bluetooth.GpsSatellite;
 import java.util.Enumeration;
 import java.util.Vector;
+
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
@@ -67,10 +69,8 @@ public class SkyCanvas extends BaseCanvas{
                 Graphics.TOP|Graphics.RIGHT);
             
         } catch(Exception ex) {
-            controller.showError(
-                "Exception while painting satellite count: " + ex.toString(),
-                10,
-                controller.getCurrentScreen());
+            controller.showError("Exception while painting satellite count: " + 
+                                 ex.toString());
         }
         
         //draw Horizon

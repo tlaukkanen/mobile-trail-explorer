@@ -37,26 +37,51 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 
 /**
+ * Thread based class which encapsulates recording data from a GPS device.
  * 
  * @author Tommi
  */
 public class GpsRecorder implements Runnable {
 
+    /**
+     * Local reference to Thread running this instance.
+     */
     private Thread recorderThread;
-    private boolean recording;
-    private Track recordedTrack;
+
+    /**
+     * State : true = recording in progress, false = recording not in progress
+     */
+    private boolean recording = false;
+
+    /**
+     * Current track being recorded to
+     */
+    private Track recordedTrack = new Track();
+
+    /**
+     * Interval between recorded positions
+     */
     private int intervalSeconds;
+
+    /**
+     * Interval between recorded Markers
+     */
     private int intervalMarkerStep;
+
+    /**
+     * Reference to controller object
+     */
     private Controller controller;
 
-    /** Creates a new instance of GpsRecorder */
+    /**
+     * Constructor - sets up local variables then launches the instance in a
+     * thread.
+     */
     public GpsRecorder(Controller controller) {
         this.controller = controller;
         RecorderSettings settings = controller.getSettings();
         intervalSeconds = settings.getRecordingInterval();
         intervalMarkerStep = settings.getRecordingMarkerInterval();
-        recordedTrack = new Track();
-        recording = false;
         recorderThread = new Thread(this);
         recorderThread.start();
     }
@@ -115,10 +140,12 @@ public class GpsRecorder implements Runnable {
         while (true) {
             try {
                 Thread.sleep(1000);
-                if (recording == true && secondsFromLastTrailPoint >= intervalSeconds) {
+                if (recording == true
+                        && secondsFromLastTrailPoint >= intervalSeconds) {
 
                     secondsFromLastTrailPoint = 0;
-                    final GpsPosition currentPosition = controller.getPosition();
+                    final GpsPosition currentPosition = controller
+                            .getPosition();
 
                     /**
                      * Check if user haven't moved -> don't record the same
@@ -130,7 +157,9 @@ public class GpsRecorder implements Runnable {
                     }
 
 
-                    // Logger.getLogger().log("interval: "+ intervalSeconds  + " currentPosition is " + (currentPosition==null?"null":"not null"));
+                    // Logger.getLogger().log("interval: "+ intervalSeconds + "
+                    // currentPosition is " + (currentPosition==null?"null":"not
+                    // null"));
                     /**
                      * Record current position if user have moved or this is a
                      * first recorded position.
@@ -147,70 +176,113 @@ public class GpsRecorder implements Runnable {
                         lastRecordedPosition = currentPosition;
                         recordedCount++;
                     }
-                }else{
+                } else {
                     secondsFromLastTrailPoint++;
                 }
             } catch (Exception ex) {
-                controller.showError("Error in recorder thread: " + ex.toString());
+                controller.showError("Error in recorder thread: "
+                        + ex.toString());
             }
         }
     }
 
+    /**
+     * Thread based class which encapsulates recording a point into a single
+     * slot in the RMS. This thread makes calls to the method
+     * putPositionInRMS(...) which is synchronized on the parent class. This is
+     * needed so that calls to getPositionFromRMS() again contained in the
+     * parent class return a consistant value.
+     */
     private class GpsRmsRecorder implements Runnable {
 
-        private Thread recorderThread;
+        /**
+         * Local reference to the Thread running this instance
+         */
+        private Thread rmsRecorderThread;
 
-        private GpsPosition nextPositionToWrite;
-        private GpsPosition lastPositionWritten;
+        /**
+         * Next position to be written
+         */
+        private GpsPosition nextPositionToWrite = null;
 
+        /**
+         * Last position which has already been written
+         */
+        private GpsPosition lastPositionWritten = null;
+
+        /**
+         * Constructor - Start a thread running a new instance of this class
+         */
         private GpsRmsRecorder() {
-            this.nextPositionToWrite = null;
-            this.lastPositionWritten = null;
-
-            recorderThread = new Thread(this);
-            recorderThread.start();
+            rmsRecorderThread = new Thread(this);
+            rmsRecorderThread.start();
         }
 
-        public void setGpsPosition(GpsPosition pos) {
-            synchronized (this) {
-                this.nextPositionToWrite = pos;
-            }
-        }
-
-
-        public void run() {
-            while (true) {
+        /**
+         * @param xiPos
+         *            Position to be written to RMS
+         */
+        public synchronized void setGpsPosition(GpsPosition pos) {
+            // ------------------------------------------------------------------
+            // If work has already been set - wait until we are notfied that it
+            // has been written
+            // ------------------------------------------------------------------
+            while (this.nextPositionToWrite != this.lastPositionWritten) {
                 try {
-                    Thread.sleep(1000);
-                    synchronized (this) {
-                        if (this.nextPositionToWrite != this.lastPositionWritten) {
-                            putPositionInRMS(nextPositionToWrite);
-                            this.lastPositionWritten = this.nextPositionToWrite;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (Exception anyOtherException) {
-                    anyOtherException.printStackTrace();
+                    this.wait();
+                } catch (InterruptedException lInterEx) {
+                    /* Throw away and continue */
                 }
+            }
+            nextPositionToWrite = pos;
 
+            // ------------------------------------------------------------------
+            // Notify everyone including the worker thread that there is work
+            // to be completed
+            // ------------------------------------------------------------------
+            this.notifyAll();
+        }
+
+
+        /**
+         * Main worker thread method
+         */
+        public void run() {
+            synchronized (this) {
+                while (true) {
+                    try {
+                        if (nextPositionToWrite != lastPositionWritten) {
+                            putPositionInRMS(nextPositionToWrite);
+                            lastPositionWritten = nextPositionToWrite;
+                        } else {
+                            this.wait();
+                        }
+                    } catch (InterruptedException lInterEx) {
+                        /* Throw away and continue */
+                    } catch (Exception lAnyOtherException) {
+                        // XXX : mchr : log this exception?
+                        lAnyOtherException.printStackTrace();
+                    }
+                }
             }
         }
     }
 
-
+    /**
+     * Name of record store to use
+     */
     private static final String POSITION_RMS_STORE = "gps-position-rms-store";
 
     /**
      * <p>
      * Saves the specified GPS position to the RMS.
-     * </p>
      * 
+     * <p>
      * This method should later be expanded to store multiple positions to the
      * RMS, but for the time being, it ensures that there is ONLY ONE position
      * in the RMS at a time.
      * 
-     * @param pos
+     * @param xiPos
      *            The {@link GpsPosition} to save to the RMS.
      * 
      * @see Settings#getPositionFromRMS()
@@ -228,13 +300,15 @@ public class GpsRecorder implements Runnable {
                 dos.close();
                 baos.close();
 
-                RecordStore positionStore = RecordStore.openRecordStore(POSITION_RMS_STORE, true);
+                RecordStore positionStore = RecordStore.openRecordStore(
+                        POSITION_RMS_STORE, true);
                 /*
                  * Enusre that there is no other positions in there. (this
                  * should be removed in the future when multiple records are
                  * allowed in the store.
                  */
-                RecordEnumeration re = positionStore.enumerateRecords(null, null, false);
+                RecordEnumeration re = positionStore.enumerateRecords(null,
+                        null, false);
                 while (re.hasNextElement()) {
                     positionStore.deleteRecord(re.nextRecordId());
                 }
@@ -243,19 +317,18 @@ public class GpsRecorder implements Runnable {
                 positionStore.addRecord(data, 0, data.length);
                 positionStore.closeRecordStore();
             } catch (RecordStoreException e) {
+                // XXX : mchr : Log/display this exception?
                 e.printStackTrace();
             } catch (IOException e) {
+                // XXX : mchr : Log/display this exception?
                 e.printStackTrace();
             }
         }
     }
 
     /**
-     * <p>
-     * Returns the GpsPosition that was saved in the RMS by the last call to
+     * <p> Returns the GpsPosition that was saved in the RMS by the last call to
      * {@link Settings#putPositionInRMS(GpsPosition)}.
-     * </p>
-     * 
      * 
      * @return the last GpsPosition saved to the RMS, or NULL if there is none
      *         saved there.
@@ -266,8 +339,10 @@ public class GpsRecorder implements Runnable {
     public synchronized GpsPosition getPositionFromRMS() {
         GpsPosition result = null;
         try {
-            RecordStore positionStore = RecordStore.openRecordStore(POSITION_RMS_STORE, false);
-            RecordEnumeration re = positionStore.enumerateRecords(null, null, false);
+            RecordStore positionStore = RecordStore.openRecordStore(
+                    POSITION_RMS_STORE, false);
+            RecordEnumeration re = positionStore.enumerateRecords(null, null,
+                    false);
             byte[] data = positionStore.getRecord(re.nextRecordId());
             re.destroy();
             positionStore.closeRecordStore();

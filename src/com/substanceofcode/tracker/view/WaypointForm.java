@@ -26,6 +26,7 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Waypoint;
 
 import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -131,7 +132,7 @@ public class WaypointForm extends Form implements CommandListener {
             } catch (NumberFormatException nfe) {
                 controller.showError("Error while parsing latitude or longitude. " +
                                      "Valid format for latitude and longitude is:\n" +
-                                     "[-]xxx.xxxxx", Alert.FOREVER, this);
+                                     "[-]xxx.xxxxx");
                 return;
             }
             Waypoint waypoint = new Waypoint( name, latitude, longitude );

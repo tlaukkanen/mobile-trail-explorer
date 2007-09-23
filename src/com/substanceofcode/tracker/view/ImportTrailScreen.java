@@ -22,21 +22,13 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.data.FileIOException;
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.GpxConverter;
-import com.substanceofcode.tracker.model.KmlConverter;
-import com.substanceofcode.tracker.model.Track;
-import com.substanceofcode.tracker.model.TrackConverter;
-
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
-import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
-import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.StringItem;
-import javax.microedition.lcdui.TextField;
+import javax.microedition.lcdui.*;
+
+import com.substanceofcode.data.FileIOException;
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.*;
 
 /**
  * Import SettingsForm includes information about exporting trail.
@@ -137,20 +129,18 @@ public class ImportTrailScreen extends Form implements CommandListener {
                                 Logger.getLogger().log(
                                         "Unable to save 'Empty Trail' "
                                                 + e.toString(), Logger.WARN);
-                                controller
-                                        .showError(
-                                                "Can not save \"Empty\" Trail. must record at least 1 point",
-                                                5, ImportTrailScreen.this);
+                                controller.showError("Can not save \"Empty\" Trail. " +
+                                            "must record at least 1 point");
                             } catch (FileIOException e) {
                                 Logger.getLogger().log(
                                         "Unable to save Trail " + e.toString(),
                                         Logger.WARN);
                                 ;
-                                controller.showError(
+                                controller.showAlert(
                                         "An Exception was thrown when attempting to save "
                                                 + "the Trail to the RMS!  "
                                                 + e.toString(), 5,
-                                        ImportTrailScreen.this);
+                                        AlertType.ERROR);
                                 e.printStackTrace();
                             }
                         }

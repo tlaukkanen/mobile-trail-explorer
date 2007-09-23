@@ -24,6 +24,7 @@ package com.substanceofcode.tracker.view;
 import java.io.IOException;
 import java.util.Vector;
 
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -31,6 +32,7 @@ import javax.microedition.lcdui.List;
 
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.Track;
 
 /**
@@ -47,6 +49,7 @@ public class TrailsList extends List implements CommandListener{
     private final Command deleteCommand;
     private final Command showDetailsCommand;
     private final Command newTrailCommand;
+    private final Command newStreamTrailCommand;
     private final Command backCommand;
     private final Command useAsGhostTrailCommand;    
     private final Command importTrailCommand;
@@ -65,9 +68,10 @@ public class TrailsList extends List implements CommandListener{
         this.addCommand(deleteCommand = new Command("Delete", Command.ITEM, 3));
         this.addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
         this.addCommand(newTrailCommand = new Command("New Trail", Command.ITEM, 5));
-        this.addCommand(useAsGhostTrailCommand = new Command("Use as ghost trail", Command.ITEM, 6));
-        this.addCommand(importTrailCommand = new Command("Import a trail", Command.ITEM, 7));
-        this.addCommand(exportTrailCommand = new Command("Export trail", Command.ITEM, 8));
+        this.addCommand(newStreamTrailCommand = new Command("New Trail (Stream to Disk)", Command.ITEM, 6));
+        this.addCommand(useAsGhostTrailCommand = new Command("Use as ghost trail", Command.ITEM, 7));
+        this.addCommand(importTrailCommand = new Command("Import a trail", Command.ITEM, 8));
+        this.addCommand(exportTrailCommand = new Command("Export trail", Command.ITEM, 9));
         this.addCommand(backCommand = new Command("Cancel", Command.BACK, 10));
 
         this.refresh();
@@ -108,8 +112,8 @@ public class TrailsList extends List implements CommandListener{
                         controller.loadTrack(trail);
                         controller.showTrail();
                     } catch (IOException e) {
-                        controller.showError("ERROR! An Exception was thrown when attempting to load " +
-                                "the Trail from the RMS!  " +  e.toString(), 5, this);
+                        controller.showError("An Exception was thrown when attempting to load " +
+                                             "the Trail from the RMS!");
                         e.printStackTrace();
                     }
                 }else{
@@ -120,7 +124,7 @@ public class TrailsList extends List implements CommandListener{
                 controller.showTrailDetails(selectedTrailName);
                 
             }else if(command == saveCurrentCommand){
-                controller.saveTrail();
+                controller.saveTrail(new AlertHandler(controller, this));
                 this.refresh();
             }else if(command == this.backCommand){
                 controller.showTrail();
@@ -131,8 +135,8 @@ public class TrailsList extends List implements CommandListener{
                 try {
                     FileSystem.getFileSystem().deleteFile(this.getString(this.getSelectedIndex()));
                 } catch (IOException e) {
-                    controller.showError("ERROR! An Exception was thrown when attempting to delete " +
-                            "the Trail from the RMS!  " +  e.toString(), 5, this);
+                    controller.showAlert("ERROR! An Exception was thrown when attempting to delete " +
+                            "the Trail from the RMS!  " +  e.toString(), 5, AlertType.ERROR);
                 }
                 this.refresh();
             }else if(command ==  this.useAsGhostTrailCommand) {
@@ -144,8 +148,8 @@ public class TrailsList extends List implements CommandListener{
                     }
                     controller.showTrail();
                 } catch(IOException e) {
-                    controller.showError("ERROR! An Exception was thrown when attempting to set ghost " +
-                            "trail from the RMS!  " +  e.toString(), 5, this);
+                    controller.showAlert("ERROR! An Exception was thrown when attempting to set ghost " +
+                            "trail from the RMS!  " +  e.toString(), 5, AlertType.ERROR);
                 }
             }else if(command == importTrailCommand){
                 if(importTrailScreen == null){
@@ -158,6 +162,19 @@ public class TrailsList extends List implements CommandListener{
                 if(selectedTrail!=null) {
                     controller.showTrailActionsForm(selectedTrail, selectedTrailName);
                 }                
+            }else if(command == this.newStreamTrailCommand){
+                try {
+                    String folder = controller.getSettings().getExportFolder();
+                    folder += (folder.endsWith("/") ? "" : "/");
+                    String fullPath = "file:///" + folder + "stream.gpx";
+                    Track streamTrack = new Track(fullPath);
+                    controller.loadTrack(streamTrack);
+                    controller.showTrail();
+                }
+                catch (Exception e)
+                {
+                    controller.showError("Error : " + e.toString());
+                }
             }
         }
         
@@ -171,7 +188,7 @@ public class TrailsList extends List implements CommandListener{
             return selectedTrail;
         } catch (Exception ex) {
             Logger.getLogger().log("Unable to load selected trail: " + ex.getMessage(), Logger.ERROR);
-            controller.showError("Unable to load selected trail: " + ex.getMessage(), 5, this);
+            controller.showError("Unable to load selected trail: " + ex.getMessage());
             return null;
         }
     }

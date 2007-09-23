@@ -34,42 +34,63 @@ import com.siemens.mp.game.Light;
 
 
 /**
- * <p>
  * This class is used to keep the backlight always on.
- * </p>
  * 
  * @author Mario Sansone
- *
+ * 
  */
 public final class Backlight extends TimerTask {
-    
+
+    /**
+     * Interval after which we "refresh" the backlight
+     */
     private static final int BACKLIGHT_TIMER_INTERVAL = 5000;
-    
+
+    /**
+     * BACKLIGHT enum 
+     * XXX : mchr : change to a boolean?
+     */
     private static final int BACKLIGHT_OFF = 0;
     private static final int BACKLIGHT_ON = 1;
-    
+
+    /**
+     * VENDOR enum
+     */
     private static final int VENDOR_UNKNOWN = -1;
     private static final int VENDOR_NOKIA = 0;
     private static final int VENDOR_SONY_ERICSSON = 1;
     private static final int VENDOR_SIEMENS = 2;
     private static final int VENDOR_SAMSUNG = 3;
 
+    /**
+     * VENDOR state
+     */
     private int phoneVendor = VENDOR_UNKNOWN;
 
+    /**
+     * Timer thread for scheduling refreshes
+     */
     private Timer backlightTimer;
+
+    /**
+     * Self reference for use in Timer scheduling
+     */
     private Backlight backlightTimerTask;
-    private boolean initialized = false;
+
+    /**
+     * Reference to MIDlet
+     */
     private MIDlet midlet;
 
+    /**
+     * Constructor - stores reference to the MIDlet and attempts to work out
+     * what make of phone we are dealing with
+     * 
+     * @param xiMidlet
+     *            Midlet to allow for calls to flashBacklight()
+     */
     public Backlight(MIDlet midlet) {
-        this.midlet = midlet;    // is needed by MIDP2.0 flashBacklight()
-        init();
-    }
-
-    private void init() {
-        if (initialized)
-            return;
-        
+        this.midlet = midlet; // is needed by MIDP2.0 flashBacklight()
         try {
             Class.forName("com.nokia.mid.ui.DeviceControl");
             if (System.getProperty("com.sonyericsson.imei") == null) {
@@ -77,16 +98,18 @@ public final class Backlight extends TimerTask {
             } else {
                 phoneVendor = VENDOR_SONY_ERICSSON;
             }
-        } catch (Exception ex) {}
-        
+        } catch (Exception ex) {
+        }
+
         if (phoneVendor == VENDOR_UNKNOWN) {
             try {
                 /* if this class is found, the phone is a siemens phone */
                 Class.forName("com.siemens.mp.game.Light");
                 phoneVendor = VENDOR_SIEMENS;
-            } catch (Exception ex) {}
+            } catch (Exception ex) {
+            }
         }
-        
+
         if (phoneVendor == VENDOR_UNKNOWN) {
             try {
                 /* if this class is found, the phone is a samsung phone */
@@ -94,63 +117,58 @@ public final class Backlight extends TimerTask {
                 if (LCDLight.isSupported()) {
                     phoneVendor = VENDOR_SAMSUNG;
                 }
-            } catch (Exception ex) {}
+            } catch (Exception ex) {
+            }
         }
-        
+
         /* Default case: Sony Ericsson backlight solution will be used */
         if (phoneVendor == VENDOR_UNKNOWN) {
             phoneVendor = VENDOR_SONY_ERICSSON;
         }
-        
-        initialized = true;
     }
 
     /**
-     * <p>
      * Switches on the backlight and keeps it on
-     * </p>
      */
     public void backlightOn() {
-        
+
         switch (phoneVendor) {
             case VENDOR_NOKIA:
                 switchBacklightNokia(BACKLIGHT_ON);
                 return;
-    
+
             case VENDOR_SONY_ERICSSON:
                 switchBacklightSonyEricsson(BACKLIGHT_ON);
                 return;
-    
+
             case VENDOR_SIEMENS:
                 switchBacklightSiemens(BACKLIGHT_ON);
                 return;
-                
+
             case VENDOR_SAMSUNG:
                 switchBacklightSamsung(BACKLIGHT_ON);
                 return;
         }
     }
-   
+
     /**
-     * <p>
      * Switches off the backlight. After this call the default backlight
      * behaviour should be active
-     * </p>
      */
     public void backlightOff() {
         switch (phoneVendor) {
             case VENDOR_NOKIA:
                 switchBacklightNokia(BACKLIGHT_OFF);
                 return;
-    
+
             case VENDOR_SONY_ERICSSON:
                 switchBacklightSonyEricsson(BACKLIGHT_OFF);
                 return;
-    
+
             case VENDOR_SIEMENS:
                 switchBacklightSiemens(BACKLIGHT_OFF);
                 return;
-                
+
             case VENDOR_SAMSUNG:
                 switchBacklightSamsung(BACKLIGHT_OFF);
                 return;
@@ -167,14 +185,16 @@ public final class Backlight extends TimerTask {
             } else {
                 DeviceControl.setLights(0, 100);
             }
-            System.out.println("Backlight " + (backlightOnOff != 0 ? "on" : "off"));
-        } catch (Throwable ex) {}
+            System.out.println("Backlight "
+                    + (backlightOnOff != 0 ? "on" : "off"));
+        } catch (Throwable ex) {
+            // XXX : mchr : log/notify lights failure?
+        }
     }
 
     /**
-     * Siemens specific backlight control
-     * NOTE: This is not tested. We wait for feedback from users
-     *       with a siemens phone
+     * Siemens specific backlight control NOTE: This is not tested. We wait for
+     * feedback from users with a siemens phone
      */
     private void switchBacklightSiemens(int backlightOnOff) {
         try {
@@ -183,8 +203,11 @@ public final class Backlight extends TimerTask {
             } else {
                 Light.setLightOn();
             }
-            System.out.println("Backlight " + (backlightOnOff != 0 ? "on" : "off"));
-        } catch (Throwable ex) {}
+            System.out.println("Backlight "
+                    + (backlightOnOff != 0 ? "on" : "off"));
+        } catch (Throwable ex) {
+            // XXX : mchr : log/notify lights failure?
+        }
     }
 
     /**
@@ -196,21 +219,29 @@ public final class Backlight extends TimerTask {
                 cancelTimer();
             } else {
                 if (backlightTimer == null) {
-                    /* We have to start a timer here to keep the backlight
-                     * always on. */
+                    /*
+                     * We have to start a timer here to keep the backlight
+                     * always on.
+                     */
                     backlightTimer = new Timer();
-                    backlightTimerTask = new Backlight(midlet);
-                    backlightTimer.schedule(backlightTimerTask, 1000, BACKLIGHT_TIMER_INTERVAL);
+                    // XXX : mchr : I think we can just use "this" here
+                    // Documentation for mBacklightTimerTask will assume this
+                    // mBacklightTimerTask = new Backlight(mMidlet);
+                    backlightTimerTask = this;
+                    backlightTimer.schedule(backlightTimerTask, 1000,
+                            BACKLIGHT_TIMER_INTERVAL);
                 }
             }
-            System.out.println("Backlight " + (backlightOnOff != 0 ? "on" : "off"));
-        } catch (Throwable ex) {}
+            System.out.println("Backlight "
+                    + (backlightOnOff != 0 ? "on" : "off"));
+        } catch (Throwable ex) {
+            // XXX : mchr : log/notify lights failure?
+        }
     }
 
     /**
-     * Samsung specific backlight control
-     * NOTE: This is not tested. We wait for feedback from users
-     *       with a samsung phone
+     * Samsung specific backlight control NOTE: This is not tested. We wait for
+     * feedback from users with a samsung phone
      */
     private void switchBacklightSamsung(int backlightOnOff) {
         try {
@@ -219,27 +250,28 @@ public final class Backlight extends TimerTask {
             } else {
                 LCDLight.on(10000);
             }
-            System.out.println("Backlight " + (backlightOnOff != 0 ? "on" : "off"));
-        } catch (Throwable ex) {}
+            System.out.println("Backlight "
+                    + (backlightOnOff != 0 ? "on" : "off"));
+        } catch (Throwable ex) {
+            //XXX : mchr : log/notify lights failure?
+        }
     }
-    
+
     /**
-     * <p>
      * Cancels the backlight timertask and timer, which were started to
      * keep backlight always on (e.g. on Sony Ericsson phones)
-     * </p>
      */
     private void cancelTimer() {
         if (backlightTimerTask != null) {
             backlightTimerTask.cancel();
             backlightTimerTask = null;
-        }  
+        }
         if (backlightTimer != null) {
             backlightTimer.cancel();
             backlightTimer = null;
         }
     }
-    
+
     /** 
      * This method will be called when backgroundTimerTask is scheduled
      */

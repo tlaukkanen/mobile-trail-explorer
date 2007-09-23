@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 
 import javax.microedition.io.Connector;
 import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -168,8 +169,7 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
                                     "Neither of the only 2 choices are selected. Crazy! class="
                                             + this.getClass().getName(), Logger.ERROR);
                             Controller.getController().showError(
-                                            "Message not sent because of some ERROR!, See log for details",
-                                            Alert.FOREVER, Controller.getController().getCurrentScreen());
+                                            "Message not sent because of some ERROR!, See log for details");
                         }
                     }catch(Throwable t){
                         Logger.getLogger().log("Error trying to do SmsScreen.commandAction(..., sendCommand)", Logger.ERROR);

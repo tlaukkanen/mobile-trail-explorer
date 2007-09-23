@@ -32,15 +32,29 @@ import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.Version;
 
 /**
+ * TODO
  * @author  Tommi Laukkanen
  */
 public class TrailExplorerMidlet extends MIDlet {
     
-    // The current Version of this Mobile Trail Explorer. (Major, Minor, Build)
+    /** 
+     * The current Version of this Mobile Trail Explorer. (Major, Minor, Build) 
+     */
     public static final Version VERSION = new Version(1, 7, 0);
     
+    /**
+     * Local Controller object
+     */
     private static Controller controller;
     
+    /**
+     * Constructor:
+     * <ul>
+     * <li> Get a Display
+     * <li> Instanciate the Controlle
+     * <li> Display the splash
+     * </ul>
+     */
     public TrailExplorerMidlet() {
     	try{
 	        Display disp = Display.getDisplay(this);
@@ -51,6 +65,9 @@ public class TrailExplorerMidlet extends MIDlet {
     	}
     }
     
+    /**
+     * MIDlet state change -> Active state
+     */
     public void startApp() {
     	if (controller.checkIfPaused()==true) {
     		controller.unpause();    		
@@ -58,11 +75,17 @@ public class TrailExplorerMidlet extends MIDlet {
         Logger.getLogger().log("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
+    /**
+     * MIDlet state change -> Paused state
+     */
     public void pauseApp() {
     	controller.pause();
         Logger.getLogger().log("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
     }
     
+    /**
+     * MIDlet state change -> Destroyed state - we must terminate ourselves
+     */
     public void destroyApp(boolean unconditional) {
         Logger.getLogger().log("TrailExplorerMidlet.destroyApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
     }

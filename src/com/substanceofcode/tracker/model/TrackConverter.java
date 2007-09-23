@@ -34,55 +34,72 @@ import org.kxml2.io.KXmlParser;
 import com.substanceofcode.tracker.view.Logger;
 
 /**
- * TrackConverter interface is used when track positions are exported to 
+ * TrackConverter interface is used when track positions are exported to
  * different formats.
- *
+ * 
  * @author Tommi Laukkanen
  */
 // FIXME: it would make sense for this to extend KXmlParser.( I think anyway)
 public abstract class TrackConverter {
-    
-    /** Convert track to specific format */
-    public abstract String convert(
-            Track track, 
-            Vector waypoints,
-            boolean includeWaypoints, 
-            boolean includeMarkers);
-    
-    public abstract Track importTrack(KXmlParser trackDescription);
 
-	public Track importTrack(FileConnection connection){
+  /**
+  * Abstract method to allow for differentiated handling of different xml 
+  * formats e.g. kml/gpx
+  */
+	public abstract String convert(Track track, 
+			                           Vector waypoints,
+			                           boolean includeWaypoints, 
+			                           boolean includeMarkers);
+
+	/**
+	 * Abstract method to allow for differentiated handling of different xml 
+	 * formats e.g. kml/gpx
+	 */
+	public abstract Track importTrack(KXmlParser trackDescription);
+
+	/**
+	 * TrackConverter : Open File using provided FileConnection and construct
+	 * a KXmlParser using the resulting InputStreamReader - This is then passed
+	 * to abstract method importTrack(...) which will handle the file in an
+	 * appropriate way.
+	 */
+	public Track importTrack(FileConnection connection) {
 		Track result = null;
-		try{
+		try {
 			/* Make sure file exists and can be read */
-	        if(!connection.exists()){
-	        	Logger.getLogger().log("FileConnection does not exist, Track Import aborted", Logger.WARN);
-	        	return null;
-	        }    
-	        if(!connection.canRead()){
-	        	Logger.getLogger().log("FileConnection can not be read exist, Track Import aborted", Logger.WARN);
-	        	return null;
-	        }
-	        
-	        InputStream is = connection.openInputStream();
+			if (!connection.exists()) {
+				Logger.getLogger().log("FileConnection does not exist, Track Import " +
+						                   "aborted", Logger.WARN);
+				return null;
+			}
+			if (!connection.canRead()) {
+				Logger.getLogger().log("FileConnection can not be read exist, " +
+						                   "Track Import aborted",Logger.WARN);
+				return null;
+			}
+
+			InputStream is = connection.openInputStream();
 			InputStreamReader isr = new InputStreamReader(is);
 
 			KXmlParser parser = new KXmlParser();
 			parser.setInput(isr);
 
-	        result = importTrack(parser);
-	        
-	        try{
-	        	isr.close();
-	        }catch(IOException e){}
-	        try{
-	        	is.close();
-	        }catch(IOException e){}
-		}catch(Exception e){
-			Logger.getLogger().log("Exception caught trying to importTrack :" + e.toString(), Logger.WARN);
+			result = importTrack(parser);
+
+			try {
+				isr.close();
+			} catch (IOException e) {
+			}
+			try {
+				is.close();
+			} catch (IOException e) {
+			}
+		} catch (Exception e) {
+			Logger.getLogger().log("Exception caught trying to importTrack :" + 
+					                   e.toString(),Logger.WARN);
 			e.printStackTrace();
 		}
-        return result;
+		return result;
 	}
-    
+
 }
