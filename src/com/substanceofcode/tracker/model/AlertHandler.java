@@ -102,8 +102,10 @@ public class AlertHandler implements CommandListener {
             mActiveAlert = mController.showError(message + "\n" + lErrorMsg);
             mActiveAlert.setCommandListener(this);
             mAlertDisplayed = true;
-            
-            mListener.notifyError();
+            if (mListener != null)
+            {
+                mListener.notifyError();
+            }
         }
     }
 

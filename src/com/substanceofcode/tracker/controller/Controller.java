@@ -529,6 +529,12 @@ public class Controller {
 		}
 	}
 
+  /** Show stream recovery screen */
+  public void showStreamRecovery()
+  {
+    display.setCurrent(new StreamRecovery());
+  }
+  
 	/** Show trail */
 	public void showTrail() {
 		display.setCurrent(getTrailCanvas());
@@ -908,7 +914,7 @@ public class Controller {
 	/** Rotate around main displays */
 	public void switchDisplay() {
 		currentDisplayIndex++;
-		if (currentDisplayIndex > 5) {
+		if (currentDisplayIndex >= screens.length) {
 			currentDisplayIndex = 0;
 		}
 

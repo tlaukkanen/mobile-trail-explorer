@@ -84,6 +84,10 @@ public class RecorderSettings {
     /** Default recording intervals */
     private static final int RECORDING_INTERVAL_DEFAULT = 1;
     private static final int RECORDING_MARKER_INTERVAL_DEFAULT = 1;
+    
+    /** Streaming options */
+    private static final String STREAMING_FILE = "streaming-file";
+    private static final String STREAMING_STARTED = "streaming-started";
 
 
     /** Creates a new instance of RecorderSettings */
@@ -96,6 +100,45 @@ public class RecorderSettings {
         }
     }
 
+    /**
+     * @return True if streaming trail was unfinished.
+     */
+    public boolean getStreamingStarted()
+    {
+        return settings.getBooleanProperty(STREAMING_STARTED, false);
+    }
+    
+    /**
+     * @return Filename of currently unfinished streaming file or "" if no such
+     * filename was saved.
+     */
+    public String getStreamingFile()
+    {
+        return settings.getStringProperty(STREAMING_FILE, "");
+    }
+    
+    /**
+     * This will set a flag that the streaming has started and will set the
+     * full path of the file being streamed to.
+     * @param fullPath Full path of file which is being written to.
+     */
+    public void setStreamingStarted(String fullPath)
+    {
+        settings.setBooleanProperty(STREAMING_STARTED, true);
+        settings.setStringProperty(STREAMING_FILE, fullPath);
+        saveSettings();
+    }
+    
+    /**
+     * Flags that no stream is active and clears the stored path.
+     */
+    public void setStreamingStopped()
+    {
+        settings.setBooleanProperty(STREAMING_STARTED, false);
+        settings.setStringProperty(STREAMING_FILE, "");
+        saveSettings();
+    }
+    
     /** Get export folder. Default is root1/ */
     public String getExportFolder() {
         return settings.getStringProperty(EXPORT_FOLDER, "E:/");

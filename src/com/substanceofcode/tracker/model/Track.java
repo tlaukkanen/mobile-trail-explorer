@@ -70,9 +70,9 @@ public class Track implements Serializable {
     private Vector trackPoints;
 
     /** A Vector of {@link GpsPosition}s representing this 'Trails' Markers or WayPoints. */
-    private Vector markers;
+    private Vector trackMarkers;
 
-    /** The Track distance*/
+    /** The Track distance */
     private double distance;
 
     /** The Tracks name */
@@ -81,41 +81,76 @@ public class Track implements Serializable {
     /** Constant:Pause file name */
     public static final String PAUSEFILENAME = "pause";
     
-    /**
-     * TODO
-     */
+    //--------------------------------------------------------------------------
+    // Optional elements associated with a Track which is being streamed to
+    // disk
+    //--------------------------------------------------------------------------
     private FileConnection streamConnection = null;
     private OutputStream streamOut = null;
     private PrintStream streamPrint = null;
 
     /**
-     * TODO
+     * State variable : True - This track should be streamed to disk,
+     *                  False - This track should be saved right at the end
      */
     private boolean isStreaming = false;
 
-    /** Creates a new instance of Track */
+    /** 
+     * Creates a new instance of Track which will be saved at the end 
+     */
     public Track() {
         trackPoints = new Vector();
-        markers = new Vector();
+        trackMarkers = new Vector();
         distance = 0.0;
     }
     
-    public Track(String fullPath) throws Exception {
+    /**
+     * Construct a Track which streams all points directly to a GPX file.
+     * @param fullPath Full path of GPX stream
+     * @param newStream True : Creates a new GPX stream, 
+     *                  False : Reconnects to an existing GPX stream
+     * @throws IOException
+     */
+    public Track(String fullPath, boolean newStream) throws IOException {
         this();
         isStreaming = true;
         try {
-            streamConnection = (FileConnection)Connector.open(fullPath, Connector.WRITE);
-            streamConnection.create();
-            streamOut = streamConnection.openOutputStream();
+            //------------------------------------------------------------------
+            // Create a FileConnection and if this is a new stream create the
+            // file
+            //------------------------------------------------------------------
+            streamConnection = (FileConnection)Connector.open(fullPath, Connector.READ_WRITE);
+            if (newStream)
+            {
+                streamConnection.create();
+            }
+            
+            //------------------------------------------------------------------
+            // Open outputStream positioned at the end of the file
+            // For a new file this will be the same as positiining at the start
+            // For an existing file this allows us to append data
+            //------------------------------------------------------------------
+            streamOut = streamConnection.openOutputStream(streamConnection.fileSize()+1);
             streamPrint = new PrintStream(streamOut);
-            StringBuffer gpxHead = new StringBuffer();
-            GpxConverter.addHeader(gpxHead);
-            GpxConverter.addTrailStart(gpxHead);
-            streamPrint.print(gpxHead.toString());
-            streamPrint.flush();
-            streamOut.flush();
+            
+            //------------------------------------------------------------------
+            // If this is a new stream we must add headers
+            //------------------------------------------------------------------
+            if (newStream)
+            {
+                StringBuffer gpxHead = new StringBuffer();
+                GpxConverter.addHeader(gpxHead);
+                GpxConverter.addTrailStart(gpxHead);
+                streamPrint.print(gpxHead.toString());
+                streamPrint.flush();
+                streamOut.flush();
+            }
         }
-        catch (Exception e) {
+        catch (IOException e) {
+            //------------------------------------------------------------------
+            // If we get any IOException we must ensure that we close all stream
+            // objects
+            //------------------------------------------------------------------
             if (streamPrint != null) {
                 streamPrint.close();
                 streamPrint = null;
@@ -180,18 +215,18 @@ public class Track implements Serializable {
 
     /** @return the marker count */
     public int getMarkerCount() {
-        return markers.size();
+        return trackMarkers.size();
     }
 
     /** @return an Enumeration of the Markers for this Track */
     public Enumeration getTrackMarkersEnumeration() {
-        return markers.elements();
+        return trackMarkers.elements();
     }
 
     /** @return the Marker specified by the parameter
      * @param markerNumber , the index of the Marker to return */
     public GpsPosition getMarker(int markerNumber) {
-        return (GpsPosition) markers.elementAt(markerNumber);
+        return (GpsPosition) trackMarkers.elementAt(markerNumber);
     }
 
     /** @return the Trackss distance in kilometers */
@@ -242,7 +277,7 @@ public class Track implements Serializable {
             RecorderSettings lSettings = lController.getSettings();
             StringBuffer gpxPos = new StringBuffer();
             GpxConverter.addPosition(pos, gpxPos);
-            streamPrint.print(gpxPos);
+            streamPrint.print(gpxPos.toString());
             streamPrint.flush();
             try
             {
@@ -269,7 +304,7 @@ public class Track implements Serializable {
 
     /** Add new marker */
     public void addMarker(GpsPosition marker) {
-        markers.addElement(marker);
+        trackMarkers.addElement(marker);
         
         //----------------------------------------------------------------------
         // If this is a streaming trail remove old markers from memory
@@ -281,9 +316,9 @@ public class Track implements Serializable {
             int maxNumPos = lSettings.getNumberOfPositionToDraw();
             int markerInterval = lSettings.getRecordingMarkerInterval();
             int maxNumMarkers = maxNumPos / markerInterval;
-            while (markers.size() > maxNumMarkers)
+            while (trackMarkers.size() > maxNumMarkers)
             {
-                markers.removeElementAt(0);
+                trackMarkers.removeElementAt(0);
             }
         }
     }
@@ -291,10 +326,36 @@ public class Track implements Serializable {
     /** Clears <b>all</b> of this Tracks Points AND Markers and resets the distance to 0.0 */
     public void clear() {
         trackPoints.removeAllElements();
-        markers.removeAllElements();
+        trackMarkers.removeAllElements();
         distance = 0.0;
     }
 
+    /**
+     * TODO
+     * @return
+     * @throws IOException
+     */
+    public String closeStream() throws IOException
+    {
+        if (isStreaming)
+        {
+            StringBuffer gpxTail = new StringBuffer();
+            GpxConverter.addTrailEnd(gpxTail);
+            GpxConverter.addFooter(gpxTail);
+            streamPrint.print(gpxTail.toString());
+            streamPrint.flush();
+            streamPrint.close();
+            streamOut.close();
+            streamConnection.close();
+            isStreaming = false;
+            return streamConnection.getPath() + "/" + streamConnection.getName();
+        }
+        else
+        {
+            return "";
+        }
+    }
+    
     /** 
      * Export track to file.
      * @return Full path of file which was written to
@@ -338,16 +399,7 @@ public class Track implements Serializable {
         if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX &&
             this.isStreaming)
         {
-            StringBuffer gpxTail = new StringBuffer();
-            GpxConverter.addTrailEnd(gpxTail);
-            GpxConverter.addFooter(gpxTail);
-            streamPrint.print(gpxTail.toString());
-            streamPrint.flush();
-            streamPrint.close();
-            streamOut.close();
-            streamConnection.close();
-            isStreaming = false;
-            fullPath = streamConnection.getPath() + "/" + streamConnection.getName();
+            fullPath = closeStream();
         }
         else 
         {
@@ -450,7 +502,7 @@ public class Track implements Serializable {
      * @throws IllegalStateException if this trail is empty
      */
     public void saveToRMS() throws FileIOException, IllegalStateException {
-        if (this.markers.size() == 0 && this.trackPoints.size() == 0) {
+        if (this.trackMarkers.size() == 0 && this.trackPoints.size() == 0) {
             // May not save an empty trail.
             throw new IllegalStateException(
                     "Can not save \"Empty\" Trail. must record at least 1 point");
@@ -474,7 +526,7 @@ public class Track implements Serializable {
      * in the circumstances 
      */
     public void pause() {
-        if (this.markers.size() == 0 && this.trackPoints.size() == 0) {
+        if (this.trackMarkers.size() == 0 && this.trackPoints.size() == 0) {
             return;
         } else {
             try {
@@ -494,10 +546,10 @@ public class Track implements Serializable {
         for (int i = 0; i < numPoints; i++) {
             ((GpsPosition) trackPoints.elementAt(i)).serialize(dos);
         }
-        final int numMarkers = markers.size();
+        final int numMarkers = trackMarkers.size();
         dos.writeInt(numMarkers);
         for (int i = 0; i < numMarkers; i++) {
-            ((GpsPosition) markers.elementAt(i)).serialize(dos);
+            ((GpsPosition) trackMarkers.elementAt(i)).serialize(dos);
         }
         dos.writeDouble(distance);
         if (this.name == null) {
@@ -519,9 +571,9 @@ public class Track implements Serializable {
         }
 
         final int numMarkers = dis.readInt();
-        markers = new Vector(numMarkers);
+        trackMarkers = new Vector(numMarkers);
         for (int i = 0; i < numMarkers; i++) {
-            markers.addElement(new GpsPosition(dis));
+            trackMarkers.addElement(new GpsPosition(dis));
         }
         distance = dis.readDouble();
         if (dis.readBoolean()) {

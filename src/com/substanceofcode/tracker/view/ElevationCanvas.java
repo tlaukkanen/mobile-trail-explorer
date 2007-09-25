@@ -35,9 +35,7 @@ import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
 
 /**
- * <p>
- * Elevation canvas shows the change in elevation over the course of the Trail
- * </p>
+ * <p> Elevation canvas shows the change in elevation over the course of the Trail
  * 
  * @author Barry Redmond
  */
@@ -48,8 +46,7 @@ public class ElevationCanvas extends BaseCanvas {
 
     private static final int X_SCALE_TIME = 0;
     private static final int X_SCALE_DISTANCE = 1;
-    private static final int X_MIN_ZOOM = Integer.MAX_VALUE
-            & X_SCALE_SCALE_MASK;
+    private static final int X_MIN_ZOOM = Integer.MAX_VALUE & X_SCALE_SCALE_MASK;
     private static final int X_MAX_ZOOM = 0;
 
     private final int MARGIN = this.getWidth() > 200 ? 5 : 2;
@@ -63,12 +60,14 @@ public class ElevationCanvas extends BaseCanvas {
     private boolean gridOn;
 
     private double minAltitude, maxAltitude;
+    
+    private boolean manualZoom = false;
 
     public ElevationCanvas(GpsPosition initialPosition) {
         super();
-
+        
         this.lastPosition = initialPosition;
-
+        
         this.verticalMovementSize = this.getHeight() / 8;
         this.horizontalMovementSize = this.getWidth() / 8;
         this.verticalMovement = this.horizontalMovement = 0;
@@ -178,7 +177,6 @@ public class ElevationCanvas extends BaseCanvas {
         for (int i = 1; i < maxPositions; i++, yPos -= pixelIncrement, yAlt += altitudeIncrement) {
             drawAltitudeBar(g, yPos, yAlt);
         }
-        // TODO: draw Scale
     }
 
     private void drawAltitudeBar(Graphics g, int pixel, double altitude) {
@@ -308,13 +306,16 @@ public class ElevationCanvas extends BaseCanvas {
                     double lat = pos.latitude;
                     double lon = pos.longitude;
                     double alt = pos.altitude;
-                    // Make sure the graph covers all the appropriate altitude
-                    // range.
-                    if (alt > this.maxAltitude) {
-                        this.maxAltitude = alt;
-                    }
-                    if (alt < this.minAltitude) {
-                        this.minAltitude = alt;
+                    if (!manualZoom)
+                    {
+                      // Make sure the graph covers all the appropriate altitude
+                      // range.                    
+                      if (alt > this.maxAltitude) {
+                          this.maxAltitude = alt;
+                      }
+                      if (alt < this.minAltitude) {
+                          this.minAltitude = alt;
+                      }
                     }
                     Date time = pos.date;
                     CanvasPoint point1 = convertPosition(lat, lon, alt, time,
@@ -386,11 +387,24 @@ public class ElevationCanvas extends BaseCanvas {
         switch (keyCode) {
             case (KEY_NUM1):
                 // Zoom in vertically
+                manualZoom = true;
+                maxAltitude /= 2;
+                minAltitude /= 2;
                 break;
 
+            case (KEY_NUM2):
+                // Fix altitude scale
+                manualZoom = false;
+                setMinMaxValues();
+                break;
+            
             case (KEY_NUM3):
                 // Zoom out vertically
-                break;
+                manualZoom = true;
+                maxAltitude *= 2;
+                minAltitude *= 2;
+                break;          
+            
             case (KEY_NUM7):
                 // Zoom in horizontally
                 int xScaleType = this.xScale & X_SCALE_TYPE_MASK;
@@ -412,7 +426,7 @@ public class ElevationCanvas extends BaseCanvas {
                 xScaleScale = ((xScaleScale >> 1) - 1) << 1;
                 this.xScale = (byte) (xScaleScale | xScaleType);
                 break;
-
+                
             case (KEY_NUM0):
                 // Change screen
                 controller.switchDisplay();

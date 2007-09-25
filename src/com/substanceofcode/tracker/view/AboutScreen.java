@@ -77,6 +77,10 @@ public final class AboutScreen extends Canvas {
     private static final String[] elevationScreenHelpText = {
             "Scroll the Elevation Diagram LEFT or RIGHT using the 4 and 6 keys respectivly.",
             "",
+            "The Elevation scale can be \"Zoomed\" using the 1 and 3 keys for ZOOM-OUT and ZOOM-IN respectivly.",
+            "",
+            "The Elevation scale can be re-centered by pressing the 2 key.",
+            "",
             "The Time scale can be \"Zoomed\" using the 7 and 9 keys for ZOOM-OUT and ZOOM-IN respectivly.",
             "",
             "N.B. Altitude accuracy on GPS is similar to location (i.e. ~10metres. However since most trails do not"

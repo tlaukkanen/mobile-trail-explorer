@@ -164,19 +164,29 @@ public class TrailsList extends List implements CommandListener{
                     controller.showTrailActionsForm(selectedTrail, selectedTrailName);
                 }                
             }else if(command == this.newStreamTrailCommand){
-                try {
-                    String folder = controller.getSettings().getExportFolder();
-                    folder += (folder.endsWith("/") ? "" : "/");
-                    String timeStamp = DateTimeUtil.getCurrentDateStamp();
-                    String fullPath = "file:///" + folder + "stream_" + 
-                                      timeStamp + ".gpx";
-                    Track streamTrack = new Track(fullPath);
-                    controller.loadTrack(streamTrack);
-                    controller.showTrail();
-                }
-                catch (Exception e)
-                {
-                    controller.showError("Error : " + e.toString());
+                if (controller.getSettings().getStreamingStarted()) {
+                    controller.showStreamRecovery();
+                } else {
+                    try {
+                        String folder = controller.getSettings()
+                                .getExportFolder();
+                        folder += (folder.endsWith("/") ? "" : "/");
+                        String timeStamp = DateTimeUtil.getCurrentDateStamp();
+                        String fullPath = "file:///" + folder + "stream_"
+                                + timeStamp + ".gpx";
+                        Track streamTrack = new Track(fullPath, true);
+                        controller.loadTrack(streamTrack);
+
+                        // ----------------------------------------------------------
+                        // Store details in our settings file to allow us to
+                        // recover from crashes
+                        // ----------------------------------------------------------
+                        controller.getSettings().setStreamingStarted(fullPath);
+
+                        controller.showTrail();
+                    } catch (Exception e) {
+                        controller.showError("Error : " + e.toString());
+                    }
                 }
             }
         }

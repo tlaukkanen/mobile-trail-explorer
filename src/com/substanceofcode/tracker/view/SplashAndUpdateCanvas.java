@@ -30,6 +30,7 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.tracker.TrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.Version;
@@ -55,8 +56,10 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
     /** Thread for moving on */
     private Thread timeoutThread;
     
-    /** <p>The length of time to show the SplashScreen for before automatically exiting</p>  
-     * This is in miliseconds, so 1 seconds should be (displayTime = 1000).*/
+    /** 
+     * <p>The length of time to show the SplashScreen for before automatically exiting  
+     * <p>This is in miliseconds, so 1 seconds should be (displayTime = 1000).
+     */
     private long displayTime;
     
     /**
@@ -159,14 +162,24 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         }
         // Make sure the SplashAndUpdateCanvas is being displayed.
         if(this.isShown()){
-            Controller.getController().showTrail();
+            //------------------------------------------------------------------
+            // First check for unfinished trails
+            //------------------------------------------------------------------
+            Controller controller = Controller.getController();
+            RecorderSettings settings = controller.getSettings();
+            if (settings.getStreamingStarted()) {
+                controller.showStreamRecovery();
+            } else {
+                Controller.getController().showTrail();
+            }
         }
     }
     
     /**
      * Updates the MIDlet from a previous Version to a currentVersion.
+     * 
      * @author Barry Redmond
-     *
+     * 
      */
     private class Updater extends Thread{
         
