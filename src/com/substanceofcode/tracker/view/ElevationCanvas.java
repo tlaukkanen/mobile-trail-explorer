@@ -58,6 +58,8 @@ public class ElevationCanvas extends BaseCanvas {
     private Image redDotImage;
     private int xScale, yScale;
     private boolean gridOn;
+    
+    private int altitudeZoomIncrement = 10;
 
     private double minAltitude, maxAltitude;
     
@@ -388,23 +390,28 @@ public class ElevationCanvas extends BaseCanvas {
             case (KEY_NUM1):
                 // Zoom in vertically
                 manualZoom = true;
-                maxAltitude /= 2;
-                minAltitude /= 2;
+                if (maxAltitude - minAltitude > 20) {
+                    maxAltitude -= altitudeZoomIncrement;
+                    minAltitude += altitudeZoomIncrement;
+                    altitudeZoomIncrement /= 2;
+                }
                 break;
 
             case (KEY_NUM2):
                 // Fix altitude scale
                 manualZoom = false;
                 setMinMaxValues();
+                altitudeZoomIncrement = 10;
                 break;
-            
+
             case (KEY_NUM3):
                 // Zoom out vertically
                 manualZoom = true;
-                maxAltitude *= 2;
-                minAltitude *= 2;
-                break;          
-            
+                maxAltitude += altitudeZoomIncrement;
+                minAltitude -= altitudeZoomIncrement;
+                altitudeZoomIncrement *= 2;
+                break;
+
             case (KEY_NUM7):
                 // Zoom in horizontally
                 int xScaleType = this.xScale & X_SCALE_TYPE_MASK;
@@ -426,7 +433,7 @@ public class ElevationCanvas extends BaseCanvas {
                 xScaleScale = ((xScaleScale >> 1) - 1) << 1;
                 this.xScale = (byte) (xScaleScale | xScaleType);
                 break;
-                
+
             case (KEY_NUM0):
                 // Change screen
                 controller.switchDisplay();

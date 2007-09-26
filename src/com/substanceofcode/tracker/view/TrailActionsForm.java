@@ -22,6 +22,7 @@
 
 package com.substanceofcode.tracker.view;
 
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.microedition.lcdui.*;
@@ -39,105 +40,143 @@ import com.substanceofcode.tracker.model.*;
  *
  * @author Mario Sansone
  */
-public class TrailActionsForm extends Form implements CommandListener, AlertListener {
-    
-	private static final String[] ALL_ACTIONS = {"Export to KML", "Export to GPX", "Save Trail"}; 
-	
+public class TrailActionsForm extends Form implements CommandListener,
+        AlertListener {
+
+    private static final String[] ALL_ACTIONS = { "Export to KML",
+                                                  "Export to GPX", 
+                                                  "Save Trail", 
+                                                  "Save GPX Stream" };
+
     private Controller controller;
-    
+
     private Command saveCommand;
     private Command cancelCommand;
 
     private ChoiceGroup actionsGroup;
-    
+
     /**
      * State indicating whether save to RMS is an option - not applicable when
      * exporting from a trail already saved in the RMS
      */
     private final boolean saveIsAnOption;
-    
+
+    /**
+     * State for whether there were any errors during the save
+     */
     private boolean noSaveErrors = true;
-    
+
+    /**
+     * Track to operate on - provided in the constuctor or fetched from the
+     * controller
+     */
     private final Track track;
-    private final String trackName;
     
+    /**
+     * Name of Track - could be null
+     */
+    private final String trackName;
+
     /** Creates a new instance of TrailActionsForm */
     public TrailActionsForm(Controller controller) {
         super("Trail Actions");
         this.saveIsAnOption = true;
-        this.track = null;
-        this.trackName = null;
+        this.track = controller.getTrack();
+        this.trackName = track.getName();
         this.initialize(controller);
     }
-    
+
     /** 
      * Creates a new instance of TrailActionForm for when
      * exporting from a 'saved' Trail.
      */
-    public TrailActionsForm(Controller controller, Track track, String trackName){
-    	super("Trail Actions");
-    	this.saveIsAnOption = false;
-    	this.track = track;
-    	this.trackName = trackName;
-    	this.initialize(controller);
+    public TrailActionsForm(Controller controller, Track track, String trackName) {
+        super("Trail Actions");
+        this.saveIsAnOption = false;
+        this.track = track;
+        this.trackName = trackName;
+        this.initialize(controller);
     }
-    
+
     /**
      * The common core function for initializing all TrailActionForms
      *
      */
-    private void initialize(Controller controller){
-    	this.controller = controller;
-    	this.initializeCommands();
-    	this.initializeControls();
-    	this.setCommandListener(this);
+    private void initialize(Controller controller) {
+        this.controller = controller;
+        this.initializeCommands();
+        this.initializeControls();
+        this.setCommandListener(this);
     }
 
     /** Initialize commands */
     private void initializeCommands() {
-        this.addCommand( saveCommand = new Command("Save", Command.SCREEN, 1));
-        this.addCommand( cancelCommand = new Command("Cancel", Command.BACK, 100));
+        this.addCommand(saveCommand = new Command("Save", Command.SCREEN, 1));
+        this
+                .addCommand(cancelCommand = new Command("Cancel", Command.BACK,
+                        100));
     }
-    
+
     /** Initialize form controls */
     private void initializeControls() {
-        final int numActions;
-        if(saveIsAnOption){
-        	numActions = 3;
-        }else{
-        	numActions = 2;
+        int numActions;
+        //----------------------------------------------------------------------
+        // If we are converting an existing track in the RMS then SaveToRMS
+        // is not an option
+        //----------------------------------------------------------------------
+        if (saveIsAnOption) {
+            numActions = 3;
+        } else {
+            numActions = 2;
         }
+        //----------------------------------------------------------------------
+        // A streaming track can't be loaded from RMS so we always have all
+        // 4 options possible
+        //----------------------------------------------------------------------
+        if (track.isStreaming()) {
+            numActions = 4;
+        }
+        //----------------------------------------------------------------------
+        // Construct default checked array
+        //----------------------------------------------------------------------
+        final boolean kml = Controller.getController().getSettings()
+                .getExportToKML();
+        final boolean gpx = Controller.getController().getSettings()
+                .getExportToGPX();
+        final boolean save = Controller.getController().getSettings()
+                .getExportToSave();
+        final boolean[] allSelectedFlags = { kml, gpx, save, true };
+        //----------------------------------------------------------------------
+        // Copy values into correct sized arrays for this form
+        //----------------------------------------------------------------------
         final String[] actions = new String[numActions];
-        final boolean kml = Controller.getController().getSettings().getExportToKML();
-        final boolean gpx = Controller.getController().getSettings().getExportToGPX();
-        final boolean save = Controller.getController().getSettings().getExportToSave();
-        final boolean[] allSelectedFlags = {kml, gpx, save};
         boolean[] selectedFlags = new boolean[numActions];
-        for(int i = 0; i < actions.length; i++){
-        	actions[i] = ALL_ACTIONS[i];
-        	selectedFlags[i] = allSelectedFlags[i];
+        for (int i = 0; i < actions.length; i++) {
+            actions[i] = ALL_ACTIONS[i];
+            selectedFlags[i] = allSelectedFlags[i];
         }
-       
+        //-----------------------------------------------------------------------
+        // Construct choice group
+        //-----------------------------------------------------------------------
         actionsGroup = new ChoiceGroup(
-                "Please select the next actions for the current trail. Multiple " +
-                "actions are possible:",
-                ChoiceGroup.MULTIPLE, 
-                actions, 
-                null);
-        
-        actionsGroup.setSelectedFlags( selectedFlags );
+                "Please select the next actions for the current trail. Multiple "
+                        + "actions are possible:", ChoiceGroup.MULTIPLE,
+                actions, null);
+
+        actionsGroup.setSelectedFlags(selectedFlags);
 
         this.append(actionsGroup);
     }
-    
+
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if(command == saveCommand) {
+        if (command == saveCommand) {
             final Displayable lThis = this;
             // do IO operations in another thread to prevent UI freezing.
-            new Thread(new Runnable(){
-                public void run(){
+            new Thread(new Runnable() {
+                public void run() {
                     noSaveErrors = true;
+                    boolean noStreamCloseErrors = track.isStreaming();
                     // Do specified actions for this trail:
                     // 0 = Export trail to KML file
                     // 1 = Export trail to GPX file
@@ -146,77 +185,99 @@ public class TrailActionsForm extends Form implements CommandListener, AlertList
                     if (actionsGroup.isSelected(0)) {
                         exportTrail(RecorderSettings.EXPORT_FORMAT_KML, lListen);
                     }
-                    if (actionsGroup.isSelected(1) || controller.getTrack().isStreaming()) {
+                    if (actionsGroup.isSelected(1)) {
                         exportTrail(RecorderSettings.EXPORT_FORMAT_GPX, lListen);
                     }
                     if (saveIsAnOption && actionsGroup.isSelected(2)) {
                         controller.saveTrail(lListen);
                     }
-                               
+                    if (track.isStreaming() && actionsGroup.isSelected(3)) {
+                        try {
+                            lListen.notifyProgressStart("Closing GPX Stream");
+                            lListen.notifyProgress(10);
+                            track.closeStream();
+                            lListen.notifySuccess("GPX Stream Closed");
+                        } catch (IOException e) {
+                            lListen.notifyError("Error Closing GPX Stream", e);
+                            noStreamCloseErrors = false;
+                        }
+                    }
+
                     System.out.println("Finished save process");
                     System.out.println("No Errors : " + noSaveErrors);
-                    // After doing all actions, we return to the normal previous Screen
-                    if(noSaveErrors){
+
+                    //----------------------------------------------------------
+                    // If we were dealing with a streaming trail and it was
+                    // successfully closed or we chose to do nothing then
+                    // forget about it
+                    //----------------------------------------------------------
+                    if (noStreamCloseErrors) {
+                        controller.getSettings().setStreamingStopped();
+                    }
+
+                    //----------------------------------------------------------
+                    // After doing all actions, we return to the normal 
+                    // previous Screen
+                    //----------------------------------------------------------
+                    if (noSaveErrors) {
                         System.out.println("goBack()");
                         lListen.join();
                         TrailActionsForm.this.goBack();
                     }
                 }
             }).start();
-        }else if(command == cancelCommand){
+        } else if (command == cancelCommand) {
             this.goBack();
         }
     }
-    
+
     /** Export the current recorded trail to a file with the specified format */
     private void exportTrail(int exportFormat, AlertHandler xiListen) {
         String lType = "";
-        switch(exportFormat)
-        {
+        switch (exportFormat) {
             case RecorderSettings.EXPORT_FORMAT_GPX:
                 lType = "GPX";
                 break;
-                
+
             case RecorderSettings.EXPORT_FORMAT_KML:
                 lType = "KML";
                 break;
         }
         try {
             RecorderSettings settings = controller.getSettings();
-            final Track recordedTrack;
             final Vector waypoints;
-            if(saveIsAnOption){
-                recordedTrack = controller.getTrack();
+            if (saveIsAnOption) {
                 waypoints = controller.getWaypoints();
-            }else{
-                recordedTrack = track;
+            } else {
                 waypoints = null;
             }
             boolean useKilometers = settings.getUnitsAsKilometers();
             String exportFolder = settings.getExportFolder();
-            recordedTrack.writeToFile(exportFolder, 
-                                      waypoints, 
-                                      useKilometers, 
-                                      exportFormat, 
-                                      trackName, 
-                                      xiListen);
-            if (xiListen != null){
+            track.writeToFile(exportFolder, waypoints, useKilometers,
+                    exportFormat, trackName, xiListen);
+            if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX
+                    && controller.getSettings().getStreamingStarted()) {
+                controller.getSettings().setStreamingStopped();
+            }
+            if (xiListen != null) {
                 xiListen.notifySuccess(lType + " : Save Complete");
             }
         } catch (Exception ex) {
-            Logger.getLogger().log("Exception caught when trying to export trail: "  + ex.toString(), Logger.ERROR);
-            if (xiListen != null){
+            Logger.getLogger().log(
+                    "Exception caught when trying to export trail: "
+                            + ex.toString(), Logger.ERROR);
+            if (xiListen != null) {
                 xiListen.notifyError(lType + " : Save Failed", ex);
             }
         }
     }
-    
-    private void goBack(){
-    	if(saveIsAnOption){
-    		controller.showTrail();
-    	}else{
-    		controller.showTrailsList();
-    	}
+
+    private void goBack() {
+        if (saveIsAnOption) {
+            controller.showTrail();
+        } else {
+            controller.showTrailsList();
+        }
     }
 
     /* (non-Javadoc)
@@ -228,4 +289,3 @@ public class TrailActionsForm extends Form implements CommandListener, AlertList
     }
 
 }
-

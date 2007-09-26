@@ -380,15 +380,13 @@ public class Track implements Serializable {
         //----------------------------------------------------------------------
         // Notify listener that we have started a long running process
         //----------------------------------------------------------------------
-        if (listener != null)
-        {
+        if (listener != null) {
             String lType = "";
-            switch(exportFormat)
-            {
+            switch (exportFormat) {
                 case RecorderSettings.EXPORT_FORMAT_GPX:
                     lType = "GPX";
                     break;
-                    
+
                 case RecorderSettings.EXPORT_FORMAT_KML:
                     lType = "KML";
                     break;
@@ -396,100 +394,89 @@ public class Track implements Serializable {
             listener.notifyProgressStart("Writing to " + lType + " file");
             listener.notifyProgress(1);
         }
-        if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX &&
-            this.isStreaming)
-        {
-            fullPath = closeStream();
+        // ------------------------------------------------------------------
+        // Instanciate the correct converter
+        // ------------------------------------------------------------------
+        TrackConverter converter = null;
+        String extension = ".xml";
+        if (exportFormat == RecorderSettings.EXPORT_FORMAT_KML) {
+            converter = new KmlConverter(useKilometers);
+            extension = ".kml";
+        } else if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX) {
+            converter = new GpxConverter();
+            extension = ".gpx";
         }
-        else 
-        {
 
-            //------------------------------------------------------------------
-            // Instanciate the correct converter
-            //------------------------------------------------------------------
-            TrackConverter converter = null;
-            String extension = ".xml";
-            if (exportFormat == RecorderSettings.EXPORT_FORMAT_KML) {
-                converter = new KmlConverter(useKilometers);
-                extension = ".kml";
-            } else if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX) {
-                converter = new GpxConverter();
-                extension = ".gpx";
-            }
-
-            //------------------------------------------------------------------
-            // Construct filename and connect to the file
-            //------------------------------------------------------------------
-            if (filename == null) {
-                filename = DateTimeUtil.getCurrentDateStamp();
-            }
-            FileConnection connection;
-            try {
-                folder += (folder.endsWith("/") ? "" : "/");
-                fullPath = "file:///" + folder + "track_" + filename + extension;
-                System.out.println("Opening : " + fullPath);
-                connection = (FileConnection)Connector.open(fullPath, Connector.WRITE);
-            } catch (Exception ex) {
-                System.out.println("Open threw : " + ex.toString());
-                ex.printStackTrace();
-                throw new Exception("writeToFile: Open Connector: " + ex.toString());
-            }
-            try {
-                // Create file
-                connection.create();
-            } catch (Exception ex) {
-                connection.close();
-                throw new Exception("writeToFile: Unable to open file : " +
-                        "Full details : " + ex.toString());
-            }
-
-            //------------------------------------------------------------------
-            // Create OutputStream to the file connection
-            //------------------------------------------------------------------
-            OutputStream out;
-            try {
-                out = connection.openOutputStream();
-            } catch (Exception ex) {
-                connection.close();
-                throw new Exception("writeToFile: Open output stream: "
-                        + ex.toString());
-            }
-            PrintStream output = new PrintStream(out);
-
-            //------------------------------------------------------------------
-            // Notify progress
-            //------------------------------------------------------------------
-            if (listener != null)
-            {
-                listener.notifyProgress(2);
-            }
-
-            //------------------------------------------------------------------
-            // Convert the data into a String
-            //------------------------------------------------------------------
-            String exportData = converter.convert(this, waypoints, true, true);
-
-            //------------------------------------------------------------------
-            // Notify progress
-            //------------------------------------------------------------------
-            if (listener != null)
-            {
-                listener.notifyProgress(8);
-            }
-
-            //------------------------------------------------------------------
-            // Save the data to a file
-            //------------------------------------------------------------------
-            output.println(exportData);
-            output.close();
-            out.close();
+        // ------------------------------------------------------------------
+        // Construct filename and connect to the file
+        // ------------------------------------------------------------------
+        if (filename == null) {
+            filename = DateTimeUtil.getCurrentDateStamp();
+        }
+        FileConnection connection;
+        try {
+            folder += (folder.endsWith("/") ? "" : "/");
+            fullPath = "file:///" + folder + "track_" + filename + extension;
+            System.out.println("Opening : " + fullPath);
+            connection = (FileConnection) Connector.open(fullPath,
+                    Connector.WRITE);
+        } catch (Exception ex) {
+            System.out.println("Open threw : " + ex.toString());
+            ex.printStackTrace();
+            throw new Exception("writeToFile: Open Connector: " + ex.toString());
+        }
+        try {
+            // Create file
+            connection.create();
+        } catch (Exception ex) {
             connection.close();
+            throw new Exception("writeToFile: Unable to open file : "
+                    + "Full details : " + ex.toString());
         }
-        //----------------------------------------------------------------------
+
+        // ------------------------------------------------------------------
+        // Create OutputStream to the file connection
+        // ------------------------------------------------------------------
+        OutputStream out;
+        try {
+            out = connection.openOutputStream();
+        } catch (Exception ex) {
+            connection.close();
+            throw new Exception("writeToFile: Open output stream: "
+                    + ex.toString());
+        }
+        PrintStream output = new PrintStream(out);
+
+        // ------------------------------------------------------------------
         // Notify progress
-        //----------------------------------------------------------------------
-        if (listener != null)
-        {
+        // ------------------------------------------------------------------
+        if (listener != null) {
+            listener.notifyProgress(2);
+        }
+
+        // ------------------------------------------------------------------
+        // Convert the data into a String
+        // ------------------------------------------------------------------
+        String exportData = converter.convert(this, waypoints, true, true);
+
+        // ------------------------------------------------------------------
+        // Notify progress
+        // ------------------------------------------------------------------
+        if (listener != null) {
+            listener.notifyProgress(8);
+        }
+
+        // ------------------------------------------------------------------
+        // Save the data to a file
+        // ------------------------------------------------------------------
+        output.println(exportData);
+        output.close();
+        out.close();
+        connection.close();
+        // ----------------------------------------------------------------------
+        // Notify progress
+        // ----------------------------------------------------------------------
+        if (listener != null) {
             listener.notifyProgress(10);
         }
         return fullPath;
@@ -498,8 +485,10 @@ public class Track implements Serializable {
 
     /**
      * 
-     * @throws FileIOException if there is a problem saving to the FileSystem
-     * @throws IllegalStateException if this trail is empty
+     * @throws FileIOException
+     *             if there is a problem saving to the FileSystem
+     * @throws IllegalStateException
+     *             if this trail is empty
      */
     public void saveToRMS() throws FileIOException, IllegalStateException {
         if (this.trackMarkers.size() == 0 && this.trackPoints.size() == 0) {
