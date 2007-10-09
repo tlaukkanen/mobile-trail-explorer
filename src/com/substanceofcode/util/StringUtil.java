@@ -70,15 +70,15 @@ public class StringUtil {
     }
 
     /**
-     * Chops up the 'origional' string into 1 or more strings which have a width <= 'width' when
+     * Chops up the 'original' string into 1 or more strings which have a width <= 'width' when
      * rasterized with the specified Font.
      * 
      * The exception is if a single WORD is wider than 'width' in which case that word will be on its
      * own, but it WILL still be longer than 'width'
      * 
-     * @param origional The origional String which is to be chopped up
+     * @param origional The original String which is to be chopped up
      * 
-     * @param separator The delimiter for seperating words, this will usuall be the string " "(i.e. 1 space)
+     * @param separator The delimiter for separating words, this will usually be the string " "(i.e. 1 space)
      * 
      * @param font The font to use to determine the width of the words/Strings.
      * 
@@ -136,6 +136,45 @@ public class StringUtil {
         }
         return (value < 0 ? "-" : "") + 
             String.valueOf(Math.abs(integerValue)) + "." + valueString;
+    }
+    
+    /** Parse string to short, return defaultValue is parse fails */
+    public static short parseShort(String value, short defaultValue) {
+        short parsed = defaultValue;
+        if (value != null){
+            try {
+                parsed =  Short.parseShort(value);
+            } catch (NumberFormatException e) {
+                parsed =  defaultValue;
+            }
+        }
+        return parsed;
+    }
+    
+    /** Parse string to int, return defaultValue is parse fails */
+    public static int parseInteger(String value, int defaultValue) {
+        int parsed = defaultValue;
+        if (value != null){
+            try {
+                parsed =  Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                parsed =  defaultValue;
+            }
+        }
+        return parsed;
+    }
+    
+    /** Parse string to double, return defaultValue is parse fails */
+    public static double parseDouble(String value, double defaultValue) {
+        double parsed = defaultValue;
+        if (value != null){
+            try {
+                parsed = Double.parseDouble(value);
+            } catch (NumberFormatException e) {
+                parsed = defaultValue;
+            }
+        }
+        return parsed;
     }
 
 }

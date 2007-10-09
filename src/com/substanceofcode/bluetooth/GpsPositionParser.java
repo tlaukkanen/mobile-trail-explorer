@@ -266,7 +266,7 @@ public class GpsPositionParser {
         final String longitudeDirection = values[6];
 
         // Ground speed (eg. 18.28)
-        final String groundSpeed = values[7];
+        final double groundSpeed = StringUtil.parseDouble(values[7], 0d);
 
         // Course (198.00)
         final String courseString = values[8];
@@ -292,7 +292,7 @@ public class GpsPositionParser {
         int course = 0;
         if (courseString.length() > 0) {
             try {
-                course = (int) Double.parseDouble(courseString);
+                course = (int) StringUtil.parseDouble(courseString, 180d);
             } catch (Exception e) {
                 course = 180;
             }
@@ -300,18 +300,17 @@ public class GpsPositionParser {
         
         
         // if we have a speed value, work out the Miles Per Hour
-        if (groundSpeed.length() > 0) {
-            try {
-                // km/h = knots * 1.852
-            	
-                speed = (int) (Double.parseDouble(groundSpeed) * 1.852);
-                
-                if (speed <maxSpeed){
-                	maxSpeed=speed;
-                }
-            } catch (Exception e) {
-                speed = -1;
+        if (groundSpeed > 0) {
+            // km/h = knots * 1.852            	 
+            speed = (int) ((groundSpeed) * 1.852);
+            
+            if (speed > maxSpeed){
+            	maxSpeed=speed;
             }
+        }
+        // A negative speed doesn't make sense.
+        if (speed < 0) {
+            speed = 0;
         }
 
         if (warning.equals("A")) {
@@ -448,10 +447,11 @@ public class GpsPositionParser {
      */
     private synchronized void parseGPGGA(String record) {
         String[] values = StringUtil.split(record, DELIMITER);
-        short isFixed = Short.parseShort(values[6]);
-        satelliteCount = Short.parseShort( values[7] );
+        short isFixed = StringUtil.parseShort(values[6], (short) 0);
+        satelliteCount = StringUtil.parseShort(values[7], (short) 0);
+        
         if (isFixed > 0) {
-            lastAltitude = Double.parseDouble( values[9] );
+            lastAltitude = StringUtil.parseDouble( values[9], 0d );
         }
 
     }
@@ -492,7 +492,7 @@ public class GpsPositionParser {
     private synchronized void parseGPGSV(String record) {
         String[] values = StringUtil.split(record, DELIMITER);
         
-        final short cyclePos = Short.parseShort(values[2]);
+        final short cyclePos = StringUtil.parseShort(values[2], (short) 0);
         if (cyclePos == 1) {
             // New cycle started, copy over last cycles satellites and blank.
             copyLastCycleSatellitesAndClear();
@@ -500,10 +500,10 @@ public class GpsPositionParser {
     
         int index = 4;
         while(index+3 < values.length){
-            short satelliteNumber = parseShort(values[index++], GpsSatellite.UNKNOWN);
-            short elevation = parseShort(values[index++], GpsSatellite.UNKNOWN);
-            short azimuth = parseShort(values[index++], GpsSatellite.UNKNOWN);
-            short satelliteSnr = parseShort(values[index++], GpsSatellite.UNKNOWN);
+            short satelliteNumber = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
+            short elevation = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
+            short azimuth = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
+            short satelliteSnr = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
             if(satelliteNumber != GpsSatellite.UNKNOWN){
                 final GpsSatellite sat = new GpsSatellite(satelliteNumber, satelliteSnr, elevation,
                     azimuth);
@@ -541,12 +541,12 @@ public class GpsPositionParser {
     private void parseGPGSA(String record) {    	
         String[] values = StringUtil.split(record, DELIMITER);             
         //String mode=values[1];
-          int fixtype=Short.parseShort(values[2]);
+          int fixtype=StringUtil.parseShort(values[2], (short) 0);
           if (fixtype>1){
           	int [] svid =new int[13];
           	for(int i = 2;i<15;i++){        
           		try{
-          		svid[i-2]=Short.parseShort(values[i]);
+          		svid[i-2]=StringUtil.parseShort(values[i], (short) 0);
           		}
           		catch (NumberFormatException nfe){
           			svid[i-2]=0;
@@ -610,14 +610,6 @@ public class GpsPositionParser {
             this.satellites.addElement(e.nextElement());
         }
         this.tempSatellites.removeAllElements();
-    }
-
-    private final short parseShort(String value, short defaultValue) {
-        try {
-            return Short.parseShort(value);
-        } catch (Exception e) {
-            return defaultValue;
-        }
     }
 
     /**
