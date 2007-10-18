@@ -11,7 +11,7 @@ import java.io.IOException;
  * i.e. Which RecordStores and which records the file blob is in.<br>
  * It also has some additional anciliary information, such as file name and mime type.
  * 
- * It also contails methods to recover and store a FileLocator to a DataInputStream and DataOutputStream respectivly
+ * It also contains methods to recover and store a FileLocator to a DataInputStream and DataOutputStream respectively
  * @author Barry
  *
  */

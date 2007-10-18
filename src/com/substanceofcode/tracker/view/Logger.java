@@ -21,6 +21,11 @@
  */
 package com.substanceofcode.tracker.view;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import javax.microedition.io.Connector;
+import javax.microedition.io.file.FileConnection;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -79,7 +84,7 @@ public class Logger extends Form implements CommandListener{
     private final Command warnCommand;
     private final Command infoCommand;
     private final Command debugCommand;
-    
+   
     
     private final RecorderSettings settings;
     
@@ -87,6 +92,8 @@ public class Logger extends Form implements CommandListener{
     
     private StringBuffer buffer;
     private int maxSize;
+    
+    private long lastLoggedAt=0; // Timestamp of the lastlogged message
     
     private byte loggingLevel;
     
@@ -134,7 +141,7 @@ public class Logger extends Form implements CommandListener{
     private byte lastMessageLevel = -1;
     private int numOfLastMessage;
     public void log(StringBuffer message, byte level){
-    	System.out.println(level + ") " + message);
+        System.out.println(level + ") " + message);     
         if(level < DEBUG || level > FATAL){
             throw new IllegalArgumentException("Logging level must be between DEBUG(" + DEBUG + ") and FATAL(" + FATAL + ")");
         }
@@ -142,8 +149,8 @@ public class Logger extends Form implements CommandListener{
             return;
         }
         synchronized(buffer){
-        	
-        	
+            
+            	
             if(level == lastMessageLevel && message.toString().equals(this.lastMessage)){
                 numOfLastMessage++;
                 if(numOfLastMessage == 2){
@@ -170,7 +177,10 @@ public class Logger extends Form implements CommandListener{
                         buffer.delete(0, buffer.length());
                     }
                 }
+                
                 buffer.append(message).append(' ').append('\n');
+               
+                lastLoggedAt=System.currentTimeMillis();
             }
         }
     }
@@ -230,5 +240,21 @@ public class Logger extends Form implements CommandListener{
     
     public byte getLoggingLevel(){
         return this.loggingLevel;
-    } 
+    }
+    /**
+     * Returns the last logged message
+     * @return The last logged message
+     */
+    public String getLastMessage(){
+        return lastMessage;
+    }
+    /**
+     * Returns the date the last logged message was recorded at
+     * @return Date
+     */
+    public long getTimeOfLastMessage(){
+        return lastLoggedAt;
+    }
+
+   
 }

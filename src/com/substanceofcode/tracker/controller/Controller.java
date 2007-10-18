@@ -125,7 +125,7 @@ public class Controller {
 
 	/**
 	 * Array of defined screens
-	 * XXX : mchr : It would be nice to instanciate the contents here but
+	 * XXX : mchr : It would be nice to instantiate the contents here but
 	 * there are dependancies in the Constructor
 	 */
 	private BaseCanvas[] screens;
@@ -206,7 +206,7 @@ public class Controller {
   }
   
 	/**
-	 * @return Last instanciation of this class 
+	 * @return Last instantiation of this class 
 	 * XXX : mchr : Should this be changed to proper singleton pattern?
 	 */
 	public static Controller getController() {
@@ -241,7 +241,7 @@ public class Controller {
 			bt.initialize();
 			System.out.println("Finding devices.");
 			bt.findDevices();
-			// XXX : mchr : Add explicit timout to avoid infinite loop?
+			// XXX : mchr : Add explicit timeout to avoid infinite loop?
 			while (bt.searchComplete() == false) {
 				Thread.sleep(100);
 			}
@@ -484,10 +484,8 @@ public class Controller {
 	/**
    * @return Current GpsGPGSA data object
    */
-	public synchronized GpsGPGSA getGPGSA() {
-		System.out.println("entered getGPGSA");
+	public synchronized GpsGPGSA getGPGSA() {		
 		if (gpsDevice == null) {
-			System.out.println("gpsdevice is null");
 			return null;
 		}
 		return gpsDevice.getGPGSA();
@@ -950,5 +948,9 @@ public class Controller {
       // try and avoid exceptions
 		}
 	}
+        
+        public int getNumAlphaLevels(){
+            return display.numAlphaLevels();
+        }
 
 }

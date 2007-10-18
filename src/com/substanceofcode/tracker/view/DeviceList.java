@@ -78,8 +78,8 @@ public class DeviceList extends List implements Runnable, CommandListener {
         setSelectCommand(selectCommand);
         cancelCommand = new Command("Cancel", Command.SCREEN, 3);
         addCommand(cancelCommand);
-     //   mockGpsCommand = new Command("MockGPS", Command.ITEM, 4);
-     //   addCommand(mockGpsCommand);
+        mockGpsCommand = new Command("MockGPS", Command.ITEM, 4);
+        addCommand(mockGpsCommand);
         
         setCommandListener(this);
     }

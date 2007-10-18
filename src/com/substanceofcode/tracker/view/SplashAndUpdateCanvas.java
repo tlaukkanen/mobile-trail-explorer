@@ -33,6 +33,7 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.ImageUtil;
+import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.util.Version;
 
 import javax.microedition.lcdui.Canvas;
@@ -116,12 +117,16 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
             String title = "Trail Explorer";
             g.drawString(title, titleX, titleY, Graphics.HCENTER|Graphics.VCENTER);
         }
+      
         
         if(updateRequired){
             g.setColor(0xFF0000);
             g.drawString("Updating MTE", getWidth()/2, getHeight()-5, Graphics.BOTTOM | Graphics.HCENTER);
         }
     }
+
+
+
     
     /** Key pressed */
     protected void keyPressed(int keyCode) {

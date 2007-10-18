@@ -36,6 +36,8 @@ public class MathUtil {
     /** ln(0.5) constant */
     final static public double LOGdiv2 = -0.6931471805599453094;
     
+    public final static double EVal = 2.718281828459045235;
+    
     /** Creates a new instance of MathUtil */
     private MathUtil() {
     }
@@ -131,4 +133,51 @@ public class MathUtil {
         //
         return a;
     }    
+    
+    public static double log(double x){
+    	 if (x<0) return Double.NaN;
+         //
+         if (x==1) return 0d;
+         
+         if (x==0) return Double.NEGATIVE_INFINITY;
+         //
+         if (x>1) {
+             x = 1/x;
+             return -1*_log(x);
+         }
+         return _log(x);
+    }
+    
+    public static double _log(double x){
+    	
+    	  
+          double f = 0.0;
+          // Make x to close at 1
+          int appendix = 0;
+          while (x >0 && x < 1) {
+              x = x*2;
+              appendix++;
+          }
+          //
+          x = x/2;
+          appendix--;
+          //
+          double y1 = x-1;
+          double y2 = x+1;
+          double y = y1/y2;
+          //
+          double k = y;
+          y2 = k*y;
+          //
+          for (long i = 1; i < 50; i += 2) {
+              f = f+(k/i);
+              k = k*y2;
+          }
+          //
+          f = f*2;
+          for (int i = 0; i < appendix; i++)
+              f = f+(LOGdiv2);
+          //
+          return f;
+    }
 }

@@ -22,13 +22,6 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.bluetooth.GpsPosition;
-import com.substanceofcode.data.FileIOException;
-import com.substanceofcode.data.FileSystem;
-import com.substanceofcode.data.Serializable;
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.util.DateTimeUtil;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,8 +30,17 @@ import java.io.PrintStream;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.Vector;
+
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
+
+import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.data.FileIOException;
+import com.substanceofcode.data.FileSystem;
+import com.substanceofcode.data.Serializable;
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.DateTimeUtil;
 
 /**
  * <p>A Track is an ordered list of {@link GpsPosition}s which represents the movement of a
@@ -88,6 +90,7 @@ public class Track implements Serializable {
     private FileConnection streamConnection = null;
     private OutputStream streamOut = null;
     private PrintStream streamPrint = null;
+
 
     /**
      * State variable : True - This track should be streamed to disk,
@@ -170,7 +173,7 @@ public class Track implements Serializable {
     }
 
     /**
-     * Instanciate a Track from a DataInputStream
+     * Instantiate a Track from a DataInputStream
      */
     public Track(DataInputStream dis) throws IOException {
         this.unserialize(dis);
@@ -445,7 +448,8 @@ public class Track implements Serializable {
             throw new Exception("writeToFile: Open output stream: "
                     + ex.toString());
         }
-        PrintStream output = new PrintStream(out);
+        //PrintStream output = new PrintStream(out);
+        DataOutputStream output= new DataOutputStream(out);
 
         // ------------------------------------------------------------------
         // Notify progress
@@ -469,7 +473,10 @@ public class Track implements Serializable {
         // ------------------------------------------------------------------
         // Save the data to a file
         // ------------------------------------------------------------------
-        output.println(exportData);
+        
+        //faster, apparently
+        output.write(exportData.getBytes());
+        //output.println(exportData);
         output.close();
         out.close();
         connection.close();
@@ -518,11 +525,22 @@ public class Track implements Serializable {
         if (this.trackMarkers.size() == 0 && this.trackPoints.size() == 0) {
             return;
         } else {
-            try {
-                FileSystem.getFileSystem().saveFile(PAUSEFILENAME,
-                        getMimeType(), this, false);
-            } catch (FileIOException e) {
-            }
+
+        	FileSystem fs = FileSystem.getFileSystem();
+    		
+    		//If there is already a pause track, overwrite it with this one
+        	try {
+	    		if (fs.containsFile(Track.PAUSEFILENAME)) {
+	    			fs.deleteFile(Track.PAUSEFILENAME);	
+	    		}
+            
+
+				fs.saveFile(PAUSEFILENAME,
+				        getMimeType(), this, false);
+			} catch (FileIOException e) {		
+                            Logger.getLogger().log("Error creating pause file " +e.getMessage(),Logger.ERROR);
+			}
+
         }
     }
 

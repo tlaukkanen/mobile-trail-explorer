@@ -37,6 +37,8 @@ import javax.microedition.lcdui.game.Sprite;
 
 import com.substanceofcode.bluetooth.GpsGPGSA;
 import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.map.MapLocator;
+import com.substanceofcode.map.TileDownloader;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
@@ -44,6 +46,7 @@ import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
+import com.substanceofcode.util.MathUtil;
 import com.substanceofcode.util.StringUtil;
 
 // import com.nokia.mid.ui.DeviceControl;
@@ -59,18 +62,18 @@ public class TrailCanvas extends BaseCanvas {
 
     private GpsPosition lastPosition;
     private GpsGPGSA gpgsa = null;
-    // private Vector positionTrail;
 
     private int counter;
     private String error;
 
     /** Trail drawing helpers */
-    private int center;
-    private int middle;
+    private int midWidth;
+    private int midHeight;
     private int movementSize;
     private int verticalMovement;
     private int horizontalMovement;
     private int verticalZoomFactor;
+
     private int horizontalZoomFactor;
     private Hashtable zoomScaleBarDefinition;
     private final int MAX_ZOOM = 1048576;
@@ -80,22 +83,30 @@ public class TrailCanvas extends BaseCanvas {
     private Image compass;
     private Sprite compassArrows;
     private boolean largeDisplay;
+    
+    private int zoom=14; //Used by the map display for the default zoom level
+
+    // Variables needed by the map generator
+    private Image images[] = new Image[9];
+    public int m[] = new int[] { 0, 1, 2, 0, 1, 2, 0, 1, 2 };
+    public int n[] = new int[] { 0, 0, 0, 1, 1, 1, 2, 2, 2 };
+
+    private TileDownloader td = null;
 
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(GpsPosition initialPosition) {
         super();
         this.lastPosition = initialPosition;
 
-        // positionTrail = new Vector();
         counter = 0;
 
-        center = this.getWidth() / 2;
-        middle = this.getHeight() / 2;
+        midWidth = this.getWidth() / 2;
+        midHeight = this.getHeight() / 2;
         movementSize = this.getWidth() / 8;
         verticalMovement = 0;
         horizontalMovement = 0;
-        verticalZoomFactor = 2048;
-        horizontalZoomFactor = 1024;
+        verticalZoomFactor = 32;
+        horizontalZoomFactor = 16;
 
         /*
          * Pre-defined settings for the scale bar in each zoom level The key of
@@ -110,40 +121,41 @@ public class TrailCanvas extends BaseCanvas {
          * should be divided (only if unit is set to "miles")
          */
         zoomScaleBarDefinition = new Hashtable();
-        zoomScaleBarDefinition.put("16", 
-                               new double[] { 400000, 4, 5120, 482803.2, 3 });
-        zoomScaleBarDefinition.put("32", 
-                               new double[] { 200000, 4, 2560, 241402.6, 3 });
-        zoomScaleBarDefinition.put("64", 
-                               new double[] { 100000, 5, 1280, 128747.52, 4 });
-        zoomScaleBarDefinition.put("128", 
-                               new double[] { 50000, 5, 640, 48280.4, 3 });
-        zoomScaleBarDefinition.put("256", 
-                               new double[] { 20000, 4, 320, 24140.17, 3 });
-        zoomScaleBarDefinition.put("512", 
-                               new double[] { 10000, 5, 160, 16093.45, 4 });
-        zoomScaleBarDefinition.put("1024", 
-                               new double[] { 8000, 4, 80, 8046.73, 5 });
-        zoomScaleBarDefinition.put("2048", 
-                               new double[] { 4000, 4, 40, 3218.69, 4 });
-        zoomScaleBarDefinition.put("4096", 
-                               new double[] { 2000, 4, 20, 1609.35, 4 });
+
+        zoomScaleBarDefinition.put("16", new double[] { 400000, 4, 5120,
+                482803.2, 3 });
+        zoomScaleBarDefinition.put("32", new double[] { 200000, 4, 2560,
+                241402.6, 3 });
+        zoomScaleBarDefinition.put("64", new double[] { 100000, 5, 1280,
+                128747.52, 4 });
+        zoomScaleBarDefinition.put("128", new double[] { 50000, 5, 640,
+                48280.4, 3 });
+        zoomScaleBarDefinition.put("256", new double[] { 20000, 4, 320,
+                24140.17, 3 });
+        zoomScaleBarDefinition.put("512", new double[] { 10000, 5, 160,
+                16093.45, 4 });
+        zoomScaleBarDefinition.put("1024", new double[] { 8000, 4, 80, 8046.73,
+                5 });
+        zoomScaleBarDefinition.put("2048", new double[] { 4000, 4, 40, 3218.69,
+                4 });
+        zoomScaleBarDefinition.put("4096", new double[] { 2000, 4, 20, 1609.35,
+                4 });
         zoomScaleBarDefinition.put("8192",
-                               new double[] { 1000, 5, 10, 914.4, 5 });
+                new double[] { 1000, 5, 10, 914.4, 5 });
         zoomScaleBarDefinition.put("16384",
-                               new double[] { 500, 5, 5, 457.2, 3 });
-        zoomScaleBarDefinition.put("32768", 
-                               new double[] { 200, 4, 2.5, 243.84, 4 });
-        zoomScaleBarDefinition.put("65536", 
-                               new double[] { 100, 5, 1.25, 121.92, 4 });
-        zoomScaleBarDefinition.put("131072", 
-                               new double[] { 50, 5, 0.625, 60.96, 4 });
-        zoomScaleBarDefinition.put("262144", 
-                               new double[] { 25, 5, 0.3125, 30.48, 5 });
-        zoomScaleBarDefinition.put("524288", 
-                               new double[] { 10, 5, 0.15625, 15.24, 5 });
-        zoomScaleBarDefinition.put("1048576", 
-                               new double[] { 5, 5, 0.078125, 7.62, 5 });
+                new double[] { 500, 5, 5, 457.2, 3 });
+        zoomScaleBarDefinition.put("32768", new double[] { 200, 4, 2.5, 243.84,
+                4 });
+        zoomScaleBarDefinition.put("65536", new double[] { 100, 5, 1.25,
+                121.92, 4 });
+        zoomScaleBarDefinition.put("131072", new double[] { 50, 5, 0.625,
+                60.96, 4 });
+        zoomScaleBarDefinition.put("262144", new double[] { 25, 5, 0.3125,
+                30.48, 5 });
+        zoomScaleBarDefinition.put("524288", new double[] { 10, 5, 0.15625,
+                15.24, 5 });
+        zoomScaleBarDefinition.put("1048576", new double[] { 5, 5, 0.078125,
+                7.62, 5 });
 
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
 
@@ -172,31 +184,72 @@ public class TrailCanvas extends BaseCanvas {
 
     /** Paint */
     public void paint(Graphics g) {
+
         final int height = getHeight();
         final int width = getWidth();
+
 
         /** Fill background with white */
         g.setColor(COLOR_WHITE);
         g.fillRect(0, 0, width, height);
 
-        /** Draw status bar */
-        drawStatusBar(g);
+        RecorderSettings settings = controller.getSettings();
 
+
+        // Draw maps first, as they will fill the screen
+        // and we don't want to occlude other items
+        drawMaps(g, settings.getDrawMap());
+        /** Draw status bar */
+        // Draw to an image, then we can display it with an alpha channel
+       /* if (controller.getNumAlphaLevels() > 2) {
+            try {
+                Image image = Image.createImage(getWidth(), getHeight());
+                Graphics gi = image.getGraphics();
+                drawStatusBar(gi);
+                int[] rgbData = new int[3];
+                if(image!=null){
+                    System.out.println("image was not null");
+                image.getRGB(rgbData, 0, getWidth(), 0, 0, getWidth(),
+                        getHeight());
+                }else{System.out.println("image was null");
+                
+                }
+                // int col = rgbData[1]&0x00FFFFFF;
+                // int alpha =128<<24; // 50% transparent
+                // col+=alpha;
+                // rgbData[1]=col;
+                // g.drawRGB(rgbData,0,getWidth(),0,0,getWidth(),getHeight(),true);
+
+
+                // g.drawImage(image, 0, 0, Graphics.TOP| Graphics.LEFT);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else { */
+            drawStatusBar(g);
+        //}
         /** Draw waypoints */
         drawWaypoints(g);
 
         /** Draw ghost trail */
+        // TODO: Draw all the saved tracks to 'ghost' PNGs, then display using
+        // the code used for maps
+        // This could be more efficient than drawing each track
         Track ghostTrail = controller.getGhostTrail();
         drawTrail(g, ghostTrail, 0xAAAAAA, true);
 
         /** Draw current trail */
         Track currentTrail = controller.getTrack();
-        RecorderSettings settings = controller.getSettings();
+
+       
+
         drawTrail(g, currentTrail, 0xDD0000, settings.getDrawWholeTrail());
 
         /** Draw current location with red dot */
-        g.drawImage(redDotImage, center + horizontalMovement, middle
+
+        g.drawImage(redDotImage, midWidth + horizontalMovement, midHeight
                 + verticalMovement, Graphics.VCENTER | Graphics.HCENTER);
+
 
         /** Draw compass */
         drawCompass(g);
@@ -205,8 +258,130 @@ public class TrailCanvas extends BaseCanvas {
         drawZoomScaleBar(g);
     }
 
+
     public void setLastPosition(GpsPosition position) {
         this.lastPosition = position;
+    }
+
+    /**
+     * 
+     * @param g
+     * @param drawMap
+     */
+    private void drawMaps(Graphics g, int drawMap) {
+        // conditionally draw background map tiles
+
+        
+        if (drawMap > 0) {
+          
+            if (td == null) {
+                Logger.getLogger().log("Starting TileDownloader Instance:",
+                        Logger.DEBUG);
+                td = new TileDownloader(drawMap);               
+                td.start();
+            }
+            if (lastPosition != null) {
+               // System.out.println("lastPos not null");
+                if (td != null && td.isStarted() == true ) {
+                   // System.out.println("td not null and td was started");
+                    int maxtiles = (int) MathUtil.pow(2, zoom);
+                    int[] pt = MapLocator.conv(lastPosition.latitude,
+                            lastPosition.longitude, zoom);
+
+
+                    if (pt[0] == 0 && zoom != 1) {
+                        pt[0] = maxtiles;
+                    } else {
+                        pt[0] = pt[0] - 1;
+                    }
+
+
+                    if (pt[1] == 0 && zoom != 1) {
+                        pt[1] = maxtiles;
+                    } else {
+                        pt[1] = pt[1] - 1;
+                    }
+
+
+                    // System.out.println("zoom = "+zoom);
+                    
+                    try{
+                    images[4] = td.fetchTile(pt[0] + m[4], pt[1] + n[4], zoom,false);                    
+                    images[1] = td.fetchTile(pt[0] + m[1], pt[1] + n[1], zoom,false);                    
+                    images[3] = td.fetchTile(pt[0] + m[3], pt[1] + n[3], zoom,false);                   
+                    images[5] = td.fetchTile(pt[0] + m[5], pt[1] + n[5], zoom,false);
+                    images[7] = td.fetchTile(pt[0] + m[7], pt[1] + n[7], zoom,false);                    
+                    images[0] = td.fetchTile(pt[0] + m[0], pt[1] + n[0], zoom,true);
+                    images[2] = td.fetchTile(pt[0] + m[2], pt[1] + n[2], zoom,false);
+                    images[6] = td.fetchTile(pt[0] + m[6], pt[1] + n[6], zoom,false);                    
+                    images[8] = td.fetchTile(pt[0] + m[8], pt[1] + n[8], zoom,false);
+                    }
+                    catch(Exception e){
+                        e.printStackTrace();
+                            
+                        
+                    }
+
+                    // Alpha blending
+                    /*
+                     * int [] rgbData=null; images[0].getRGB(rgbData, 0, 256, 0,
+                     * 0, 256, 256); int col = rgbData[1]&0x00FFFFFF; int alpha =
+                     * 128<<24; col+=alpha; rgbData[1]=col;
+                     * 
+                     * g.drawRGB(rgbData,0,256,0,0,256,256,true);
+                     * 
+                     */
+                    g.drawImage(images[0], midWidth - pt[2]
+                            + horizontalMovement - TileDownloader.TILE_SIZE,
+                            midHeight - pt[3] + verticalMovement
+                                    - TileDownloader.TILE_SIZE, Graphics.TOP
+                                    | Graphics.LEFT);
+                    g.drawImage(images[1], midWidth - pt[2]
+                            + horizontalMovement, midHeight - pt[3]
+                            + verticalMovement - TileDownloader.TILE_SIZE,
+                            Graphics.TOP | Graphics.LEFT);
+                    g.drawImage(images[2], midWidth - pt[2]
+                            + horizontalMovement + TileDownloader.TILE_SIZE,
+                            midHeight - pt[3] + verticalMovement
+                                    - TileDownloader.TILE_SIZE, Graphics.TOP
+                                    | Graphics.LEFT);
+
+                    g.drawImage(images[3], midWidth - pt[2]
+                            + horizontalMovement - TileDownloader.TILE_SIZE,
+                            midHeight - pt[3] + verticalMovement, Graphics.TOP
+                                    | Graphics.LEFT);
+                    g.drawImage(images[4], midWidth - pt[2]
+                            + horizontalMovement, midHeight - pt[3]
+                            + verticalMovement, Graphics.TOP | Graphics.LEFT);
+                    g.drawImage(images[5], midWidth - pt[2]
+                            + horizontalMovement + TileDownloader.TILE_SIZE,
+                            midHeight - pt[3] + verticalMovement, Graphics.TOP
+                                    | Graphics.LEFT);
+
+                    g.drawImage(images[6], midWidth - pt[2]
+                            + horizontalMovement - TileDownloader.TILE_SIZE,
+                            midHeight - pt[3] + verticalMovement
+                                    + TileDownloader.TILE_SIZE, Graphics.TOP
+                                    | Graphics.LEFT);
+                    g.drawImage(images[7], midWidth - pt[2]
+                            + horizontalMovement, midHeight - pt[3]
+                            + verticalMovement + TileDownloader.TILE_SIZE,
+                            Graphics.TOP | Graphics.LEFT);
+                    g.drawImage(images[8], midWidth - pt[2]
+                            + horizontalMovement + TileDownloader.TILE_SIZE,
+                            midHeight - pt[3] + verticalMovement
+                                    + TileDownloader.TILE_SIZE, Graphics.TOP
+                                    | Graphics.LEFT);
+                }
+
+            }
+        } else {
+            // Thread is started so we need to stop it
+            if (td != null && td.isStarted() == true) {
+                td.stop();
+                td = null;
+            }
+        }
     }
 
     /** Draw waypoints */
@@ -247,14 +422,14 @@ public class TrailCanvas extends BaseCanvas {
 
         double currentLatitude = lastPosition.latitude;
         double currentLongitude = lastPosition.longitude;
-
+        // Current latitude will be zero, hence in the middle of the screen
         latitude -= currentLatitude;
         latitude *= verticalZoomFactor;
-        int y = middle + verticalMovement - (int) latitude;
+        int y = midHeight + verticalMovement - (int) latitude;
 
         longitude -= currentLongitude;
         longitude *= horizontalZoomFactor;
-        int x = (int) longitude + center + horizontalMovement;
+        int x = (int) longitude + midWidth + horizontalMovement;
 
         CanvasPoint point = new CanvasPoint(x, y);
         return point;
@@ -270,7 +445,8 @@ public class TrailCanvas extends BaseCanvas {
 
             g.setColor(color);
 
-            // TODO: implement the drawing based soely on numPositions.
+
+            // TODO: implement the drawing based solely on numPositions.
             final int numPositionsToDraw = controller.getSettings()
                     .getNumberOfPositionToDraw();
 
@@ -297,6 +473,7 @@ public class TrailCanvas extends BaseCanvas {
                 int positionsDrawn = 0;
 
                 try {
+                    if (trail!=null && trail.getEndPosition() !=null){
                     double lastLatitude = trail.getEndPosition().latitude;
                     double lastLongitude = trail.getEndPosition().longitude;
 
@@ -319,9 +496,12 @@ public class TrailCanvas extends BaseCanvas {
                             break;
                         }
                     }
+                    }
                 } catch (NoSuchElementException nsee) {
-                    // This occurs when there is no track so consume the error
-                    // here
+              
+                }
+                catch (NullPointerException npe){
+                    Logger.getLogger().log("NPE while drawing trail", Logger.ERROR);
                 }
             }
         } catch (Exception ex) {
@@ -361,12 +541,14 @@ public class TrailCanvas extends BaseCanvas {
 
         RecorderSettings settings = controller.getSettings();
 
+
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN,
                 Font.SIZE_SMALL));
         final int MARGIN_LEFT = 2; // left margin of the complete zoom scale
-                                    // bar
+        // bar
         final int MARGIN_BOTTOM = 3; // bottom margin of the complete zoom
-                                        // scale bar
+        // scale bar
+
 
         int scaleLength;
         int scaleParts;
@@ -421,6 +603,7 @@ public class TrailCanvas extends BaseCanvas {
 
     /** Draw status bar */
     private void drawStatusBar(Graphics g) {
+        
         // int width = getWidth();
         int height = getHeight();
 
@@ -431,8 +614,10 @@ public class TrailCanvas extends BaseCanvas {
 
         /** Draw status */
         g.setColor(0, 0, 255);
+
         g.drawString("Status: " + controller.getStatusText(), 1, 0,
                 Graphics.TOP | Graphics.LEFT);
+
 
         /** Draw status */
         g.setColor(0, 0, 0);
@@ -485,9 +670,11 @@ public class TrailCanvas extends BaseCanvas {
                 int speed;
                 String units;
                 if (settings.getUnitsAsKilometers() == false) {
+
                     speed = (int) UnitConverter.convertSpeed(
                             lastPosition.speed, UnitConverter.UNITS_KPH,
                             UnitConverter.UNITS_MPH);
+
                     units = " mph";
                 } else {
                     speed = (int) lastPosition.speed;
@@ -518,10 +705,12 @@ public class TrailCanvas extends BaseCanvas {
                 double distanceInKilometers = track.getDistance();
                 if (settings.getUnitsAsKilometers() == false) {
                     /** Distance in feets */
+
                     double distanceInMiles = UnitConverter.convertLength(
                             distanceInKilometers,
                             UnitConverter.UNITS_KILOMETERS,
                             UnitConverter.UNITS_MILES);
+
                     distance = StringUtil.valueOf(distanceInMiles, 2);
                     units = " ml";
                 } else {
@@ -544,9 +733,11 @@ public class TrailCanvas extends BaseCanvas {
 
                 if (settings.getUnitsAsKilometers() == false) {
                     /** Altitude in feets */
+
                     double altitudeInFeets = UnitConverter.convertLength(
                             altitudeInMeters, UnitConverter.UNITS_METERS,
                             UnitConverter.UNITS_FEET);
+
                     altitude = StringUtil.valueOf(altitudeInFeets, 2);
                     units = " ft";
                 } else {
@@ -561,6 +752,7 @@ public class TrailCanvas extends BaseCanvas {
                 displayRow++;
             }
 
+
             /** Draw any other gps info */
 
             if (gpgsa != null) {
@@ -574,7 +766,7 @@ public class TrailCanvas extends BaseCanvas {
                         | Graphics.LEFT);
                 g.drawString("" + gpgsa.getPdop(), positionAdd, fontHeight
                         * displayRow, Graphics.TOP | Graphics.LEFT);
-                // displayRow++;
+                displayRow++;
 
                 // g.drawString("HDOP:", 1, fontHeight * displayRow,
                 // Graphics.TOP | Graphics.LEFT);
@@ -589,6 +781,25 @@ public class TrailCanvas extends BaseCanvas {
                 // displayRow, Graphics.TOP
                 // | Graphics.LEFT);
                 // displayRow++;
+            }
+
+            /**
+             * Draw the last logged message. Split the string on a word boundary
+             * and draw on separate lines. Only draw the string if it is less
+             * than 10 seconds old, so that old messages aren't left on screen
+             */
+            long ageOfLastMessage=System.currentTimeMillis()-Logger.getLogger().getTimeOfLastMessage();
+            if (ageOfLastMessage< 10000) {
+                String lastLoggedMessage = "LOG:"
+                        + Logger.getLogger().getLastMessage();
+                String[] loglines = StringUtil.chopStrings(lastLoggedMessage,
+                        " ", currentFont, getWidth());
+
+                for (int i = 0; i < loglines.length; i++) {
+                    g.drawString(loglines[i], 1, fontHeight * displayRow++,
+                            Graphics.TOP | Graphics.LEFT);
+
+                }
             }
 
             long secondsSinceLastPosition = -1;
@@ -669,6 +880,7 @@ public class TrailCanvas extends BaseCanvas {
          */
     }
 
+
     /** Thread for getting current position */
     public void run() {
         // GpsPosition lastRecordedPosition = null;
@@ -683,51 +895,78 @@ public class TrailCanvas extends BaseCanvas {
                     this.repaint();
                     continue;
                 }
+               
                 final GpsPosition temp = controller.getPosition();
+               
                 this.gpgsa = controller.getGPGSA();
+               
                 if (temp != null) {
+               
                     this.lastPosition = controller.getPosition();
                 }
 
+               
                 this.repaint();
             } catch (Exception ex) {
                 Logger.getLogger().log(
-                        "Error in TrailCanvas.run(): " + ex.toString(),
+                        "Error in TrailCanvas.run(): " + ex.toString()+"\n",
                         Logger.WARN);
+                ex.printStackTrace();
                 error = ex.toString();
             }
         }
     }
 
+
     public TrailCanvas() {
     }
 
-    public static void main(String[] args) {
-        TrailCanvas tc = new TrailCanvas();
-        tc.run();
-    }
 
     /** Handle key presses */
     public void keyPressed(int keyCode) {
         System.out.println("key=" + keyCode);
+
         /** Handle zooming keys */
         switch (keyCode) {
             case (KEY_NUM1):
-                if (horizontalZoomFactor < MAX_ZOOM)
-                {
+                if (horizontalZoomFactor < MAX_ZOOM) {
                     // Zoom in
                     verticalZoomFactor *= 2;
                     horizontalZoomFactor *= 2;
+                    
                 }
+
+               
                 break;
 
             case (KEY_NUM3):
-                if (horizontalZoomFactor > MIN_ZOOM)
-                {
+
+                if (horizontalZoomFactor > MIN_ZOOM) {
                     // Zoom out
                     verticalZoomFactor /= 2;
                     horizontalZoomFactor /= 2;
+                    
                 }
+
+                break;
+                //scaling between trail and map is screwed. 
+                //Separate the relative zoom levels to try to figure
+                //out the best combination
+            case (KEY_NUM7):
+
+                if (zoom > 0) {
+                    // Zoom map out
+                   zoom--; 
+                }
+
+                break;
+
+            case (KEY_NUM9):
+                //Zoom map in
+                if (zoom < 17) {
+                    zoom++;
+                }
+
                 break;
 
             case (KEY_NUM0):

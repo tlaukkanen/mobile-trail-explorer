@@ -53,6 +53,7 @@ public class RecorderSettings {
     private static final String BACKLIGHT = "backlight";
     private static final String POSITIONS_TO_DRAW = "number-of-position-to-draw";
     private static final String DRAW_STYLE = "draw-style";
+    private static final String DRAW_MAP = "draw-map";
     private static final String LOGGING_LEVEL = "logger-recording-level";
     private static final String VERSION_NUMBER = "version-number";
 
@@ -323,6 +324,18 @@ public class RecorderSettings {
         saveSettings();
     }
 
+    /** Are we going to display background maps? */
+    public int getDrawMap() {
+        return settings.getIntProperty(DRAW_MAP,0);
+    }
+
+    /** Set the drawing style */
+    public void setDrawMap(int value) {       
+        settings.setIntProperty(DRAW_MAP, value);
+        saveSettings();
+    }
+    
+    
     /**
      * Should the backlight always be on? Default is false;
      */

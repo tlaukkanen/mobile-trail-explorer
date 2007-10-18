@@ -55,6 +55,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     private TextField drawingLimitField;
 
     private ChoiceGroup drawingStyleGroup;
+    
+    private ChoiceGroup drawingMapsGroup;
 
     private ChoiceGroup backlightGroup;
 
@@ -116,6 +118,9 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             
             /** Save the drawing style */
             settings.setDrawWholeTrail(drawingStyleGroup.isSelected(1));
+            
+            /** Save the maps properties */
+            settings.setDrawMap(drawingMapsGroup.getSelectedIndex());
 
             /** 4. Save the Backlight property */;
             boolean backlightOn = backlightGroup.isSelected(1);
@@ -190,6 +195,16 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             drawingStyleGroup.setSelectedIndex(0, true);
         }
         this.append(drawingStyleGroup);
+        
+        /** Map display options */
+        String[] drawingMaps = {"Don't draw maps","Draw OSM maps"};
+        drawingMapsGroup = new ChoiceGroup(
+                "Map Display", ChoiceGroup.EXCLUSIVE, drawingMaps, null);
+        
+        drawingMapsGroup.setSelectedIndex(settings.getDrawMap(), true);
+         
+        this.append(drawingMapsGroup);
+        
 
         String[] backlight = { "Phones Default" /* Allow Off */,
                 "Attempt to Force On" };
