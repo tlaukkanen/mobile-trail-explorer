@@ -87,11 +87,11 @@ public class TrailCanvas extends BaseCanvas {
     private int zoom=14; //Used by the map display for the default zoom level
 
     // Variables needed by the map generator
-    private Image images[] = new Image[9];
+    private Image mapTiles[] = new Image[9];
     public int m[] = new int[] { 0, 1, 2, 0, 1, 2, 0, 1, 2 };
     public int n[] = new int[] { 0, 0, 0, 1, 1, 1, 2, 2, 2 };
 
-    private TileDownloader td = null;
+    private TileDownloader tileDownloader = null;
 
     /** Creates a new instance of TrailCanvas */
     public TrailCanvas(GpsPosition initialPosition) {
@@ -195,10 +195,15 @@ public class TrailCanvas extends BaseCanvas {
 
         RecorderSettings settings = controller.getSettings();
 
-
         // Draw maps first, as they will fill the screen
         // and we don't want to occlude other items
-        drawMaps(g, settings.getDrawMap());
+        try {
+            drawMaps(g, settings.getDrawMap());
+        } catch(Exception ex) {
+            Logger.getLogger().log(
+                    "drawMaps Exception: " + ex.getMessage(), 
+                    Logger.FATAL);
+        }
         /** Draw status bar */
         // Draw to an image, then we can display it with an alpha channel
        /* if (controller.getNumAlphaLevels() > 2) {
@@ -272,17 +277,17 @@ public class TrailCanvas extends BaseCanvas {
         // conditionally draw background map tiles
 
         
-        if (drawMap > 0) {
+        if (drawMap != RecorderSettings.DRAW_MAP_NONE) {
           
-            if (td == null) {
+            if (tileDownloader == null) {
                 Logger.getLogger().log("Starting TileDownloader Instance:",
                         Logger.DEBUG);
-                td = new TileDownloader(drawMap);               
-                td.start();
+                tileDownloader = new TileDownloader(drawMap);               
+                tileDownloader.start();
             }
             if (lastPosition != null) {
                // System.out.println("lastPos not null");
-                if (td != null && td.isStarted() == true ) {
+                if (tileDownloader != null && tileDownloader.isStarted() == true ) {
                    // System.out.println("td not null and td was started");
                     int maxtiles = (int) MathUtil.pow(2, zoom);
                     int[] pt = MapLocator.conv(lastPosition.latitude,
@@ -306,15 +311,15 @@ public class TrailCanvas extends BaseCanvas {
                     // System.out.println("zoom = "+zoom);
                     
                     try{
-                    images[4] = td.fetchTile(pt[0] + m[4], pt[1] + n[4], zoom,false);                    
-                    images[1] = td.fetchTile(pt[0] + m[1], pt[1] + n[1], zoom,false);                    
-                    images[3] = td.fetchTile(pt[0] + m[3], pt[1] + n[3], zoom,false);                   
-                    images[5] = td.fetchTile(pt[0] + m[5], pt[1] + n[5], zoom,false);
-                    images[7] = td.fetchTile(pt[0] + m[7], pt[1] + n[7], zoom,false);                    
-                    images[0] = td.fetchTile(pt[0] + m[0], pt[1] + n[0], zoom,true);
-                    images[2] = td.fetchTile(pt[0] + m[2], pt[1] + n[2], zoom,false);
-                    images[6] = td.fetchTile(pt[0] + m[6], pt[1] + n[6], zoom,false);                    
-                    images[8] = td.fetchTile(pt[0] + m[8], pt[1] + n[8], zoom,false);
+                    mapTiles[4] = tileDownloader.fetchTile(pt[0] + m[4], pt[1] + n[4], zoom,false);                    
+                    mapTiles[1] = tileDownloader.fetchTile(pt[0] + m[1], pt[1] + n[1], zoom,false);                    
+                    mapTiles[3] = tileDownloader.fetchTile(pt[0] + m[3], pt[1] + n[3], zoom,false);                   
+                    mapTiles[5] = tileDownloader.fetchTile(pt[0] + m[5], pt[1] + n[5], zoom,false);
+                    mapTiles[7] = tileDownloader.fetchTile(pt[0] + m[7], pt[1] + n[7], zoom,false);                    
+                    mapTiles[0] = tileDownloader.fetchTile(pt[0] + m[0], pt[1] + n[0], zoom,true);
+                    mapTiles[2] = tileDownloader.fetchTile(pt[0] + m[2], pt[1] + n[2], zoom,false);
+                    mapTiles[6] = tileDownloader.fetchTile(pt[0] + m[6], pt[1] + n[6], zoom,false);                    
+                    mapTiles[8] = tileDownloader.fetchTile(pt[0] + m[8], pt[1] + n[8], zoom,false);
                     }
                     catch(Exception e){
                         e.printStackTrace();
@@ -331,43 +336,43 @@ public class TrailCanvas extends BaseCanvas {
                      * g.drawRGB(rgbData,0,256,0,0,256,256,true);
                      * 
                      */
-                    g.drawImage(images[0], midWidth - pt[2]
+                    g.drawImage(mapTiles[0], midWidth - pt[2]
                             + horizontalMovement - TileDownloader.TILE_SIZE,
                             midHeight - pt[3] + verticalMovement
                                     - TileDownloader.TILE_SIZE, Graphics.TOP
                                     | Graphics.LEFT);
-                    g.drawImage(images[1], midWidth - pt[2]
+                    g.drawImage(mapTiles[1], midWidth - pt[2]
                             + horizontalMovement, midHeight - pt[3]
                             + verticalMovement - TileDownloader.TILE_SIZE,
                             Graphics.TOP | Graphics.LEFT);
-                    g.drawImage(images[2], midWidth - pt[2]
+                    g.drawImage(mapTiles[2], midWidth - pt[2]
                             + horizontalMovement + TileDownloader.TILE_SIZE,
                             midHeight - pt[3] + verticalMovement
                                     - TileDownloader.TILE_SIZE, Graphics.TOP
                                     | Graphics.LEFT);
 
-                    g.drawImage(images[3], midWidth - pt[2]
+                    g.drawImage(mapTiles[3], midWidth - pt[2]
                             + horizontalMovement - TileDownloader.TILE_SIZE,
                             midHeight - pt[3] + verticalMovement, Graphics.TOP
                                     | Graphics.LEFT);
-                    g.drawImage(images[4], midWidth - pt[2]
+                    g.drawImage(mapTiles[4], midWidth - pt[2]
                             + horizontalMovement, midHeight - pt[3]
                             + verticalMovement, Graphics.TOP | Graphics.LEFT);
-                    g.drawImage(images[5], midWidth - pt[2]
+                    g.drawImage(mapTiles[5], midWidth - pt[2]
                             + horizontalMovement + TileDownloader.TILE_SIZE,
                             midHeight - pt[3] + verticalMovement, Graphics.TOP
                                     | Graphics.LEFT);
 
-                    g.drawImage(images[6], midWidth - pt[2]
+                    g.drawImage(mapTiles[6], midWidth - pt[2]
                             + horizontalMovement - TileDownloader.TILE_SIZE,
                             midHeight - pt[3] + verticalMovement
                                     + TileDownloader.TILE_SIZE, Graphics.TOP
                                     | Graphics.LEFT);
-                    g.drawImage(images[7], midWidth - pt[2]
+                    g.drawImage(mapTiles[7], midWidth - pt[2]
                             + horizontalMovement, midHeight - pt[3]
                             + verticalMovement + TileDownloader.TILE_SIZE,
                             Graphics.TOP | Graphics.LEFT);
-                    g.drawImage(images[8], midWidth - pt[2]
+                    g.drawImage(mapTiles[8], midWidth - pt[2]
                             + horizontalMovement + TileDownloader.TILE_SIZE,
                             midHeight - pt[3] + verticalMovement
                                     + TileDownloader.TILE_SIZE, Graphics.TOP
@@ -377,9 +382,9 @@ public class TrailCanvas extends BaseCanvas {
             }
         } else {
             // Thread is started so we need to stop it
-            if (td != null && td.isStarted() == true) {
-                td.stop();
-                td = null;
+            if (tileDownloader != null && tileDownloader.isStarted() == true) {
+                tileDownloader.stop();
+                tileDownloader = null;
             }
         }
     }

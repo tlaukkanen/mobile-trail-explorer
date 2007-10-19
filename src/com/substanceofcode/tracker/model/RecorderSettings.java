@@ -90,6 +90,9 @@ public class RecorderSettings {
     private static final String STREAMING_FILE = "streaming-file";
     private static final String STREAMING_STARTED = "streaming-started";
 
+    /** Map drawing options */
+    public static final int DRAW_MAP_NONE = 0;
+    public static final int DRAW_MAP_OSM = 1;
 
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
