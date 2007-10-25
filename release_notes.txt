@@ -8,11 +8,15 @@ Mario Sansone
 Barry Redmond
 Dave Walsh
 Anthony McCormack
-
+Gareth Jones
 
 Release Notes:
 
-v1.7 (August ?th 2007)
+v1.8 (xxx xth 2007)
++ Trail duration is displayed and exported to KML
++ Initial map texture support (Issue 49)
+
+v1.7 (August 17th 2007)
 + Changed Logging Levels to more "understandable" ones.
 + Logger now states what level it's currently logging at.
 + Changed How Trails & GpsPositions are serialized

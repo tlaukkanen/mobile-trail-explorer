@@ -40,7 +40,7 @@ public class TrailExplorerMidlet extends MIDlet {
     /** 
      * The current Version of this Mobile Trail Explorer. (Major, Minor, Build) 
      */
-    public static final Version VERSION = new Version(1, 7, 0);
+    public static final Version VERSION = new Version(1, 8, 0);
     
     /**
      * Local Controller object
@@ -69,10 +69,14 @@ public class TrailExplorerMidlet extends MIDlet {
      * MIDlet state change -> Active state
      */
     public void startApp() {
-    	if (controller.checkIfPaused()==true) {
-    		controller.unpause();    		
-    	}    	                                      
-        Logger.getLogger().log("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
+        try {
+            if (controller.checkIfPaused()==true) {
+                    controller.unpause();    		
+            }    	                                      
+            Logger.getLogger().log("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
     }
     
     /**

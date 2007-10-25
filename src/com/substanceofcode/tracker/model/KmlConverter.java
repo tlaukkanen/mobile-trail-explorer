@@ -235,8 +235,13 @@ public class KmlConverter extends TrackConverter {
             markerString.append("<Placemark>\r\n");
             markerString.append("<name>").append(timeStamp).append(
                     "</name>\r\n");
+            String duration = DateTimeUtil.getTimeInterval(
+                    track.getStartPosition().date, 
+                    track.getEndPosition().date);
             markerString.append("<description>Distance ").append(distance)
-                    .append(units).append("</description>");
+                    .append(units).append("\r\n")
+                    .append("Duration ").append(duration)
+                    .append("</description>");
             markerString.append("<Style>\r\n");
             markerString.append("<IconStyle>\r\n");
             markerString.append("<scale>0.6</scale>\r\n");

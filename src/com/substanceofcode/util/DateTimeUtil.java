@@ -207,4 +207,24 @@ public abstract class DateTimeUtil {
             return hours + ":" + minutes;
         }
     }
+    
+    /** 
+     * 
+     * @param startDate Interval start date time
+     * @param endDate Interval end date time
+     * @return Time interval in format hh:mm:ss
+     */
+    public static String getTimeInterval(Date startDate, Date endDate) {
+        long intervalSeconds = (endDate.getTime() - startDate.getTime()) / 1000;
+        long hours = intervalSeconds / 3600;
+        long minutes = (intervalSeconds % 3600) / 60;
+        long seconds = intervalSeconds % 60;
+        String hoursText = String.valueOf( hours );
+        if(hoursText.length()==1) { hoursText = "0" + hoursText; }
+        String minutesText = String.valueOf( minutes );
+        if(minutesText.length()==1) { minutesText = "0" + minutesText; } 
+        String secondsText = String.valueOf( seconds );
+        if(secondsText.length()==1) { secondsText = "0" + secondsText; }
+        return hoursText + ":" + minutesText + ":" + secondsText;
+    }
 }
