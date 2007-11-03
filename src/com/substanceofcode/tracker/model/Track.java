@@ -41,6 +41,7 @@ import com.substanceofcode.data.Serializable;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
+import java.util.Date;
 
 /**
  * <p>A Track is an ordered list of {@link GpsPosition}s which represents the movement of a
@@ -74,8 +75,9 @@ public class Track implements Serializable {
     /** A Vector of {@link GpsPosition}s representing this 'Trails' Markers or WayPoints. */
     private Vector trackMarkers;
 
-    /** The Track distance */
+    /** The Track statistics */
     private double distance;
+    private GpsPosition maxSpeedPosition;
 
     /** The Tracks name */
     private String name = null;
@@ -105,6 +107,7 @@ public class Track implements Serializable {
         trackPoints = new Vector();
         trackMarkers = new Vector();
         distance = 0.0;
+        name = "";
     }
     
     /**
@@ -215,6 +218,29 @@ public class Track implements Serializable {
     public GpsPosition getEndPosition() throws NoSuchElementException {
         return (GpsPosition) trackPoints.lastElement();
     }
+    
+    /** @return the position of maximum speed */
+    public GpsPosition getMaxSpeedPosition() {
+        return maxSpeedPosition;
+    }
+    
+    /** @return the track duration in milliseconds */
+    public long getDurationMilliSeconds() {
+        Date startDate = this.getStartPosition().date;
+        Date endDate = this.getEndPosition().date;
+        return (endDate.getTime() - startDate.getTime());
+    }
+    
+    /** @return the average speed (kmh) */
+    public double getAverageSpeed() {
+        double distanceKm = getDistance();
+        double hours = getDurationMilliSeconds()/3600000.0;
+        if(distanceKm>0.01) {
+            return distanceKm/hours;
+        } else {
+            return 0;
+        }
+    }
 
     /** @return the marker count */
     public int getMarkerCount() {
@@ -258,11 +284,17 @@ public class Track implements Serializable {
 
     /** Add new Track Point to the end of this Track */
     public void addPosition(GpsPosition pos) {
+        /** Handle distance calculations */
         if (trackPoints.size() > 0) {
             // Increment Distance
             final GpsPosition lastPosition = getEndPosition();
             double tripLength = lastPosition.getDistanceFromPosition(pos);
             distance += tripLength;
+        }
+        
+        /** Check for max speed */
+        if(maxSpeedPosition==null || maxSpeedPosition.speed<pos.speed) {
+            maxSpeedPosition = pos;
         }
 
         trackPoints.addElement(pos);
@@ -413,13 +445,13 @@ public class Track implements Serializable {
         // ------------------------------------------------------------------
         // Construct filename and connect to the file
         // ------------------------------------------------------------------
-        if (filename == null) {
+        if (filename == null || filename.length()==0) {
             filename = DateTimeUtil.getCurrentDateStamp();
         }
         FileConnection connection;
         try {
             folder += (folder.endsWith("/") ? "" : "/");
-            fullPath = "file:///" + folder + "track_" + filename + extension;
+            fullPath = "file:///" + folder + filename + extension;
             System.out.println("Opening : " + fullPath);
             connection = (FileConnection) Connector.open(fullPath,
                     Connector.WRITE);
@@ -574,7 +606,11 @@ public class Track implements Serializable {
         final int numPoints = dis.readInt();
         trackPoints = new Vector(numPoints);
         for (int i = 0; i < numPoints; i++) {
-            trackPoints.addElement(new GpsPosition(dis));
+            GpsPosition pos = new GpsPosition(dis);
+            if(maxSpeedPosition==null || pos.speed>maxSpeedPosition.speed) {
+                maxSpeedPosition = pos;
+            }
+            trackPoints.addElement(pos);
         }
 
         final int numMarkers = dis.readInt();

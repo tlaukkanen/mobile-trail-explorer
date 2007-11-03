@@ -22,6 +22,9 @@
 
 package com.substanceofcode.tracker.model;
 
+import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.util.StringUtil;
+
 /**
  * UnitConverter class can convert speed from km/h to mph.
  *
@@ -74,7 +77,46 @@ public class UnitConverter {
                   "supported : ( unit index " + originalUnits + 
                   " to unit index" + convertedUnits + ")");
     }
-
+    
+    /** Get speed string in given units (kmh or mph) */
+    public static String getSpeedString(
+        double speed, 
+        boolean useKilometers, 
+        boolean includeUnits) {
+        
+        String units;
+        String speedString;
+        if (useKilometers == true) {
+            units = " km/h";
+            speedString = String.valueOf(speed);
+        } else {
+            double mileSpeed = UnitConverter.convertSpeed(
+                speed,
+                UnitConverter.UNITS_KPH,
+                UnitConverter.UNITS_MPH);
+            speedString = StringUtil.valueOf(mileSpeed, 1);
+            units = " mph";
+        }
+        
+        int dotIndex = speedString.indexOf(".");
+        if(dotIndex>0) {
+            // 12.1234
+            // 7 - (2+1)
+            // 1234.12
+            // 7 - (4+1)
+            int decimalCount = speedString.length() - (dotIndex+1);
+            if(decimalCount>2) {
+                speedString = speedString.substring(0, dotIndex+3);
+            }
+        }
+        
+        String result = speedString;
+        if(includeUnits) {
+            result += units;
+        }
+        return result;
+    }
+    
     /** 
      * Convert lengths. Supported conversions:
      * <ul>

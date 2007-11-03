@@ -876,24 +876,23 @@ public class Controller {
    * Unpause by loading the last saved Track from the RMS and setting it as
    * the current track. 
    */
-	public void unpause() {
-		Logger.getLogger().log("Resuming from pause", Logger.DEBUG);
-		Track pausedTrack;
-		FileSystem fs = FileSystem.getFileSystem();
-		if (fs.containsFile(Track.PAUSEFILENAME)) {
-			try {
-				pausedTrack = new Track(fs.getFile(Track.PAUSEFILENAME));
-				recorder.clearTrack();
-				recorder.setTrack(pausedTrack);
-				fs.deleteFile(Track.PAUSEFILENAME);
-			} catch (IOException e) {
-				Logger.getLogger().log(
-						"Resume from pause failed: " + e.getMessage(),
-						Logger.ERROR);
-			}
-		}
+    public void unpause() {
+        try {
+            Logger.getLogger().log("Resuming from pause", Logger.DEBUG);
+            Track pausedTrack;
+            FileSystem fs = FileSystem.getFileSystem();
+            if (fs.containsFile(Track.PAUSEFILENAME)) {
+                pausedTrack = new Track(fs.getFile(Track.PAUSEFILENAME));
+                recorder.clearTrack();
+                recorder.setTrack(pausedTrack);
+                fs.deleteFile(Track.PAUSEFILENAME);
+            }
+        } catch (IOException e) {
+            Logger.getLogger().log("Resume from pause failed: " + e.getMessage(),
+                    Logger.ERROR);
+        }
 
-	}
+    }
 
 	/**
 	 * @return true if a pause file exists in the RMS

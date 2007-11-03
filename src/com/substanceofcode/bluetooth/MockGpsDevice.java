@@ -71,7 +71,7 @@ public class MockGpsDevice extends GpsDevice {
             init();
         }
         return getPositionFromMockTrack();
-      //  return getMadeUpPosition();
+        // return getMadeUpPosition();
     }
 
    
@@ -96,7 +96,7 @@ public class MockGpsDevice extends GpsDevice {
         // lat = -90 -> 90 = pi =180
         // long = -180->180=2pi =360
 
-
+        speed = 20 * Math.sin(t);
         latitudeDouble = INITIALLATITUDE + r * Math.PI
                 * Math.sin(50 * t * Math.PI / 180);
         longitudeDouble = INITIALLONGITUDE + 2 * r * Math.PI

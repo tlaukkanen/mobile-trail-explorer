@@ -29,6 +29,7 @@ import javax.microedition.lcdui.*;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.*;
+import com.substanceofcode.util.DateTimeUtil;
 
 /**
  * TrailActionsForm will be shown when recording was stopped by user.
@@ -53,6 +54,7 @@ public class TrailActionsForm extends Form implements CommandListener,
     private Command saveCommand;
     private Command cancelCommand;
 
+    private TextField trailNameField;
     private ChoiceGroup actionsGroup;
 
     /**
@@ -71,18 +73,17 @@ public class TrailActionsForm extends Form implements CommandListener,
      * controller
      */
     private final Track track;
-    
-    /**
-     * Name of Track - could be null
-     */
-    private final String trackName;
 
     /** Creates a new instance of TrailActionsForm */
     public TrailActionsForm(Controller controller) {
         super("Trail Actions");
         this.saveIsAnOption = true;
         this.track = controller.getTrack();
-        this.trackName = track.getName();
+        String name = track.getName();
+        if(name==null||name.length()==0) {
+            name = DateTimeUtil.getCurrentDateStamp();
+        }
+        this.trailNameField = new TextField("Name", name, 64, TextField.ANY);
         this.initialize(controller);
     }
 
@@ -94,7 +95,11 @@ public class TrailActionsForm extends Form implements CommandListener,
         super("Trail Actions");
         this.saveIsAnOption = false;
         this.track = track;
-        this.trackName = trackName;
+        String name = trackName;
+        if(name==null||name.length()==0) {
+            name = DateTimeUtil.getCurrentDateStamp();
+        }        
+        this.trailNameField = new TextField("Name", name, 64, TextField.ANY);
         this.initialize(controller);
     }
 
@@ -155,6 +160,9 @@ public class TrailActionsForm extends Form implements CommandListener,
             actions[i] = ALL_ACTIONS[i];
             selectedFlags[i] = allSelectedFlags[i];
         }
+        /** Add trail name field first */
+        this.append(trailNameField);        
+        
         //-----------------------------------------------------------------------
         // Construct choice group
         //-----------------------------------------------------------------------
@@ -253,6 +261,7 @@ public class TrailActionsForm extends Form implements CommandListener,
             }
             boolean useKilometers = settings.getUnitsAsKilometers();
             String exportFolder = settings.getExportFolder();
+            String trackName = trailNameField.getString();
             track.writeToFile(exportFolder, waypoints, useKilometers,
                     exportFormat, trackName, xiListen);
             if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX

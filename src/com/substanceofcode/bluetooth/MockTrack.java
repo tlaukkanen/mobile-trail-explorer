@@ -1377,7 +1377,7 @@ private final String trackData = ""
 
         short course = 0;
         double altitude = Double.parseDouble(coords[2]);
-        double speed = 0;
+        double speed = 12.34;
         double longitudeDouble = Double.parseDouble(coords[0]);
         double latitudeDouble = Double.parseDouble(coords[1]);
         Date date = new Date();

@@ -188,7 +188,7 @@ public class KmlConverter extends TrackConverter {
             GpsPosition startPosition = track.getStartPosition();
             String timeStamp = DateTimeUtil
                     .convertToTimeStamp(startPosition.date);
-            markerString.append("<name>Start/End</name>\r\n");
+            markerString.append("<name>Start/End/Info</name>\r\n");
             markerString.append("<Placemark>\r\n");
             markerString.append("<name>" + timeStamp + "</name>\r\n");
             markerString.append("<Style>\r\n");
@@ -263,6 +263,25 @@ public class KmlConverter extends TrackConverter {
                             + "generate Endpoints in KML export function",
                     Logger.DEBUG);
         }
+        
+        /** Max speed */
+        GpsPosition maxSpeedPos = track.getMaxSpeedPosition();
+        if(maxSpeedPos!=null) {
+            String units;
+            String speed;
+            if (useKilometers == true) {
+                units = " km/h";
+                speed = String.valueOf(maxSpeedPos.speed);
+            } else {
+                double mileSpeed = UnitConverter.convertSpeed(maxSpeedPos.speed,
+                        UnitConverter.UNITS_KPH,
+                        UnitConverter.UNITS_MPH);
+                speed = StringUtil.valueOf(mileSpeed, 1);
+                units = " mph";
+            }        
+            markerString.append(getPlaceMark(maxSpeedPos, "Max speed " + speed + " " + units));
+        }
+        
         // Close the start/end folder
         markerString.append("</Folder>\r\n");
         return markerString;
@@ -280,6 +299,28 @@ public class KmlConverter extends TrackConverter {
         Logger.getLogger().log("Starting to parse KML track from file",
                 Logger.DEBUG);
         return null;
+    }
+    
+    /** Create KML place mark element */
+    private String getPlaceMark(GpsPosition position, String name) {
+        StringBuffer markBuffer = new StringBuffer();
+        markBuffer.append("<Placemark>\r\n");
+        markBuffer.append("<name>").append(name).append("</name>\r\n");
+        markBuffer.append("<description/>\r\n");
+        markBuffer.append("<Style>\r\n");
+        markBuffer.append("<IconStyle>\r\n");
+        markBuffer.append("<Icon>\r\n");
+        markBuffer.append("<href>http://maps.google.com/mapfiles/kml/pal3/icon61.png</href>\r\n");
+        markBuffer.append("</Icon>\r\n");
+        markBuffer.append("</IconStyle>\r\n");
+        markBuffer.append("</Style>\r\n");
+        markBuffer.append("<Point><coordinates>\r\n");
+        markBuffer.append(formatDegrees(position.longitude)).append(
+                ",").append(formatDegrees(position.latitude)).append(
+                ",").append((int) position.altitude).append("\r\n");
+        markBuffer.append("</coordinates></Point>\r\n");
+        markBuffer.append("</Placemark>\r\n");
+        return markBuffer.toString();
     }
 
 }

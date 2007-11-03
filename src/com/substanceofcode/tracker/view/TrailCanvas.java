@@ -105,8 +105,8 @@ public class TrailCanvas extends BaseCanvas {
         movementSize = this.getWidth() / 8;
         verticalMovement = 0;
         horizontalMovement = 0;
-        verticalZoomFactor = 32;
-        horizontalZoomFactor = 16;
+        verticalZoomFactor = 4096;
+        horizontalZoomFactor = 2048;
 
         /*
          * Pre-defined settings for the scale bar in each zoom level The key of

@@ -26,6 +26,7 @@ import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.SpeedFormatter;
 import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
 
@@ -41,15 +42,21 @@ import javax.microedition.lcdui.Graphics;
  */
 public class InformationCanvas extends BaseCanvas{
     
+    private int lineRow;
+
+    private final static Font BIG_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
+    private final static Font SMALL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
+    private final static int VALUE_COL = BIG_FONT.stringWidth("LAT:_:");
+    
     /** Creates a new instance of InformationCanvas */
     public InformationCanvas() {
         super();
-        
         refreshThread.start();
     }    
     
     /** Paint information canvas */
     protected void paint(Graphics g) {
+                
 	g.setColor(255,255,255);
 	g.fillRect(0,0,getWidth(),getHeight());
         
@@ -62,10 +69,9 @@ public class InformationCanvas extends BaseCanvas{
         
         GpsPosition position = controller.getPosition();
         
-        Font bigFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_LARGE);
-        g.setFont(bigFont);
+        g.setFont(BIG_FONT);
         
-        int charHeight = bigFont.getHeight();
+        int charHeight = BIG_FONT.getHeight();
         String lat = "";
         String lon = "";
         String spd = "";
@@ -73,6 +79,8 @@ public class InformationCanvas extends BaseCanvas{
         String alt = "";
         String dst = "";
         String durationTime = "";
+        String maximumSpeed = "";
+        String averageSpeed = "";
         if(position!=null) {
             lat = StringUtil.valueOf(position.latitude, 4);
             lon = StringUtil.valueOf(position.longitude, 4);
@@ -91,29 +99,53 @@ public class InformationCanvas extends BaseCanvas{
                 durationTime = DateTimeUtil.getTimeInterval(
                     currentTrack.getStartPosition().date, 
                     currentTrack.getEndPosition().date);
+                
+                maximumSpeed = UnitConverter.getSpeedString(
+                    currentTrack.getMaxSpeedPosition().speed, 
+                    controller.getSettings().getUnitsAsKilometers(),
+                    true);
+                
+                averageSpeed = UnitConverter.getSpeedString(
+                    currentTrack.getAverageSpeed(), 
+                    controller.getSettings().getUnitsAsKilometers(),
+                    true);
             }
             
         }
-        int infoPos = bigFont.stringWidth("LAT:_:");
+        int infoPos = BIG_FONT.stringWidth("LAT:_:");
+        lineRow = titleHeight;
+        
+        drawNextHeader(g, "Position");        
+        drawNextString(g, "LAT:", lat);
+        drawNextString(g, "LON:", lon);
+        drawNextString(g, "ALT:", alt);
+        drawNextString(g, "HEA:", hea);
+        
+        drawNextHeader(g, "Speed");        
+        drawNextString(g, "SPD:", spd);
+        drawNextString(g, "AVG:", averageSpeed);
+        drawNextString(g, "MAX:", maximumSpeed);
+
+        drawNextHeader(g, "Trail");
+        drawNextString(g, "DST:", dst);
+        drawNextString(g, "DUR:", durationTime);
+      
+    }
+    
+    private void drawNextString(Graphics g, String name, String value) {
+        g.setFont(BIG_FONT);
         g.setColor(32,128,32);
-        g.drawString("LAT: ", 1, titleHeight+1+charHeight*0, Graphics.TOP|Graphics.LEFT);
-        g.drawString("LON: ", 1, titleHeight+1+charHeight*1, Graphics.TOP|Graphics.LEFT);
-        g.drawString("SPD: ", 1, titleHeight+2+charHeight*2, Graphics.TOP|Graphics.LEFT);
-        g.drawString("HEA: ", 1, titleHeight+3+charHeight*3, Graphics.TOP|Graphics.LEFT);
-        g.drawString("ALT: ", 1, titleHeight+4+charHeight*4, Graphics.TOP|Graphics.LEFT);
-        g.drawString("DST: ", 1, titleHeight+5+charHeight*5, Graphics.TOP|Graphics.LEFT);     
-        g.drawString("DUR: ", 1, titleHeight+6+charHeight*6, Graphics.TOP|Graphics.LEFT);     
-        
+        g.drawString(name, 1, lineRow, Graphics.TOP|Graphics.LEFT);
         g.setColor(0,0,0);
-        g.drawString(lat, infoPos, titleHeight+1+charHeight*0, Graphics.TOP|Graphics.LEFT);
-        g.drawString(lon, infoPos, titleHeight+1+charHeight*1, Graphics.TOP|Graphics.LEFT);
-        g.drawString(spd, infoPos, titleHeight+2+charHeight*2, Graphics.TOP|Graphics.LEFT);
-        g.drawString(hea, infoPos, titleHeight+3+charHeight*3, Graphics.TOP|Graphics.LEFT);
-        g.drawString(alt, infoPos, titleHeight+4+charHeight*4, Graphics.TOP|Graphics.LEFT);
-        g.drawString(dst, infoPos, titleHeight+5+charHeight*5, Graphics.TOP|Graphics.LEFT);
-        g.drawString(durationTime, infoPos, titleHeight+6+charHeight*6, Graphics.TOP|Graphics.LEFT);
-        
-			
+        g.drawString(value, VALUE_COL, lineRow, Graphics.TOP|Graphics.LEFT);
+        lineRow += BIG_FONT.getHeight();
+    }
+    
+    private void drawNextHeader(Graphics g, String header) {
+        g.setFont(SMALL_FONT);
+        g.setColor(128,32,32);
+        g.drawString(header, getWidth()/2, lineRow, Graphics.TOP|Graphics.HCENTER);
+        lineRow += SMALL_FONT.getHeight();
     }
     
     /** Key pressed handler */

@@ -14,7 +14,10 @@ Release Notes:
 
 v1.8 (xxx xth 2007)
 + Trail duration is displayed and exported to KML
++ Trail maximum speed is displayed and exported to KML
++ Trail average speed is displayed
 + Initial map texture support (Issue 49)
++ User can select filename for exported trail
 
 v1.7 (August 17th 2007)
 + Changed Logging Levels to more "understandable" ones.
