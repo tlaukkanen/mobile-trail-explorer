@@ -1,14 +1,13 @@
 package com.substanceofcode.map;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Image;
 
 import com.substanceofcode.tracker.view.Logger;
-import com.sun.cldc.i18n.StreamReader;
 
 /**
  * TileCache used for storage and quick lookup of predownloaded tiles. I'm
@@ -28,14 +27,15 @@ public class TileCacheManager implements Runnable {
     MemCache memCache = null;
     Vector RMS2MEMQueue = new Vector();
     private String storename;
-    private volatile Thread cacheThread;
+    private volatile Thread cacheThread;    
 
     public TileCacheManager(String cacheDir, String storename) {
-        // this.cacheDir=cacheDir;
         this.storename = storename;
         cacheThread = new Thread(this);
         cacheThread.start();
+    }
 
+    public TileCacheManager() {
 
     }
 
@@ -44,9 +44,6 @@ public class TileCacheManager implements Runnable {
         Logger.getLogger().log(
                 "Initializing TileCacheManager, storename=" + storename,
                 Logger.DEBUG);
-        // TODO: temporarily disabled whilst debugging amazing slowness
-        // populateTileCacheFromRms();
-        // populateTileCacheFromFileSystem();
         this.storename = storename;
         rmsCache = new RMSCache(storename);
         memCache = new MemCache();
@@ -57,40 +54,106 @@ public class TileCacheManager implements Runnable {
      * Create an Image from the input stream data, then save it to the cache(s)
      * 
      * @param tile
-     * @param is
-     *            Inputstream containing the tile data
+     * @param is - Inputstream containing the tile data 
+     * Returns boolean true if save was successful
      */
     public boolean saveTile(Tile tile, InputStream is) {
         Logger.getLogger().log("Save tile 1)", Logger.DEBUG);
 
-        Image im;
+
+        long freeMem = Runtime.getRuntime().freeMemory();
+        long totalMem = Runtime.getRuntime().totalMemory();
         boolean result = true;
-        try {
-            if (is != null) {
-                InputStreamReader x =new InputStreamReader(is);
-       
-                Logger.getLogger().log("Creating tile image" , Logger.DEBUG);
-                im = Image.createImage(is);
-                Logger.getLogger().log("Created tile image", Logger.DEBUG);
-                tile.setImage(im);
-                memCache.put(tile);
-                rmsCache.addToQueue(tile);
-            } else {
-                Logger.getLogger().log("Input stream was null ", Logger.ERROR);
-            }
-            Logger.getLogger().log("Tile Saved", Logger.DEBUG);
-        } catch (IOException e) {
-            result = false;
-            e.printStackTrace();
-            Logger.getLogger().log("Error creating tile image", Logger.ERROR);
-        } catch (Exception e) {
-            result = false;
-            e.printStackTrace();
-            Logger.getLogger()
-                    .log("Error creating tile image " + e.getMessage(),
+
+        byte[] nbuffer = parseInputStream(is);
+        System.out.println("Regular input stream size=" + nbuffer.length);
+        
+            try {
+                if (nbuffer != null) {
+                    if (nbuffer.length < 4) { // response was 'nil' or zero, not an image
+                        result = false;
+                    } else {
+                    // Image.createImage appears to throw an Exception if there
+                    // is
+                    // not enough
+                    // Memory to complete the operation.
+                    // Note the exception thrown is not 'Throwable' so cannot
+                    // ever
+                    // be caught in code
+
+                    Logger.getLogger().log(
+                            "Creating tile image: freemem=" + freeMem
+                                    + " totalmem=" + totalMem, Logger.DEBUG);
+                    System.gc();
+
+
+                    if (freeMem > 10000 && totalMem > 10000) {
+                        
+                            tile.setImage(Image.createImage(nbuffer, 0,
+                                    nbuffer.length));
+                        
+                        memCache.put(tile);
+                        // rmsCache.addToQueue(tile);
+                    }
+
+                    Logger.getLogger().log("Created tile image", Logger.DEBUG);
+                    }
+                } else {
+                    Logger.getLogger().log("Input stream was null ",
                             Logger.ERROR);
-        }
+                }
+                Logger.getLogger().log("Tile Saved", Logger.DEBUG);
+            } catch (Throwable e) {
+                result = false;
+                e.printStackTrace();
+                Logger.getLogger().log(
+                        "Error creating tile image: " + e.toString(),
+                        Logger.ERROR);
+
+            }
+        
         return result;
+
+    }
+
+
+    private byte[] parseInputStream(InputStream is) {
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(8192);
+
+        byte[] buffer = new byte[1024];
+
+
+        int bytesRead = 0;
+        int totalBytesRead = 0;
+
+        while (true) {
+            try {
+                bytesRead = is.read(buffer, 0, 1024);
+
+                if (bytesRead == -1)
+                    break;
+                else
+                    totalBytesRead += bytesRead;
+                baos.write(buffer, 0, bytesRead);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (is != null)
+            try {
+                is.close();
+            } catch (IOException e) {
+
+            }
+
+        is = null;
+        byte[] out = new byte[totalBytesRead];
+        out = baos.toByteArray();
+        return out;
 
     }
 
@@ -132,11 +195,6 @@ public class TileCacheManager implements Runnable {
                             "Exception while writing tile to RMS"
                                     + e.getMessage(), Logger.ERROR);
                 }
-            } else {
-                // Logger.getLogger().log(
-                // "TCM: RMS2MEMQueue empty " + RMS2MEMQueue.size(),
-                // Logger.DEBUG);
-
             }
 
         }
@@ -156,11 +214,16 @@ public class TileCacheManager implements Runnable {
             }
         } else if (rmsCache.checkRMSCache(storename + "-" + z + "-" + x + "-"
                 + y)) {
-            Logger.getLogger().log(
-                    "TCM: Found tile in rms cache, will copy to memcache 1)",
-                    Logger.DEBUG);
-            // put this into a thread to save ui performance
-            RMS2MEMQueue.addElement(storename + "-" + z + "-" + x + "-" + y);
+            if (!RMS2MEMQueue.contains(storename + "-" + z + "-" + x + "-" + y)) {
+                Logger
+                        .getLogger()
+                        .log(
+                                "TCM: Found tile in rms cache, will copy to memcache 1)",
+                                Logger.DEBUG);
+
+                RMS2MEMQueue
+                        .addElement(storename + "-" + z + "-" + x + "-" + y);
+            }
             result = 1;
         } else {
             result = -1;

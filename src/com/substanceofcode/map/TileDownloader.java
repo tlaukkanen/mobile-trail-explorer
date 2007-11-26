@@ -317,8 +317,11 @@ public class TileDownloader implements Runnable {
                                 Logger.DEBUG);
                         if (conn.getResponseCode() == 200) {
                             try {
-
-                                tc.saveTile(tile, in);
+                                //If we get a 200 response but then can't save the tile
+                                // save a blank image there instead.
+                               if(!tc.saveTile(tile, in)){
+                                   tc.saveTile(tile, blankImage());
+                               }
 
 
                                 Logger.getLogger().log(
@@ -376,7 +379,7 @@ public class TileDownloader implements Runnable {
 
             return p;
         }
-        // System.out.println("Creating null placeHolder Image");
+       
         loadingImage[nullImageCounter] = Image
                 .createImage(TILE_SIZE, TILE_SIZE);
         Graphics g = loadingImage[nullImageCounter].getGraphics();
