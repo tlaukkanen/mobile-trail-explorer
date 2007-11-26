@@ -620,9 +620,9 @@ public class TrailCanvas extends BaseCanvas {
         /** Draw status */
         g.setColor(0, 0, 255);
 
-        g.drawString("Status: " + controller.getStatusText(), 1, 0,
-                Graphics.TOP | Graphics.LEFT);
-
+        String satelliteCount = String.valueOf(controller.getSatelliteCount());
+        g.drawString("Status: " + controller.getStatusText() + " (" + satelliteCount + ")", 
+                1, 0, Graphics.TOP | Graphics.LEFT);
 
         /** Draw status */
         g.setColor(0, 0, 0);
@@ -848,7 +848,7 @@ public class TrailCanvas extends BaseCanvas {
                             + " seconds";
                 }
 
-                g.drawString("Last refresh:", 1, height - (fontHeight * 4 + 6),
+                g.drawString("Time from last fix:", 1, height - (fontHeight * 4 + 6),
                         Graphics.TOP | Graphics.LEFT);
                 g.drawString(timeSinceLastPosition + " ago.", 1, height
                         - (fontHeight * 3 + 6), Graphics.TOP | Graphics.LEFT);
@@ -856,7 +856,7 @@ public class TrailCanvas extends BaseCanvas {
             }
 
         } else if (controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
-            g.drawString("Position data is unavailable. " + counter, 1,
+            g.drawString("No GPS fix. " + counter, 1,
                     fontHeight, Graphics.TOP | Graphics.LEFT);
         }
 

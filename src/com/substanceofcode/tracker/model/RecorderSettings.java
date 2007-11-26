@@ -68,6 +68,9 @@ public class RecorderSettings {
     /** Recording setting keys */
     private static final String RECORDING_INTERVAL = "recording-interval";
     private static final String RECORDING_MARKER_INTERVAL = "recording-marker-interval";
+    private static final String RECORDING_MAX_SPEED = "recording-max-speed";
+    private static final String RECORDING_MAX_ACCELERATION = "recording-max-acceleration";
+    private static final String RECORDING_MIN_DISTANCE = "recording-min-distance";
 
     /** Display setting keys */
     public static final String DISPLAY_COORDINATES = "display-coordinates";
@@ -84,7 +87,10 @@ public class RecorderSettings {
 
     /** Default recording intervals */
     private static final int RECORDING_INTERVAL_DEFAULT = 1;
-    private static final int RECORDING_MARKER_INTERVAL_DEFAULT = 1;
+    private static final int RECORDING_MARKER_INTERVAL_DEFAULT = 10;
+    private static final int RECORDING_MAX_SPEED_DEFAULT = 310;
+    private static final int RECORDING_MAX_ACCELERATION_DEFAULT = 40;
+    private static final int RECORDING_MIN_DISTANCE_DEFAULT = 5;
     
     /** Streaming options */
     private static final String STREAMING_FILE = "streaming-file";
@@ -104,6 +110,48 @@ public class RecorderSettings {
         }
     }
 
+    /**
+     * @return Max acceleration between GPS positions.
+     */
+    public int getMaxAcceleration() {
+        int maxAcc = settings.getIntProperty(
+                RECORDING_MAX_ACCELERATION, 
+                RECORDING_MAX_ACCELERATION_DEFAULT);
+        return maxAcc;
+    }
+    
+    public void setMaxAcceleration(int maxAcceleration) {
+        settings.setIntProperty(RECORDING_MAX_ACCELERATION, maxAcceleration);
+    }
+    
+    /** 
+     * @return Max speed for recorded position.
+     */
+    public int getMaxRecordedSpeed() {
+        int maxSpeed = settings.getIntProperty(
+                RECORDING_MAX_SPEED,
+                RECORDING_MAX_SPEED_DEFAULT);
+        return maxSpeed;        
+    }
+    
+    public void setMaxRecordedSpeed(int maxSpeed) {
+        settings.setIntProperty(RECORDING_MAX_SPEED, maxSpeed);
+    }
+    
+    
+    /** @return Min distance for recorded position since last position */
+    public int getMinRecordedDistance() {
+        int minDistance = settings.getIntProperty(
+                RECORDING_MIN_DISTANCE, 
+                RECORDING_MIN_DISTANCE_DEFAULT);
+        return minDistance;
+    }
+
+    public void setMinDistance(int minDistance) {
+        settings.setIntProperty(RECORDING_MIN_DISTANCE, minDistance);
+    }
+    
+    
     /**
      * @return True if streaming trail was unfinished.
      */

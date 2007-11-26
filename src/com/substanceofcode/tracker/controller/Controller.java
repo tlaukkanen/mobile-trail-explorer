@@ -727,18 +727,23 @@ public class Controller {
                         final int seconds,
                         AlertType type) {
 		final Alert alert = new Alert("Error", message, null, AlertType.ERROR);
-		alert
-				.setTimeout(seconds == 0 || seconds == Alert.FOREVER ? Alert.FOREVER
+		alert.setTimeout(seconds == 0 || seconds == Alert.FOREVER ? Alert.FOREVER
 						: seconds * 1000);
 		// Put it into a thread as 2 calls to this method in quick succession
 		// would otherwise fail... miserably.
 		final Thread t = new Thread(new Runnable() {
 			public void run() {
-        Display.getDisplay(midlet).setCurrent(alert);
+                try {
+                    Display.getDisplay(midlet).setCurrent(alert);
+                } catch(IllegalArgumentException e){
+                    //do nothing just log
+                    Logger.getLogger().log("IllegalArgumetException occured " +
+                            "in showAlert", Logger.WARN);
+                }
 			}
 		});
 		t.start();
-    return alert;
+        return alert;
 	}
 
 	/**

@@ -135,17 +135,22 @@ public class GpsRecorder implements Runnable {
     public void run() {
         final GpsRmsRecorder rmsRecorder = new GpsRmsRecorder();
         GpsPosition lastRecordedPosition = null;
+        GpsPosition lastPosition = null;
         int secondsFromLastTrailPoint = 0;
         int recordedCount = 0;
         while (true) {
             try {
                 Thread.sleep(1000);
+                GpsPosition currentPosition = controller.getPosition();
+                boolean isValidPosition = checkValidPosition(
+                        currentPosition, 
+                        lastPosition, 
+                        lastRecordedPosition);
                 if (recording == true
-                        && secondsFromLastTrailPoint >= intervalSeconds) {
+                        && secondsFromLastTrailPoint >= intervalSeconds
+                        && isValidPosition) {
 
                     secondsFromLastTrailPoint = 0;
-                    final GpsPosition currentPosition = controller
-                            .getPosition();
 
                     /**
                      * Check if user haven't moved -> don't record the same
@@ -155,7 +160,6 @@ public class GpsRecorder implements Runnable {
                     if (lastRecordedPosition != null && currentPosition != null) {
                         stopped = currentPosition.equals(lastRecordedPosition);
                     }
-
 
                     // Logger.getLogger().log("interval: "+ intervalSeconds + "
                     // currentPosition is " + (currentPosition==null?"null":"not
@@ -176,14 +180,55 @@ public class GpsRecorder implements Runnable {
                         lastRecordedPosition = currentPosition;
                         recordedCount++;
                     }
+                    lastPosition = currentPosition;
                 } else {
                     secondsFromLastTrailPoint++;
+                    lastPosition = controller.getPosition();
                 }
+                
             } catch (Exception ex) {
                 controller.showError("Error in recorder thread: "
                         + ex.toString());
             }
         }
+    }
+
+    private boolean checkValidPosition(
+            GpsPosition currentPosition,
+            GpsPosition lastPosition,
+            GpsPosition lastRecordedPosition) {
+        /** Check for valid position */
+        if(currentPosition==null) {
+            return false;
+        }
+        
+        /** Check for max speed */
+        RecorderSettings settings = controller.getSettings();
+        int maxSpeed = settings.getMaxRecordedSpeed();
+        if(currentPosition.speed>(int)maxSpeed) {
+            return false;
+        }
+        
+        /** Check for max acceleration */
+        if( lastPosition!=null ) {
+            int maxAcceleration = settings.getMaxAcceleration();
+            int acceleration = (int)(lastPosition.speed - currentPosition.speed);
+            if( Math.abs(acceleration)>maxAcceleration ) {
+                return false;
+            }            
+        }
+        
+        /** Check for min distance */
+        if(lastRecordedPosition!=null && currentPosition!=null) {
+            int minDistance = settings.getMinRecordedDistance();
+            double distance = 1000 * lastRecordedPosition.getDistanceFromPosition(currentPosition);
+            if(distance<minDistance) {
+                return false;
+            }
+        }
+        
+        /** We have a valid position */
+        return true;
     }
 
     /**

@@ -44,6 +44,9 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     
     private TextField intervalField;
     private TextField markerStepField;
+    private TextField maxSpeedField;
+    private TextField maxAccelerationField;
+    private TextField minDistanceField;
     
     /** Creates a new instance of RecordingSettingsForm */
     public RecordingSettingsForm(Controller controller) {
@@ -65,9 +68,20 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             String markerStepText = markerStepField.getString();
             int newInterval;
             int newStep;
+            int maxSpeed = 310;
+            int maxAcceleration = 50;
+            int minDistance = 5;
             try{
+                // TODO: Add max speed and acceleration
                 newInterval = Integer.valueOf( intervalText ).intValue();
                 newStep = Integer.valueOf( markerStepText ).intValue();
+                String maxSpeedText = maxSpeedField.getString();
+                maxSpeed = Integer.valueOf( maxSpeedText ).intValue();
+                String maxAccelerationText = maxAccelerationField.getString();
+                maxAcceleration = Integer.valueOf(maxAccelerationText).intValue();
+                String minDistanceText = minDistanceField.getString();
+                minDistance = Integer.valueOf(minDistanceText).intValue();
+                
             }catch(Exception ex) {
                 ex.printStackTrace();
                 newInterval = 10;
@@ -75,6 +89,11 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             }
             controller.saveRecordingInterval( newInterval );
             controller.saveRecordingMarkerStep( newStep );
+            
+            RecorderSettings settings = controller.getSettings();
+            settings.setMaxRecordedSpeed(maxSpeed);
+            settings.setMaxAcceleration(maxAcceleration);
+            settings.setMinDistance(minDistance);
             
             controller.showSettings();
         } else {
@@ -113,6 +132,30 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 6,
                 TextField.NUMERIC);
         this.append(markerStepField);
+        
+        int maxSpeed = settings.getMaxRecordedSpeed();
+        maxSpeedField = new TextField(
+                "Maximum speed for recorded position (km/h)",
+                String.valueOf(maxSpeed),
+                6,
+                TextField.NUMERIC);
+        this.append(maxSpeedField);
+        
+        int maxAcceleration = settings.getMaxAcceleration();
+        maxAccelerationField = new TextField(
+                "Maximum acceleration for recorded position ((km/h)/s)",
+                String.valueOf(maxAcceleration),
+                6,
+                TextField.NUMERIC);
+        this.append(maxAccelerationField);
+        
+        int minDistance = settings.getMinRecordedDistance();
+        minDistanceField = new TextField(
+                "Minimum distance between recorded positions (m)",
+                String.valueOf(minDistance),
+                6,
+                TextField.NUMERIC);
+        this.append(minDistanceField);
     }
     
 }

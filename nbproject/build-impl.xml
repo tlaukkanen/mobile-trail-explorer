@@ -881,7 +881,6 @@
     </target>
     <!--nsicom-run-->
     <target name="nsicom-run" if="nsicom-platform.trigger">
-        <taskdef name="nsicomExecDeploy" classname="org.netbeans.modules.j2me.cdc.project.nsicom.NSIcomExecDeployTask" classpath="${libs.nsicom-ant-utils.classpath}:${libs.ActiveSync.classpath}:"/>
         <nsicomExecDeploy home="${platform.home}" mainclass="${main.class}" args="${application.args}" jvmargs="${run.jvmargs}" device="${platform.device}" profile="${platform.profile}" xlet="${main.class.xlet}" applet="${main.class.applet}" verbose="${nsicom.application.runverbose}" hostip="${nsicom.application.monitorhost}" runondevice="${nsicom.application.runremote}" remotevmlocation="${nsicom.remotevm.location}" remoteDataLocation="${nsicom.remoteapp.location}">
             <fileset dir="${dist.dir}">
                 <exclude name="javadoc/**"/>
@@ -998,7 +997,7 @@
     <target name="javadoc" depends="preprocess">
         <fail unless="dist.javadoc.dir">Must set dist.javadoc.dir</fail>
         <mkdir dir="${dist.javadoc.dir}"/>
-        <javadoc source="${javac.source}" destdir="${dist.javadoc.dir}" bootclasspath="${platform.bootclasspath}" notree="${javadoc.notree}" use="${javadoc.use}" nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}" splitindex="${javadoc.splitindex}" author="${javadoc.author}" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}" private="${javadoc.private}" encoding="${javac.encoding}">
+        <javadoc source="${javac.source}" destdir="${dist.javadoc.dir}" bootclasspath="${platform.bootclasspath}" notree="${javadoc.notree}" use="${javadoc.use}" nonavbar="${javadoc.nonavbar}" noindex="${javadoc.noindex}" splitindex="${javadoc.splitindex}" author="${javadoc.author}" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}" private="${javadoc.private}" encoding="${javac.encoding}" docencoding="${javac.encoding}" charset="${javac.encoding}">
             <classpath>
                 <path path="${libs.classpath}"/>
             </classpath>

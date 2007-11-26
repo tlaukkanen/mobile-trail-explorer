@@ -105,7 +105,11 @@ public class GpsDevice extends BluetoothDevice implements Runnable {
     
     /** Get satellites in view count */
     public int getSatelliteCount() {
-        return parser.getSatelliteCount();
+        if(parser!=null) {
+            return parser.getSatelliteCount();
+        } else {
+            return 0;
+        }
     }
     
     /** Get satellites */
