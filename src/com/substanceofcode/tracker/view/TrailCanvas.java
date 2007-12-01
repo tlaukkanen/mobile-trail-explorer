@@ -787,6 +787,12 @@ public class TrailCanvas extends BaseCanvas {
                 // | Graphics.LEFT);
                 // displayRow++;
             }
+            
+            /** Debugging free mem */
+            //long freeMem = Runtime.getRuntime().freeMemory();
+            //g.drawString("Freemem:" + freeMem, 1, fontHeight * displayRow, Graphics.TOP
+            //            | Graphics.LEFT);
+            //displayRow++;
 
             /**
              * Draw the last logged message. Split the string on a word boundary

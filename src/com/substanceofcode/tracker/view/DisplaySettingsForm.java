@@ -197,7 +197,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         this.append(drawingStyleGroup);
         
         /** Map display options */
-        String[] drawingMaps = {"Don't draw maps","Draw OSM maps"};
+        String[] drawingMaps = {"Don't draw maps","Draw OSM maps","Draw T@H maps"};
         drawingMapsGroup = new ChoiceGroup(
                 "Map Display", ChoiceGroup.EXCLUSIVE, drawingMaps, null);
         
