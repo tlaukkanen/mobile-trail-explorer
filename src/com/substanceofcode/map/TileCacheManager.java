@@ -70,7 +70,7 @@ public class TileCacheManager implements Runnable {
         
             try {
                 if (nbuffer != null) {
-                    if (nbuffer.length < 4) { // response was 'nil' or zero, not an image
+                    if (nbuffer.length < 28) { // response was 'nil' or zero, not an image
                         result = false;
                     } else {
                     // Image.createImage appears to throw an Exception if there
@@ -84,7 +84,7 @@ public class TileCacheManager implements Runnable {
                     Logger.getLogger().log(
                             "Creating tile image: freemem=" + freeMem
                                     + " totalmem=" + totalMem, Logger.DEBUG);
-                    System.gc();
+                    //System.gc();
 
 
                     if (freeMem > 10000 && totalMem > 10000) {
@@ -99,16 +99,21 @@ public class TileCacheManager implements Runnable {
                     Logger.getLogger().log("Created tile image", Logger.DEBUG);
                     }
                 } else {
+                    result = false;
                     Logger.getLogger().log("Input stream was null ",
                             Logger.ERROR);
                 }
                 Logger.getLogger().log("Tile Saved", Logger.DEBUG);
             } catch (Throwable e) {
                 result = false;
-                e.printStackTrace();
+                //e.printStackTrace();
+                int bufferSize = 0;
+                if(nbuffer!=null) {
+                    bufferSize = nbuffer.length;
+                }
                 Logger.getLogger().log(
-                        "Error creating tile image: " + e.toString(),
-                        Logger.ERROR);
+                        "Error creating tile image(" + bufferSize + "): " + 
+                        e.toString(), Logger.ERROR);
 
             }
         
@@ -128,19 +133,21 @@ public class TileCacheManager implements Runnable {
         int bytesRead = 0;
         int totalBytesRead = 0;
 
-        while (true) {
-            try {
+        try {
+            while (true) {
                 bytesRead = is.read(buffer, 0, 1024);
 
-                if (bytesRead == -1)
+                if (bytesRead == -1) {
                     break;
-                else
+                } else {
                     totalBytesRead += bytesRead;
-                baos.write(buffer, 0, bytesRead);
-
-            } catch (IOException e) {
-                e.printStackTrace();
+                    baos.write(buffer, 0, bytesRead);
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Logger.getLogger().log("Error while reading stream:" + e.getMessage(), 
+                    Logger.ERROR);
         }
 
         if (is != null)
@@ -151,9 +158,13 @@ public class TileCacheManager implements Runnable {
             }
 
         is = null;
-        byte[] out = new byte[totalBytesRead];
-        out = baos.toByteArray();
-        return out;
+        if(totalBytesRead>0) {
+            byte[] out = new byte[totalBytesRead];
+            out = baos.toByteArray();
+            return out;
+        } else {
+            return null;
+        }
 
     }
 

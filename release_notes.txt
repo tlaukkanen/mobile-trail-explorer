@@ -12,7 +12,10 @@ Gareth Jones
 
 Release Notes:
 
-v1.8 (xxx xth 2007)
+v1.9 (xxx xth 200x)
++ 
+
+v1.8 (December 3rd 2007)
 + Trail duration is displayed and exported to KML
 + Trail maximum speed is displayed and exported to KML
 + Trail average speed is displayed
