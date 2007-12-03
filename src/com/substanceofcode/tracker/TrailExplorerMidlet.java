@@ -40,7 +40,7 @@ public class TrailExplorerMidlet extends MIDlet {
     /** 
      * The current Version of this Mobile Trail Explorer. (Major, Minor, Build) 
      */
-    public static final Version VERSION = new Version(1, 8, 0);
+    public static final Version VERSION = new Version(1, 9, 0);
     
     /**
      * Local Controller object
