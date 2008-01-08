@@ -29,8 +29,6 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 
 import com.nokia.mid.ui.DeviceControl;
-import com.samsung.util.LCDLight;
-import com.siemens.mp.game.Light;
 
 
 /**
@@ -101,26 +99,6 @@ public final class Backlight extends TimerTask {
         } catch (Exception ex) {
         }
 
-        if (phoneVendor == VENDOR_UNKNOWN) {
-            try {
-                /* if this class is found, the phone is a siemens phone */
-                Class.forName("com.siemens.mp.game.Light");
-                phoneVendor = VENDOR_SIEMENS;
-            } catch (Exception ex) {
-            }
-        }
-
-        if (phoneVendor == VENDOR_UNKNOWN) {
-            try {
-                /* if this class is found, the phone is a samsung phone */
-                Class.forName("com.samsung.util.LCDLight");
-                if (LCDLight.isSupported()) {
-                    phoneVendor = VENDOR_SAMSUNG;
-                }
-            } catch (Exception ex) {
-            }
-        }
-
         /* Default case: Sony Ericsson backlight solution will be used */
         if (phoneVendor == VENDOR_UNKNOWN) {
             phoneVendor = VENDOR_SONY_ERICSSON;
@@ -141,13 +119,6 @@ public final class Backlight extends TimerTask {
                 switchBacklightSonyEricsson(BACKLIGHT_ON);
                 return;
 
-            case VENDOR_SIEMENS:
-                switchBacklightSiemens(BACKLIGHT_ON);
-                return;
-
-            case VENDOR_SAMSUNG:
-                switchBacklightSamsung(BACKLIGHT_ON);
-                return;
         }
     }
 
@@ -163,14 +134,6 @@ public final class Backlight extends TimerTask {
 
             case VENDOR_SONY_ERICSSON:
                 switchBacklightSonyEricsson(BACKLIGHT_OFF);
-                return;
-
-            case VENDOR_SIEMENS:
-                switchBacklightSiemens(BACKLIGHT_OFF);
-                return;
-
-            case VENDOR_SAMSUNG:
-                switchBacklightSamsung(BACKLIGHT_OFF);
                 return;
         }
     }
@@ -192,23 +155,6 @@ public final class Backlight extends TimerTask {
         }
     }
 
-    /**
-     * Siemens specific backlight control NOTE: This is not tested. We wait for
-     * feedback from users with a siemens phone
-     */
-    private void switchBacklightSiemens(int backlightOnOff) {
-        try {
-            if (backlightOnOff == BACKLIGHT_OFF) {
-                Light.setLightOff();
-            } else {
-                Light.setLightOn();
-            }
-            System.out.println("Backlight "
-                    + (backlightOnOff != 0 ? "on" : "off"));
-        } catch (Throwable ex) {
-            // XXX : mchr : log/notify lights failure?
-        }
-    }
 
     /**
      * Sony Ericsson specific backlight control
@@ -236,24 +182,6 @@ public final class Backlight extends TimerTask {
                     + (backlightOnOff != 0 ? "on" : "off"));
         } catch (Throwable ex) {
             // XXX : mchr : log/notify lights failure?
-        }
-    }
-
-    /**
-     * Samsung specific backlight control NOTE: This is not tested. We wait for
-     * feedback from users with a samsung phone
-     */
-    private void switchBacklightSamsung(int backlightOnOff) {
-        try {
-            if (backlightOnOff == BACKLIGHT_OFF) {
-                LCDLight.off();
-            } else {
-                LCDLight.on(10000);
-            }
-            System.out.println("Backlight "
-                    + (backlightOnOff != 0 ? "on" : "off"));
-        } catch (Throwable ex) {
-            //XXX : mchr : log/notify lights failure?
         }
     }
 
