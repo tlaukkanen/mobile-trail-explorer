@@ -23,16 +23,59 @@
 package com.substanceofcode.tracker.controller;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.Vector;
 
-import javax.microedition.lcdui.*;
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Display;
+import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Gauge;
 import javax.microedition.midlet.MIDlet;
 
-import com.substanceofcode.bluetooth.*;
+import com.substanceofcode.bluetooth.BluetoothDevice;
+import com.substanceofcode.bluetooth.BluetoothGPSDeviceImpl;
+import com.substanceofcode.bluetooth.BluetoothUtility;
+import com.substanceofcode.bluetooth.Device;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
-import com.substanceofcode.tracker.model.*;
-import com.substanceofcode.tracker.view.*;
+import com.substanceofcode.gps.GpsGPGSA;
+import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.gpsdevice.GpsDevice;
+import com.substanceofcode.gpsdevice.GpsDeviceFactory;
+import com.substanceofcode.gpsdevice.Jsr179Device;
+import com.substanceofcode.gpsdevice.MockGpsDevice;
+import com.substanceofcode.tracker.model.AlertHandler;
+import com.substanceofcode.tracker.model.Backlight;
+import com.substanceofcode.tracker.model.GpsRecorder;
+import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.view.AboutScreen;
+import com.substanceofcode.tracker.view.BaseCanvas;
+import com.substanceofcode.tracker.view.DevelopmentMenu;
+import com.substanceofcode.tracker.view.DeviceList;
+import com.substanceofcode.tracker.view.DisplaySettingsForm;
+import com.substanceofcode.tracker.view.ElevationCanvas;
+import com.substanceofcode.tracker.view.ExportSettingsForm;
+import com.substanceofcode.tracker.view.ExportSettingsList;
+import com.substanceofcode.tracker.view.InformationCanvas;
+import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.tracker.view.RecordingSettingsForm;
+import com.substanceofcode.tracker.view.SatelliteCanvas;
+import com.substanceofcode.tracker.view.SettingsList;
+import com.substanceofcode.tracker.view.SkyCanvas;
+import com.substanceofcode.tracker.view.SmsScreen;
+import com.substanceofcode.tracker.view.SplashAndUpdateCanvas;
+import com.substanceofcode.tracker.view.StreamRecovery;
+import com.substanceofcode.tracker.view.TrailActionsForm;
+import com.substanceofcode.tracker.view.TrailCanvas;
+import com.substanceofcode.tracker.view.TrailDetailsScreen;
+import com.substanceofcode.tracker.view.TrailsList;
+import com.substanceofcode.tracker.view.WaypointCanvas;
+import com.substanceofcode.tracker.view.WaypointForm;
+import com.substanceofcode.tracker.view.WaypointList;
 
 /**
  * Controller contains methods for the application flow.
