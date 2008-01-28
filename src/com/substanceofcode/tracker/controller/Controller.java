@@ -35,17 +35,13 @@ import javax.microedition.lcdui.Gauge;
 import javax.microedition.midlet.MIDlet;
 
 import com.substanceofcode.bluetooth.BluetoothDevice;
-import com.substanceofcode.bluetooth.BluetoothGPSDeviceImpl;
 import com.substanceofcode.bluetooth.BluetoothUtility;
-import com.substanceofcode.bluetooth.Device;
+import com.substanceofcode.bluetooth.GpsDevice;
+import com.substanceofcode.bluetooth.GpsGPGSA;
+import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.bluetooth.MockGpsDevice;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
-import com.substanceofcode.gps.GpsGPGSA;
-import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.gpsdevice.GpsDevice;
-import com.substanceofcode.gpsdevice.GpsDeviceFactory;
-import com.substanceofcode.gpsdevice.Jsr179Device;
-import com.substanceofcode.gpsdevice.MockGpsDevice;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.Backlight;
 import com.substanceofcode.tracker.model.GpsRecorder;
@@ -114,7 +110,7 @@ public class Controller {
     /**
      * GPS device being used
      */
-    private Device gpsDevice;
+    private GpsDevice gpsDevice;
 
     /**
      * GpsRecorder which will do the actual logging
@@ -211,7 +207,7 @@ public class Controller {
 
         recorder = new GpsRecorder(this);
         if (gpsAddress.length() > 0) {
-            gpsDevice = GpsDeviceFactory.createDevice(gpsAddress, "GPS");
+            gpsDevice = new GpsDevice(gpsAddress, "GPS");
         } else {
             // XXX : mchr : what is going on here?
             // Causes exception since getcurrentScreen returns null at this
@@ -270,27 +266,7 @@ public class Controller {
         }
     }
 
-    /**
-     * See if there are any supported JSRs that provide a location api ie Jsr179
-     */
-    public void searchDevicesByJsr() {
-        //Jsr179Device j = new Jsr179Device();
-        if (devices == null) {
-            devices = new Vector();
-        }
-        boolean b = Jsr179Device.checkAvailability();
-        try {
 
-            if (b) {
-                BluetoothDevice dev = new BluetoothGPSDeviceImpl("internal",
-                        "Internal GPS (Jsr 179)");
-                devices.addElement(dev);
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Search for all available bluetooth devices
@@ -344,8 +320,7 @@ public class Controller {
 
     /** Set GPS device */
     public void setGpsDevice(String address, String alias) {
-        
-        gpsDevice = GpsDeviceFactory.createDevice(address, alias);
+        gpsDevice = new GpsDevice(address, alias);
         settings.setGpsDeviceConnectionString(gpsDevice.getAddress());
     }
 
@@ -410,9 +385,7 @@ public class Controller {
             } else {
                 // Connect to a GPS device
                 try {
-                    if(gpsDevice instanceof BluetoothDevice){
-                        ((BluetoothDevice)gpsDevice).connect();
-                    }
+                    gpsDevice.connect();
                     recorder.startRecording();
                     status = STATUS_RECORDING;
                 } catch (Exception ex) {                    
@@ -456,10 +429,8 @@ public class Controller {
         status = STATUS_STOPPED;
 
         try {
-            // Disconnect from bluetooth GPS
-            if(gpsDevice instanceof BluetoothDevice){
-                ((BluetoothDevice)gpsDevice).disconnect();
-            }
+            // Disconnect from GPS
+            gpsDevice.disconnect();
         } catch (Exception e) {
             showError("Error while disconnecting from GPS device: "
                     + e.toString());
