@@ -13,7 +13,7 @@ Gareth Jones
 Release Notes:
 
 v1.9 (xxx xth 200x)
-+ 
++ Changed the Export Settings page to use a generated list of options 
 
 v1.8 (December 3rd 2007)
 + Trail duration is displayed and exported to KML
