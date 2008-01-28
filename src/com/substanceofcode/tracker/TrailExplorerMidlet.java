@@ -83,8 +83,10 @@ public class TrailExplorerMidlet extends MIDlet {
      * MIDlet state change -> Paused state
      */
     public void pauseApp() {
-    	controller.pause();
-        Logger.getLogger().log("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
+        if(controller.getStatusCode() == Controller.STATUS_RECORDING){
+            controller.pause();
+            Logger.getLogger().log("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
+        }
     }
     
     /**
