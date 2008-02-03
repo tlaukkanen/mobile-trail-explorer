@@ -53,8 +53,8 @@ public class DevelopmentMenu extends List implements CommandListener{
         this.append("Parsing Metrics", null);
         this.append("Log", null);
         
-        this.addCommand(backCommand = new Command("BACK", Command.BACK, 2));
-        this.addCommand(okCommand = new Command("OK", Command.OK, 1));
+        this.addCommand(backCommand = new Command("Back", Command.BACK, 2));
+        this.addCommand(okCommand = new Command("Ok", Command.OK, 1));
         this.setSelectCommand(okCommand);
         this.setCommandListener(this);
     }
