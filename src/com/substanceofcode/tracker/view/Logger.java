@@ -97,11 +97,11 @@ public class Logger extends Form implements CommandListener{
     
     private byte loggingLevel;
     
-    public static Logger getLogger(RecorderSettings settings){
+    public static void init(RecorderSettings settings){
         if(logger == null){
             logger = new Logger(settings);
         }
-        return logger;
+        
     }
     
     public static Logger getLogger() throws NullPointerException{
@@ -109,6 +109,30 @@ public class Logger extends Form implements CommandListener{
             throw new NullPointerException("Logger.logger is null. The first time you access the Logger, you must use getLogger(RecorderSettings)");
         }
         return logger;
+    }
+    
+    /**
+     * Utility method to put a debug log message
+     * @param message
+     */
+    public static void debug(String message){
+        logger.log(message, DEBUG);
+    }
+    
+    public static void info(String message){
+        logger.log(message, DEBUG);
+    }
+    
+    public static void warn(String message){
+        logger.log(message, DEBUG);
+    }
+    
+    public static void error(String message){
+        logger.log(message, DEBUG);
+    }
+    
+    public static void fatal(String message){
+        logger.log(message, FATAL);
     }
     
     private Logger(RecorderSettings settings){
@@ -140,7 +164,7 @@ public class Logger extends Form implements CommandListener{
     private String lastMessage;
     private byte lastMessageLevel = -1;
     private int numOfLastMessage;
-    public void log(StringBuffer message, byte level){
+    private void log(String message, byte level){
         System.out.println(level + ") " + message);     
         if(level < DEBUG || level > FATAL){
             throw new IllegalArgumentException("Logging level must be between DEBUG(" + DEBUG + ") and FATAL(" + FATAL + ")");
@@ -151,7 +175,7 @@ public class Logger extends Form implements CommandListener{
         synchronized(buffer){
             
             	
-            if(level == lastMessageLevel && message.toString().equals(this.lastMessage)){
+            if(level == lastMessageLevel && message.equals(this.lastMessage)){
                 numOfLastMessage++;
                 if(numOfLastMessage == 2){
                     buffer.append("(x" + numOfLastMessage + ")");
@@ -185,9 +209,9 @@ public class Logger extends Form implements CommandListener{
         }
     }
     
-    public void log(String message, byte level){
-        this.log(new StringBuffer(message), level);
-    }
+ //   public void log(String message, byte level){
+   //     this.log(new StringBuffer(message), level);
+    //}
     
     public void refresh(){
         this.deleteAll();
@@ -196,6 +220,7 @@ public class Logger extends Form implements CommandListener{
         }else{
             this.append(buffer.toString());
         }
+        
     }
 
     public void commandAction(Command command, Displayable disp) {
