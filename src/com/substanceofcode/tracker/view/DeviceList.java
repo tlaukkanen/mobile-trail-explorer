@@ -23,20 +23,23 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.bluetooth.BluetoothDevice;
-import com.substanceofcode.tracker.controller.Controller;
 import java.util.Vector;
+
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
+import com.substanceofcode.bluetooth.BluetoothDevice;
+import com.substanceofcode.bluetooth.Device;
+import com.substanceofcode.tracker.controller.Controller;
+
 /**
- *
+ * 
  * @author Tommi
  */
 public class DeviceList extends List implements Runnable, CommandListener {
-    
+
     private Controller controller;
     private int status;
     private final static int STATUS_READY = 0;
@@ -44,16 +47,16 @@ public class DeviceList extends List implements Runnable, CommandListener {
     private final static int STATUS_COMPLETE = 3;
     private Thread searchThread;
     private final static String TITLE = "Devices";
-    
+
     /** Commands */
     private Command refreshCommand;
     private Command selectCommand;
     private Command cancelCommand;
     private Command mockGpsCommand;
-    
+
     /** Creates a new instance of DeviceList */
     public DeviceList(Controller controller) {
-        super(TITLE, List.IMPLICIT);        
+        super(TITLE, List.IMPLICIT);
 
         // Set controller
         this.controller = controller;
@@ -61,14 +64,14 @@ public class DeviceList extends List implements Runnable, CommandListener {
         // Set status
         status = STATUS_READY;
 
-        // Initialize commands 
+        // Initialize commands
         initializeCommands();
-        
+
         // Set search thread
         searchThread = new Thread(this);
         searchThread.start();
     }
-    
+
     /** Initialize commands */
     private void initializeCommands() {
         refreshCommand = new Command("Refresh", Command.ITEM, 2);
@@ -80,63 +83,66 @@ public class DeviceList extends List implements Runnable, CommandListener {
         addCommand(cancelCommand);
         mockGpsCommand = new Command("MockGPS", Command.ITEM, 4);
         addCommand(mockGpsCommand);
-        
+
         setCommandListener(this);
     }
-    
-    /** 
+
+    /**
      * Refresh the device list. List is not refreshed if another search is
      * already in progress.
      */
     public void refresh() {
         this.deleteAll();
         status = STATUS_READY;
-        if(!searchThread.isAlive()) {
+        if (!searchThread.isAlive()) {
             searchThread = new Thread(this);
             searchThread.start();
         }
-    } 
-       
+    }
+
     /** Get selected bluetooth device */
-    public BluetoothDevice getSelectedDevice() {
+    public Device getSelectedDevice() {
         // Set selected device as GPS
         int selectedIndex = this.getSelectedIndex();
-        String selectedDeviceAlias = this.getString( selectedIndex );
+        String selectedDeviceAlias = this.getString(selectedIndex);
 
         Vector devices = controller.getDevices();
         int deviceCount = devices.size();
         int deviceIndex;
-        BluetoothDevice selectedDevice = null;
-        for(deviceIndex=0; deviceIndex<deviceCount; deviceIndex++) {
-            BluetoothDevice dev = (BluetoothDevice)devices.elementAt(deviceIndex);
+        Device selectedDevice = null;
+        for (deviceIndex = 0; deviceIndex < deviceCount; deviceIndex++) {
+            Device dev = (Device) devices.elementAt(deviceIndex);
             String devAlias = dev.getAlias();
-            if(selectedDeviceAlias.equals(devAlias)==true) {
+            if (selectedDeviceAlias.equals(devAlias) == true) {
                 // We found the selected device
                 // Set device as GPS device
                 selectedDevice = dev;
             }
-        }      
+        }
         return selectedDevice;
     }
 
     public void run() {
-        while(status!=STATUS_COMPLETE) {
+        
+        while (status != STATUS_COMPLETE) {
             try {
-                
+
                 /** If we are ready then we'll search for the devices */
-                if(status==STATUS_READY) {
+                if (status == STATUS_READY) {
                     this.append("Searching...", null);
-                    System.out.println("Searching GPS devices");
+                    System.out.println("Searching GPS devices");                    
                     controller.searchDevices();
                     status = STATUS_SEARCHING;
                 }
-                
+               
                 /** Search is complete */
-                Vector devices = controller.getDevices();
-                if(devices != null && devices.size() > 0) {
+                Vector devices=controller.getDevices();
+                
+                if (devices != null && devices.size() > 0) {
+                    Logger.debug("Search Complete. devices="+ devices.size());
                     this.set(0, "Found " + devices.size() + " device(s)", null);
-                    for(int deviceIndex = 0; deviceIndex < devices.size(); deviceIndex++) {
-                        BluetoothDevice device = (BluetoothDevice)devices.elementAt(deviceIndex);
+                    for (int deviceIndex = 0; deviceIndex < devices.size(); deviceIndex++) {
+                        Device device = (Device) devices.elementAt(deviceIndex);
                         this.append(device.getAlias(), null);
                     }
                     status = STATUS_COMPLETE;
@@ -144,8 +150,8 @@ public class DeviceList extends List implements Runnable, CommandListener {
                     this.set(0, "No devices found", null);
                     status = STATUS_COMPLETE;
                 }
-                
-            } catch(Exception ex) {
+
+            } catch (Exception ex) {
                 System.err.println("Error in DeviceList.run: " + ex.toString());
                 status = STATUS_COMPLETE;
             }
@@ -153,25 +159,26 @@ public class DeviceList extends List implements Runnable, CommandListener {
     }
 
     public void commandAction(Command command, Displayable displayable) {
-        if(command==refreshCommand) {
+        if (command == refreshCommand) {
             // Refresh devices
             refresh();
         }
-        if(command==selectCommand) {
-            BluetoothDevice dev = getSelectedDevice();
-            if(dev!=null) {
+        if (command == selectCommand) {
+            Device dev = getSelectedDevice();
+            if (dev != null) {
+                // Logger.getLogger().log("dev is null" , Logger.DEBUG);
                 controller.setGpsDevice(dev.getAddress(), dev.getAlias());
             }
             controller.showSettings();
         }
-        if(command==cancelCommand) {
+        if (command == cancelCommand) {
             controller.showSettings();
-        }        
-        if(command==mockGpsCommand) {
-            controller.setMockGpsDevice("Mock","MockGpsDevice");
+        }
+        if (command == mockGpsCommand) {
+            controller.setMockGpsDevice("Mock", "MockGpsDevice");
             controller.showSettings();
-        }        
+        }
     }
-    
-    
+
+
 }
