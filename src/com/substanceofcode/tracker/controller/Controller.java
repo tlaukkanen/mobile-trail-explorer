@@ -184,7 +184,7 @@ public class Controller {
     /**
      *  Controls whether FileCache is used or not
      */
-    private boolean useFileCache=true;
+    private boolean useFileCache=false;
     
     /**
      * Creates a new instance of Controller which performs the following:
