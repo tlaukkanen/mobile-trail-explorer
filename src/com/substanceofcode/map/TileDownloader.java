@@ -24,16 +24,18 @@ import com.substanceofcode.util.StringUtil;
  */
 public class TileDownloader implements Runnable {
 
-    private static final String GoogleStoreName = "gmmaps";
-    private static final String OSMStoreName = "osmmaps";
+    static final String GoogleStoreName = "gmmaps";
+    static final String OSMStoreName = "osmmaps";
 
-    private static final String TahStoreName = "tahmaps";
+    static final String TahStoreName = "tahmaps";
+    private static final String RootImageDir=System.getProperty("fileconn.dir.photos");
+    public static final String RootCacheDir="file:///Memory Card/"+"MTE/cache/"; 
     
-    private static final String GooglecacheDir = "e/cache/" + GoogleStoreName;
+    static final String GooglecacheDir = RootCacheDir + GoogleStoreName;
 
-    private static final String OSMcacheDir = "e/cache/" + OSMStoreName;
+    static final String OSMcacheDir = RootCacheDir + OSMStoreName;
     
-    private static final String TahCacheDir = "e/cache/" + TahStoreName;
+    static final String TahCacheDir = RootCacheDir + TahStoreName;
 
     private static String storename = "";
     private static String cacheDir = "";
@@ -50,11 +52,12 @@ public class TileDownloader implements Runnable {
 
     public static final int TILE_SIZE = 256;
 
-    private int gridSize = 9; // This is the assumed maximum concurrently
-    // displayed tile number
+    private int gridSize = 9; // This is the assumed maximum = 256px *3
 
     public Image[] loadingImage = new Image[gridSize];
     public Image blankImage = null;
+    public Image loadingRmsCachedImage = null;
+    public Image loadingFileCachedImage = null;
     private volatile boolean running = false;
 
     private TileCacheManager tc;
@@ -82,7 +85,7 @@ public class TileDownloader implements Runnable {
     private volatile Thread downloaderThread;
 
     public TileDownloader(int MapSource) {
-        Logger.getLogger().log("TileDownloader Constructer", Logger.DEBUG);
+        Logger.debug("TileDownloader Constructer");
         setMapSource(MapSource);
         tileQueue = new Vector();
         tc = new TileCacheManager(cacheDir, storename);
@@ -93,9 +96,8 @@ public class TileDownloader implements Runnable {
     public void start() {
         downloaderThread = new Thread(this);
 
-        Logger.getLogger().log(
-                "Starting TileDownloader Thread:" + downloaderThread.getName(),
-                Logger.DEBUG);
+        Logger.debug(
+                "Starting TileDownloader Thread:" + downloaderThread.getName());
         running = true;
         downloaderThread.start();
 
@@ -160,7 +162,7 @@ public class TileDownloader implements Runnable {
     }
 
     /**
-     * Manages requests for tile images from the display canvas Tiles are
+     * Manages requests for tile images from the display canvas. Tiles are
      * preferably retrieved from a cache, to save on network traffic. If the
      * tile is in the cache, it is returned to the caller. If not, a request for
      * the tile is added to the bottom of the <code>tileRequestQueue</code>
@@ -180,9 +182,7 @@ public class TileDownloader implements Runnable {
         Image theImage = null;
         try {
             theImage = loadingImage();
-
-            // Logger.getLogger().log("TD: Fetching Tile, zoomlevel =" + z,
-            // Logger.DEBUG);
+            
             // Make sure we only request valid tiles
             int maxtiles = (int) MathUtil.pow(2, z);
             x = x % (maxtiles);
@@ -192,9 +192,15 @@ public class TileDownloader implements Runnable {
                 // System.out.println("TD: Satisfied from Cache");
                 if (cacheResult == 0) {
                     theImage = (Image) tc.get(x, y, z);
-                } else if (cacheResult == 1) {
-                    // Will return the placeholder
-                    // System.out.println("TD: Satisfied from Cache");
+                } else if (cacheResult == 1 ) {
+                    //Tile has been found in the RMS 
+                    // It will get asynchronously copied into the memcache
+                    // until that happens we return a loading image
+                    theImage = loadingImageFromRmsCache();
+                   
+                }else if (cacheResult==2){
+                   //Tile was found on filecache
+                    theImage=loadingImageFromFileCache();
                 }
 
             } else {
@@ -204,8 +210,7 @@ public class TileDownloader implements Runnable {
                 }
             }
         } catch(Exception ex) {
-            Logger.getLogger().log("Error in fetchTile(..): " + ex.getMessage(), 
-                    Logger.ERROR);
+            Logger.error("Error in fetchTile(..): " + ex.getMessage());
         }
 
         return theImage;
@@ -232,14 +237,14 @@ public class TileDownloader implements Runnable {
         try {
             String targetUrl = makeurl(UrlFormat, x, y, setZoom(zoom));
             String destDir = cacheDir + "/" + zoom + "/" + x + "/";
-            String destFile = destDir + y + ".png";
+            String destFile = y + ".png";
             Tile t = new Tile(x, y, zoom, targetUrl, destDir,
                     destFile, storename);
             // Invalid tile requested, return a blank tile
             if (x < 0 || y < 0) {
-                Logger.getLogger().log(
+                Logger.error(
                         "Invalid Tile requested x=" + x + ",y=" + y + ",zoom="
-                                + zoom, Logger.ERROR);
+                                + zoom);
                 tc.saveTile(t, blankImage());
                 return;
             }
@@ -257,8 +262,8 @@ public class TileDownloader implements Runnable {
                 }
             }
         } catch(Exception ex) {
-            Logger.getLogger().log("Error in TileDownloader.downloadTile(..):" + 
-                    ex.getMessage(), Logger.ERROR);
+            Logger.error("Error in TileDownloader.downloadTile(..):" + 
+                    ex.getMessage());
         }
         // Check
         // System.out.println("Added tile to queue");
@@ -300,7 +305,7 @@ public class TileDownloader implements Runnable {
         return output.toString();
     }
 
-    // Use a bunch of threads
+    // TODO: Use a bunch of threads
     // to download several tiles asynchronously?....
     /**
      * Picks tiles of the top of the request queue and attempts to retrieve them
@@ -314,32 +319,30 @@ public class TileDownloader implements Runnable {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e1) {
-                Logger.getLogger().log("TD: Thread Interrupted", Logger.DEBUG);
+                Logger.debug("TD: Thread Interrupted");
                 e1.printStackTrace();
             }
             if (tileQueue.size() > 0) {
                 synchronized (tileQueue) {
                     if (tileQueue.size() > 0) {
-                        Logger.getLogger().log(
-                                "TD: queue size is:" + tileQueue.size(),
-                                Logger.DEBUG);
+                        Logger.debug(
+                                "TD: queue size is:" + tileQueue.size());
                         tile = (Tile) tileQueue.firstElement();
                         tileQueue.removeElementAt(0);
                     }
                 }
                 try {
                     if (tile != null) {
-                        Logger.getLogger().log(
-                                "TD: Requesting url " + tile.url, Logger.DEBUG);
+                        Logger.debug(
+                                "TD: Requesting url " + tile.url);
                         conn = (HttpConnection) Connector.open(tile.url);
 
                         in = conn.openInputStream();
 
-                        Logger.getLogger().log(
+                        Logger.debug(
                                 "TD: Response code was "
                                         + conn.getResponseCode() + " "
-                                        + conn.getResponseMessage(),
-                                Logger.DEBUG);
+                                        + conn.getResponseMessage());
                         if (conn.getResponseCode() == 200) {
                             try {
                                 //If we get a 200 response but then can't save the tile
@@ -349,36 +352,34 @@ public class TileDownloader implements Runnable {
                                }
 
 
-                                Logger.getLogger().log(
-                                        "TD: Downloaded Tile " + tile.cacheKey,
-                                        Logger.DEBUG);
+                                Logger.debug(
+                                        "TD: Downloaded Tile " + tile.cacheKey);
                             } catch (Exception e) {
-                                Logger.getLogger().log(
+                                Logger.debug(
                                         "TD: Error saving tile " + tile.cacheKey
-                                                + ", " + e.getMessage(),
-                                        Logger.DEBUG);
+                                                + ", " + e.getMessage());
                             }
                         } else {
-                            Logger.getLogger().log(
+                            Logger.debug(
                                     "TD: Tile " + tile.cacheKey
                                             + " got status "
-                                            + conn.getResponseCode(),
-                                    Logger.DEBUG);
+                                            + conn.getResponseCode());
                         }
                     }
                 } catch (ConnectionNotFoundException e) {
                     e.printStackTrace();
-                    Logger.getLogger().log("TD run(): " + e.getMessage(), Logger.ERROR);
+                    Logger.error("TD run(): " + e.getMessage());
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Logger.getLogger().log("TD run(): " + e.getMessage(), Logger.ERROR);
+                    Logger.error("TD run(): " + e.getMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Logger.getLogger().log("TD run(): " + e.getMessage(), Logger.ERROR);
+                    Logger.error("TD run(): " + e.getMessage());
                 }
             } else {
-                // Logger.getLogger().log("Nothing to download " +
+                // Logger.getLogger().log("Nothing to download, yielding " +
                 // tileQueue.size(),Logger.DEBUG);
+                Thread.yield();
             }
         }
 
@@ -404,7 +405,7 @@ public class TileDownloader implements Runnable {
 
             return p;
         }
-       
+        // Create the loading image
         loadingImage[nullImageCounter] = Image
                 .createImage(TILE_SIZE, TILE_SIZE);
         Graphics g = loadingImage[nullImageCounter].getGraphics();
@@ -441,6 +442,32 @@ public class TileDownloader implements Runnable {
         g.setColor(255, 255, 255);
         g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
         return blankImage;
+    }
+    /**
+     * Another placeholder image to display while fetching a tile. This one is used 
+     * to show that the image is already on the device (cached) and will be shortly available
+     * @return
+     */
+    public Image loadingImageFromRmsCache() {
+        if (loadingRmsCachedImage != null) {
+            return loadingRmsCachedImage;
+        }
+        loadingRmsCachedImage = Image.createImage(TILE_SIZE, TILE_SIZE);
+        Graphics g = loadingRmsCachedImage.getGraphics();
+        g.setColor(0, 0, 215);
+        g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+        return loadingRmsCachedImage;
+    }
+    
+    public Image loadingImageFromFileCache() {
+        if (loadingFileCachedImage != null) {
+            return loadingFileCachedImage;
+        }
+        loadingFileCachedImage = Image.createImage(TILE_SIZE, TILE_SIZE);
+        Graphics g = loadingFileCachedImage.getGraphics();
+        g.setColor(0, 255, 0);
+        g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+        return loadingFileCachedImage;
     }
 
 
