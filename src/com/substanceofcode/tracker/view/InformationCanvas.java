@@ -22,7 +22,7 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.SpeedFormatter;
 import com.substanceofcode.tracker.model.Track;
@@ -66,7 +66,7 @@ public class InformationCanvas extends BaseCanvas{
         g.drawString("Information", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
         
         final int titleHeight = 2 + titleFont.getHeight();
-        
+        Logger.debug("InformationCanvas getPosition called");
         GpsPosition position = controller.getPosition();
         
         g.setFont(BIG_FONT);

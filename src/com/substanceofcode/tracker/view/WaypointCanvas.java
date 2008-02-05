@@ -22,7 +22,7 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.Waypoint;
 import java.util.Enumeration;
@@ -99,7 +99,7 @@ public class WaypointCanvas extends BaseCanvas {
         
         int rowHeight = rowFont.getHeight() + 1;
         int currentLine = y;
-        
+        Logger.debug("WaypointCanvas getPosition called");
         GpsPosition currentPosition = controller.getPosition();
                
         allowScrollingDown = false;

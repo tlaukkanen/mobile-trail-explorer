@@ -22,7 +22,8 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.bluetooth.GpsSatellite;
+import com.substanceofcode.gps.GpsSatellite;
+
 import java.util.Enumeration;
 import java.util.Vector;
 

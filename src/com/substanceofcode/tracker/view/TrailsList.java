@@ -200,7 +200,7 @@ public class TrailsList extends List implements CommandListener{
             Track selectedTrail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
             return selectedTrail;
         } catch (Exception ex) {
-            Logger.getLogger().log("Unable to load selected trail: " + ex.getMessage(), Logger.ERROR);
+            Logger.error("Unable to load selected trail: " + ex.getMessage());
             controller.showError("Unable to load selected trail: " + ex.getMessage());
             return null;
         }

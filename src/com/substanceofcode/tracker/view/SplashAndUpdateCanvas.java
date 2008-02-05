@@ -26,8 +26,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 
-import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.data.FileSystem;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.TrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
@@ -94,6 +94,8 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         this.displayTime = SPLASH_SCREEN_TIMEOUT;
         timeoutThread = new Thread(this);
         timeoutThread.start();
+
+
     }
 
     /** Paint canvas */
@@ -141,7 +143,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
     
     /**
      * This is the run() method for the thread, it simply exits the SplashAndUpdateCanvas to 
-     * the Trail Screen after 'dispalyTime' milliseconds have passed.
+     * the Trail Screen after 'displayTime' milliseconds have passed.
      */
     public void run() {
         long waitMiliSeconds = this.displayTime;
@@ -197,7 +199,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         }
         
         public void run(){
-            Logger.getLogger().log("Beginning update proccess, from V:" + initialVersion.toString() + " to V:" + finalVersion.toString() , Logger.DEBUG);
+            Logger.debug("Beginning update proccess, from V:" + initialVersion.toString() + " to V:" + finalVersion.toString() );
             
             if(initialVersion.lessThan(new Version(1,7,0))){
                 // Update from version 1.6 to 1.7
@@ -206,7 +208,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
             
             
             Controller.getController().getSettings().setVersionNumber(finalVersion);
-            Logger.getLogger().log("Finished update proccess. Now at Version:" + finalVersion.toString(), Logger.DEBUG);
+            Logger.debug("Finished update proccess. Now at Version:" + finalVersion.toString());
             SplashAndUpdateCanvas.this.updateFinished();
         }
     }
@@ -235,7 +237,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
                             
                 fs.saveFile(trackName, track, true);
             }catch(IOException e){
-                Logger.getLogger().log("IOException caught trying to update a file: " +trackName + " || " + e.toString(), Logger.ERROR);
+                Logger.error("IOException caught trying to update a file: " +trackName + " || " + e.toString());
             }
         }
         

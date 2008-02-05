@@ -283,7 +283,7 @@ public class ExportSettingsList extends List implements CommandListener {
             } else {
                 this.append("  " + fileName, null);
             }
-            Logger.getLogger().log("Export: " + fileName, Logger.DEBUG);
+            Logger.debug("Export: " + fileName);
         }
     }
 

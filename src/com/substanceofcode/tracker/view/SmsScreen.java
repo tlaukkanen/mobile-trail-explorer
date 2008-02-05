@@ -18,7 +18,7 @@ import javax.microedition.lcdui.TextField;
 import javax.wireless.messaging.MessageConnection;
 import javax.wireless.messaging.TextMessage;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Waypoint;
 
@@ -165,14 +165,14 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
     
                         } else {
                             // Should never reach here!
-                            Logger.getLogger().log(
+                            Logger.error(
                                     "Neither of the only 2 choices are selected. Crazy! class="
-                                            + this.getClass().getName(), Logger.ERROR);
+                                            + this.getClass().getName());
                             Controller.getController().showError(
                                             "Message not sent because of some ERROR!, See log for details");
                         }
                     }catch(Throwable t){
-                        Logger.getLogger().log("Error trying to do SmsScreen.commandAction(..., sendCommand)", Logger.ERROR);
+                        Logger.error("Error trying to do SmsScreen.commandAction(..., sendCommand)");
                     }
                 }
             }.start();
@@ -202,12 +202,10 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
                     .newMessage(MessageConnection.TEXT_MESSAGE, URI);
             textMessage.setPayloadText(message);
             messageConnection.send(textMessage);
-            Logger.getLogger().log("Message sent", Logger.DEBUG);
+            Logger.debug("Message sent");
             this.goBack();
         } catch (Exception e) {
-            Logger.getLogger()
-                    .log("Error sending Text Message: " + e.toString(),
-                            Logger.ERROR);
+            Logger.error("Error sending Text Message: " + e.toString());
         }
     }
     
@@ -229,6 +227,7 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         final int type = positionType.getSelectedIndex();
         switch (type) {
             case (CURRENT_POSITION):
+                Logger.debug("SmsScreen getPosition called");
                 pos = Controller.getController().getPosition();
                 break;
             case (END_OF_TRAIL):

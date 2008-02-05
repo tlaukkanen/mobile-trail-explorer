@@ -272,9 +272,9 @@ public class TrailActionsForm extends Form implements CommandListener,
                 xiListen.notifySuccess(lType + " : Save Complete");
             }
         } catch (Exception ex) {
-            Logger.getLogger().log(
+            Logger.error(
                     "Exception caught when trying to export trail: "
-                            + ex.toString(), Logger.ERROR);
+                            + ex.toString());
             if (xiListen != null) {
                 xiListen.notifyError(lType + " : Save Failed", ex);
             }

@@ -28,7 +28,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.DateTimeUtil;
@@ -346,9 +346,9 @@ public class ElevationCanvas extends BaseCanvas {
             g.drawString("ERR: " + ex.toString(), 1, 120, Graphics.TOP
                     | Graphics.LEFT);
 
-            Logger.getLogger().log(
+            Logger.error(
                     "Exception occured while drawing elevation: "
-                            + ex.toString(), Logger.ERROR);
+                            + ex.toString());
         }
     }
 
@@ -491,15 +491,16 @@ public class ElevationCanvas extends BaseCanvas {
                     this.repaint();
                     continue;
                 }
+                Logger.debug("ElevationCanvas getPosition called");
                 final GpsPosition temp = controller.getPosition();
                 if (temp != null) {
+                    Logger.debug("ElevationCanvas getPosition called 2");
                     this.lastPosition = controller.getPosition();
                 }
                 this.repaint();
             } catch (Exception ex) {
-                Logger.getLogger().log(
-                        "Error in ElevationCanvas.run(): " + ex.toString(),
-                        Logger.WARN);
+                Logger.warn(
+                        "Error in ElevationCanvas.run(): " + ex.toString());
             }
         }
     }

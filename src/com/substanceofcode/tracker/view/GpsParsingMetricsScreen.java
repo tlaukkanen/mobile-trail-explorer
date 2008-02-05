@@ -29,7 +29,7 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Screen;
 import javax.microedition.lcdui.StringItem;
 
-import com.substanceofcode.bluetooth.GpsPositionParser;
+import com.substanceofcode.gps.GpsPositionParser;
 import com.substanceofcode.tracker.controller.Controller;
 
 public class GpsParsingMetricsScreen extends Form implements CommandListener{

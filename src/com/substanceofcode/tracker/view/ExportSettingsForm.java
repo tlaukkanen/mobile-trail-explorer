@@ -22,14 +22,17 @@
 
 package com.substanceofcode.tracker.view;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
+import javax.microedition.io.file.FileSystemRegistry;
 import javax.microedition.lcdui.*;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.*;
 
@@ -45,6 +48,11 @@ public class ExportSettingsForm extends Form implements CommandListener {
     private Command okCommand;
     private Command testpathCommand;
     private Command cancelCommand;
+    
+    private String currDirName;
+    private final static String MEGA_ROOT = "/";
+    private final static String SEP_STR = "/";
+    private final static char   SEP = '/';
 
     private TextField exportFolderField;
 
@@ -178,6 +186,61 @@ public class ExportSettingsForm extends Form implements CommandListener {
         }
         exportFolderField = new TextField("Export Folder", exportFolder, 50,
                 TextField.ANY);
+        
+        Enumeration e= FileSystemRegistry.listRoots();
+        while (e.hasMoreElements()) 
+        {
+          String fileName = (String)e.nextElement();
+          //browser.append(fileName,null);
+          Logger.debug("Export: "+ fileName);
+        }
+      
         this.append(exportFolderField);
     }
+    
+    /*
+    void showCurrDir() 
+    {
+      Enumeration e;
+      FileConnection currDir = null;
+      List browser;
+      try 
+      {
+        if (MEGA_ROOT.equals(currDirName)) 
+        {
+          e = FileSystemRegistry.listRoots();
+          browser = new List(currDirName, List.IMPLICIT);
+        } 
+        else 
+        {
+          currDir = (FileConnection)Connector.open(
+            "file://localhost/" + currDirName);
+          e = currDir.list();
+          browser = new List(currDirName, List.IMPLICIT);
+          browser.append(UP_DIRECTORY,null);
+        }
+        while (e.hasMoreElements()) 
+        {
+          String fileName = (String)e.nextElement();
+          if (fileName.charAt(fileName.length()-1) == SEP) 
+          {
+            browser.append(fileName,null);
+          } 
+          else 
+          {
+            browser.append(fileName,null);
+          }
+        }
+        browser.setSelectCommand(view);
+        browser.addCommand(exit);
+        browser.setCommandListener(this);
+        if (currDir != null) 
+        {
+          currDir.close();
+        }
+       
+      } 
+      catch (IOException ioe) 
+      {}
+    }*/
 }

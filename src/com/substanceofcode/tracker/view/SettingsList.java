@@ -61,7 +61,7 @@ public class SettingsList extends List implements CommandListener {
     static{
         SMS_AVAILABLE = smsAvailable();
         if(!SMS_AVAILABLE){
-            Logger.getLogger().log("The API required to send Messages (SMS etc) is unavailable on this phone. SMS menu option has been disabled", Logger.DEBUG); 
+            Logger.debug("The API required to send Messages (SMS etc) is unavailable on this phone. SMS menu option has been disabled"); 
         }
     }
     private static boolean smsAvailable(){

@@ -22,7 +22,7 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.util.StringUtil;
@@ -101,6 +101,7 @@ public class WaypointList extends List implements CommandListener {
         if( command == newWaypointCommand ){
             String latString = "";
             String lonString = "";
+            Logger.debug("WaypointList getPosition called");
             GpsPosition lastPosition = controller.getPosition();
             if(lastPosition!=null) {
                 double lat = lastPosition.latitude;

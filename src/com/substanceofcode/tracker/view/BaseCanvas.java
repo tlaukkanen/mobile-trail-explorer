@@ -39,9 +39,6 @@ import javax.microedition.lcdui.Font;
 public abstract class BaseCanvas extends Canvas implements CommandListener,
         Runnable {
 
-    /** The Logger to log notable Events to. */
-    protected static final Logger logger = Logger.getLogger();
-
     /** The color White, in it's integer value form. */
     protected static final int COLOR_WHITE = 0xFFFFFF;
     /** The color Black, in it's integer value form. */
@@ -143,9 +140,8 @@ public abstract class BaseCanvas extends Canvas implements CommandListener,
                 controller.showError("Exception caught in BaseCanvasThread for class: "
                                 + this.getClass().getName() + " | "
                                 + ex.toString());
-                logger.log("Exception caught in BaseCanvasThread for class: "
-                        + this.getClass().getName() + " | " + ex.toString(),
-                        Logger.ERROR);
+                Logger.error("Exception caught in BaseCanvasThread for class: "
+                        + this.getClass().getName() + " | " + ex.toString());
             }
         }
     }

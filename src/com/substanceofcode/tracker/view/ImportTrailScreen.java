@@ -97,9 +97,9 @@ public class ImportTrailScreen extends Form implements CommandListener {
                         } else if (fileExtension.equals(".gpx")) {
                             converter = new GpxConverter();
                         } else {
-                            Logger.getLogger().log(
+                            Logger.warn(
                                     "Could not determine file type for import: "
-                                            + importFile, Logger.WARN);
+                                            + importFile);
                             controller
                                     .showError("Could not determine file type for import: "
                                             + importFile);
@@ -117,24 +117,20 @@ public class ImportTrailScreen extends Form implements CommandListener {
                         if (track == null) {
                             controller
                                     .showError("Unable to retrieve specified track. See log for details");
-                            Logger
-                                    .getLogger()
-                                    .log(
-                                            "Unable to retrieve specified track, previous statements should explain.",
-                                            Logger.DEBUG);
+                            Logger.debug(
+                                            "Unable to retrieve specified track, previous statements should explain.");
                         } else {
                             try {
                                 track.saveToRMS();
                             } catch (IllegalStateException e) {
-                                Logger.getLogger().log(
+                                Logger.warn(
                                         "Unable to save 'Empty Trail' "
-                                                + e.toString(), Logger.WARN);
+                                                + e.toString());
                                 controller.showError("Can not save \"Empty\" Trail. " +
                                             "must record at least 1 point");
                             } catch (FileIOException e) {
-                                Logger.getLogger().log(
-                                        "Unable to save Trail " + e.toString(),
-                                        Logger.WARN);
+                                Logger.warn(
+                                        "Unable to save Trail " + e.toString());
                                 ;
                                 controller.showAlert(
                                         "An Exception was thrown when attempting to save "
@@ -145,9 +141,9 @@ public class ImportTrailScreen extends Form implements CommandListener {
                             }
                         }
                     } catch (Exception e) {
-                        Logger.getLogger().log(
+                        Logger.warn(
                                 "Error occured when trying to import Trail: "
-                                        + e.toString(), Logger.WARN);
+                                        + e.toString());
                         controller
                                 .showError("Error occured when trying to import Trail:  "
                                         + e.toString());
