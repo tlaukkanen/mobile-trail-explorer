@@ -22,7 +22,7 @@
 
 package com.substanceofcode.tracker.view;
 
-import java.io.IOException;
+import com.substanceofcode.gps.GpsPosition;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -35,7 +35,6 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.RecorderSettings;

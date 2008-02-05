@@ -284,6 +284,13 @@ public class Controller {
         }
     }
 
+    public void repaintDisplay() {
+        Displayable disp = display.getCurrent();
+        if(  disp instanceof BaseCanvas ) {
+            BaseCanvas canvas = (BaseCanvas) disp;
+            canvas.repaint();
+        }
+    }
 
     public void searchDevices() {
                 // Jsr179 will find external bluetooth devices if a suitable internal
@@ -301,6 +308,7 @@ public class Controller {
             searchBTDevices();
         }
     }
+
 
     /**
      * See if there are any supported JSRs that provide a location api ie Jsr179

@@ -24,7 +24,6 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
 
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -36,8 +35,7 @@ import javax.microedition.lcdui.Font;
  * @author Tommi
  * @author Barry Redmond
  */
-public abstract class BaseCanvas extends Canvas implements CommandListener,
-        Runnable {
+public abstract class BaseCanvas extends Canvas implements CommandListener {
 
     /** The color White, in it's integer value form. */
     protected static final int COLOR_WHITE = 0xFFFFFF;
@@ -58,16 +56,12 @@ public abstract class BaseCanvas extends Canvas implements CommandListener,
 
     protected Controller controller;
 
-    protected Thread refreshThread;
-
     /** Commands */
     private Command startStopCommand;
     private Command settingsCommand;
     private Command exitCommand;
     private Command manageTrailsCommand;
     private Command manageWaypointsCommand;
-
-    protected long threadSleepDelay = 2000;
 
     /*
      * private Command markWaypointCommand; private Command
@@ -80,8 +74,6 @@ public abstract class BaseCanvas extends Canvas implements CommandListener,
         this.setFullScreenMode(true);
         initializeCommands();
         setCommandListener(this);
-
-        refreshThread = new Thread(this);
     }
 
     /* Initialize commands */
@@ -125,23 +117,6 @@ public abstract class BaseCanvas extends Canvas implements CommandListener,
             }
             if (command == exitCommand) {
                 controller.exit();
-            }
-        }
-    }
-
-    public void run() {
-        while (true) {
-            if (this.isShown()) {
-                repaint();
-            }
-            try {
-                Thread.sleep(threadSleepDelay);
-            } catch (Exception ex) {
-                controller.showError("Exception caught in BaseCanvasThread for class: "
-                                + this.getClass().getName() + " | "
-                                + ex.toString());
-                Logger.error("Exception caught in BaseCanvasThread for class: "
-                        + this.getClass().getName() + " | " + ex.toString());
             }
         }
     }

@@ -51,7 +51,6 @@ public class InformationCanvas extends BaseCanvas{
     /** Creates a new instance of InformationCanvas */
     public InformationCanvas() {
         super();
-        refreshThread.start();
     }    
     
     /** Paint information canvas */

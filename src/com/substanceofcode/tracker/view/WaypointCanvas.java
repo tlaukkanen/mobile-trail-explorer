@@ -48,8 +48,6 @@ public class WaypointCanvas extends BaseCanvas {
         allowScrollingDown = false;
         
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
-        
-        refreshThread.start();
     }
 
     /** Paint waypoint list and distances to each waypoint */

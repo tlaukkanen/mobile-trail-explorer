@@ -27,7 +27,6 @@ import com.substanceofcode.gps.GpsSatellite;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
@@ -47,8 +46,7 @@ public class SatelliteCanvas extends BaseCanvas {
         
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
-        
-        refreshThread.start();
+       
     }
     
     protected void paint(Graphics g) {

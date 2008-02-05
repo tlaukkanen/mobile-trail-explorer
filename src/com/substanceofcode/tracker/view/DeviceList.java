@@ -131,7 +131,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
                 if (status == STATUS_READY) {
                     this.append("Searching...", null);
                     System.out.println("Searching GPS devices");                    
-                    controller.searchDevices();
+                    controller.searchBTDevices();
                     status = STATUS_SEARCHING;
                 }
                

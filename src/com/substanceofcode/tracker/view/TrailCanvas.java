@@ -179,7 +179,6 @@ public class TrailCanvas extends BaseCanvas {
             compassArrows.setPosition(this.getWidth() - 22, 11);
         }
 
-        refreshThread.start();
     }
 
     /** Paint */
@@ -188,6 +187,13 @@ public class TrailCanvas extends BaseCanvas {
         final int height = getHeight();
         final int width = getWidth();
 
+        this.gpgsa = controller.getGPGSA();
+
+        /** Get last position from recorder */
+        final GpsPosition temp = controller.getPosition();
+        if (temp != null) {
+            this.lastPosition = controller.getPosition();
+        }        
 
         /** Fill background with white */
         g.setColor(COLOR_WHITE);
@@ -891,46 +897,8 @@ public class TrailCanvas extends BaseCanvas {
          */
     }
 
-
-    /** Thread for getting current position */
-    public void run() {
-        // GpsPosition lastRecordedPosition = null;
-        while (true) {
-            try {
-                Thread.sleep(1000);
-                if (!this.isShown()) {
-                    // Not currently being displayed, so do nothing.
-                    continue;
-                }
-                if (controller.getStatusCode() != Controller.STATUS_RECORDING) {
-                    this.repaint();
-                    continue;
-                }
-               // Logger.getLogger().log("TrailCanvas getPosition called",Logger.DEBUG);
-                final GpsPosition temp = controller.getPosition();
-               
-                this.gpgsa = controller.getGPGSA();
-               
-                if (temp != null) {
-                  //  Logger.getLogger().log("TrailCanvas getPosition called 2",Logger.DEBUG);
-                    this.lastPosition = controller.getPosition();
-                }
-
-               
-                this.repaint();
-            } catch (Exception ex) {
-                Logger.warn(
-                        "Error in TrailCanvas.run(): " + ex.toString()+"\n");
-                ex.printStackTrace();
-                error = ex.toString();
-            }
-        }
-    }
-
-
     public TrailCanvas() {
     }
-
 
     /** Handle key presses */
     public void keyPressed(int keyCode) {
@@ -943,19 +911,14 @@ public class TrailCanvas extends BaseCanvas {
                     // Zoom in
                     verticalZoomFactor *= 2;
                     horizontalZoomFactor *= 2;
-                    
                 }
-
-               
                 break;
 
             case (KEY_NUM3):
-
                 if (horizontalZoomFactor > MIN_ZOOM) {
                     // Zoom out
                     verticalZoomFactor /= 2;
                     horizontalZoomFactor /= 2;
-                    
                 }
 
                 break;
@@ -1015,6 +978,7 @@ public class TrailCanvas extends BaseCanvas {
             verticalMovement = 0;
             horizontalMovement = 0;
         }
+        this.repaint();
     }
 
 

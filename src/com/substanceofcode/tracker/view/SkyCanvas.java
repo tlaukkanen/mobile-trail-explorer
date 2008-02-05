@@ -49,8 +49,6 @@ public class SkyCanvas extends BaseCanvas{
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         
-        refreshThread.start();
-        
     }
     
     protected void paint(Graphics g) {

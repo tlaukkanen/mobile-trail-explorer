@@ -36,7 +36,7 @@ import javax.microedition.rms.RecordStoreException;
 import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.view.Logger;
+import javax.microedition.lcdui.Displayable;
 
 /**
  * Thread based class which encapsulates recording data from a GPS device.
@@ -194,7 +194,7 @@ public class GpsRecorder implements Runnable {
                    // Logger.debug("GpsRecorder getPosition called 2");
                    lastPosition = controller.getPosition();
                 }
-                
+                controller.repaintDisplay();
             } catch (Exception ex) {
                 controller.showError("Error in recorder thread: "
                         + ex.toString()+"\n controller is " +controller+

@@ -29,7 +29,6 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
@@ -80,8 +79,6 @@ public class ElevationCanvas extends BaseCanvas {
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
 
         this.setMinMaxValues();
-        
-        refreshThread.start();
     }
 
     private void setMinMaxValues() {
@@ -264,6 +261,10 @@ public class ElevationCanvas extends BaseCanvas {
         try {
 
             // Exit if we don't have anything to draw
+            final GpsPosition temp = controller.getPosition();
+            if (temp != null) {
+                lastPosition = controller.getPosition();
+            }            
             if (lastPosition == null) {
                 return;
             }
@@ -476,35 +477,6 @@ public class ElevationCanvas extends BaseCanvas {
         }
         this.repaint();
     }
-
-    /** Thread for getting current position */
-    public void run() {
-        //GpsPosition lastRecordedPosition = null;
-        while (true) {
-            try {
-                Thread.sleep(1000);
-                if (!this.isShown()) {
-                    // Not currently being displayed, so do nothing.
-                    continue;
-                }
-                if (controller.getStatusCode() != Controller.STATUS_RECORDING) {
-                    this.repaint();
-                    continue;
-                }
-                Logger.debug("ElevationCanvas getPosition called");
-                final GpsPosition temp = controller.getPosition();
-                if (temp != null) {
-                    Logger.debug("ElevationCanvas getPosition called 2");
-                    this.lastPosition = controller.getPosition();
-                }
-                this.repaint();
-            } catch (Exception ex) {
-                Logger.warn(
-                        "Error in ElevationCanvas.run(): " + ex.toString());
-            }
-        }
-    }
-
 
     public void setLastPosition(GpsPosition position) {
         this.lastPosition = position;

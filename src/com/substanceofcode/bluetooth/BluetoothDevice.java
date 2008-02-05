@@ -23,7 +23,7 @@ package com.substanceofcode.bluetooth;
 
 /**
  *
- * @author Tommi
+ * @author Tommi Laukkanen
  */
 public class BluetoothDevice {
     
