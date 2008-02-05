@@ -36,12 +36,15 @@ import javax.microedition.midlet.MIDlet;
 
 import com.substanceofcode.bluetooth.BluetoothDevice;
 import com.substanceofcode.bluetooth.BluetoothUtility;
-import com.substanceofcode.bluetooth.GpsDevice;
-import com.substanceofcode.bluetooth.GpsGPGSA;
-import com.substanceofcode.bluetooth.GpsPosition;
-import com.substanceofcode.bluetooth.MockGpsDevice;
+import com.substanceofcode.bluetooth.Device;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
+import com.substanceofcode.gps.GpsGPGSA;
+import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.gpsdevice.GpsDevice;
+import com.substanceofcode.gpsdevice.GpsDeviceFactory;
+import com.substanceofcode.gpsdevice.Jsr179Device;
+import com.substanceofcode.gpsdevice.MockGpsDevice;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.Backlight;
 import com.substanceofcode.tracker.model.GpsRecorder;
@@ -87,11 +90,6 @@ public class Controller {
      */
     private static Controller controller;
 
-    /**
-     * Local Logger reference
-     */
-    private final Logger logger;
-
     /** Status codes */
     public final static int STATUS_STOPPED = 0;
     public final static int STATUS_RECORDING = 1;
@@ -110,7 +108,7 @@ public class Controller {
     /**
      * GPS device being used
      */
-    private GpsDevice gpsDevice;
+    private Device gpsDevice;
 
     /**
      * GpsRecorder which will do the actual logging
@@ -177,7 +175,17 @@ public class Controller {
      * XXX : mchr : What error does this hold?
      */
     private String error;
+    
+    /**
+     *  Controls whether jsr179 is used or not
+     */
+    private boolean useJsr179=false;
 
+    /**
+     *  Controls whether FileCache is used or not
+     */
+    private boolean useFileCache=true;
+    
     /**
      * Creates a new instance of Controller which performs the following:
      * <ul>
@@ -196,7 +204,8 @@ public class Controller {
         settings = new RecorderSettings(midlet);
         // Initialize Logger, as it must have an instance of RecorderSettings on
         // it's first call.
-        logger = Logger.getLogger(settings);
+        Logger.init(settings);
+        // logger = Logger.getLogger(settings);
         // XXX : mchr : Dependency from Logger to getTrailCanvas prevents this
         // array definition from being any higher - we have to tell the Logger
         // class about the RecorderSettings which in turn depend on midlet
@@ -207,12 +216,20 @@ public class Controller {
 
         recorder = new GpsRecorder(this);
         if (gpsAddress.length() > 0) {
-            gpsDevice = new GpsDevice(gpsAddress, "GPS");
+
+            try {
+                gpsDevice = GpsDeviceFactory.createDevice(gpsAddress, "GPS");
+            } catch (java.lang.SecurityException se) {
+                Logger
+                        .warn("GpsDevice could not be created because permission was not granted.");
+            }
+
         } else {
             // XXX : mchr : what is going on here?
             // Causes exception since getcurrentScreen returns null at this
             // point in time.
             // showError("Please choose a bluetooth device from Settings->GPS");
+
         }
 
         /** Waypoints */
@@ -228,6 +245,7 @@ public class Controller {
         if (settings.getBacklightOn()) {
             backlight.backlightOn();
         }
+        useJsr179=settings.getJsr179();
     }
 
     /**
@@ -267,23 +285,64 @@ public class Controller {
     }
 
 
+    public void searchDevices() {
+                // Jsr179 will find external bluetooth devices if a suitable internal
+        // one can't be found
+        // So really we only want to do one of these searches, ie use the
+        // location api if
+        // it is present, search bluetooth devices if it isn't
+        if(useJsr179 && Jsr179Device.checkApiIsPresent())
+        {
+            Logger.debug("Using JSR179 for Location services");
+            searchDevicesByJsr();
+        }
+        else{
+            Logger.debug("Using bluetooth for Location services");
+            searchBTDevices();
+        }
+    }
 
+    /**
+     * See if there are any supported JSRs that provide a location api ie Jsr179
+     */
+    public void searchDevicesByJsr() {
+    
+        if (devices == null) {
+            devices = new Vector();
+        }else{
+            devices.removeAllElements();
+        }
+
+
+            if (Jsr179Device.checkApiIsPresent()) {
+                Device dev = new Jsr179Device("internal",
+                        "Internal GPS (Jsr 179)");
+                devices.addElement(dev);
+            }
+    }
     /**
      * Search for all available bluetooth devices
      */
     public void searchBTDevices() {
         try {
             BluetoothUtility bt = new BluetoothUtility();
-            logger.log("Initializing bluetooth utility", Logger.DEBUG);
+            Logger.debug("Initializing bluetooth utility");
             bt.initialize();
-            System.out.println("Finding devices.");
+            int countDown = BluetoothUtility.SearchTimeoutLimitSecs;
+            Logger.debug("Finding devices." + countDown);
             bt.findDevices();
-            // XXX : mchr : Add explicit timeout to avoid infinite loop?
-            while (bt.searchComplete() == false) {
+            // TODO : mchr : Add explicit timeout to avoid infinite loop?
+            // yes
+
+            while (!bt.searchComplete() && !bt.searchTimeOutExceeded()) {
+                // Logger.debug("Finding devices.");
                 Thread.sleep(100);
+
+
             }
             System.out.println("Getting devices.");
-            addDevices(devices, bt.getDevices());
+            //addDevices(devices, bt.getDevices());
+            devices=bt.getDevices();
         } catch (Exception ex) {
             System.err.println("Error in Controller.searchDevices: "
                     + ex.toString());
@@ -301,13 +360,20 @@ public class Controller {
      *                returns Vector A vector containing the sum of src and dest
      */
     private Vector addDevices(Vector dest, Vector src) {
+        
         if (dest == null) {
             dest = new Vector();
+            Logger.debug("dest was null, creating.");
         }
-        int endIdx = dest.size() - 1;
-        for (int i = 0; i < src.size(); i++) {
+      
+     
+        int endIdx = dest.size() - 1;      
+        endIdx=(endIdx<0)?0:endIdx;
+      
+        for (int i = 0; i < src.size(); i++) {     
             dest.insertElementAt(src.elementAt(i), endIdx + i);
         }
+     
         return dest;
     }
 
@@ -320,7 +386,8 @@ public class Controller {
 
     /** Set GPS device */
     public void setGpsDevice(String address, String alias) {
-        gpsDevice = new GpsDevice(address, alias);
+
+        gpsDevice = GpsDeviceFactory.createDevice(address, alias);
         settings.setGpsDeviceConnectionString(gpsDevice.getAddress());
     }
 
@@ -377,21 +444,23 @@ public class Controller {
         // Start Recording
         // --------------------------------------------------------------------------
         if (status != STATUS_RECORDING) {
-            logger.log("Starting Recording", Logger.INFO);
+            Logger.info("Starting Recording");
             // XXX : HACK(disabled)
-            logger.log("gpsDevice is "+gpsDevice, Logger.DEBUG);
+            Logger.debug("gpsDevice is " + gpsDevice);
             if (gpsDevice == null) {
                 showError("Please select a GPS device first");
             } else {
                 // Connect to a GPS device
                 try {
-                    gpsDevice.connect();
+
+                    if (gpsDevice instanceof BluetoothDevice) {
+                        ((BluetoothDevice) gpsDevice).connect();
+                    }
                     recorder.startRecording();
                     status = STATUS_RECORDING;
-                } catch (Exception ex) {                    
-                    Logger.getLogger().log(
-                            "Error while connection to GPS: " + ex.toString(),
-                            Logger.ERROR);
+                } catch (Exception ex) {
+                    Logger.error("Error while connection to GPS: "
+                            + ex.toString());
                     showError("Error while connection to GPS: " + ex.toString());
                 }
             }
@@ -400,7 +469,7 @@ public class Controller {
         // Stop Recording
         // --------------------------------------------------------------------------
         else {
-            Logger.getLogger().log("Stopping Recording", Logger.INFO);
+            Logger.info("Stopping Recording");
             // Stop recording the track
             recorder.stopRecording();
             // Disconnect from GPS device
@@ -429,8 +498,11 @@ public class Controller {
         status = STATUS_STOPPED;
 
         try {
-            // Disconnect from GPS
-            gpsDevice.disconnect();
+
+            // Disconnect from bluetooth GPS
+            if (gpsDevice instanceof BluetoothDevice) {
+                ((BluetoothDevice) gpsDevice).disconnect();
+            }
         } catch (Exception e) {
             showError("Error while disconnecting from GPS device: "
                     + e.toString());
@@ -541,8 +613,8 @@ public class Controller {
         if (gpsDevice == null) {
             return null;
         }
-       // Logger.getLogger().log("Controller getPosition called",Logger.DEBUG);
-        return ((GpsDevice)gpsDevice).getPosition();
+        // Logger.getLogger().log("Controller getPosition called",Logger.DEBUG);
+        return ((GpsDevice) gpsDevice).getPosition();
     }
 
     /**
@@ -552,7 +624,7 @@ public class Controller {
         if (gpsDevice == null) {
             return null;
         }
-        return ((GpsDevice)gpsDevice).getGPGSA();
+        return ((GpsDevice) gpsDevice).getGPGSA();
     }
 
     /**
@@ -571,7 +643,9 @@ public class Controller {
         // this is here mainly for testing purposes,
         // don't know whether it should remain here.
         this.pause();
-        controller.startStop();
+        if (status == STATUS_RECORDING) {
+            controller.startStop();
+        }
         saveWaypoints();
         midlet.notifyDestroyed();
     }
@@ -655,7 +729,7 @@ public class Controller {
         }
         return exportSettingsForm;
     }
-    
+
     /** Show export settings list */
     private ExportSettingsList getExportSettingsList() {
         if (exportSettingsList == null) {
@@ -757,10 +831,7 @@ public class Controller {
                 pos = track.getEndPosition();
             } catch (NoSuchElementException e) {
                 Logger
-                        .getLogger()
-                        .log(
-                                "No EndPosition found when trying to call Controller.loadTrack(Track). Setting to null",
-                                Logger.DEBUG);
+                        .debug("No EndPosition found when trying to call Controller.loadTrack(Track). Setting to null");
                 pos = null;
             }
             this.trailCanvas.setLastPosition(pos);
@@ -815,10 +886,8 @@ public class Controller {
                     Display.getDisplay(midlet).setCurrent(alert);
                 } catch (IllegalArgumentException e) {
                     // do nothing just log
-                    Logger.getLogger()
-                            .log(
-                                    "IllegalArgumetException occured "
-                                            + "in showAlert", Logger.WARN);
+                    Logger.warn("IllegalArgumetException occured "
+                            + "in showAlert");
                 }
             }
         });
@@ -922,7 +991,7 @@ public class Controller {
     /** Get current satellite count */
     public int getSatelliteCount() {
         if (gpsDevice != null) {
-            return ((GpsDevice)gpsDevice).getSatelliteCount();
+            return ((GpsDevice) gpsDevice).getSatelliteCount();
         } else {
             return 0;
         }
@@ -931,7 +1000,7 @@ public class Controller {
     /** Get current satellites */
     public Vector getSatellites() {
         if (gpsDevice != null) {
-            return ((GpsDevice)gpsDevice).getSatellites();
+            return ((GpsDevice) gpsDevice).getSatellites();
         } else {
             return null;
         }
@@ -955,9 +1024,9 @@ public class Controller {
     /**
      * Pause the track and save it to the RMS
      */
-    public void pause() {        
-        if (controller.getStatusCode() == Controller.STATUS_RECORDING){
-            Logger.getLogger().log("Pausing current track", Logger.DEBUG);
+    public void pause() {
+        if (controller.getStatusCode() == Controller.STATUS_RECORDING) {
+            Logger.debug("Pausing current track");
             recorder.getTrack().pause();
         }
     }
@@ -968,7 +1037,7 @@ public class Controller {
      */
     public void unpause() {
         try {
-            Logger.getLogger().log("Resuming from pause", Logger.DEBUG);
+            Logger.debug("Resuming from pause");
             Track pausedTrack;
             FileSystem fs = FileSystem.getFileSystem();
             if (fs.containsFile(Track.PAUSEFILENAME)) {
@@ -978,9 +1047,7 @@ public class Controller {
                 fs.deleteFile(Track.PAUSEFILENAME);
             }
         } catch (IOException e) {
-            Logger.getLogger()
-                    .log("Resume from pause failed: " + e.getMessage(),
-                            Logger.ERROR);
+            Logger.error("Resume from pause failed: " + e.getMessage());
         }
 
     }
@@ -995,9 +1062,9 @@ public class Controller {
             status = true;
         }
 
-		return status;
+        return status;
 
-	}
+    }
 
     /** Rotate around main displays */
     public void switchDisplay() {
@@ -1031,7 +1098,7 @@ public class Controller {
             recordedTrack.writeToFile(exportFolder, waypoints, useKilometers,
                     exportFormat, trackName, null);
         } catch (Exception ex) {
-            Logger.getLogger().log(ex.toString(), Logger.ERROR);
+            Logger.error(ex.toString());
             showError(ex.getMessage());
             // XXX : mchr : Do something more sensible with some exceptions?
             // or perhaps have a test write feature when setting up path to
@@ -1041,6 +1108,22 @@ public class Controller {
 
     public int getNumAlphaLevels() {
         return display.numAlphaLevels();
+    }
+    
+    public void setUseJsr179(boolean b){
+        useJsr179=b;
+        settings.setJsr179(useJsr179);
+    }
+    public boolean getUseJsr179(){
+        return useJsr179;
+    }
+    
+    public void setUseFileCache(boolean b){
+        useFileCache=b;
+        settings.setFileCache(useFileCache);
+    }
+    public boolean getUseFileCache(){
+        return useFileCache;
     }
 
 }
