@@ -35,8 +35,8 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.game.Sprite;
 
-import com.substanceofcode.bluetooth.GpsGPGSA;
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsGPGSA;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.map.MapLocator;
 import com.substanceofcode.map.TileDownloader;
 import com.substanceofcode.tracker.controller.Controller;
@@ -84,7 +84,7 @@ public class TrailCanvas extends BaseCanvas {
     private Sprite compassArrows;
     private boolean largeDisplay;
     
-    private int zoom=14; //Used by the map display for the default zoom level
+    private int zoom=9; //Used by the map display for the default zoom level
 
     // Variables needed by the map generator
     private Image mapTiles[] = new Image[9];
@@ -198,11 +198,13 @@ public class TrailCanvas extends BaseCanvas {
         // Draw maps first, as they will fill the screen
         // and we don't want to occlude other items
         try {
-            drawMaps(g, settings.getDrawMap());
+            if(controller.getStatusCode() == Controller.STATUS_RECORDING){          
+                drawMaps(g, settings.getDrawMap());
+            }
         } catch(Exception ex) {
-            Logger.getLogger().log(
-                    "drawMaps Exception: " + ex.getMessage(), 
-                    Logger.FATAL);
+            Logger.fatal(
+                    "drawMaps Exception: " + ex.getMessage());
+            ex.printStackTrace();
         }
         /** Draw status bar */
         // Draw to an image, then we can display it with an alpha channel
@@ -280,8 +282,7 @@ public class TrailCanvas extends BaseCanvas {
         if (drawMap != RecorderSettings.DRAW_MAP_NONE) {
           
             if (tileDownloader == null) {
-                Logger.getLogger().log("Starting TileDownloader Instance:",
-                        Logger.DEBUG);
+                Logger.debug("Starting TileDownloader Instance:");
                 tileDownloader = new TileDownloader(drawMap);               
                 tileDownloader.start();
             }
@@ -506,13 +507,12 @@ public class TrailCanvas extends BaseCanvas {
               
                 }
                 catch (NullPointerException npe){
-                    Logger.getLogger().log("NPE while drawing trail", Logger.ERROR);
+                    Logger.error("NPE while drawing trail");
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger().log(
-                    "Exception occured while drawing trail: " + ex.toString(),
-                    Logger.WARN);
+            Logger.warn(
+                    "Exception occured while drawing trail: " + ex.toString());
         }
     }
 
@@ -906,22 +906,21 @@ public class TrailCanvas extends BaseCanvas {
                     this.repaint();
                     continue;
                 }
-               
+               // Logger.getLogger().log("TrailCanvas getPosition called",Logger.DEBUG);
                 final GpsPosition temp = controller.getPosition();
                
                 this.gpgsa = controller.getGPGSA();
                
                 if (temp != null) {
-               
+                  //  Logger.getLogger().log("TrailCanvas getPosition called 2",Logger.DEBUG);
                     this.lastPosition = controller.getPosition();
                 }
 
                
                 this.repaint();
             } catch (Exception ex) {
-                Logger.getLogger().log(
-                        "Error in TrailCanvas.run(): " + ex.toString()+"\n",
-                        Logger.WARN);
+                Logger.warn(
+                        "Error in TrailCanvas.run(): " + ex.toString()+"\n");
                 ex.printStackTrace();
                 error = ex.toString();
             }
