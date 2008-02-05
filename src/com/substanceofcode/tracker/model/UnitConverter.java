@@ -22,7 +22,7 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.util.StringUtil;
 
 /**

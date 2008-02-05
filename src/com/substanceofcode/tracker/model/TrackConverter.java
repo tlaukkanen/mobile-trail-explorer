@@ -68,13 +68,13 @@ public abstract class TrackConverter {
 		try {
 			/* Make sure file exists and can be read */
 			if (!connection.exists()) {
-				Logger.getLogger().log("FileConnection does not exist, Track Import " +
-						                   "aborted", Logger.WARN);
+				Logger.warn("FileConnection does not exist, Track Import " +
+						                   "aborted");
 				return null;
 			}
 			if (!connection.canRead()) {
-				Logger.getLogger().log("FileConnection can not be read exist, " +
-						                   "Track Import aborted",Logger.WARN);
+				Logger.warn("FileConnection can not be read exist, " +
+						                   "Track Import aborted");
 				return null;
 			}
 
@@ -95,8 +95,8 @@ public abstract class TrackConverter {
 			} catch (IOException e) {
 			}
 		} catch (Exception e) {
-			Logger.getLogger().log("Exception caught trying to importTrack :" + 
-					                   e.toString(),Logger.WARN);
+			Logger.warn("Exception caught trying to importTrack :" + 
+					                   e.toString());
 			e.printStackTrace();
 		}
 		return result;

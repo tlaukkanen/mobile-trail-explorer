@@ -22,7 +22,7 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
@@ -207,10 +207,9 @@ public class KmlConverter extends TrackConverter {
             markerString.append("</coordinates></Point>\r\n");
             markerString.append("</Placemark>\r\n");
         } catch (NoSuchElementException e) {
-            Logger.getLogger().log(
+            Logger.debug(
                     "No StartPosition found when trying to "
-                            + "generate Endpoints in KML export function",
-                    Logger.DEBUG);
+                            + "generate Endpoints in KML export function");
         }
 
         // End position
@@ -258,10 +257,9 @@ public class KmlConverter extends TrackConverter {
             markerString.append("</coordinates></Point>\r\n");
             markerString.append("</Placemark>\r\n");
         } catch (NoSuchElementException e) {
-            Logger.getLogger().log(
+            Logger.debug(
                     "No EndPosition found when trying to "
-                            + "generate Endpoints in KML export function",
-                    Logger.DEBUG);
+                            + "generate Endpoints in KML export function");
         }
         
         /** Max speed */
@@ -296,8 +294,7 @@ public class KmlConverter extends TrackConverter {
      * TODO: This method returns null - its has not been implemented yet
      */
     public Track importTrack(KXmlParser trackDescription) {
-        Logger.getLogger().log("Starting to parse KML track from file",
-                Logger.DEBUG);
+        Logger.debug("Starting to parse KML track from file");
         return null;
     }
     

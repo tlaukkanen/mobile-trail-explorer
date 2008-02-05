@@ -33,8 +33,10 @@ import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 
-import com.substanceofcode.bluetooth.GpsPosition;
+import com.substanceofcode.gps.GpsGPGSA;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.view.Logger;
 
 /**
  * Thread based class which encapsulates recording data from a GPS device.
@@ -138,14 +140,21 @@ public class GpsRecorder implements Runnable {
         GpsPosition lastPosition = null;
         int secondsFromLastTrailPoint = 0;
         int recordedCount = 0;
+        boolean isValidPosition=false;
+        GpsPosition currentPosition=null;
+        GpsGPGSA currentGPGSA=null;
         while (true) {
             try {
                 Thread.sleep(1000);
-                GpsPosition currentPosition = controller.getPosition();
-                boolean isValidPosition = checkValidPosition(
+                if (recording==true){
+                //Logger.debug("GpsRecorder getPosition called");
+                currentPosition = controller.getPosition();
+                currentGPGSA = controller.getGPGSA();
+                isValidPosition = checkValidPosition(
                         currentPosition, 
                         lastPosition, 
                         lastRecordedPosition);
+                }
                 if (recording == true
                         && secondsFromLastTrailPoint >= intervalSeconds
                         && isValidPosition) {
@@ -161,9 +170,8 @@ public class GpsRecorder implements Runnable {
                         stopped = currentPosition.equals(lastRecordedPosition);
                     }
 
-                    // Logger.getLogger().log("interval: "+ intervalSeconds + "
-                    // currentPosition is " + (currentPosition==null?"null":"not
-                    // null"));
+                    // Logger.debug("interval: "+ intervalSeconds + 
+                    // " currentPosition is " + (currentPosition==null?"null":"not null"));
                     /**
                      * Record current position if user have moved or this is a
                      * first recorded position.
@@ -172,7 +180,7 @@ public class GpsRecorder implements Runnable {
 
                         rmsRecorder.setGpsPosition(currentPosition);
 
-                        recordedTrack.addPosition(currentPosition);
+                        recordedTrack.addPosition(currentPosition,currentGPGSA);
                         if (intervalMarkerStep > 0 && recordedCount > 0
                                 && recordedCount % intervalMarkerStep == 0) {
                             recordedTrack.addMarker(currentPosition);
@@ -183,12 +191,14 @@ public class GpsRecorder implements Runnable {
                     lastPosition = currentPosition;
                 } else {
                     secondsFromLastTrailPoint++;
-                    lastPosition = controller.getPosition();
+                   // Logger.debug("GpsRecorder getPosition called 2");
+                   lastPosition = controller.getPosition();
                 }
                 
             } catch (Exception ex) {
                 controller.showError("Error in recorder thread: "
-                        + ex.toString());
+                        + ex.toString()+"\n controller is " +controller+
+                       "\n currentPosition is" +controller.getPosition()+"\n currentGPGSA is "+ controller.getGPGSA());
             }
         }
     }
@@ -234,9 +244,9 @@ public class GpsRecorder implements Runnable {
     /**
      * Thread based class which encapsulates recording a point into a single
      * slot in the RMS. This thread makes calls to the method
-     * putPositionInRMS(...) which is synchronized on the parent class. This is
+     * putPositionInRMS(...) which is synchronised on the parent class. This is
      * needed so that calls to getPositionFromRMS() again contained in the
-     * parent class return a consistant value.
+     * parent class return a consistent value.
      */
     private class GpsRmsRecorder implements Runnable {
 
@@ -269,7 +279,7 @@ public class GpsRecorder implements Runnable {
          */
         public synchronized void setGpsPosition(GpsPosition pos) {
             // ------------------------------------------------------------------
-            // If work has already been set - wait until we are notfied that it
+            // If work has already been set - wait until we are notified that it
             // has been written
             // ------------------------------------------------------------------
             while (this.nextPositionToWrite != this.lastPositionWritten) {

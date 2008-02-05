@@ -56,6 +56,8 @@ public class RecorderSettings {
     private static final String DRAW_MAP = "draw-map";
     private static final String LOGGING_LEVEL = "logger-recording-level";
     private static final String VERSION_NUMBER = "version-number";
+    private static final String USEJSR179="jsr179";
+    private static final String USEFILECACHE="fileCache";
 
     /** Importing settings keys */
     private static final String IMPORT_FILE = "import-file";
@@ -191,7 +193,7 @@ public class RecorderSettings {
         saveSettings();
     }
     
-    /** Get export folder. Default is root1/ */
+    /** Get export folder. Default is E:/ */
     public String getExportFolder() {
         return settings.getStringProperty(EXPORT_FOLDER, "E:/");
     }
@@ -476,6 +478,26 @@ public class RecorderSettings {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    public boolean getJsr179() {
+        return settings.getBooleanProperty(USEJSR179, true);
+    }
+
+    /** Set jsr179 support */
+    public void setJsr179(boolean value) {
+        settings.setBooleanProperty(USEJSR179, value);
+        saveSettings();
+    }
+    
+    public boolean getFileCache() {
+        return settings.getBooleanProperty(USEJSR179, true);
+    }
+
+    /** Set filecache support */
+    public void setFileCache(boolean value) {
+        settings.setBooleanProperty(USEFILECACHE, value);
+        saveSettings();
     }
 
 }

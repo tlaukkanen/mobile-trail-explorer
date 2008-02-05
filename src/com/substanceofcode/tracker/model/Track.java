@@ -34,10 +34,11 @@ import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-import com.substanceofcode.bluetooth.GpsPosition;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.data.Serializable;
+import com.substanceofcode.gps.GpsGPGSA;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
@@ -133,7 +134,7 @@ public class Track implements Serializable {
             
             //------------------------------------------------------------------
             // Open outputStream positioned at the end of the file
-            // For a new file this will be the same as positiining at the start
+            // For a new file this will be the same as positioning at the start
             // For an existing file this allows us to append data
             //------------------------------------------------------------------
             streamOut = streamConnection.openOutputStream(streamConnection.fileSize()+1);
@@ -282,8 +283,11 @@ public class Track implements Serializable {
      * Other Methods
      */
 
-    /** Add new Track Point to the end of this Track */
     public void addPosition(GpsPosition pos) {
+        addPosition(pos,null);
+    }
+    /** Add new Track Point to the end of this Track */
+    public void addPosition(GpsPosition pos,  GpsGPGSA gpgsa ) {
         /** Handle distance calculations */
         if (trackPoints.size() > 0) {
             // Increment Distance
@@ -311,7 +315,8 @@ public class Track implements Serializable {
             Controller lController = Controller.getController();
             RecorderSettings lSettings = lController.getSettings();
             StringBuffer gpxPos = new StringBuffer();
-            GpxConverter.addPosition(pos, gpxPos);
+            //GpxConverter.addPosition(pos, gpxPos);
+            GpxConverter.addPosition(pos, gpxPos,gpgsa);
             streamPrint.print(gpxPos.toString());
             streamPrint.flush();
             try
@@ -452,7 +457,7 @@ public class Track implements Serializable {
         try {
             folder += (folder.endsWith("/") ? "" : "/");
             fullPath = "file:///" + folder + filename + extension;
-            System.out.println("Opening : " + fullPath);
+            Logger.debug("Opening : " + fullPath);
             connection = (FileConnection) Connector.open(fullPath,
                     Connector.WRITE);
         } catch (Exception ex) {
@@ -570,7 +575,7 @@ public class Track implements Serializable {
 				fs.saveFile(PAUSEFILENAME,
 				        getMimeType(), this, false);
 			} catch (FileIOException e) {		
-                            Logger.getLogger().log("Error creating pause file " +e.getMessage(),Logger.ERROR);
+                            Logger.error("Error creating pause file " +e.getMessage());
 			}
 
         }
