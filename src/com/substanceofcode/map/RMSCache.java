@@ -15,10 +15,10 @@ public class RMSCache implements Runnable {
     public Vector rmsProcessQueue = new Vector();
     Vector images = null;
     boolean done = false;
-
+    boolean rmsCacheIsFull=false;
 
     public RMSCache(String storename) {
-        Logger.getLogger().log("RMS:Initializing RMSCache ", Logger.DEBUG);
+        Logger.debug("RMS:Initializing RMSCache ");
         rmsProcessQueue = new Vector();
         this.storename = storename;       
         cacheThread = new Thread(this);
@@ -26,18 +26,17 @@ public class RMSCache implements Runnable {
         cacheThread.start();
     }
 
-    public boolean checkRMSCache(String name) {
+    public boolean checkCache(String name) {
         boolean result = false;
         if (images == null) {
             getImageList();
         }
-        for (int i = 0; i < images.size() && result == false; i++) {
-            String imgName = (String) images.elementAt(i);
-            if (name.equalsIgnoreCase(imgName)) {
-                result = true;
-
-            }
+        
+        if(images.contains(name))
+        {
+            result=true;
         }
+
         return result;
 
     }
@@ -62,7 +61,7 @@ public class RMSCache implements Runnable {
         try {
             result = ImageRmsUtils.loadPngFromRMS(storename, name);
         } catch (Exception e) {
-            Logger.getLogger().log("RMS: Exception reading image",Logger.ERROR);
+            Logger.error("RMS: Exception reading image");
            result=null;
         }
 
@@ -117,11 +116,10 @@ public class RMSCache implements Runnable {
         // Logger.getLogger().log("RMSCache:Going to sleep for 5mins",
         // Logger.DEBUG);
         try {
-            Logger.getLogger().log(
-                    "RMSCache:Initialized ok, now sleeping for 5mins",
-                    Logger.DEBUG);
+            Logger.debug(
+                    "RMSCache:Initialized ok, now sleeping for 1 sec");
 
-            Thread.sleep(5 * 60 * 1000);
+            Thread.sleep( 60 * 1000);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -132,12 +130,11 @@ public class RMSCache implements Runnable {
         while (cacheThread == thisThread) {
 
             try {
-                // Logger.getLogger().log("RMSCache:Going to sleep for 5mins",
+                //Logger.getLogger().log("RMSCache:Going to sleep for 1Sec",
                 // Logger.DEBUG);
-                Thread.sleep(5 * 60 * 1000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
-                Logger.getLogger().log("RMSCache:Thread was interrupted",
-                        Logger.DEBUG);
+                Logger.debug("RMSCache:Thread was interrupted");
 
 
             }
@@ -146,25 +143,26 @@ public class RMSCache implements Runnable {
                 try {
                     if (rmsProcessQueue.size() > 0) {
 
-                        Logger.getLogger().log(
+                        Logger.debug(
                                 "RMS: RMS queue size is:"
-                                        + rmsProcessQueue.size(), Logger.DEBUG);
+                                        + rmsProcessQueue.size());
 
 
                         Tile tile = (Tile) rmsProcessQueue.firstElement();
                         rmsProcessQueue.removeElementAt(0);
                         try {
                             writeToRms(tile);
+                            
                         } catch (Exception e) {
-                            Logger.getLogger().log(
+                            Logger.error(
                                     "RMS: Exception while writing tile to RMS"
-                                            + e.getMessage(), Logger.ERROR);
+                                            + e.getMessage());
                         }
                     } else {
-                        // Logger.getLogger()
-                        // .log("RMS: RMSProcessQueueEmpty "+
+                    //     Logger.getLogger()
+                      //   .log("RMS: RMSProcessQueueEmpty, yielding"+
                         // rmsProcessQueue.size(), Logger.DEBUG);
-
+                        Thread.yield();
 
                     }
                 } catch (Exception e) {
@@ -184,15 +182,14 @@ public class RMSCache implements Runnable {
      * @param im
      */
     public void addToQueue(Tile tile) {
-        Logger.getLogger().log("RMS:Adding Tile to RMS queue", Logger.DEBUG);
+        Logger.debug("RMS:Adding Tile to RMS queue");
         synchronized (rmsProcessQueue) {
             if (!rmsProcessQueue.contains(tile)) {
                 rmsProcessQueue.addElement(tile);
             }
         }
-        Logger.getLogger().log(
-                "RMS: RMS queue size now " + rmsProcessQueue.size(),
-                Logger.DEBUG);
+        Logger.debug(
+                "RMS: RMS queue size now " + rmsProcessQueue.size());
     }
 
     /**
@@ -200,25 +197,32 @@ public class RMSCache implements Runnable {
      * 
      * @param tile
      * @param im
+     * @returns true if the save was successful
      * @throws Exception
      */
-    public void writeToRms(Tile tile) throws Exception {
+    public boolean writeToRms(Tile tile) throws Exception {
+        boolean result=false;
 
-
-        Logger.getLogger().log("RMS: Saving Tile " + tile.cacheKey + " to RMS",
-                Logger.INFO);
+        Logger.info("RMS: Saving Tile " + tile.cacheKey + " to RMS");
 
         try {
             ImageRmsUtils.savePngImage(storename, tile.cacheKey, tile
                     .getImage());
+            result=true;
         } catch (RecordStoreFullException e) {
             
-            Logger.getLogger().log("RMS is full, saving to test memcache",Logger.DEBUG);
-            //TODO:implement a filesystem cache, and move a bunch of tiles from the rmscache
-            //into it from here
-            
+            Logger.debug("RMS is full, purging");            
+            rmsCacheIsFull=true;
+            purgeRms(storename);
             
         }
+        return result;
     }
+    /**
+     * Delete all tiles from the rms for the current store name
+     */
+        public void purgeRms(String storename){
+            ImageRmsUtils.clearImageRecordStore(storename);
+        }
 
 }

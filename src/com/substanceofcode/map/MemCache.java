@@ -5,7 +5,7 @@ import java.util.Hashtable;
 import com.substanceofcode.tracker.view.Logger;
 
 /**
- * A simple cache to hold a small number of tiles, ready to
+ * A simple cache to hold a small number of Images, ready to
  * display.
  * TODO: This is looking increasingly unnecessary, A regular hashmap would probably do...
  * @author gjones
@@ -26,7 +26,7 @@ public class MemCache{
     }
     public MemCache(){
         threadName="MEM: " +Thread.currentThread().getName();
-        Logger.getLogger().log(threadName+" Initializing MemCache", Logger.DEBUG);
+        Logger.debug(threadName+" Initializing MemCache");
         hm=new Hashtable();
     }
 
@@ -58,7 +58,7 @@ public class MemCache{
     }
 
     /**
-     * Retreive a tile image from the cache
+     * Retrieve a tile image from the cache
      * @param name the cache key to retrieve
      * @return a tile Image
      */
@@ -75,7 +75,7 @@ public class MemCache{
         synchronized(hm){
         
             hm.put(key, value);
-            Logger.getLogger().log(threadName+" Storing tile to memcache 1, size=" + hm.size(), Logger.DEBUG);
+            Logger.debug(threadName+" Storing tile to memcache 1, size=" + hm.size());
         }
     }
     /**
@@ -86,7 +86,7 @@ public class MemCache{
          synchronized(hm){
                            
             hm.put(tile.cacheKey, tile.getImage());
-            Logger.getLogger().log(threadName+" Storing tile to memcache 2, size=" + hm.size(), Logger.DEBUG);
+            Logger.debug(threadName+" Storing tile to memcache 2, size=" + hm.size());
          }
     }
     
