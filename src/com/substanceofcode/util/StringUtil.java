@@ -29,7 +29,7 @@ import javax.microedition.lcdui.Font;
 
 /**
  * StringUtil contains utility functions for manipulating strings.
- *
+ * 
  * @author Tommi Laukkanen
  * @author Barry Redmond
  * @author Mario Sansone
@@ -41,10 +41,45 @@ public class StringUtil {
     }
 
     /**
+     * Split a String and put the results into a vector
+     * @param original
+     * @param separator
+     * @return
+     */
+    static public Vector splitToVector(String original, char separator) {
+        String[] tmp = split(original, separator);
+        Vector vtmp = new Vector();
+        if (tmp.length > 0) {
+            for (int i = 0; i < tmp.length; i++) {
+                vtmp.addElement(tmp[i]);
+            }
+        }else{
+            return null;
+        }
+        return vtmp;
+    }
+
+    /**
+     * Split a String into multiple strings
+     * 
+     * @param original
+     *                Original string
+     * @param separator
+     *                Separator char in original string
+     * @return String array containing separated substrings
+     */
+    static public String[] split(String original, char separator) {
+        return split(original, String.valueOf(separator));
+    }
+
+    /**
      * Split string into multiple strings
-     * @param original      Original string
-     * @param separator     Separator string in original string
-     * @return              Splitted string array
+     * 
+     * @param original
+     *                Original string
+     * @param separator
+     *                Separator string in original string
+     * @return Splitted string array
      */
     static public String[] split(String original, String separator) {
         Vector nodes = new Vector();
@@ -70,19 +105,25 @@ public class StringUtil {
     }
 
     /**
-     * Chops up the 'original' string into 1 or more strings which have a width <= 'width' when
-     * rasterized with the specified Font.
+     * Chops up the 'original' string into 1 or more strings which have a width <=
+     * 'width' when rasterized with the specified Font.
      * 
-     * The exception is if a single WORD is wider than 'width' in which case that word will be on its
-     * own, but it WILL still be longer than 'width'
+     * The exception is if a single WORD is wider than 'width' in which case
+     * that word will be on its own, but it WILL still be longer than 'width'
      * 
-     * @param origional The original String which is to be chopped up
+     * @param origional
+     *                The original String which is to be chopped up
      * 
-     * @param separator The delimiter for separating words, this will usually be the string " "(i.e. 1 space)
+     * @param separator
+     *                The delimiter for separating words, this will usually be
+     *                the string " "(i.e. 1 space)
      * 
-     * @param font The font to use to determine the width of the words/Strings.
+     * @param font
+     *                The font to use to determine the width of the
+     *                words/Strings.
      * 
-     * @param width The maximum width a single string can be. (inclusive)
+     * @param width
+     *                The maximum width a single string can be. (inclusive)
      * 
      * @return The chopped up Strings, each smaller than 'width'
      */
@@ -128,46 +169,47 @@ public class StringUtil {
     /** Get a double value in string format */
     public static String valueOf(double value, int decimalCount) {
         int integerValue = (int) value;
-        long decimals = Math.abs((long)((value - integerValue) * MathUtil.pow(10, decimalCount)));
+        long decimals = Math.abs((long) ((value - integerValue) * MathUtil.pow(
+                10, decimalCount)));
 
         String valueString = String.valueOf(decimals);
         while (valueString.length() < decimalCount) {
             valueString = "0" + valueString;
         }
-        return (value < 0 ? "-" : "") + 
-            String.valueOf(Math.abs(integerValue)) + "." + valueString;
+        return (value < 0 ? "-" : "") + String.valueOf(Math.abs(integerValue))
+                + "." + valueString;
     }
-    
+
     /** Parse string to short, return defaultValue is parse fails */
     public static short parseShort(String value, short defaultValue) {
         short parsed = defaultValue;
-        if (value != null){
+        if (value != null) {
             try {
-                parsed =  Short.parseShort(value);
+                parsed = Short.parseShort(value);
             } catch (NumberFormatException e) {
-                parsed =  defaultValue;
+                parsed = defaultValue;
             }
         }
         return parsed;
     }
-    
+
     /** Parse string to int, return defaultValue is parse fails */
     public static int parseInteger(String value, int defaultValue) {
         int parsed = defaultValue;
-        if (value != null){
+        if (value != null) {
             try {
-                parsed =  Integer.parseInt(value);
+                parsed = Integer.parseInt(value);
             } catch (NumberFormatException e) {
-                parsed =  defaultValue;
+                parsed = defaultValue;
             }
         }
         return parsed;
     }
-    
+
     /** Parse string to double, return defaultValue is parse fails */
     public static double parseDouble(String value, double defaultValue) {
         double parsed = defaultValue;
-        if (value != null){
+        if (value != null) {
             try {
                 parsed = Double.parseDouble(value);
             } catch (NumberFormatException e) {
