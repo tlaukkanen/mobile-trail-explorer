@@ -73,7 +73,7 @@ public class TrailExplorerMidlet extends MIDlet {
             if (controller.checkIfPaused()==true) {
                     controller.unpause();    		
             }    	                                      
-            Logger.getLogger().log("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
+            Logger.debug("TrailExplorerMidlet.startApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true));
         } catch(Exception ex) {
             ex.printStackTrace();
         }
@@ -85,7 +85,7 @@ public class TrailExplorerMidlet extends MIDlet {
     public void pauseApp() {
         if(controller.getStatusCode() == Controller.STATUS_RECORDING){
             controller.pause();
-            Logger.getLogger().log("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
+            Logger.debug("TrailExplorerMidlet.pauseApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true));
         }
     }
     
@@ -93,7 +93,7 @@ public class TrailExplorerMidlet extends MIDlet {
      * MIDlet state change -> Destroyed state - we must terminate ourselves
      */
     public void destroyApp(boolean unconditional) {
-        Logger.getLogger().log("TrailExplorerMidlet.destroyApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true), Logger.DEBUG);
+        Logger.debug("TrailExplorerMidlet.destroyApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true));
     }
     
 }
