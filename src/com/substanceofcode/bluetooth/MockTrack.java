@@ -2,6 +2,7 @@ package com.substanceofcode.bluetooth;
 
 import java.util.Date;
 
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
 
@@ -1372,6 +1373,7 @@ private final String trackData = ""
              {
         GpsPosition gp=null;
      try{
+        if (positionNumber<pos.length){
         String[] coords = StringUtil.split(pos[positionNumber], ",");
 
 
@@ -1383,9 +1385,12 @@ private final String trackData = ""
         Date date = new Date();
         gp=new GpsPosition(course, longitudeDouble, latitudeDouble, speed,
                 altitude, date);
+        }else{
+            
+        }
      }
      catch(ArrayIndexOutOfBoundsException aioobe){
-         Logger.getLogger().log("error occured, pos was"+positionNumber, Logger.ERROR);
+         Logger.error("error occured, pos was"+positionNumber);
          aioobe.printStackTrace();
      }
         return gp;

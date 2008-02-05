@@ -1,4 +1,4 @@
-package com.substanceofcode.bluetooth;
+package com.substanceofcode.gpsdevice;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -8,8 +8,10 @@ import java.util.Date;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import com.substanceofcode.bluetooth.MockTrack;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
+import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.view.Logger;
@@ -24,7 +26,7 @@ import com.substanceofcode.tracker.view.Logger;
  * @author gjones
  * 
  */
-public class MockGpsDevice extends GpsDevice {
+public class MockGpsDevice extends GpsDeviceImpl {
 
     private double t = 0;
     private short course;
@@ -34,6 +36,9 @@ public class MockGpsDevice extends GpsDevice {
     private double latitudeDouble;
     private double altitude;
     private int posMarker = 0;
+    
+    private String address;
+    private String alias;
     
     MockTrack mt;
 
@@ -50,23 +55,24 @@ public class MockGpsDevice extends GpsDevice {
     }
 
     public MockGpsDevice(String address, String alias) {
+        Logger.debug("MockGpsDevice constructor called 1");
         this.address = address;
         this.alias = alias;
        
     }
 
     public MockGpsDevice() {
-        
+        Logger.debug("MockGpsDevice constructor called 2");
          mt = new MockTrack();
     }
     
     private void init(){
-        
+        Logger.debug("MockGpsDevice init called");
         mt = new MockTrack();
     }
 
     public GpsPosition getPosition() {
-        
+       // Logger.getLogger().log("MockGpsDevice getPosition called",Logger.DEBUG);
         if (mt==null){
             init();
         }
@@ -112,9 +118,10 @@ public class MockGpsDevice extends GpsDevice {
     
     
     private GpsPosition getPositionFromMockTrack() {
+       // Logger.getLogger().log("MockGpsDevice getPositionFromMockTrack called",Logger.DEBUG);
         GpsPosition gps=null;
         
-        if (mtMark<mt.getPositionCount()){
+        if (mtMark<mt.getPositionCount()-1){
             gps=mt.getPosition(mtMark);
             mtMark++;
         }
@@ -138,16 +145,16 @@ public class MockGpsDevice extends GpsDevice {
                 
                 InputStream is=this.getClass().getResourceAsStream("track_20070928_1410.gpx");
                 if(is!=null){
-                    Logger.getLogger().log("is is not null",Logger.DEBUG);
+                    Logger.debug("is is not null");
                     
                 }
                 if(is==null){
-                    Logger.getLogger().log("is was null, dammit",Logger.DEBUG);
+                    Logger.debug("is was null");
                     
                 }
                 DataInputStream dis = new DataInputStream(is);
                 if(dis!=null){
-                    Logger.getLogger().log("dis is not null",Logger.DEBUG);
+                    Logger.debug("dis is not null");
                 }
                 KXmlParser k = new KXmlParser();
                 try {
@@ -159,15 +166,15 @@ public class MockGpsDevice extends GpsDevice {
                 }
                 track = new Track(dis);
                 if(track!=null){
-                    Logger.getLogger().log("Track is no longer null",Logger.DEBUG);
+                    Logger.debug("Track is no longer null");
                 }
                 if(track==null){
-                    Logger.getLogger().log("Track is still null",Logger.DEBUG);
+                    Logger.debug("Track is still null");
                 }
 
             } catch (FileIOException e) {
                 //Pause track probably does not exist yet
-                Logger.getLogger().log("File was not found",Logger.DEBUG);
+                Logger.debug("File was not found");
                 return getMadeUpPosition();                
             } catch (IOException e) {
 
@@ -179,7 +186,7 @@ public class MockGpsDevice extends GpsDevice {
 
             
         } else {
-            Logger.getLogger().log("Track is loaded, reading value",Logger.DEBUG);
+            Logger.debug("Track is loaded, reading value");
             
             if (posMarker<track.getPositionCount()){
                 result = track.getPosition(posMarker);
@@ -190,8 +197,22 @@ public class MockGpsDevice extends GpsDevice {
             }
         }
 
-        Logger.getLogger().log("Returning "+track,Logger.DEBUG);
+        Logger.debug("Returning "+track);
         return result;
+    }
+
+    
+    public void run() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public String getAddress() {      
+        return address;
+    }
+
+    public String getAlias() {
+        return alias;
     }
 
 

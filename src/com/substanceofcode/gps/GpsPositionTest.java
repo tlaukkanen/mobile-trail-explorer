@@ -1,3 +1,4 @@
+package com.substanceofcode.gps;
 ///*
 // * GpsPositionTest.java
 // *

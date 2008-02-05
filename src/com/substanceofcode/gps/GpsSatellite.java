@@ -20,7 +20,7 @@
  *
  */
 
-package com.substanceofcode.bluetooth;
+package com.substanceofcode.gps;
 
 /**
  *

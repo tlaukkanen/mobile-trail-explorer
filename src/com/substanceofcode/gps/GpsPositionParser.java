@@ -19,7 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package com.substanceofcode.bluetooth;
+package com.substanceofcode.gps;
 
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
@@ -48,7 +48,7 @@ public class GpsPositionParser {
     private final Vector satellites;
     
     /**
-     * A temporary Vector of GpsSatellites which gets coppied over to the variable 'satellites' every
+     * A temporary Vector of GpsSatellites which gets copied over to the variable 'satellites' every
      * time all the GPGSV strings in the sequence has finished.
      * 
      * Only gets initialized once, and then cleared rather than creating a new one to reduce Object creation
@@ -147,25 +147,25 @@ public class GpsPositionParser {
             try{
                 parseGPRMC(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()", Logger.INFO);
+                Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()");
             }
         }else if(record.startsWith("$GPGSA")){
             try{
                 parseGPGSA(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()", Logger.INFO);
+                Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()");
             }
         } else if (record.startsWith("$GPGGA")) {
             try{
                 parseGPGGA(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()", Logger.INFO);
+                Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()");
             }
         } else if (record.startsWith("$GPGSV")) {
             try{
                 parseGPGSV(record);
             }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()", Logger.INFO);
+                Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()");
             }
         } 
         // Don't know the type, ignore and don't bother trying to parse, it'll still be logged in the Metrics, 
@@ -253,7 +253,7 @@ public class GpsPositionParser {
         // Warning (eg. A)
         final String warning = values[2];
 
-        // Lattitude (eg. 6131.2028)
+        // Latitude (eg. 6131.2028)
         final String latitude = values[3];
 
         // Lattitude direction (eg. N)
@@ -285,7 +285,7 @@ public class GpsPositionParser {
                 latitudeDouble = -latitudeDouble;
             }
         }else{
-           logger.log("Error with lat or long", Logger.INFO);
+           Logger.info("Error with lat or long");
             return;
         }
 
@@ -318,7 +318,7 @@ public class GpsPositionParser {
                     latitudeDouble, speed, getLastAltitude());
             this.setGpsPosition(pos);
         } else {
-            logger.log("$GPRMC: Warning NOT A, so no position written: (" + warning + ")", Logger.DEBUG);
+            Logger.debug("$GPRMC: Warning NOT A, so no position written: (" + warning + ")");
         }
     }
 
