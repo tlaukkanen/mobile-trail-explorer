@@ -74,9 +74,8 @@ public final class ImageRmsUtils {
             byte[] data = bout.toByteArray();
             imagesRS.addRecord(data, 0, data.length);
         } catch (RecordStoreFullException e) {          
-            Logger.getLogger().log(
-                    "The Record Store is full, can't save any more tiles" ,
-                    Logger.ERROR);
+            Logger.error(
+                    "The Record Store is full, can't save any more tiles" );
             throw new RecordStoreFullException("Meh");
         }catch(Exception e){
             e.printStackTrace();
@@ -87,9 +86,9 @@ public final class ImageRmsUtils {
                 if (imagesRS != null)
                     imagesRS.closeRecordStore();
             } catch (Exception e) {
-                Logger.getLogger().log(
+                Logger.error(
                         "Exception in finally clause while saving png image "
-                                + e.getMessage(), Logger.ERROR);
+                                + e.getMessage());
             }
         }
     }
@@ -143,9 +142,8 @@ public final class ImageRmsUtils {
         } catch (InvalidRecordIDException ignore) {
             // End of enumeration, ignore
         } catch (Exception e) {
-            Logger.getLogger().log(
-                    "Exception while retrieving Image: " + e.getMessage(),
-                    Logger.ERROR);
+            Logger.error(
+                    "Exception while retrieving Image: " + e.getMessage());
         } finally {
             try {
                 // Close the Record Store
@@ -164,15 +162,14 @@ public final class ImageRmsUtils {
      * @param recordStore
      */
     public static Vector getImageList(String recordStore) {
-        Logger.getLogger().log("Getting Image list store name=[" +recordStore+"]", Logger.DEBUG);
+        Logger.debug("Getting Image list store name=[" +recordStore+"]");
         RecordStore imagesRS = null;
         Vector v = new Vector();
         try {
             imagesRS = RecordStore.openRecordStore(recordStore, true);
             RecordEnumeration re = imagesRS.enumerateRecords(null, null, true);
             if (re != null) {
-                Logger.getLogger().log("ImageRMSUtils: Record Enumeration was not null " ,
-                        Logger.DEBUG);
+                Logger.debug("ImageRMSUtils: Record Enumeration was not null " );
                 int numRecs = re.numRecords();
                 // For each record
                 for (int i = 0; i < numRecs; i++) {
@@ -180,7 +177,7 @@ public final class ImageRmsUtils {
                     int recId = re.nextRecordId(); // throws
                                                     // InvalidRecordIDException
                     // Get the record
-                    Logger.getLogger().log("Got a record", Logger.DEBUG);
+                    Logger.debug("Got a record");
                     byte[] rec = imagesRS.getRecord(recId);
                     ByteArrayInputStream bin = new ByteArrayInputStream(rec);
                     DataInputStream din = new DataInputStream(bin);
@@ -188,17 +185,14 @@ public final class ImageRmsUtils {
                     bin.close();
                 }
             }else{
-                Logger.getLogger().log("ImageRMSUtils Exception Record Enumeration was null " ,
-                    Logger.ERROR);}
+                Logger.error("ImageRMSUtils Exception Record Enumeration was null " );}
             
-            Logger.getLogger().log(
-                    "Retrieved " + v.size() + " images from RMS", Logger.DEBUG);
+            Logger.debug(
+                    "Retrieved " + v.size() + " images from RMS");
         } catch (InvalidRecordIDException ignore) {
-            Logger.getLogger().log("RecordId Exception " + ignore.getMessage(),
-                    Logger.ERROR);
+            Logger.error("RecordId Exception " + ignore.getMessage());
         } catch (Exception e) {
-            Logger.getLogger().log("ImageRMSUtils Exception " + e.getMessage(),
-                    Logger.ERROR);
+            Logger.error("ImageRMSUtils Exception " + e.getMessage());
         } finally {
             try {
                 // Close the Record Store
