@@ -38,10 +38,12 @@ import javax.bluetooth.ServiceRecord;
  */
 public class BluetoothUtility implements DiscoveryListener {
     
+    public static final int SearchTimeoutLimitSecs=15;
     private LocalDevice localDevice; // local Bluetooth Manager
     private DiscoveryAgent discoveryAgent; // discovery agent   
     private boolean searchComplete;
-    
+    private boolean searchTimeoutExceeded;// Prevents runaway search processes
+    private long searchStartTime=0;
     /** Collects the remote devices found during a search. */
     private Vector /* BluetoothDevice */ devices = new Vector();
 
@@ -53,6 +55,19 @@ public class BluetoothUtility implements DiscoveryListener {
     /** Creates a new instance of BluetoothUtility */
     public BluetoothUtility() {
         searchComplete = false;
+        
+    }
+    
+    public boolean searchTimeOutExceeded(){
+        long currentTime=System.currentTimeMillis();
+        
+        if (searchStartTime>0){
+            if ((currentTime-searchStartTime)/1000>=SearchTimeoutLimitSecs){
+                Logger.debug("Search timeout reached");
+                searchTimeoutExceeded=true;
+            }
+        }
+        return searchTimeoutExceeded;
     }
     
     /** Check for search status */
@@ -83,21 +98,22 @@ public class BluetoothUtility implements DiscoveryListener {
      * Find devices
      */
     public void findDevices() {
+        searchTimeoutExceeded=false;
+        searchStartTime=System.currentTimeMillis();
         try {
             //boolean complete = discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
-        	discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
+            discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
             searchComplete = false;
         } catch (BluetoothStateException ex) {
-            Logger.getLogger().log(
-                "Error in BluetoothUtility.findDevices: " + ex.toString(), 
-                Logger.ERROR);
+            Logger.error(
+                "Error in BluetoothUtility.findDevices: " + ex.toString());
             ex.printStackTrace();
         }
     }
 
     public void deviceDiscovered(RemoteDevice remoteDevice, DeviceClass deviceClass) {
 
-        // same device may found several times during single search
+        // same device may be found several times during single search
         if (devices.indexOf(deviceClass) == -1) {
             String address = remoteDevice.getBluetoothAddress();
             String name = null;
@@ -115,10 +131,9 @@ public class BluetoothUtility implements DiscoveryListener {
                     name = address;
                 }
             }
-            Logger.getLogger().log(
-                "Device found: " + name + " (" + address + ")", 
-                Logger.INFO);
-            BluetoothDevice dev = new BluetoothDevice(address, name);
+            Logger.info(
+                "Device found: " + name + " (" + address + ")");
+            BluetoothDevice dev = new BluetoothGPSDeviceImpl(address, name);
             devices.addElement(dev);
         }            
     }
@@ -130,7 +145,7 @@ public class BluetoothUtility implements DiscoveryListener {
     }
 
     public void serviceSearchCompleted(int transID, int respCode) {
-        Logger.getLogger().log("Service search completed.", Logger.INFO);
+        Logger.info("Service search completed.");
     }
 
     public void inquiryCompleted(int i) {
