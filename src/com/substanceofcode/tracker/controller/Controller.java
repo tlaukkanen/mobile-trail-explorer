@@ -43,6 +43,7 @@ import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.gpsdevice.GpsDevice;
 import com.substanceofcode.gpsdevice.GpsDeviceFactory;
+import com.substanceofcode.gpsdevice.GpsUtilities;
 import com.substanceofcode.gpsdevice.Jsr179Device;
 import com.substanceofcode.gpsdevice.MockGpsDevice;
 import com.substanceofcode.tracker.model.AlertHandler;
@@ -298,7 +299,7 @@ public class Controller {
         // So really we only want to do one of these searches, ie use the
         // location api if
         // it is present, search bluetooth devices if it isn't
-        if(useJsr179 && Jsr179Device.checkApiIsPresent())
+        if(useJsr179 && GpsUtilities.checkJsr179IsPresent())
         {
             Logger.debug("Using JSR179 for Location services");
             searchDevicesByJsr();
@@ -322,7 +323,7 @@ public class Controller {
         }
 
 
-            if (Jsr179Device.checkApiIsPresent()) {
+            if (GpsUtilities.checkJsr179IsPresent()) {
                 Device dev = new Jsr179Device("internal",
                         "Internal GPS (Jsr 179)");
                 devices.addElement(dev);
