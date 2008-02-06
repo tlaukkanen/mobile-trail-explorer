@@ -31,7 +31,7 @@
 	
 	<!-- IDE/WTK Setup Spesific Variables -->
 	<!-- You must UN-Comment the 'install.api.root' which is appropriate for you, and recomment the default one bellow -->
-	<property name="install.api.root" value="C:/WTK" />
+	<property name="install.api.root" value="C:/WTK2.5.2" />
 	<!-- <property name="install.api.root" value="C:/WTK25" />	-->
 	<!-- <property name="install.api.root" value="C:/WTK22" />	-->
 	<!-- <property name="install.api.root" value="C:/SonyEricsson/JavaME_SDK_CLDC/PC_Emulation/WTK2" /> -->
@@ -55,7 +55,7 @@
 
 	<!-- Ant extensions -->
 	<!-- This is a non-standard extension! -->
-	<taskdef resource="wtk.properties" classpath="${lib.dir}/Wtk.jar" />
+	<taskdef resource="wtk.properties" classpath="${lib.dir}/wtk.jar" />
 	
 	<!-- List of all the required JSRs for this App. -->
 	<property name="api.cldc" value="${install.api.lib}/cldcapi11.jar" />
@@ -68,7 +68,8 @@
 	<property name="api.siemens" value="${lib.dir}/SiemensAPI.jar" />
 	<property name="api.samsung" value="${lib.dir}/SamsungAPI.jar" />
 	<property name="api.messaging" value="${lib.dir}/wma20.jar" />
-	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-11};${api.nokia};${api.siemens};${api.samsung};${api.messaging}" />
+	<property name="api.jsr179" value="${install.api.lib}/jsr179.jar" />
+	<property name="jsr" value="${api.cldc};${api.midp};${api.bluetooth};${api.fileIO};${api.junit-11};${api.nokia};${api.siemens};${api.samsung};${api.messaging};${api.jsr179}" />
 	
 	
 	<!-- Setup the project build, create required folders, and copy accross required files. -->
