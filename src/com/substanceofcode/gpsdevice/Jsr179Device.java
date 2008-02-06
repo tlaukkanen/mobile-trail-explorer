@@ -134,26 +134,10 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable,
                 Logger.error(logPrefix + "Exception: " + e.getMessage());
                 e.printStackTrace();
             }
-
-
         }
-
-
     }
 
-    /**
-     * Check for the presence of the Location api
-     * 
-     * @return true is the location api exists on this device
-     */
-    public static boolean checkApiIsPresent() {
-        boolean apiIsPresent = false;
-        if (System.getProperty("microedition.location.version") != null) {
-            apiIsPresent = true;
-        }
-        return apiIsPresent;
-    }
-
+    
 
     public String getAddress() {
         return "internal";
