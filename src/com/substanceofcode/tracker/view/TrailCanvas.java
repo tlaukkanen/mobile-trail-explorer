@@ -47,6 +47,7 @@ import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.MathUtil;
+import com.substanceofcode.util.ProjectionUtil;
 import com.substanceofcode.util.StringUtil;
 
 // import com.nokia.mid.ui.DeviceControl;
@@ -61,6 +62,7 @@ import com.substanceofcode.util.StringUtil;
 public class TrailCanvas extends BaseCanvas {
 
     private GpsPosition lastPosition;
+    private CanvasPoint lastCanvasPoint;
     private GpsGPGSA gpgsa = null;
 
     private int counter;
@@ -72,19 +74,17 @@ public class TrailCanvas extends BaseCanvas {
     private int movementSize;
     private int verticalMovement;
     private int horizontalMovement;
-    private int verticalZoomFactor;
 
-    private int horizontalZoomFactor;
     private Hashtable zoomScaleBarDefinition;
-    private final int MAX_ZOOM = 1048576;
-    private final int MIN_ZOOM = 16;
+    private final int MAX_ZOOM = 20;
+    private final int MIN_ZOOM = 1;
 
     private Image redDotImage;
     private Image compass;
     private Sprite compassArrows;
     private boolean largeDisplay;
     
-    private int zoom=9; //Used by the map display for the default zoom level
+    private int zoom = 11; // Used by both the map and trail
 
     // Variables needed by the map generator
     private Image mapTiles[] = new Image[9];
@@ -93,10 +93,13 @@ public class TrailCanvas extends BaseCanvas {
 
     private TileDownloader tileDownloader = null;
 
-    /** Creates a new instance of TrailCanvas */
+    /** 
+     * Creates a new instance of TrailCanvas
+     * @param initialPosition 
+     */
     public TrailCanvas(GpsPosition initialPosition) {
         super();
-        this.lastPosition = initialPosition;
+        this.setLastPosition(initialPosition);
 
         counter = 0;
 
@@ -105,8 +108,6 @@ public class TrailCanvas extends BaseCanvas {
         movementSize = this.getWidth() / 8;
         verticalMovement = 0;
         horizontalMovement = 0;
-        verticalZoomFactor = 4096;
-        horizontalZoomFactor = 2048;
 
         /*
          * Pre-defined settings for the scale bar in each zoom level The key of
@@ -193,6 +194,7 @@ public class TrailCanvas extends BaseCanvas {
         final GpsPosition temp = controller.getPosition();
         if (temp != null) {
             this.lastPosition = controller.getPosition();
+            this.setLastPosition(lastPosition);
         }        
 
         /** Fill background with white */
@@ -213,34 +215,8 @@ public class TrailCanvas extends BaseCanvas {
             ex.printStackTrace();
         }
         /** Draw status bar */
-        // Draw to an image, then we can display it with an alpha channel
-       /* if (controller.getNumAlphaLevels() > 2) {
-            try {
-                Image image = Image.createImage(getWidth(), getHeight());
-                Graphics gi = image.getGraphics();
-                drawStatusBar(gi);
-                int[] rgbData = new int[3];
-                if(image!=null){
-                    System.out.println("image was not null");
-                image.getRGB(rgbData, 0, getWidth(), 0, 0, getWidth(),
-                        getHeight());
-                }else{System.out.println("image was null");
-                
-                }
-                // int col = rgbData[1]&0x00FFFFFF;
-                // int alpha =128<<24; // 50% transparent
-                // col+=alpha;
-                // rgbData[1]=col;
-                // g.drawRGB(rgbData,0,getWidth(),0,0,getWidth(),getHeight(),true);
-
-
-                // g.drawImage(image, 0, 0, Graphics.TOP| Graphics.LEFT);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else { */
-            drawStatusBar(g);
-        //}
+        drawStatusBar(g);
+        
         /** Draw waypoints */
         drawWaypoints(g);
 
@@ -253,16 +229,11 @@ public class TrailCanvas extends BaseCanvas {
 
         /** Draw current trail */
         Track currentTrail = controller.getTrack();
-
-       
-
         drawTrail(g, currentTrail, 0xDD0000, settings.getDrawWholeTrail());
 
         /** Draw current location with red dot */
-
         g.drawImage(redDotImage, midWidth + horizontalMovement, midHeight
                 + verticalMovement, Graphics.VCENTER | Graphics.HCENTER);
-
 
         /** Draw compass */
         drawCompass(g);
@@ -274,6 +245,7 @@ public class TrailCanvas extends BaseCanvas {
 
     public void setLastPosition(GpsPosition position) {
         this.lastPosition = position;
+        setLastPosition(position.latitude, position.longitude, zoom);
     }
 
     /**
@@ -421,10 +393,35 @@ public class TrailCanvas extends BaseCanvas {
             }
         }
     }
+    
+    /** Set last position */
+    private void setLastPosition(double lat, double lon, int zoom) {
+        lastCanvasPoint = ProjectionUtil.toCanvasPoint(lat, lon, zoom);
+    }
 
     /** Convert position to canvas point */
     private CanvasPoint convertPosition(double lat, double lon) {
 
+        CanvasPoint merc = ProjectionUtil.toCanvasPoint(lat, lon, zoom);
+                
+        int relativeX = (merc.X - lastCanvasPoint.X) + midWidth + horizontalMovement;
+        int relativeY = (merc.Y - lastCanvasPoint.Y) + midHeight + verticalMovement;
+        
+        // midWidth + horizontalMovement
+        // midHeight + verticalMovement
+        
+        //final int TILE_SIZE = 256;
+        //double scale = (1 << zoom);
+                
+        System.out.println("diffx: " + (int)relativeX);
+        System.out.println("lastpoint: " + (int)(lastCanvasPoint.X));
+        
+        CanvasPoint relativePoint = new CanvasPoint(
+                (int)(relativeX), 
+                (int)(relativeY));
+        return relativePoint;
+        
+        /*
         double latitude = lat;
         double longitude = lon;
 
@@ -445,18 +442,21 @@ public class TrailCanvas extends BaseCanvas {
 
         CanvasPoint point = new CanvasPoint(x, y);
         return point;
+         */ 
     }
 
-    /** Draw ghost trail */
-    private void drawTrail(Graphics g, Track trail, int color,
-            boolean drawWholeTrail) {
+    /** Draw trail with a given color */
+    private void drawTrail(
+            Graphics g, 
+            Track trail, 
+            int color,
+            boolean drawWholeTrail ) {
         try {
             if (trail == null) {
                 return;
             }
 
             g.setColor(color);
-
 
             // TODO: implement the drawing based solely on numPositions.
             final int numPositionsToDraw = controller.getSettings()
@@ -495,6 +495,10 @@ public class TrailCanvas extends BaseCanvas {
                         double lat = pos.latitude;
                         double lon = pos.longitude;
                         CanvasPoint point1 = convertPosition(lat, lon);
+                        // debugging...
+                        if(index == numPositions - 2) {
+                            System.out.println("coord: " + point1.X + "," + point1.Y);
+                        }
                         CanvasPoint point2 = convertPosition(lastLatitude,
                                 lastLongitude);
 
@@ -540,7 +544,7 @@ public class TrailCanvas extends BaseCanvas {
     /** Draw zoom scale bar */
     private void drawZoomScaleBar(Graphics g) {
         /* Get pre-defined settings for current horizontal zoom factor */
-        String index = Integer.toString(horizontalZoomFactor);
+        String index = "64"; //Integer.toString(horizontalZoomFactor);
         double scale[] = (double[]) zoomScaleBarDefinition.get(index);
         if (scale == null || lastPosition == null) {
             /*
@@ -907,37 +911,16 @@ public class TrailCanvas extends BaseCanvas {
         /** Handle zooming keys */
         switch (keyCode) {
             case (KEY_NUM1):
-                if (horizontalZoomFactor < MAX_ZOOM) {
+                if (zoom < MAX_ZOOM) {
                     // Zoom in
-                    verticalZoomFactor *= 2;
-                    horizontalZoomFactor *= 2;
+                    zoom++;
                 }
                 break;
 
             case (KEY_NUM3):
-                if (horizontalZoomFactor > MIN_ZOOM) {
+                if (zoom > MIN_ZOOM) {
                     // Zoom out
-                    verticalZoomFactor /= 2;
-                    horizontalZoomFactor /= 2;
-                }
-
-                break;
-                //scaling between trail and map is screwed. 
-                //Separate the relative zoom levels to try to figure
-                //out the best combination
-            case (KEY_NUM7):
-
-                if (zoom > 0) {
-                    // Zoom map out
-                   zoom--; 
-                }
-
-                break;
-
-            case (KEY_NUM9):
-                //Zoom map in
-                if (zoom < 17) {
-                    zoom++;
+                    zoom--;
                 }
 
                 break;
