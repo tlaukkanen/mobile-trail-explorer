@@ -244,8 +244,10 @@ public class TrailCanvas extends BaseCanvas {
 
 
     public void setLastPosition(GpsPosition position) {
-        this.lastPosition = position;
-        setLastPosition(position.latitude, position.longitude, zoom);
+        if(position!=null) {
+            this.lastPosition = position;
+            setLastPosition(position.latitude, position.longitude, zoom);
+        }
     }
 
     /**
