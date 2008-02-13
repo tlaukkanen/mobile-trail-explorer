@@ -17,6 +17,17 @@ public class GpsGPGSA {
 	private float vdop;
 
 	private int fixtype;
+	
+	public GpsGPGSA(float pdop, float hdop, float vdop, int fixtype){
+	    this.pdop=pdop;
+	    this.hdop=hdop;
+	    this.vdop=vdop;
+	    this.fixtype=fixtype;	    
+	}
+	
+	public GpsGPGSA(){
+	    
+	}
 
 	public String getFixtype() {
 		String type = "N/A";
