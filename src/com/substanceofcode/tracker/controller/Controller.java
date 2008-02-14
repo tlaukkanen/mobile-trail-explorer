@@ -59,7 +59,6 @@ import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.DisplaySettingsForm;
 import com.substanceofcode.tracker.view.ElevationCanvas;
 import com.substanceofcode.tracker.view.ExportSettingsForm;
-import com.substanceofcode.tracker.view.ExportSettingsList;
 import com.substanceofcode.tracker.view.InformationCanvas;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.tracker.view.RecordingSettingsForm;
@@ -76,6 +75,7 @@ import com.substanceofcode.tracker.view.TrailsList;
 import com.substanceofcode.tracker.view.WaypointCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
 import com.substanceofcode.tracker.view.WaypointList;
+import com.substanceofcode.tracker.view.ExportSettingsList2;
 
 /**
  * Controller contains methods for the application flow.
@@ -147,7 +147,7 @@ public class Controller {
     private SettingsList settingsList;
     private RecordingSettingsForm recordingSettingsForm;
     private ExportSettingsForm exportSettingsForm;
-    private ExportSettingsList exportSettingsList;
+    private ExportSettingsList2 exportSettingsList2;
     private DisplaySettingsForm displaySettingsForm;
     private WaypointForm waypointForm;
     private WaypointList waypointList;
@@ -294,7 +294,7 @@ public class Controller {
     }
 
     public void searchDevices() {
-                // Jsr179 will find external bluetooth devices if a suitable internal
+        // Jsr179 will find external bluetooth devices if a suitable internal
         // one can't be found
         // So really we only want to do one of these searches, ie use the
         // location api if
@@ -373,8 +373,7 @@ public class Controller {
         if (dest == null) {
             dest = new Vector();
             Logger.debug("dest was null, creating.");
-        }
-      
+        }      
      
         int endIdx = dest.size() - 1;      
         endIdx=(endIdx<0)?0:endIdx;
@@ -728,7 +727,7 @@ public class Controller {
 
     /** Show export settings */
     public void showExportSettings() {
-        display.setCurrent(getExportSettingsList());
+        display.setCurrent(getExportSettingsList2());
     }
 
     /** Show export settings form */
@@ -738,13 +737,12 @@ public class Controller {
         }
         return exportSettingsForm;
     }
+   
+    /** Show export settings list2 */
+    private ExportSettingsList2 getExportSettingsList2() {
+        exportSettingsList2 = new ExportSettingsList2(this, settings.getExportFolder());
 
-    /** Show export settings list */
-    private ExportSettingsList getExportSettingsList() {
-        if (exportSettingsList == null) {
-            exportSettingsList = new ExportSettingsList(this);
-        }
-        return exportSettingsList;
+        return exportSettingsList2;
     }
 
     /** Set about screens as current display */
