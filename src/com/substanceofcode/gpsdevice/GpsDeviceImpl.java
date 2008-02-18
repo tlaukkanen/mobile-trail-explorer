@@ -21,19 +21,11 @@
 
 package com.substanceofcode.gpsdevice;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Vector;
 
-import javax.microedition.io.Connector;
-import javax.microedition.io.StreamConnection;
-
-import com.substanceofcode.bluetooth.BluetoothGPSDeviceImpl;
 import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.gps.GpsPositionParser;
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.view.Logger;
 
 /**
  * Represents the superclass for Gps Devices
