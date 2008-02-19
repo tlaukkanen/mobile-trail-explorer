@@ -42,10 +42,13 @@ public class ImportTrailScreen extends Form implements CommandListener {
 
     private final Command okCommand;
     private final Command cancelCommand;
+    private final Command browseCommand;
 
     private Displayable previousScreen;
 
     private TextField importFileField;
+    
+    private ExportSettingsList2 exportSettingsList2;
 
     /** Creates a new instance of ExportSettingsForm */
     public ImportTrailScreen(Displayable previousScreen) {
@@ -55,9 +58,10 @@ public class ImportTrailScreen extends Form implements CommandListener {
 
         // Initialize commands
         this.addCommand(okCommand = new Command("OK", Command.SCREEN, 1));
-        this
-                .addCommand(cancelCommand = new Command("Cancel",
-                        Command.SCREEN, 2));
+        this.addCommand(cancelCommand = new Command("Cancel",
+                Command.SCREEN, 2));
+        this.addCommand(browseCommand = new Command("Browse",
+                Command.SCREEN, 3));
         this.setCommandListener(this);
 
         this.refreshForm();
@@ -162,13 +166,38 @@ public class ImportTrailScreen extends Form implements CommandListener {
         if (command == cancelCommand) {
             this.goBack();
         }
+        
+        if (command == browseCommand) {
+            String importFile = importFileField.getString();
+            if (importFile == null) {
+                importFile = "E:/";
+            }
+            
+            // remove the filename from the path
+            if (!importFile.endsWith("/")); {
+                while (!importFile.endsWith("/")) {
+                    importFile = importFile.substring(0, importFile.length() -1);
+                }
+                
+            }
+            
+            //TODO: check file before
+            exportSettingsList2 = new ExportSettingsList2(this.controller, importFile, true);
+            
+            controller.setCurrentScreen(exportSettingsList2);
+            
+            this.refreshForm();
+        }
     }
 
     private void goBack() {
+        /*
         if (previousScreen instanceof TrailsList) {
             ((TrailsList) previousScreen).refresh();
         }
         controller.setCurrentScreen(previousScreen);
         this.refreshForm();
+        */
+        controller.showTrailsList();
     }
 }

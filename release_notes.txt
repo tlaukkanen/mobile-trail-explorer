@@ -1,6 +1,6 @@
 Mobile Trail Explorer
 
-Copyright (c) 2006-2007 Tommi Laukkanen
+Copyright (c) 2006-2008 Tommi Laukkanen
 http://www.substanceofcode.com
 
 Contributors:
@@ -9,13 +9,15 @@ Barry Redmond
 Dave Walsh
 Anthony McCormack
 Gareth Jones
+Patrick Steiner
 
 Release Notes:
 
-v1.9 (xxx xth 2008)
+v1.9 (March xth 2008)
 + Changed the Export Settings page to use a generated list of options 
 + Changed the trail projection to mercator, same as for maps (Issue 68)
 + Both trail and map are now zoomed with same keys (1 and 2)
++ File browser is used for importing trails and selecting export path (Issue 77)
 
 v1.8 (December 3rd 2007)
 + Trail duration is displayed and exported to KML

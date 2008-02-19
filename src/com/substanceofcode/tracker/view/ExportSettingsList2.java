@@ -50,16 +50,19 @@ import com.substanceofcode.tracker.controller.Controller;
 public class ExportSettingsList2 extends List implements CommandListener {
 
     private Controller controller;
-    
+
     private Command selectCommand;
     private Command cancelCommand;
     
     private String path;
+    private String selectDir = "<select this directory>";
+    private boolean showFiles;
     
-    public ExportSettingsList2(Controller controller, String path) {
+    public ExportSettingsList2(Controller controller, String path, boolean showFiles) {
         super("Exporting", List.IMPLICIT);
         this.controller = controller;
         this.path = path;
+        this.showFiles = showFiles;
         
         selectCommand = new Command("Select", Command.ITEM, 1);
         cancelCommand = new Command("Cancel", Command.CANCEL, 2);
@@ -84,17 +87,25 @@ public class ExportSettingsList2 extends List implements CommandListener {
         } else {
             try {
                 final FileConnection connection = (FileConnection) Connector.open("file:///" + path);
-                if(!connection.isDirectory()) {
-                    path = null;
-                    this.updateContent();
+                
+                if (showFiles == false) {
+                    if (!connection.isDirectory()) {
+                        path = null;
+                        this.updateContent();
+                    }
+                    this.append(selectDir, null);
                 }
-                this.append("<select this directory>", null);
+                
 		this.append("..", null);
                 final Enumeration list = connection.list();
                 while (list.hasMoreElements()) {
                     final String element = (String) list.nextElement();
-                    if(element.endsWith("/")) {
+                    if (showFiles == true) {
                         this.append(element, null);
+                    } else {
+                        if(element.endsWith("/")) {
+                            this.append(element, null);
+                        }
                     }
                 }
             } catch(final IOException e) {
@@ -105,15 +116,24 @@ public class ExportSettingsList2 extends List implements CommandListener {
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
         if(command == selectCommand) {
-            if(path != null && getSelectedIndex() == 0) {
+            final String selected = getString(getSelectedIndex());
+            
+            if(path != null && getSelectedIndex() == 0 && showFiles == false) {
                 // <SELECT> selected store stettings
-                Logger.debug("Export: " + path);
+                Logger.debug("Export to: " + path);
                 RecorderSettings settings = controller.getSettings();
                 settings.setExportFolder(path);
                 this.deleteAll();
                 controller.showSettings();
+            } else if (path != null && !selected.equals("..") && showFiles == true && !selected.endsWith("/")) {
+                // store file 
+                String storefile = path + selected;
+                Logger.debug("Import File: " + storefile);
+                RecorderSettings settings = controller.getSettings();
+                settings.setImportFile(storefile);
+                this.deleteAll();
+                controller.showImportTrailsScreen(this);
             } else {
-                final String selected = getString(getSelectedIndex());
                 if(selected.equals("..")) {
                     final int slashIndex = path.lastIndexOf('/', path.length() - 2);
                         if(slashIndex == -1) {
@@ -138,7 +158,12 @@ public class ExportSettingsList2 extends List implements CommandListener {
             }
         } else if(command == cancelCommand) {
             this.deleteAll();
-            controller.showSettings();
+            if (showFiles == true) {
+                controller.showImportTrailsScreen(this);
+            } else {
+                controller.showSettings();
+            }
+            
         }
     }
 }

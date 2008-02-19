@@ -76,6 +76,7 @@ import com.substanceofcode.tracker.view.WaypointCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
 import com.substanceofcode.tracker.view.WaypointList;
 import com.substanceofcode.tracker.view.ExportSettingsList2;
+import com.substanceofcode.tracker.view.ImportTrailScreen;
 
 /**
  * Controller contains methods for the application flow.
@@ -155,6 +156,7 @@ public class Controller {
     private DevelopmentMenu developmentMenu;
     private TrailActionsForm trailActionsForm;
     private SmsScreen smsScreen;
+    private ImportTrailScreen importTrailScreen;
 
     /**
      * Display which we are drawing to
@@ -740,9 +742,15 @@ public class Controller {
    
     /** Show export settings list2 */
     private ExportSettingsList2 getExportSettingsList2() {
-        exportSettingsList2 = new ExportSettingsList2(this, settings.getExportFolder());
+        exportSettingsList2 = new ExportSettingsList2(this, settings.getExportFolder(), false);
 
         return exportSettingsList2;
+    }
+    public void showImportTrailsScreen(Displayable displayable) {
+         if(importTrailScreen == null){
+             importTrailScreen = new ImportTrailScreen(displayable);
+         }
+         controller.setCurrentScreen(importTrailScreen);
     }
 
     /** Set about screens as current display */
