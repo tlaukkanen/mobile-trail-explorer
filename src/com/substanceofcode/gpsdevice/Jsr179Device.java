@@ -3,7 +3,6 @@ package com.substanceofcode.gpsdevice;
 import java.util.Date;
 import java.util.Vector;
 
-import javax.microedition.location.AddressInfo;
 import javax.microedition.location.Criteria;
 import javax.microedition.location.Location;
 import javax.microedition.location.LocationException;
@@ -23,19 +22,79 @@ import com.substanceofcode.util.StringUtil;
  * @author gareth
  * 
  */
-public class Jsr179Device extends GpsDeviceImpl implements Runnable,
-        LocationListener {
-
+public class Jsr179Device extends GpsDeviceImpl implements Runnable {
+    
     private static final String JSR179MIMETYPE="application/X-jsr179-location-nmea";
     private final String logPrefix = "Jsr179: ";
     private Thread thread;
-    private LocationProvider locationProvider;
+    //private LocationProvider locationProvider;
     // GPS position variables
     private  boolean usingExternalGPS=false; 
     private String extraInfo = "";
     private GpsGPGSA gpgsa=null;
     GpsPosition gp=null;
     protected GpsPositionParser parser;
+    
+    private LocationProvider locationProvider;
+    
+    private final LocationListener locationListener = new LocationListener() {
+        public void locationUpdated(LocationProvider provider, Location location) {
+            System.out.println("Location updated!");
+            if (location.isValid()) {
+                extraInfo = location.getExtraInfo(JSR179MIMETYPE);
+                
+                //Guessing that if there is no nmea data present, the Location API is giving us an internal
+                //GPS or a network
+                if(extraInfo!=null){
+                   usingExternalGPS=true;
+                   Logger.debug("usingExternalGps is "+usingExternalGPS);
+                }
+                
+                float course=location.getCourse();
+                float speed=location.getSpeed();
+                
+                QualifiedCoordinates qc=location.getQualifiedCoordinates();
+                float altitude=qc.getAltitude();
+                float hdop=qc.getHorizontalAccuracy();
+                double lat=  qc.getLatitude();
+                double lon=  qc.getLongitude();
+                float vdop= qc.getVerticalAccuracy();
+                
+                
+                System.out.println("alt:"+altitude);
+                System.out.println("hdop:"+hdop);
+                System.out.println("lat:"+lat);
+                System.out.println("lon:"+lon);
+                System.out.println("vdop:"+vdop);
+                
+                //These might be useful later...
+               // boolean isValid=location.isValid();               
+               // AddressInfo addressInfo=location.getAddressInfo();
+                //int locationMethod=location.getLocationMethod();
+                
+                long timestamp=location.getTimestamp();                
+                gp=new GpsPosition("",(short)course,lon,lat,speed,(double)altitude,new Date(timestamp));
+                gpgsa=new GpsGPGSA(0.0f,hdop,vdop,0);
+            }
+        }
+        
+        public void providerStateChanged(final javax.microedition.location.LocationProvider provider, final int newState) {
+            String state="";
+            switch (newState) {
+                case javax.microedition.location.LocationProvider.AVAILABLE:
+                    state="Available";
+                    break;
+                case javax.microedition.location.LocationProvider.OUT_OF_SERVICE:
+                    state="Unavailable";
+                    break;
+                case javax.microedition.location.LocationProvider.TEMPORARILY_UNAVAILABLE:
+                    state="Temporarily Unavailable";
+                    break;
+                
+            }
+            Logger.debug(logPrefix + "State Changed: [" + state + "]");
+        }
+    };
 
     public Jsr179Device() {
         
@@ -53,11 +112,13 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable,
 
         try {
             if (locationProvider == null) {
+                
                 locationProvider = LocationProvider.getInstance(new Criteria());
+
             }
             Logger.debug(logPrefix + "LocationProvider state: "
                     + locationProvider.getState());
-            locationProvider.setLocationListener(this, -1, -1, -1);
+            locationProvider.setLocationListener(locationListener, -1, -1, -1);
         } catch (LocationException e) {
             Logger.fatal(logPrefix + "Device failed to initialise:"
                     + e.getMessage());
@@ -212,67 +273,4 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable,
         return parser.getSatellites();
     }
 
-    /**
-     * Called by the Location framework when the position is updated
-     * 
-     */
-    public void locationUpdated(LocationProvider provider, Location location) {
-        
-        extraInfo = location.getExtraInfo(JSR179MIMETYPE);
-        
-        //Guessing that if there is no nmea data present, the Location API is giving us an internal
-        //GPS or a network
-        if(extraInfo!=null){
-           usingExternalGPS=true;
-           Logger.debug("usingExternalGps is "+usingExternalGPS);
-        }
-        
-        float course=location.getCourse();
-        float speed=location.getSpeed();
-        
-        QualifiedCoordinates qc=location.getQualifiedCoordinates();
-        float altitude=qc.getAltitude();
-        float hdop=qc.getHorizontalAccuracy();
-        double lat=  qc.getLatitude();
-        double lon=  qc.getLongitude();
-        float vdop= qc.getVerticalAccuracy();
-        
-        
-        System.out.println(altitude);
-        System.out.println(hdop);
-        System.out.println(lat);
-        System.out.println(lon);
-        System.out.println(vdop);
-        
-        //These might be useful later...
-       // boolean isValid=location.isValid();               
-       // AddressInfo addressInfo=location.getAddressInfo();
-        //int locationMethod=location.getLocationMethod();
-        
-        long timestamp=location.getTimestamp();
-        
-        gp=new GpsPosition("",(short)course,lon,lat,speed,(double)altitude,new Date(timestamp));
-        gpgsa=new GpsGPGSA(0.0f,hdop,vdop,0);
-        
-         
-    }
-    /**
-     * Called by the Location framework when the status of the provider has changed
-     */
-    public void providerStateChanged(LocationProvider lp, int arg1) {
-        String state="";
-        switch (arg1){
-            case 1:
-                state="Available";
-                break;
-            case 2:
-                state="Temporarily Unavailable";
-                break;
-            case 3:
-                state="UnAvailable";
-                break;
-        }
-        
-        Logger.debug(logPrefix + "State Changed: [" + state + "]");
-    }
 }
