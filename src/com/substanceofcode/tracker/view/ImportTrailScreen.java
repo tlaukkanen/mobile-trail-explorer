@@ -48,7 +48,7 @@ public class ImportTrailScreen extends Form implements CommandListener {
 
     private TextField importFileField;
     
-    private ExportSettingsList2 exportSettingsList2;
+    private FileChooser filechooser;
 
     /** Creates a new instance of ExportSettingsForm */
     public ImportTrailScreen(Displayable previousScreen) {
@@ -182,9 +182,9 @@ public class ImportTrailScreen extends Form implements CommandListener {
             }
             
             //TODO: check file before
-            exportSettingsList2 = new ExportSettingsList2(this.controller, importFile, true);
+            filechooser = new FileChooser(this.controller, importFile, true);
             
-            controller.setCurrentScreen(exportSettingsList2);
+            controller.setCurrentScreen(filechooser);
             
             this.refreshForm();
         }

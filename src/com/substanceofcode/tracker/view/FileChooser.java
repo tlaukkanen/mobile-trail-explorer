@@ -1,5 +1,5 @@
 /*
- * ExportSettingsList2.java
+ * FileChooser.java
  *
  * Copyright (C) 2005-2006 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -37,7 +37,7 @@ import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.controller.Controller;
 
 /**
- * ExportSettings incl. Filebrowser (thanks to bbtrack.org) :-)
+ * Filechooser (thanks to bbtrack.org) :-)
  *
  * @author Steiner Patrick
  */
@@ -47,7 +47,7 @@ import com.substanceofcode.tracker.controller.Controller;
  * - include testfolder function
  * @author steinerp
  */
-public class ExportSettingsList2 extends List implements CommandListener {
+public class FileChooser extends List implements CommandListener {
 
     private Controller controller;
 
@@ -58,7 +58,7 @@ public class ExportSettingsList2 extends List implements CommandListener {
     private String selectDir = "<select this directory>";
     private boolean showFiles;
     
-    public ExportSettingsList2(Controller controller, String path, boolean showFiles) {
+    public FileChooser(Controller controller, String path, boolean showFiles) {
         super("Exporting", List.IMPLICIT);
         this.controller = controller;
         this.path = path;

@@ -75,7 +75,7 @@ import com.substanceofcode.tracker.view.TrailsList;
 import com.substanceofcode.tracker.view.WaypointCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
 import com.substanceofcode.tracker.view.WaypointList;
-import com.substanceofcode.tracker.view.ExportSettingsList2;
+import com.substanceofcode.tracker.view.FileChooser;
 import com.substanceofcode.tracker.view.ImportTrailScreen;
 
 /**
@@ -148,7 +148,7 @@ public class Controller {
     private SettingsList settingsList;
     private RecordingSettingsForm recordingSettingsForm;
     private ExportSettingsForm exportSettingsForm;
-    private ExportSettingsList2 exportSettingsList2;
+    private FileChooser filechooser;
     private DisplaySettingsForm displaySettingsForm;
     private WaypointForm waypointForm;
     private WaypointList waypointList;
@@ -729,7 +729,7 @@ public class Controller {
 
     /** Show export settings */
     public void showExportSettings() {
-        display.setCurrent(getExportSettingsList2());
+        display.setCurrent(getFileChooser());
     }
 
     /** Show export settings form */
@@ -740,11 +740,11 @@ public class Controller {
         return exportSettingsForm;
     }
    
-    /** Show export settings list2 */
-    private ExportSettingsList2 getExportSettingsList2() {
-        exportSettingsList2 = new ExportSettingsList2(this, settings.getExportFolder(), false);
+    /** Show export the file chooser */
+    private FileChooser getFileChooser() {
+        filechooser = new FileChooser(this, settings.getExportFolder(), false);
 
-        return exportSettingsList2;
+        return filechooser;
     }
     public void showImportTrailsScreen(Displayable displayable) {
          if(importTrailScreen == null){
