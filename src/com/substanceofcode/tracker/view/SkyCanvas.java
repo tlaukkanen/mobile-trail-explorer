@@ -27,7 +27,6 @@ import com.substanceofcode.gps.GpsSatellite;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
@@ -99,8 +98,8 @@ public class SkyCanvas extends BaseCanvas{
         g.setFont(titleFont);
         g.drawString("N",horizonX+horizonDiameter/2,horizonY+1,Graphics.TOP|Graphics.HCENTER);
         g.drawString("S",horizonX+horizonDiameter/2,horizonY+horizonDiameter,Graphics.BOTTOM|Graphics.HCENTER);
-        g.drawString("E",horizonX+1,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.LEFT);
-        g.drawString("W",horizonX+horizonDiameter,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.RIGHT);
+        g.drawString("W",horizonX+1,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.LEFT);
+        g.drawString("E",horizonX+horizonDiameter,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.RIGHT);
         
         this.drawSatelliteData(g,horizonX,horizonY,horizonDiameter);
     }
