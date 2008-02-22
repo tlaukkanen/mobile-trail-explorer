@@ -7,7 +7,7 @@ import java.io.IOException;
 public interface Serializable {
 
     /** The MIME type for this class, can/should be used when storing to the file system */
-    public abstract String getMimeType();
+    public String getMimeType();
     
     /**
      * This method should serialize the given file into a sequence of bytes so
@@ -15,7 +15,7 @@ public interface Serializable {
      * 
      * @param dos The OutputStream to write to.
      */
-    public abstract void serialize(DataOutputStream dos) throws IOException;
+    public void serialize(DataOutputStream dos) throws IOException;
 
     /**
      * This method should do the exact opposite of the
@@ -24,6 +24,6 @@ public interface Serializable {
      * 
      * @param dis the InputStream to read the data from.
      */
-    public abstract void unserialize(DataInputStream dis) throws IOException;
+    public void unserialize(DataInputStream dis) throws IOException;
 
 }
