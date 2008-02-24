@@ -38,10 +38,11 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**
- * GpxConverter writes track data in GPX format.
+ * GpxConverter writes track/waypoint data in GPX format.
  * 
  * @author Tommi Laukkanen
  * @author Mario Sansone
+ * @author Patrick Steiner
  */
 public class GpxConverter extends TrackConverter {
 
@@ -64,6 +65,21 @@ public class GpxConverter extends TrackConverter {
             addPosition(pos, gpx);
         }
         addTrailEnd(gpx);
+
+        // Finalize the GPX
+        addFooter(gpx);
+        return gpx.toString();
+    }
+    
+    /** Convert waypoint to GPX format. */
+    public String convert(Waypoint waypoint, Vector waypoints,
+            boolean includeWaypoints, boolean includeMarkers) {
+
+        StringBuffer gpx = new StringBuffer();
+        addHeader(gpx);
+
+        // Create waypoints
+        gpx.append(createWaypoints(waypoints));
 
         // Finalize the GPX
         addFooter(gpx);

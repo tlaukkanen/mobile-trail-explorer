@@ -50,6 +50,11 @@ public abstract class TrackConverter {
 			                           Vector waypoints,
 			                           boolean includeWaypoints, 
 			                           boolean includeMarkers);
+        
+        public abstract String convert(Waypoint waypoint, 
+			                           Vector waypoints,
+			                           boolean includeWaypoints, 
+			                           boolean includeMarkers);
 
 	/**
 	 * Abstract method to allow for differentiated handling of different xml 

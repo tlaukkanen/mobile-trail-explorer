@@ -34,11 +34,12 @@ import java.util.Vector;
 import org.kxml2.io.KXmlParser;
 
 /**
- * Class to convert a Track to KML (google-earth) format.
+ * Class to convert a Track/Waypoint to KML (google-earth) format.
  * 
  * @author Tommi Laukkanen
  * @author Barry Redmond
  * @author Mario Sansone
+ * @author Patrick Steiner
  */
 public class KmlConverter extends TrackConverter {
 
@@ -56,13 +57,56 @@ public class KmlConverter extends TrackConverter {
     public String convert(Track track, Vector waypoints,
             boolean includeWaypoints, boolean includeMarkers) {
         String currentDateStamp = DateTimeUtil.getCurrentDateStamp();
-        String kmlContent = export(currentDateStamp, track, waypoints);
+        String kmlContent = exportTrack(currentDateStamp, track, waypoints);
+        return kmlContent;
+    }
+    
+    /** Convert waypoint to Google Eart format (KML) */
+    public String convert(Waypoint waypoint, Vector waypoints,
+            boolean includeWaypoints, boolean includeMarkers) {
+        String currentDateStamp = DateTimeUtil.getCurrentDateStamp();
+        String kmlContent = exportWaypoint(currentDateStamp, waypoints);
         return kmlContent;
     }
 
     /** Convert to string */
-    public String export(String dateStamp, Track track, Vector waypoints) {
+    public String exportTrack(String dateStamp, Track track, Vector waypoints) {
         StringBuffer trackString = new StringBuffer();
+        
+        addHeader(trackString, dateStamp);
+        
+        Enumeration trackEnum = track.getTrackPointsEnumeration();
+        while (trackEnum.hasMoreElements() == true) {
+            GpsPosition pos = (GpsPosition) trackEnum.nextElement();
+            trackString.append(formatDegrees(pos.longitude)).append(",")
+                    .append(formatDegrees(pos.latitude)).append(",").append(
+                            (int) pos.altitude).append("\r\n");
+        }
+        closeTrack(trackString);
+
+        trackString.append(generateWaypointData(waypoints));
+        trackString.append(generateMarkers(track.getTrackMarkersEnumeration()));
+        trackString.append(generateEndpoints(track));
+
+        addFooter(trackString);
+
+        return trackString.toString();
+    }
+    /** Convert to string */
+    public String exportWaypoint(String dateStamp, Vector waypoints) {
+        StringBuffer waypointString = new StringBuffer();
+        
+        addHeader(waypointString, dateStamp);
+        closeTrack(waypointString);
+        
+        waypointString.append(generateWaypointData(waypoints));
+
+        addFooter(waypointString);
+
+        return waypointString.toString();
+    }
+    
+    public static void addHeader(StringBuffer trackString, String dateStamp) {
         trackString.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
         trackString
                 .append("<kml xmlns=\"http://earth.google.com/kml/2.0\">\r\n");
@@ -85,25 +129,17 @@ public class KmlConverter extends TrackConverter {
         trackString.append("<extrude>0</extrude>\r\n");
         trackString.append("<altitudeMode>clampToGround</altitudeMode>\r\n");
         trackString.append("<coordinates>\r\n");
-        Enumeration trackEnum = track.getTrackPointsEnumeration();
-        while (trackEnum.hasMoreElements() == true) {
-            GpsPosition pos = (GpsPosition) trackEnum.nextElement();
-            trackString.append(formatDegrees(pos.longitude)).append(",")
-                    .append(formatDegrees(pos.latitude)).append(",").append(
-                            (int) pos.altitude).append("\r\n");
-        }
+    }
+    
+    public static void closeTrack(StringBuffer trackString) {
         trackString.append("</coordinates>\r\n");
         trackString.append("</LineString>\r\n");
         trackString.append("</Placemark>\r\n");
-
-        trackString.append(generateWaypointData(waypoints));
-        trackString.append(generateMarkers(track.getTrackMarkersEnumeration()));
-        trackString.append(generateEndpoints(track));
-
+    }
+    
+    public static void addFooter(StringBuffer trackString) {
         trackString.append("</Folder>\r\n");
         trackString.append("</kml>\r\n");
-
-        return trackString.toString();
     }
 
     /** Generate waypoint data */

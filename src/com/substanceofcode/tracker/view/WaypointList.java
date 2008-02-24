@@ -37,6 +37,7 @@ import javax.microedition.lcdui.List;
 /**
  *
  * @author Tommi Laukkanen
+ * @author Patrick Steiner
  */
 public class WaypointList extends List implements CommandListener {
     
@@ -46,6 +47,8 @@ public class WaypointList extends List implements CommandListener {
     private final Command deleteCommand;
     private final Command backCommand;
     private final Command newWaypointCommand;
+    private final Command exportWaypointCommand;
+    private final Command exportAllWaypointsCommand;
     
     private static final String TITLE = "Waypoints";
     
@@ -57,14 +60,16 @@ public class WaypointList extends List implements CommandListener {
         super(TITLE, List.IMPLICIT);        
         this.controller = controller;
         
-        this.addCommand( editCommand = new Command("Edit", Command.OK, 1) );
-        this.addCommand( deleteCommand = new Command("Remove", Command.SCREEN, 2) );
-        this.addCommand( newWaypointCommand = new Command("Add new waypoint", Command.ITEM, 4));
-        this.addCommand( backCommand = new Command("Back", Command.BACK, 10) );
+        this.addCommand(editCommand = new Command("Edit", Command.OK, 1));
+        this.addCommand(deleteCommand = new Command("Remove", Command.SCREEN, 2));
+        this.addCommand(newWaypointCommand = new Command("Add new waypoint", Command.ITEM, 4));
+        this.addCommand(exportWaypointCommand = new Command("Export selected waypoint", Command.ITEM, 5));
+        this.addCommand(exportAllWaypointsCommand = new Command("Export all waypoints", Command.ITEM, 6));
+        this.addCommand(backCommand = new Command("Back", Command.BACK, 10));
 
-        setSelectCommand( editCommand );
+        setSelectCommand(editCommand);
         
-        this.setCommandListener( this );
+        this.setCommandListener(this);
     }
     
     /** Set waypoints */
@@ -79,26 +84,26 @@ public class WaypointList extends List implements CommandListener {
     }
         
     public void commandAction(Command command, Displayable displayable) {
-        if( command == backCommand ) {
+        if(command == backCommand) {
             /** Display the trail canvas */
             controller.showTrail();
         }
         
-        if( command == editCommand ) {
+        if(command == editCommand) {
             /** Display selected waypoint */
             Waypoint wp = getSelectedWaypoint();
-            controller.editWaypoint( wp );
+            controller.editWaypoint(wp);
         }
         
-        if( command == deleteCommand ) {
+        if(command == deleteCommand) {
             /** Delete selected waypoint */
             Waypoint wp = getSelectedWaypoint();
             controller.removeWaypoint(wp);
             int selectedIndex = this.getSelectedIndex();
-            this.delete( selectedIndex );
+            this.delete(selectedIndex);
         }
         
-        if( command == newWaypointCommand ){
+        if(command == newWaypointCommand) {
             String latString = "";
             String lonString = "";
             Logger.debug("WaypointList getPosition called");
@@ -112,6 +117,23 @@ public class WaypointList extends List implements CommandListener {
             }
             
             controller.markWaypoint(latString, lonString);
+        }
+        
+        if(command == exportWaypointCommand) {
+            String selectedWaypointName = this.getString(this.getSelectedIndex());
+            Waypoint selectedWaypoint = getSelectedWaypoint();
+            if(selectedWaypoint != null) {
+                controller.showWaypointActionsForm(selectedWaypoint, selectedWaypointName, false);
+            }
+            
+        }
+        
+        if(command == exportAllWaypointsCommand) {
+            String exportName = "WP_ALL";
+            Waypoint selectedWaypoint = getSelectedWaypoint();
+            if(selectedWaypoint != null) {
+                controller.showWaypointActionsForm(selectedWaypoint, exportName, true);
+            }
         }
     }
     

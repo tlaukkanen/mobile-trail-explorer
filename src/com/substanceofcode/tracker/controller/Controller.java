@@ -75,6 +75,7 @@ import com.substanceofcode.tracker.view.TrailsList;
 import com.substanceofcode.tracker.view.WaypointCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
 import com.substanceofcode.tracker.view.WaypointList;
+import com.substanceofcode.tracker.view.WaypointActionsForm;
 import com.substanceofcode.tracker.view.FileChooser;
 import com.substanceofcode.tracker.view.ImportTrailScreen;
 
@@ -968,6 +969,17 @@ public class Controller {
     /** Remove selected waypoint */
     public void removeWaypoint(Waypoint wp) {
         waypoints.removeElement(wp);
+    }
+    
+    /**
+     * @param Waypoint
+     *                Waypoint object to display
+     * @param WaypointName
+     *                Name of waypoint
+     */
+    public void showWaypointActionsForm(Waypoint waypoint, String waypointName, boolean exportAllWps) {
+        WaypointActionsForm form = new WaypointActionsForm(this, waypoint, waypointName, exportAllWps);
+        display.setCurrent(form);
     }
 
     /** Display recording settings form */
