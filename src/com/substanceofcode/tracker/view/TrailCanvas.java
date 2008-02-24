@@ -731,9 +731,15 @@ public class TrailCanvas extends BaseCanvas {
                     distance = StringUtil.valueOf(distanceInMiles, 2);
                     units = " ml";
                 } else {
-                    /** Altitude in meters */
-                    distance = StringUtil.valueOf(distanceInKilometers, 2);
-                    units = " km";
+                    /** Distance in meters. */
+                    if(distanceInKilometers>5) {
+                        distance = StringUtil.valueOf(distanceInKilometers, 2);
+                        units = " km";
+                    } else {
+                        distance = StringUtil.valueOf(distanceInKilometers * 1000, 0);
+                        units = " m";
+                    }                    
+                    
                 }
                 g.drawString("DST:", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
