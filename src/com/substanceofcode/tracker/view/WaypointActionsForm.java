@@ -64,9 +64,15 @@ public class WaypointActionsForm extends Form implements CommandListener {
         super("Trail Actions");
         this.waypoint = waypoint;
         String name = waypointName;
-        if(name==null||name.length()==0) {
+        if(name == null || name.length() == 0) {
             name = DateTimeUtil.getCurrentDateStamp();
-        }        
+        }
+
+        if(exportAllWaypoints) {
+            String dateStr = DateTimeUtil.getCurrentDateStamp();
+            name = name + "_" + dateStr;
+        }
+
         this.waypointNameField = new TextField("Name", name, 64, TextField.ANY);
         this.exportAllWaypoints = exportAllWaypoints;
         this.initialize(controller);
