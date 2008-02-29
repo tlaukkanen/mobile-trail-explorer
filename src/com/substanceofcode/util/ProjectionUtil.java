@@ -64,6 +64,11 @@ public class ProjectionUtil {
                 (int) (normalised.getX() * scale), 
                 (int) (normalised.getY() * scale));
     }
+    
+    public static double pixelSize(double lat, double lng, int zoom) {
+        double scale = (1 << zoom) * TILE_SIZE;
+        return 40075160 * Math.cos (Math.PI * lat / 180) / scale;
+    }
 }
 
    
