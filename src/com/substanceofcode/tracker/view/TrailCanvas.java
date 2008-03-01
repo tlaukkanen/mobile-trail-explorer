@@ -26,7 +26,6 @@ package com.substanceofcode.tracker.view;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
@@ -75,7 +74,6 @@ public class TrailCanvas extends BaseCanvas {
     private int verticalMovement;
     private int horizontalMovement;
 
-    private Hashtable zoomScaleBarDefinition;
     private final int MAX_ZOOM = 20;
     private final int MIN_ZOOM = 1;
 
@@ -108,55 +106,6 @@ public class TrailCanvas extends BaseCanvas {
         movementSize = this.getWidth() / 8;
         verticalMovement = 0;
         horizontalMovement = 0;
-
-        /*
-         * Pre-defined settings for the scale bar in each zoom level The key of
-         * the Hashtable is the horizontal zoom factor The value is an array of
-         * double values with the following meaning: - Value 1 is the range of
-         * zoom scale in meters - Value 2 tells in how many parts the complete
-         * scale bar should be divided - Value 3 is the factor which is used to
-         * calculate the scale bar length in pixels, e.g. 50000 metres (=50km)
-         * should be shown and scale is 50000/640 pixels long, means ~ 78 Pixels -
-         * Value 4 is the range of zoom scale in meters (only if unit is set to
-         * "miles") - Value 5 tells in how many parts the complete scale bar
-         * should be divided (only if unit is set to "miles")
-         */
-        zoomScaleBarDefinition = new Hashtable();
-
-        zoomScaleBarDefinition.put("16", new double[] { 400000, 4, 5120,
-                482803.2, 3 });
-        zoomScaleBarDefinition.put("32", new double[] { 200000, 4, 2560,
-                241402.6, 3 });
-        zoomScaleBarDefinition.put("64", new double[] { 100000, 5, 1280,
-                128747.52, 4 });
-        zoomScaleBarDefinition.put("128", new double[] { 50000, 5, 640,
-                48280.4, 3 });
-        zoomScaleBarDefinition.put("256", new double[] { 20000, 4, 320,
-                24140.17, 3 });
-        zoomScaleBarDefinition.put("512", new double[] { 10000, 5, 160,
-                16093.45, 4 });
-        zoomScaleBarDefinition.put("1024", new double[] { 8000, 4, 80, 8046.73,
-                5 });
-        zoomScaleBarDefinition.put("2048", new double[] { 4000, 4, 40, 3218.69,
-                4 });
-        zoomScaleBarDefinition.put("4096", new double[] { 2000, 4, 20, 1609.35,
-                4 });
-        zoomScaleBarDefinition.put("8192",
-                new double[] { 1000, 5, 10, 914.4, 5 });
-        zoomScaleBarDefinition.put("16384",
-                new double[] { 500, 5, 5, 457.2, 3 });
-        zoomScaleBarDefinition.put("32768", new double[] { 200, 4, 2.5, 243.84,
-                4 });
-        zoomScaleBarDefinition.put("65536", new double[] { 100, 5, 1.25,
-                121.92, 4 });
-        zoomScaleBarDefinition.put("131072", new double[] { 50, 5, 0.625,
-                60.96, 4 });
-        zoomScaleBarDefinition.put("262144", new double[] { 25, 5, 0.3125,
-                30.48, 5 });
-        zoomScaleBarDefinition.put("524288", new double[] { 10, 5, 0.15625,
-                15.24, 5 });
-        zoomScaleBarDefinition.put("1048576", new double[] { 5, 5, 0.078125,
-                7.62, 5 });
 
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
 
@@ -545,17 +494,20 @@ public class TrailCanvas extends BaseCanvas {
 
     /** Draw zoom scale bar */
     private void drawZoomScaleBar(Graphics g) {
-        /* Get pre-defined settings for current horizontal zoom factor */
-        String index = "64"; //Integer.toString(horizontalZoomFactor);
-        double scale[] = (double[]) zoomScaleBarDefinition.get(index);
-        if (scale == null || lastPosition == null) {
-            /*
-             * If there are no pre-defined settings for this zoom factor or
-             * recording didn't start yet, we don't display the scale bar
-             */
-            return;
+        String text = "", unit = "";
+        double lat, lon;
+        
+        if (lastPosition != null) {
+            lat = lastPosition.latitude;
+            lon = lastPosition.longitude;
+        } else {
+            lat = 0;
+            lon = 0;
         }
-
+        double pixelSize = ProjectionUtil.pixelSize(lat, lon, zoom);
+        double barDist = 1;
+        int scaleLength;
+        int scaleParts;
         RecorderSettings settings = controller.getSettings();
 
 
@@ -566,17 +518,33 @@ public class TrailCanvas extends BaseCanvas {
         final int MARGIN_BOTTOM = 3; // bottom margin of the complete zoom
         // scale bar
 
-
-        int scaleLength;
-        int scaleParts;
-        if (settings.getUnitsAsKilometers()) {
-            scaleLength = (int) (scale[0] / scale[2]);
-            scaleParts = (int) scale[1];
-        } else {
-            scaleLength = (int) (scale[3] / scale[2]);
-            scaleParts = (int) scale[4];
+        scaleLength = getWidth() / 2;
+        pixelSize *= scaleLength;
+           
+        if (!settings.getUnitsAsKilometers()) {
+            if (pixelSize > 1600) {
+                pixelSize /= (1000 * UnitConverter.KILOMETERS_IN_A_MILE);
+                unit = "ml";
+            } else {
+                pixelSize /= UnitConverter.METERS_IN_A_FOOT;
+                unit = "ft";
+            }
         }
-
+        
+        while (barDist < pixelSize)
+            barDist *= 10;
+        barDist /= 10;
+        if ((barDist * 5) < pixelSize) {
+            barDist *= 5;
+            scaleParts = 5;
+        } else {
+            if ((barDist * 2) < pixelSize)
+                barDist *= 2;
+            scaleParts = 4;
+        }
+        
+        scaleLength = (int)(scaleLength * barDist / pixelSize);
+        
         g.setColor(0, 0, 0); // black color
         g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT
                 + scaleLength, getHeight() - MARGIN_BOTTOM);
@@ -597,18 +565,16 @@ public class TrailCanvas extends BaseCanvas {
          * Build text for the right end of the scale bar and get width of this
          * text
          */
-        String text = "", unit = "";
         if (settings.getUnitsAsKilometers()) {
-            text = scale[0] >= 1000 ? Integer.toString((int) (scale[0] / 1000))
-                    : Integer.toString((int) scale[0]);
-            unit = scale[0] >= 1000 ? "km" : "m";
-        } else {
-            text = scale[3] >= 1600 ? Integer.toString((int) (scale[3]
-                    / UnitConverter.KILOMETERS_IN_A_MILE / 1000))
-                    : Integer
-                            .toString((int) (scale[3] / UnitConverter.METERS_IN_A_FOOT));
-            unit = scale[3] >= 1600 ? "ml" : "ft";
+            if (barDist > 1000) {
+                barDist /= 1000;
+                unit = "km";
+            } else {
+                unit = "m";
+            }
         }
+        text = Integer.toString((int) barDist);
+
         int textWidth = g.getFont().stringWidth(text);
 
         g.drawString("0", MARGIN_LEFT - 1, getHeight() - MARGIN_BOTTOM - 2,
@@ -805,6 +771,15 @@ public class TrailCanvas extends BaseCanvas {
                 // | Graphics.LEFT);
                 // displayRow++;
             }
+
+            Vector waypoints = controller.getWaypoints();
+            if (waypoints != null) {
+                g.drawString("WP:", 1, fontHeight * displayRow, Graphics.TOP
+                        | Graphics.LEFT);
+                g.drawString(String.valueOf(waypoints.size()), positionAdd,
+                        fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                displayRow++;
+            }
             
             /** Debugging free mem */
             //long freeMem = Runtime.getRuntime().freeMemory();
@@ -936,6 +911,21 @@ public class TrailCanvas extends BaseCanvas {
             case (KEY_NUM0):
                 // Change screen
                 controller.switchDisplay();
+                break;
+
+            case (KEY_STAR):
+            case (KEY_POUND):
+                Logger.debug("WaypointList getPosition called");
+                GpsPosition lp = controller.getPosition();
+                if(lp!=null) {
+                    int waypointCount = controller.getWaypoints().size();
+                    String name = "WP" + String.valueOf(waypointCount + 1);
+                    Waypoint waypoint = new Waypoint( name, lp.latitude, lp.longitude );
+                    controller.saveWaypoint(waypoint);
+                    
+                    //AlertHandler lListen = new AlertHandler(controller, this);
+                    //lListen.notifySuccess("Waypoint " + name + " created");
+                }
                 break;
 
             default:
