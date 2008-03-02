@@ -39,7 +39,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     
     private final LocationListener locationListener = new LocationListener() {
         public void locationUpdated(LocationProvider provider, Location location) {
-            System.out.println("Location updated!");
+           
             if (location.isValid()) {
                 extraInfo = location.getExtraInfo(JSR179MIMETYPE);
                 
@@ -47,7 +47,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 //GPS or a network
                 if(extraInfo!=null){
                    usingExternalGPS=true;
-                   Logger.debug("usingExternalGps is "+usingExternalGPS);
+                   Logger.debug("using ExternalGps is "+usingExternalGPS);
                 }
                 
                 float course=location.getCourse();
@@ -56,17 +56,14 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 QualifiedCoordinates qc=location.getQualifiedCoordinates();
                 float altitude=qc.getAltitude();
                 float hdop=qc.getHorizontalAccuracy();
-                double lat=  qc.getLatitude();
-                double lon=  qc.getLongitude();
+                
+                //Lat and lon appear to be the wrong way round
+                double lon=  qc.getLatitude();
+                double lat=  qc.getLongitude();
                 float vdop= qc.getVerticalAccuracy();
                 
                 
-                System.out.println("alt:"+altitude);
-                System.out.println("hdop:"+hdop);
-                System.out.println("lat:"+lat);
-                System.out.println("lon:"+lon);
-                System.out.println("vdop:"+vdop);
-                
+        
                 //These might be useful later...
                // boolean isValid=location.isValid();               
                // AddressInfo addressInfo=location.getAddressInfo();
