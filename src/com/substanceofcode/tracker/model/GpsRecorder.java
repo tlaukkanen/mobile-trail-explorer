@@ -29,6 +29,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import javax.microedition.io.Connector;
+import javax.microedition.io.HttpConnection;
 import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
@@ -36,7 +38,6 @@ import javax.microedition.rms.RecordStoreException;
 import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import javax.microedition.lcdui.Displayable;
 
 /**
  * Thread based class which encapsulates recording data from a GPS device.
@@ -71,9 +72,15 @@ public class GpsRecorder implements Runnable {
     private int intervalMarkerStep;
 
     /**
+     * Url to upload recorded points to
+     */
+    private String uploadURL;
+    /**
      * Reference to controller object
      */
     private Controller controller;
+    
+    private HttpConnection uploadConn;
 
     /**
      * Constructor - sets up local variables then launches the instance in a
@@ -84,6 +91,7 @@ public class GpsRecorder implements Runnable {
         RecorderSettings settings = controller.getSettings();
         intervalSeconds = settings.getRecordingInterval();
         intervalMarkerStep = settings.getRecordingMarkerInterval();
+        uploadURL=settings.getUploadURL();
         recorderThread = new Thread(this);
         recorderThread.start();
     }
@@ -187,6 +195,32 @@ public class GpsRecorder implements Runnable {
                         }
                         lastRecordedPosition = currentPosition;
                         recordedCount++;
+                        
+                        //If the uploadURL is set (not "") then try to upload the
+                        //GpsPosition too.
+                        uploadURL=controller.getSettings().getUploadURL();
+                        if(uploadURL!=""){
+                            DataOutputStream dos=null;
+                            try{
+                            uploadConn= (HttpConnection) Connector.open(uploadURL);
+                            uploadConn.setRequestMethod(HttpConnection.POST);
+                            dos= uploadConn.openDataOutputStream();
+                            currentPosition.serialize(dos);
+                            dos.write("\r\n".getBytes());
+                            dos.flush();
+                            
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }finally{
+                                
+                                if(dos!=null)dos.close();
+                                if(uploadConn!=null)uploadConn.close();
+                                
+                            }
+                            
+                        }
+                        
+                        
                     }
                     lastPosition = currentPosition;
                 } else {
