@@ -14,6 +14,8 @@ import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 
+import com.substanceofcode.tracker.view.Logger;
+
 
 
 /**
@@ -64,6 +66,7 @@ public class FileSystem{
 			RecordStore indexRS = RecordStore.openRecordStore(RMS_FILE_INDEX, false);
 			// Records exist already.
 			RecordEnumeration re = indexRS.enumerateRecords(null, null, false);
+			if(re.hasNextElement()){
 			byte[] data = re.nextRecord();
 			DataInputStream dos = new DataInputStream(new ByteArrayInputStream(data));
 			int numberOfFiles = dos.readInt();
@@ -79,15 +82,21 @@ public class FileSystem{
 			}
 			indexRS.closeRecordStore();
 			dos.close();
+		}
 		} catch (RecordStoreNotFoundException e) {
 			// Records DO NOT exist already
 			currentRecordStoreNumber = 1;
 			recordsInCurrentRecordStore = 0;
 			fileTable = new Hashtable();
+			//e.printStackTrace();
 		} catch (RecordStoreException e) {
+		    //either of these exceptions will mean the fileTable
+		    //is not initialized, causing problems later
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}catch(Exception e){
+		    e.printStackTrace();
 		}
 	}
 	
@@ -216,6 +225,7 @@ public class FileSystem{
 	 * @return a Vector of Strings corrosponding to the filenames stored in this FileSystem.
 	 */
 	public Vector /*String*/ listFiles(){
+	    Logger.debug("fileTable is "+fileTable);
 		Enumeration keysEnumeration = fileTable.keys();
 		Vector keysVector = new Vector();
 		while(keysEnumeration.hasMoreElements()){
@@ -248,7 +258,12 @@ public class FileSystem{
         }
 	
 	public boolean containsFile(String filename) {
+	    if(fileTable !=null){
 		return fileTable.containsKey(filename);
+	    }else{
+	        Logger.error("fileTable was null!!");
+	        return false;
+	    }
 	}
         
         /**
@@ -304,6 +319,27 @@ public class FileSystem{
 		} 
 	}
 
+	  /**
+         * Delete all the files of the specified type from the 'filesystem'
+         * @param type the type of files to delete
+         */
+        public void deleteFiles(String type){
+            Vector deleteList=listFiles(type);
+            while(deleteList.size()>0){
+                String fileToDelete= (String)deleteList.firstElement();
+                deleteList.removeElementAt(0);
+                try {
+                    deleteFile(fileToDelete);
+                } catch (FileIOException e) {
+                    Logger.error("Could not delete file "+fileToDelete);
+                    e.printStackTrace();
+                }
+                
+            }
+        }
+      
+        
+	
 	/**
 	 * <p>Formats the filesystem, deleting ALL files, and ALL RecordStores along the way.</p>
 	 * 
