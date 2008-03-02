@@ -22,6 +22,7 @@
 
 package com.substanceofcode.tracker.view;
 
+import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import javax.microedition.lcdui.ChoiceGroup;
@@ -197,7 +198,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         this.append(drawingStyleGroup);
         
         /** Map display options */
-        String[] drawingMaps = {"Don't draw maps","Draw OSM maps","Draw T@H maps"};
+    //    String[] drawingMaps = {"Don't draw maps","Draw OSM maps","Draw T@H maps"};
+        String[] drawingMaps= MapProviderManager.getDisplayStrings();
         drawingMapsGroup = new ChoiceGroup(
                 "Map Display", ChoiceGroup.EXCLUSIVE, drawingMaps, null);
         
