@@ -263,7 +263,7 @@ public class ElevationCanvas extends BaseCanvas {
             // Exit if we don't have anything to draw
             final GpsPosition temp = controller.getPosition();
             if (temp != null) {
-                lastPosition = controller.getPosition();
+                lastPosition = temp;
             }            
             if (lastPosition == null) {
                 return;
