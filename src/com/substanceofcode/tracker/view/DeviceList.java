@@ -30,7 +30,6 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import com.substanceofcode.bluetooth.BluetoothDevice;
 import com.substanceofcode.bluetooth.Device;
 import com.substanceofcode.tracker.controller.Controller;
 
