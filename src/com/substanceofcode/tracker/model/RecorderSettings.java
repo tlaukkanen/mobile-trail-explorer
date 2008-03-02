@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 
+import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.util.Version;
@@ -73,6 +74,7 @@ public class RecorderSettings {
     private static final String RECORDING_MAX_SPEED = "recording-max-speed";
     private static final String RECORDING_MAX_ACCELERATION = "recording-max-acceleration";
     private static final String RECORDING_MIN_DISTANCE = "recording-min-distance";
+    private static final String UPLOAD_URL = "upload-url";
 
     /** Display setting keys */
     public static final String DISPLAY_COORDINATES = "display-coordinates";
@@ -151,6 +153,16 @@ public class RecorderSettings {
 
     public void setMinDistance(int minDistance) {
         settings.setIntProperty(RECORDING_MIN_DISTANCE, minDistance);
+    }
+    
+
+    public String getUploadURL(){
+        return settings.getStringProperty(UPLOAD_URL,"");
+    }
+    
+    
+    public void setUploadURL(String url){
+        settings.setStringProperty(UPLOAD_URL, url);
     }
     
     
@@ -385,6 +397,7 @@ public class RecorderSettings {
     /** Set the drawing style */
     public void setDrawMap(int value) {       
         settings.setIntProperty(DRAW_MAP, value);
+        MapProviderManager.setSelectedMapProvider(value);
         saveSettings();
     }
     
