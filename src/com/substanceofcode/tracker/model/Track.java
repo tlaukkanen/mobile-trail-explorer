@@ -215,9 +215,16 @@ public class Track implements Serializable {
         return (GpsPosition) trackPoints.firstElement();
     }
 
-    /** @return the last position in the track */
-    public GpsPosition getEndPosition() throws NoSuchElementException {
-        return (GpsPosition) trackPoints.lastElement();
+    /** @return the last position in the track, or null if there is no end position */
+    public GpsPosition getEndPosition(){
+        GpsPosition endPosition=null;
+    
+        try{
+            endPosition=(GpsPosition) trackPoints.lastElement();
+        }catch(NoSuchElementException nsee){
+            
+        }
+        return endPosition;
     }
     
     /** @return the position of maximum speed */
