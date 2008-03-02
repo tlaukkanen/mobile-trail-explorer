@@ -21,12 +21,13 @@
 
 package com.substanceofcode.gps;
 
-import com.substanceofcode.util.MathUtil;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Date;
+
+import com.substanceofcode.data.Serializable;
+import com.substanceofcode.util.MathUtil;
 
 /**
  * <p>
@@ -46,7 +47,7 @@ import java.util.Date;
  * @author Tommi
  * @author Barry Redmond
  */
-public final class GpsPosition {
+public final class GpsPosition implements Serializable{
 
     /***************************************************************************
      * 
@@ -55,7 +56,7 @@ public final class GpsPosition {
      * 
      **************************************************************************/
 
-    /** The 'raw' GPS data, as recieved from the GPS Device */
+    /** The 'raw' GPS data, as received from the GPS Device */
     public final String rawData;
 
     /** The longitude at this GpsPosition */
@@ -75,6 +76,8 @@ public final class GpsPosition {
 
     /** A timestamp for this GpsPosition */
     public final Date date;
+    
+    public String MIMETYPE="gpsposition";
 
     public GpsPosition(String rawData, short course, double longitudeDouple,
             double latitudeDouple, double speed, double altitude) {
@@ -329,6 +332,14 @@ public final class GpsPosition {
             dos.writeBoolean(true);
             dos.writeLong(date.getTime());
         }
+    }
+    public String getMimeType() {
+        
+        return MIMETYPE;
+    }
+    public void unserialize(DataInputStream dis) throws IOException {
+        // TODO Auto-generated method stub
+        
     }
 
 }
