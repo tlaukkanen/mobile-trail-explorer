@@ -26,7 +26,6 @@ package com.substanceofcode.tracker.view;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
@@ -49,7 +48,6 @@ import com.substanceofcode.util.MathUtil;
 import com.substanceofcode.util.ProjectionUtil;
 import com.substanceofcode.util.StringUtil;
 
-// import com.nokia.mid.ui.DeviceControl;
 
 /**
  * TrailCanvas is a main view for the application. It contains a current
@@ -212,7 +210,7 @@ public class TrailCanvas extends BaseCanvas {
           
             if (tileDownloader == null) {
                 Logger.debug("Starting TileDownloader Instance:");
-                tileDownloader = new TileDownloader(drawMap);               
+                tileDownloader = new TileDownloader();               
                 tileDownloader.start();
             }
             if (lastPosition != null) {
@@ -364,8 +362,8 @@ public class TrailCanvas extends BaseCanvas {
         //final int TILE_SIZE = 256;
         //double scale = (1 << zoom);
                 
-        System.out.println("diffx: " + (int)relativeX);
-        System.out.println("lastpoint: " + (int)(lastCanvasPoint.X));
+        //System.out.println("diffx: " + (int)relativeX);
+        //System.out.println("lastpoint: " + (int)(lastCanvasPoint.X));
         
         CanvasPoint relativePoint = new CanvasPoint(
                 (int)(relativeX), 
@@ -447,9 +445,9 @@ public class TrailCanvas extends BaseCanvas {
                         double lon = pos.longitude;
                         CanvasPoint point1 = convertPosition(lat, lon);
                         // debugging...
-                        if(index == numPositions - 2) {
-                            System.out.println("coord: " + point1.X + "," + point1.Y);
-                        }
+                      //  if(index == numPositions - 2) {
+                        //    System.out.println("coord: " + point1.X + "," + point1.Y);
+                       // }
                         CanvasPoint point2 = convertPosition(lastLatitude,
                                 lastLongitude);
 
@@ -464,9 +462,7 @@ public class TrailCanvas extends BaseCanvas {
                         }
                     }
                     }
-                } catch (NoSuchElementException nsee) {
-              
-                }
+                } 
                 catch (NullPointerException npe){
                     Logger.error("NPE while drawing trail");
                 }
