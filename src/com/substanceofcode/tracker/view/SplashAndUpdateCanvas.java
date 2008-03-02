@@ -28,6 +28,7 @@ import java.util.Enumeration;
 
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.tracker.TrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
@@ -89,6 +90,9 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         if(updateRequired){
             new Updater(settingsVersion).start();
         }
+        
+        //Initialize the MapProviderManager here, before any of the methods get called
+        MapProviderManager.initialize();
         
         // Initialize timeout thread
         this.displayTime = SPLASH_SCREEN_TIMEOUT;
