@@ -1,19 +1,22 @@
 package com.substanceofcode.map;
 
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Image;
 import javax.microedition.rms.RecordStoreFullException;
 
+import com.substanceofcode.data.FileIOException;
+import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.data.ImageRmsUtils;
 import com.substanceofcode.tracker.view.Logger;
 
-public class RMSCache implements Runnable {
+public class RMSCache implements  TileCache ,Runnable {
 
     private String storename;
     private Thread cacheThread;
     public Vector rmsProcessQueue = new Vector();
-    Vector images = null;
+    Vector tiles = null;
     boolean done = false;
     boolean rmsCacheIsFull=false;
 
@@ -28,11 +31,11 @@ public class RMSCache implements Runnable {
 
     public boolean checkCache(String name) {
         boolean result = false;
-        if (images == null) {
-            getImageList();
+        if (tiles== null) {
+            getTileList();
         }
         
-        if(images.contains(name))
+        if(tiles.contains(name))
         {
             result=true;
         }
@@ -49,29 +52,55 @@ public class RMSCache implements Runnable {
      *            the index of the image to retrieve
      * @return returns an image from the cache
      * @throws IndexOutOfBoundsException
+     * @throws IOException 
+     * @throws FileIOException 
      */
-    public Image get(int index) throws IndexOutOfBoundsException {
-        return ImageRmsUtils.loadPngFromRMS(storename, (String) images
-                .elementAt(index));
-
+    public Tile get(int index) throws  FileIOException, IOException {
+     // return ImageRmsUtils.loadPngFromRMS(storename, (String) tiles
+       //       .elementAt(index));
+            Tile t=null;
+            try {
+                t=new Tile(FileSystem.getFileSystem().getFile((String)tiles.elementAt(index)));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        return t;
+    }
+    
+    public  Image getImage(String name){
+        Image out= null;
+        Tile t;
+        try {
+            t = getTile(name);
+            out=t.getImage();        
+        } catch (Exception e) {
+            Logger.error("RMS:" +e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return out;
     }
 
-    public Image get(String name) {
-        Image result;
+    public Tile getTile(String name)  {
+        Tile result=null;
         try {
-            result = ImageRmsUtils.loadPngFromRMS(storename, name);
+            result = new Tile(FileSystem.getFileSystem().getFile(name));
         } catch (Exception e) {
-            Logger.error("RMS: Exception reading image");
-           result=null;
+            Logger.error("RMS: "+e.getMessage());
+            e.printStackTrace();
+        
         }
-
+        
         return result;
     }
 
-    private void getImageList() {
-        if (images == null) {
-            images = ImageRmsUtils.getImageList(storename);
-        }
+    
+    private void getTileList(){
+        Logger.debug("RMS: getTileList called");
+     if(tiles==null){
+         tiles=FileSystem.getFileSystem().listFiles(Tile.MIMETYPE);
+     }
     }
 
     /**
@@ -108,7 +137,7 @@ public class RMSCache implements Runnable {
      * from RMS, Loaded " + count + " images", Logger.DEBUG); }
      */
     /**
-     * This reads tiles from a queue and writes them to the RMS
+     * This reads tiles off a queue and writes them to the RMS
      */
     public void run() {
         Thread thisThread = Thread.currentThread();
@@ -119,7 +148,7 @@ public class RMSCache implements Runnable {
             Logger.debug(
                     "RMSCache:Initialized ok, now sleeping for 1 sec");
 
-            Thread.sleep( 60 * 1000);
+            Thread.sleep( 1000);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -151,7 +180,8 @@ public class RMSCache implements Runnable {
                         Tile tile = (Tile) rmsProcessQueue.firstElement();
                         rmsProcessQueue.removeElementAt(0);
                         try {
-                            writeToRms(tile);
+                           // writeToRms(tile);
+                         saveToRms(tile);
                             
                         } catch (Exception e) {
                             Logger.error(
@@ -173,6 +203,10 @@ public class RMSCache implements Runnable {
         }
 
     }
+    
+    public void put(Tile tile){
+        addToQueue(tile);
+    }
 
     /**
      * Adds an image to a queue of images that will eventually be written to the
@@ -181,7 +215,7 @@ public class RMSCache implements Runnable {
      * @param cacheKey
      * @param im
      */
-    public void addToQueue(Tile tile) {
+    private void addToQueue(Tile tile) {
         Logger.debug("RMS:Adding Tile to RMS queue");
         synchronized (rmsProcessQueue) {
             if (!rmsProcessQueue.contains(tile)) {
@@ -211,7 +245,7 @@ public class RMSCache implements Runnable {
             result=true;
         } catch (RecordStoreFullException e) {
             
-            Logger.debug("RMS is full, purging");            
+            Logger.debug("RMS is full, purging tiles");            
             rmsCacheIsFull=true;
             purgeRms(storename);
             
@@ -222,7 +256,18 @@ public class RMSCache implements Runnable {
      * Delete all tiles from the rms for the current store name
      */
         public void purgeRms(String storename){
-            ImageRmsUtils.clearImageRecordStore(storename);
+            FileSystem.getFileSystem().deleteFiles(Tile.MIMETYPE);
+        }
+        
+        
+        //New version will save the entire tile to the rms (hopefully)
+        //This means all the caches are storing the same objects which will make it easier (possible?) to 
+        //Move stuff between them.
+        //Should return a status value...
+        public void saveToRms(Tile tile) throws Exception {
+            
+            FileSystem.getFileSystem().saveFile(tile.cacheKey, tile.getMimeType(), tile,
+                    true);
         }
 
 }

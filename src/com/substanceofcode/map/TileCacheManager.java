@@ -4,17 +4,15 @@ import java.io.InputStream;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Image;
-
-import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 
 /**
  * TileCache used for storage and quick lookup of predownloaded tiles. I'm
  * imagining a 3 layer cache MemCache->RMSCache->FileCache The assumptions
  * being: MemCache will be fast but small, RMSCache will be slower but bigger,
- * and doesn't require permission for each read/write operation. FileCache
- * will be slowest and biggest, but requires permission to read write from
- * (every single time on an N80).
+ * and doesn't require permission for each read/write operation. FileCache will
+ * be slowest and biggest, but requires permission to read write from (every
+ * single time on an N80).
  * 
  * @author gjones
  * 
@@ -22,34 +20,34 @@ import com.substanceofcode.tracker.view.Logger;
 
 public class TileCacheManager implements Runnable {
 
-    RMSCache rmsCache = null;
-    MemCache memCache = null;
-    FileCache fileCache=null;
-    Vector Rme2MemQueue = new Vector();
-    Vector File2MemQueue = new Vector();
-    private String storename;
-    private volatile Thread cacheThread;
-    private boolean fileCacheEnabled=Controller.getController().getUseFileCache();
-
-    public TileCacheManager(String cacheDir, String storename) {
-        this.storename = storename;
-        cacheThread = new Thread(this);
-        cacheThread.start();
-    }
+    TileCache rmsCache = null;
+    TileCache memCache = null;
+    TileCache fileCache = null;
+    Vector Rms2MemQueue = new Vector(); // Queue to hold requests to move tiles
+                                        // from the rms cache to the mem cache
+    Vector File2MemQueue = new Vector(); // Queue to hold requests to move
+                                            // tiles from the file cache to the
+                                            // mem cache
+  //  private String storename;
+    private Thread cacheManagerThread;
+    private boolean rmsEnabled=false;
+    private boolean fileCacheEnabled = true;//Controller.getController().getUseFileCache();
 
     public TileCacheManager() {
-
+        //this.storename = storename;
+        cacheManagerThread = new Thread(this);
+        cacheManagerThread.start();
     }
 
 
-    public void initialize(String storename) {
-        Logger.debug(
-                "Initializing TileCacheManager, storename=" + storename);
-        this.storename = storename;
-        rmsCache = new RMSCache(storename);
+
+    public void initialize() {
+        Logger.debug("Initializing TileCacheManager, storename=" + MapProviderManager.getStoreName());
+        //this.storename = storename;
+//        rmsCache = new RMSCache(storename);
         memCache = new MemCache();
-        if (fileCacheEnabled){
-            fileCache= new FileCache();
+        if (fileCacheEnabled) {
+            fileCache = new FileCache();
         }
 
     }
@@ -58,8 +56,9 @@ public class TileCacheManager implements Runnable {
      * Create an Image from the input stream data, then save it to the cache(s)
      * 
      * @param tile
-     * @param is - Inputstream containing the tile data 
-     * Returns boolean true if save was successful
+     * @param is -
+     *                Inputstream containing the tile data Returns boolean true
+     *                if save was successful
      */
     public boolean saveTile(Tile tile, InputStream is) {
         Logger.debug("Save tile 1)");
@@ -70,121 +69,126 @@ public class TileCacheManager implements Runnable {
         boolean result = true;
 
         byte[] nbuffer = MapUtils.parseInputStream(is);
-        System.out.println("Regular input stream size=" + nbuffer.length);
-        
-            try {
-                if (nbuffer != null) {
-                    if (nbuffer.length < 28) { // response was 'nil' or zero, not an image
-                        result = false;
-                    } else {
-                       
-                    Logger.debug(
-                            "Creating tile image: freemem=" + freeMem
-                                    + " totalmem=" + totalMem);
-                   
+//        System.out.println("Regular input stream size=" + nbuffer.length);
+
+        try {
+            if (nbuffer != null) {
+                if (nbuffer.length < 28) { // response was 'nil' or zero, not
+                                            // an image
+                    result = false;
+                } else {
+
+                   // Logger.debug("Creating tile image: freemem=" + freeMem
+                     //       + " totalmem=" + totalMem);
 
 
                     if (freeMem > 10000 && totalMem > 10000) {
                         tile.setImageByteArray(nbuffer);
-                        //no longer needed, image will be created from internal byte buffer
-                        tile.setImage(Image.createImage(nbuffer, 0,
-                                    nbuffer.length));
-                        
+                        // no longer needed, image will be created from internal
+                        // byte buffer
+                        // tile.setImage(Image.createImage(nbuffer, 0,
+                        // nbuffer.length));
+
                         memCache.put(tile);
-                        if(!rmsCache.checkCache(tile.cacheKey)){
-                            rmsCache.addToQueue(tile);
-                        }
-                        if(fileCacheEnabled && !fileCache.checkCache(tile.cacheKey)){
-                            fileCache.addToQueue(tile);
+//                        if (rmsEnabled && !rmsCache.checkCache(tile.cacheKey)) {
+  //                          rmsCache.put(tile);
+    //                    }
+                        if (fileCacheEnabled
+                                && !fileCache.checkCache(tile.cacheKey)) {
+                            fileCache.put(tile);
                         }
                     }
 
-                    Logger.debug("Created tile image");
-                    }
-                } else {
-                    result = false;
-                    Logger.error("Input stream was null ");
+                //    Logger.debug("Created tile image");
                 }
-                Logger.debug("Tile Saved");
-            } catch (Throwable e) {
+            } else {
                 result = false;
-                //e.printStackTrace();
-                int bufferSize = 0;
-                if(nbuffer!=null) {
-                    bufferSize = nbuffer.length;
-                }
-                Logger.error(
-                        "Error creating tile image(" + bufferSize + "): " + 
-                        e.toString());
+                Logger.error("Input stream was null ");
             }
+        //    Logger.debug("Tile Saved");
+        } catch (Throwable e) {
+            result = false;
+            // e.printStackTrace();
+            int bufferSize = 0;
+            if (nbuffer != null) {
+                bufferSize = nbuffer.length;
+            }
+            Logger.error("Error creating tile image(" + bufferSize + "): "
+                    + e.toString());
+        }
         return result;
     }
 
 
-   /**
-    * Is this even used?
-    * @param tile
-    * @param im
-    */
+    /**
+     * 
+     * Add a tile to the relevant queues, so that they will get saved to the
+     * caches Is this even used? Yes, in the case where a blank image is saved
+     * when the http response did not have an image in it TODO: refactor this
+     * out, tiles must have an inputStream
+     * 
+     * @param tile
+     * @param im
+     */
     public void saveTile(Tile tile, Image im) {
         Logger.debug("Save tile 2)");
         tile.setImage(im);
         memCache.put(tile);
-        rmsCache.addToQueue(tile);
-        if(fileCacheEnabled){
-            fileCache.addToQueue(tile);
+      //  rmsCache.put(tile);
+        if (fileCacheEnabled) {
+            fileCache.put(tile);
         }
     }
 
+    /**
+     * Responsible for moving tiles between caches, such as when a filecache
+     * tile is moved into the memory cache
+     */
     public void run() {
         Thread thisThread = Thread.currentThread();
 
-        while (cacheThread == thisThread) {
+        while (cacheManagerThread == thisThread) {
 
             try {
-                // Logger.getLogger().log("TCM:Going to sleep for 1 sec",
-                // Logger.DEBUG);
+                // Pause briefly. These values can be tuned once everything is
+                // working
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-
                 Logger.debug("TCM:Thread Interrupted");
             }
-            if (Rme2MemQueue.size() > 0) {
+            if (Rms2MemQueue.size() > 0) {
 
-                Logger.debug(
-                        "TCM: Rms work queue size is:" + Rme2MemQueue.size()
-                        );
+                Logger.debug("TCM: Rms work queue size is:"
+                        + Rms2MemQueue.size());
 
 
-                String name = (String) Rme2MemQueue.firstElement();
-                Rme2MemQueue.removeElementAt(0);
+              //  String name = (String) Rms2MemQueue.firstElement();
+                Rms2MemQueue.removeElementAt(0);
                 try {
-                    memCache.put(name, rmsCache.get(name));
+             //       Tile t = rmsCache.getTile(name);
+               //     memCache.put(t);
                 } catch (Exception e) {
-                    Logger.error(
-                            "Exception while writing tile to RMS"
+                    Logger.error("Exception while writing tile to RMS"
+                            + e.getMessage());
+                }
+            } else if (fileCacheEnabled && File2MemQueue.size() > 0) {
+
+                Logger.debug("TCM: File work queue size is:"
+                        + File2MemQueue.size());
+
+
+                String name = (String) File2MemQueue.firstElement();
+                File2MemQueue.removeElementAt(0);
+                try {
+                    Tile t = fileCache.getTile(name);
+                    memCache.put(t);
+                } catch (Exception e) {
+                    Logger
+                            .error("Exception while moving tile from file cache to memcache "
                                     + e.getMessage());
-                }}
-                else if (fileCacheEnabled && File2MemQueue.size() > 0) {
+                }
 
-                    Logger.debug(
-                            "TCM: File work queue size is:" + File2MemQueue.size());
-
-
-                    String name = (String) File2MemQueue.firstElement();
-                    File2MemQueue.removeElementAt(0);
-                    try {
-                        memCache.put(name, fileCache.get(name));
-                    } catch (Exception e) {
-                        Logger.error(
-                                "Exception while moving tile from file cache to memcache"
-                                        + e.getMessage());
-                    }
-                
-            }else{
-               // Logger.getLogger().log(
-                 //       "TCM: RMS2MEMQueue is empty, yielding"
-                   //            , Logger.DEBUG);
+            } else {
                 Thread.yield();
             }
 
@@ -200,45 +204,81 @@ public class TileCacheManager implements Runnable {
      * @param x
      * @param y
      * @param z
-     * @return 1 if the tile was found, -1 if it wasn't
+     * @return 1 if the tile was found in the memcache, 2 for RMS, 3 for file,
+     *         -1 if it wasn't
      */
     public int checkCache(int x, int y, int z) {
         int result = 0;
-        String tileName=storename + "-" + z + "-" + x + "-" + y;
+        String tileName = MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y;
         if (memCache.checkCache(tileName)) {
-            if (memCache.get(tileName) != null) {
-                result = 0;
+            try {
+                if (memCache.getTile(tileName) != null) {
+                    result = 0;
+                }
+            } catch (Exception e) {
+                Logger.error("checkCache: " + e.getMessage());
+                e.printStackTrace();
             }
-        } else if (rmsCache.checkCache(tileName)) {
-            if (!Rme2MemQueue.contains(tileName)) {
-                Logger.debug(
-                                "TCM: Found tile in rms cache, will copy to memcache 1)");
+        } else if (rmsEnabled && rmsCache.checkCache(tileName)) {
+            // We won't read the tile directly out of the RMS,
+            // instead we'll add a request to the queue that will
+            // eventually copy the tile to the memcache
+            
+            try {
+                if (!Rms2MemQueue.contains(tileName)) {
+                    Logger
+                            .debug("TCM: Found tile in rms cache, will copy to memcache 1)");
 
-                Rme2MemQueue
-                        .addElement(tileName);
-            }
-            result = 1;
-        } else if (fileCacheEnabled && fileCache.checkCache(tileName)){
-            if (!File2MemQueue.contains(tileName)) {
-                Logger.debug(
-                                "TCM: Found tile in File cache, will copy to memcache 1)");
+                    Rms2MemQueue.addElement(tileName);
+                }
 
-                File2MemQueue
-                        .addElement(tileName);
+                result = 1;
+                
+            } catch (Exception e) {
+                Logger.error("checkCache: " + e.getMessage());
+                e.printStackTrace();
             }
-            result = 2;
-        }
-        else{
+        } else if (fileCacheEnabled && fileCache.checkCache(tileName)) {
+            try {
+                if (!File2MemQueue.contains(tileName)) {
+                    Logger
+                            .debug("TCM: Found tile in File cache, will copy to memcache 1)");
+
+                    File2MemQueue.addElement(tileName);
+                }
+                result = 2;
+            } catch (Exception e) {
+                Logger.error("checkCache: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
             result = -1;
-        
+
         }
-        
+
         return result;
     }
 
-
-    public Object get(int x, int y, int z) {
-        return memCache.get(storename + "-" + z + "-" + x + "-" + y);
+    /**
+     * Retrieve a tile from the memcache, then extract the image inside it ,and
+     * return that
+     * 
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public Object getImage(int x, int y, int z) {
+        Tile t = null;
+        Image i = null;
+        try {
+            t = (Tile) memCache
+                    .getTile(MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y);
+            i = t.getImage();
+        } catch (Exception e) {
+            Logger.error("TCM: " + e.getMessage());
+        }
+        return i;
     }
 
 }

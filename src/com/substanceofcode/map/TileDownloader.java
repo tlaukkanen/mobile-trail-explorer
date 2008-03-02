@@ -13,7 +13,6 @@ import javax.microedition.lcdui.Image;
 
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.MathUtil;
-import com.substanceofcode.util.StringUtil;
 
 /**
  * Code to download tiles from various map servers See:
@@ -24,31 +23,17 @@ import com.substanceofcode.util.StringUtil;
  */
 public class TileDownloader implements Runnable {
 
-    static final String GoogleStoreName = "gmmaps";
-    static final String OSMStoreName = "osmmaps";
-
-    static final String TahStoreName = "tahmaps";
-    private static final String RootImageDir=System.getProperty("fileconn.dir.photos");
+    
+ 
     public static final String RootCacheDir="file:///Memory Card/"+"MTE/cache/"; 
     
-    static final String GooglecacheDir = RootCacheDir + GoogleStoreName;
-
-    static final String OSMcacheDir = RootCacheDir + OSMStoreName;
+    //public static final int OSM = 1;
     
-    static final String TahCacheDir = RootCacheDir + TahStoreName;
-
-    private static String storename = "";
-    private static String cacheDir = "";
-
+    //public static final int OSMARENDER = 2;
     
+    //public static final int GOOGLE = 3;
     
-    public static final int OSM = 1;
-    
-    public static final int OSMARENDER = 2;
-    
-    public static final int GOOGLE = 3;
-
-    private int configuration = 0;
+    private int lastZoomLevel=0; //Used to detect a change of zoom level
 
     public static final int TILE_SIZE = 256;
 
@@ -60,17 +45,9 @@ public class TileDownloader implements Runnable {
     public Image loadingFileCachedImage = null;
     private volatile boolean running = false;
 
+    private static final short THREADDELAY=500;
     private TileCacheManager tc;
-
-
-    private String GoogleMapsUrlFormat = "";
-
-    private String OSMUrlFormat = "http://tile.openstreetmap.org/X/X/X.png";
     
-    private String TahUrlFormat = "http://tah.openstreetmap.org/Tiles/tile/X/X/X.png";
-
-    private String UrlFormat = "";
-
     private Hashtable requestLog = new Hashtable();
 
     private int nullImageCounter = 0;
@@ -84,12 +61,13 @@ public class TileDownloader implements Runnable {
 
     private volatile Thread downloaderThread;
 
-    public TileDownloader(int MapSource) {
+    public TileDownloader(/*int MapSource*/) {
         Logger.debug("TileDownloader Constructer");
-        setMapSource(MapSource);
+        //mpm=MapProviderManager.getInstance();
+     //   setMapSource(MapSource);  // No need to do this any more, as we have a Manager in place
         tileQueue = new Vector();
-        tc = new TileCacheManager(cacheDir, storename);
-        tc.initialize(storename);
+        tc = new TileCacheManager();
+        tc.initialize();
 
     }
 
@@ -115,51 +93,42 @@ public class TileDownloader implements Runnable {
     }
 
     public void setMapSource(int source) {
+        //MapProviderManager.configure(source);
+        /*
         switch (source) {
             case 1:
                 configuration = TileDownloader.OSM;
                 UrlFormat = OSMUrlFormat;
                 cacheDir = OSMcacheDir;
-                storename = OSMStoreName;
+                storeName = OSMStoreName;
                 break;
             
             case 2:
                 configuration = TileDownloader.OSMARENDER;
                 UrlFormat = TahUrlFormat;
                 cacheDir = TahCacheDir;
-                storename = TahStoreName;
+                storeName = TahStoreName;
                 break;
 
             case 3:
             //    configuration = TileDownloader.GOOGLE;
                 UrlFormat = GoogleMapsUrlFormat;
                 cacheDir = GooglecacheDir;
-                storename = GoogleStoreName;
+                storeName = GoogleStoreName;
                 break;
                 
             default:
                 configuration = TileDownloader.OSM;
                 UrlFormat = OSMUrlFormat;
                 cacheDir = OSMcacheDir;
-                storename = OSMStoreName;
+                storeName = OSMStoreName;
                 break;
         }
+        */
 
     }
 
-    /**
-     * Zoom levels are specified as 0 for the most zoomed out view, and 17 for the 
-     * most zoomed in.    
-     * 
-     * @param zoom
-     * @return 17-zoomlevel if using googlemaps as the image source
-     */
-    private int setZoom(int zoom) {
-      // if (configuration == TileDownloader.GOOGLE) {
-       //     zoom = 17 - zoom;
-       // }
-        return zoom;
-    }
+
 
     /**
      * Manages requests for tile images from the display canvas. Tiles are
@@ -180,6 +149,7 @@ public class TileDownloader implements Runnable {
     public Image fetchTile(int x, int y, int z, boolean pushToTop) {
 
         Image theImage = null;
+        int cacheResult=0;
         try {
             theImage = loadingImage();
             
@@ -187,11 +157,15 @@ public class TileDownloader implements Runnable {
             int maxtiles = (int) MathUtil.pow(2, z);
             x = x % (maxtiles);
             y = y % (maxtiles);
-            int cacheResult = tc.checkCache(x, y, z);
+            try{
+                 cacheResult = tc.checkCache(x, y, z);
+            }catch(Exception e){
+                Logger.error("TD: checkCache error :"+e.getMessage());
+            }
             if (cacheResult >= 0) {
                 // System.out.println("TD: Satisfied from Cache");
                 if (cacheResult == 0) {
-                    theImage = (Image) tc.get(x, y, z);
+                    theImage = (Image) tc.getImage(x, y, z);
                 } else if (cacheResult == 1 ) {
                     //Tile has been found in the RMS 
                     // It will get asynchronously copied into the memcache
@@ -235,11 +209,11 @@ public class TileDownloader implements Runnable {
     public void downloadTile(int x, int y, int zoom, boolean putAtTop) {
 
         try {
-            String targetUrl = makeurl(UrlFormat, x, y, setZoom(zoom));
-            String destDir = cacheDir + "/" + zoom + "/" + x + "/";
+            String targetUrl = MapProviderManager.makeUrl(x, y, zoom);
+            String destDir = MapProviderManager.getCacheDir() + "/" + zoom + "/" + x + "/";
             String destFile = y + ".png";
             Tile t = new Tile(x, y, zoom, targetUrl, destDir,
-                    destFile, storename);
+                    destFile, MapProviderManager.getStoreName());
             // Invalid tile requested, return a blank tile
             if (x < 0 || y < 0) {
                 Logger.error(
@@ -251,59 +225,31 @@ public class TileDownloader implements Runnable {
             // only download if it is not cached
             requestLog.put(getCacheKey(x, y, zoom), "QUEUED");
             synchronized (tileQueue) {
-                // Keep the tile list short quite short, if it is too long
-                // the current position may move out of range of the queued
-                // tiles before they are downloaded
-                if (tileQueue.size() < 10) {
-                    if (putAtTop)
-                        tileQueue.insertElementAt(t, 0);
-                    else
-                        tileQueue.addElement(t);
+                //Check if we have just changed zoom levels. If so,
+                //delete all the tiles in the queue before adding the new one
+                if (lastZoomLevel!=zoom){
+                    Logger.debug("ZoomLevel changed, deleting all queued tiles.");
+                    tileQueue.removeAllElements();
                 }
+                lastZoomLevel=zoom;
+                
+                if (putAtTop)
+                    tileQueue.insertElementAt(t, 0);
+                else
+                    tileQueue.addElement(t);
+                
             }
         } catch(Exception ex) {
             Logger.error("Error in TileDownloader.downloadTile(..):" + 
                     ex.getMessage());
+            ex.printStackTrace();
         }
         // Check
         // System.out.println("Added tile to queue");
     }
 
 
-    /**
-     * Save the tile to an in memory cache.
-     * 
-     * @param tile
-     * @param is
-     * @throws Exception
-     */
-
-
-    private String makeurl(String format, int a, int b, int c) {
-
-        String[] bits = StringUtil.split(format, "X");
-        StringBuffer output = new StringBuffer(bits[0]);
-
-
-
-        if (configuration == TileDownloader.OSM || configuration == TileDownloader.OSMARENDER) {
-            output.append(c);
-            output.append(bits[1]);
-            output.append(a);
-            output.append(bits[2]);
-            output.append(b);
-            output.append(bits[3]);
-        }
-       /* else if (configuration == TileDownloader.GOOGLE) {
-            output.append(a);
-            output.append(bits[1]);
-            output.append(b);
-            output.append(bits[2]);
-            output.append(c);
-        }*/
-
-        return output.toString();
-    }
+   
 
     // TODO: Use a bunch of threads
     // to download several tiles asynchronously?....
@@ -317,7 +263,7 @@ public class TileDownloader implements Runnable {
         Tile tile = null;
         while (downloaderThread == thisThread && running) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(THREADDELAY);
             } catch (InterruptedException e1) {
                 Logger.debug("TD: Thread Interrupted");
                 e1.printStackTrace();
@@ -387,7 +333,7 @@ public class TileDownloader implements Runnable {
     }
 
     public static String getCacheKey(int x, int y, int z) {
-        return storename + "-" + z + "-" + x + "-" + y;
+        return MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y;
     }
 
     /**

@@ -7,6 +7,12 @@ import java.io.InputStream;
 import com.substanceofcode.tracker.view.Logger;
 
 public class MapUtils {
+    
+    /**
+     * Make an input stream into a byte array
+     * @param is
+     * @return byte array
+     */
     public static byte[] parseInputStream(InputStream is) {
 
 
