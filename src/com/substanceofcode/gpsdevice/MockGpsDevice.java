@@ -10,9 +10,9 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import com.substanceofcode.bluetooth.MockTrack;
 import com.substanceofcode.data.FileIOException;
-import com.substanceofcode.data.FileSystem;
+
 import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.tracker.controller.Controller;
+
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.view.Logger;
 
@@ -135,7 +135,7 @@ public class MockGpsDevice extends GpsDeviceImpl {
      * Read a saved track from the RMS
      * 
      * @return GpsPosition
-     */
+     *//*
     private GpsPosition getPositionFromSavedTrail() {
         
         GpsPosition result = null;
@@ -201,6 +201,7 @@ public class MockGpsDevice extends GpsDeviceImpl {
         return result;
     }
 
+*/
     
     public void run() {
         // TODO Auto-generated method stub
