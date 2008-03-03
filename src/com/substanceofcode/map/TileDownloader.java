@@ -147,7 +147,7 @@ public class TileDownloader implements Runnable {
      * @return
      */
     public Image fetchTile(int x, int y, int z, boolean pushToTop) {
-
+        Logger.debug("FetChTile called");
         Image theImage = null;
         int cacheResult=0;
         try {
@@ -230,6 +230,7 @@ public class TileDownloader implements Runnable {
                 if (lastZoomLevel!=zoom){
                     Logger.debug("ZoomLevel changed, deleting all queued tiles.");
                     tileQueue.removeAllElements();
+                    requestLog.clear();
                 }
                 lastZoomLevel=zoom;
                 
