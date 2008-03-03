@@ -45,35 +45,43 @@ import com.substanceofcode.util.DateTimeUtil;
 import java.util.Date;
 
 /**
- * <p>A Track is an ordered list of {@link GpsPosition}s which represents the movement of a
- * GPS enabled device over time.
+ * <p>
+ * A Track is an ordered list of {@link GpsPosition}s which represents the
+ * movement of a GPS enabled device over time.
  * 
- * <p>A Track has two main elements
+ * <p>
+ * A Track has two main elements
  * <ul>
- *   <li>The Track:   An ordered list of {@link GpsPosition}s which is <b>the Track</b>
- *   <li>The Markers: An ordered list of Markers (or Waypoints). Markers should, to be of use,
- *   be relavent to the Track, but this is not a strict requirement.
+ * <li>The Track: An ordered list of {@link GpsPosition}s which is <b>the
+ * Track</b>
+ * <li>The Markers: An ordered list of Markers (or Waypoints). Markers should,
+ * to be of use, be relavent to the Track, but this is not a strict requirement.
  * </ul>
  * 
- * <p>A Track also has a distance. This is the sum of the distances between the points on the track.<br>
- * <small>i.e. if a track consists of 5 points, a, b, c, d, and e, and |ab| is the distance between
- * point a and point b, then Tracks 'Distance' would be (|ab| + |bc| + |cd| + |de|)</small> 
- *  
+ * <p>
+ * A Track also has a distance. This is the sum of the distances between the
+ * points on the track.<br>
+ * <small>i.e. if a track consists of 5 points, a, b, c, d, and e, and |ab| is
+ * the distance between point a and point b, then Tracks 'Distance' would be
+ * (|ab| + |bc| + |cd| + |de|)</small>
+ * 
  * @author Tommi
  * @author Barry Redmond
  */
 public class Track implements Serializable {
 
     /**
-     * The MIME type for all Tracks stored
-     * XXX : mchr : What is this for?
+     * The MIME type for all Tracks stored XXX : mchr : What is this for?
      */
     private static final String MIME_TYPE = "Mobile Trail Trail";
 
     /** A Vector of {@link GpsPosition}s representing this 'Trails' route. */
     private Vector trackPoints;
 
-    /** A Vector of {@link GpsPosition}s representing this 'Trails' Markers or WayPoints. */
+    /**
+     * A Vector of {@link GpsPosition}s representing this 'Trails' Markers or
+     * WayPoints.
+     */
     private Vector trackMarkers;
 
     /** The Track statistics */
@@ -85,24 +93,24 @@ public class Track implements Serializable {
 
     /** Constant:Pause file name */
     public static final String PAUSEFILENAME = "pause";
-    
-    //--------------------------------------------------------------------------
+
+    // --------------------------------------------------------------------------
     // Optional elements associated with a Track which is being streamed to
     // disk
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
     private FileConnection streamConnection = null;
     private OutputStream streamOut = null;
     private PrintStream streamPrint = null;
 
 
     /**
-     * State variable : True - This track should be streamed to disk,
-     *                  False - This track should be saved right at the end
+     * State variable : True - This track should be streamed to disk, False -
+     * This track should be saved right at the end
      */
     private boolean isStreaming = false;
 
-    /** 
-     * Creates a new instance of Track which will be saved at the end 
+    /**
+     * Creates a new instance of Track which will be saved at the end
      */
     public Track() {
         trackPoints = new Vector();
@@ -110,41 +118,44 @@ public class Track implements Serializable {
         distance = 0.0;
         name = "";
     }
-    
+
     /**
      * Construct a Track which streams all points directly to a GPX file.
-     * @param fullPath Full path of GPX stream
-     * @param newStream True : Creates a new GPX stream, 
-     *                  False : Reconnects to an existing GPX stream
+     * 
+     * @param fullPath
+     *                Full path of GPX stream
+     * @param newStream
+     *                True : Creates a new GPX stream, False : Reconnects to an
+     *                existing GPX stream
      * @throws IOException
      */
     public Track(String fullPath, boolean newStream) throws IOException {
         this();
         isStreaming = true;
         try {
-            //------------------------------------------------------------------
+            // ------------------------------------------------------------------
             // Create a FileConnection and if this is a new stream create the
             // file
-            //------------------------------------------------------------------
-            streamConnection = (FileConnection)Connector.open(fullPath, Connector.READ_WRITE);
-            if (newStream)
-            {
+            // ------------------------------------------------------------------
+            streamConnection = (FileConnection) Connector.open(fullPath,
+                    Connector.READ_WRITE);
+            if (newStream) {
                 streamConnection.create();
             }
-            
-            //------------------------------------------------------------------
+
+            // ------------------------------------------------------------------
             // Open outputStream positioned at the end of the file
             // For a new file this will be the same as positioning at the start
             // For an existing file this allows us to append data
-            //------------------------------------------------------------------
-            streamOut = streamConnection.openOutputStream(streamConnection.fileSize()+1);
+            // ------------------------------------------------------------------
+            streamOut = streamConnection.openOutputStream(streamConnection
+                    .fileSize() + 1);
             streamPrint = new PrintStream(streamOut);
-            
-            //------------------------------------------------------------------
+
+            // ------------------------------------------------------------------
             // If this is a new stream we must add headers
-            //------------------------------------------------------------------
-            if (newStream)
-            {
+            // ------------------------------------------------------------------
+            if (newStream) {
                 StringBuffer gpxHead = new StringBuffer();
                 GpxConverter.addHeader(gpxHead);
                 GpxConverter.addTrailStart(gpxHead);
@@ -152,22 +163,21 @@ public class Track implements Serializable {
                 streamPrint.flush();
                 streamOut.flush();
             }
-        }
-        catch (IOException e) {
-            //------------------------------------------------------------------
+        } catch (IOException e) {
+            // ------------------------------------------------------------------
             // If we get any IOException we must ensure that we close all stream
             // objects
-            //------------------------------------------------------------------
+            // ------------------------------------------------------------------
             if (streamPrint != null) {
                 streamPrint.close();
                 streamPrint = null;
             }
-            
+
             if (streamOut != null) {
                 streamOut.close();
                 streamOut = null;
             }
-                
+
             if (streamConnection != null) {
                 streamConnection.close();
                 streamConnection = null;
@@ -187,11 +197,10 @@ public class Track implements Serializable {
      * Getter Methods
      */
     /** Get whether this is a streaming trail */
-    public boolean isStreaming()
-    {
+    public boolean isStreaming() {
         return isStreaming;
     }
-    
+
     /** Get position count */
     public int getPositionCount() {
         int positionCount = trackPoints.size();
@@ -203,48 +212,60 @@ public class Track implements Serializable {
         return trackPoints.elements();
     }
 
-    /** @return the Track Point specified by the parameter 
-     * @param positionNumber , the index of the Track Point to return*/
+    /**
+     * @return the Track Point specified by the parameter
+     * @param positionNumber ,
+     *                the index of the Track Point to return
+     */
     public GpsPosition getPosition(int positionNumber)
             throws ArrayIndexOutOfBoundsException {
         return (GpsPosition) trackPoints.elementAt(positionNumber);
     }
 
     /** @return the first position */
-    public GpsPosition getStartPosition() throws NoSuchElementException {
-        return (GpsPosition) trackPoints.firstElement();
+    public GpsPosition getStartPosition() {
+        GpsPosition startPosition = null;
+        try {
+            startPosition = (GpsPosition) trackPoints.firstElement();
+        } catch (NoSuchElementException nsee) {
+
+        }
+        return startPosition;
     }
 
-    /** @return the last position in the track, or null if there is no end position */
-    public GpsPosition getEndPosition(){
-        GpsPosition endPosition=null;
-    
-        try{
-            endPosition=(GpsPosition) trackPoints.lastElement();
-        }catch(NoSuchElementException nsee){
-            
+    /**
+     * @return the last position in the track, or null if there is no end
+     *         position
+     */
+    public GpsPosition getEndPosition() {
+        GpsPosition endPosition = null;
+
+        try {
+            endPosition = (GpsPosition) trackPoints.lastElement();
+        } catch (NoSuchElementException nsee) {
+
         }
         return endPosition;
     }
-    
+
     /** @return the position of maximum speed */
     public GpsPosition getMaxSpeedPosition() {
         return maxSpeedPosition;
     }
-    
+
     /** @return the track duration in milliseconds */
     public long getDurationMilliSeconds() {
         Date startDate = this.getStartPosition().date;
         Date endDate = this.getEndPosition().date;
         return (endDate.getTime() - startDate.getTime());
     }
-    
+
     /** @return the average speed (kmh) */
     public double getAverageSpeed() {
         double distanceKm = getDistance();
-        double hours = getDurationMilliSeconds()/3600000.0;
-        if(distanceKm>0.01) {
-            return distanceKm/hours;
+        double hours = getDurationMilliSeconds() / 3600000.0;
+        if (distanceKm > 0.01) {
+            return distanceKm / hours;
         } else {
             return 0;
         }
@@ -260,8 +281,11 @@ public class Track implements Serializable {
         return trackMarkers.elements();
     }
 
-    /** @return the Marker specified by the parameter
-     * @param markerNumber , the index of the Marker to return */
+    /**
+     * @return the Marker specified by the parameter
+     * @param markerNumber ,
+     *                the index of the Marker to return
+     */
     public GpsPosition getMarker(int markerNumber) {
         return (GpsPosition) trackMarkers.elementAt(markerNumber);
     }
@@ -291,10 +315,11 @@ public class Track implements Serializable {
      */
 
     public void addPosition(GpsPosition pos) {
-        addPosition(pos,null);
+        addPosition(pos, null);
     }
+
     /** Add new Track Point to the end of this Track */
-    public void addPosition(GpsPosition pos,  GpsGPGSA gpgsa ) {
+    public void addPosition(GpsPosition pos, GpsGPGSA gpgsa) {
         /** Handle distance calculations */
         if (trackPoints.size() > 0) {
             // Increment Distance
@@ -302,49 +327,46 @@ public class Track implements Serializable {
             double tripLength = lastPosition.getDistanceFromPosition(pos);
             distance += tripLength;
         }
-        
+
         /** Check for max speed */
-        if(maxSpeedPosition==null || maxSpeedPosition.speed<pos.speed) {
+        if (maxSpeedPosition == null || maxSpeedPosition.speed < pos.speed) {
             maxSpeedPosition = pos;
         }
 
         trackPoints.addElement(pos);
-        
-        //----------------------------------------------------------------------
+
+        // ----------------------------------------------------------------------
         // If this is a streaming track then we need to save the new position
         // and possibly forget about some old points
-        //----------------------------------------------------------------------
-        if (isStreaming)
-        {
-            //------------------------------------------------------------------
+        // ----------------------------------------------------------------------
+        if (isStreaming) {
+            // ------------------------------------------------------------------
             // Store the new point
-            //------------------------------------------------------------------
+            // ------------------------------------------------------------------
             Controller lController = Controller.getController();
             RecorderSettings lSettings = lController.getSettings();
             StringBuffer gpxPos = new StringBuffer();
-            //GpxConverter.addPosition(pos, gpxPos);
-            GpxConverter.addPosition(pos, gpxPos,gpgsa);
+            // GpxConverter.addPosition(pos, gpxPos);
+            GpxConverter.addPosition(pos, gpxPos, gpgsa);
             streamPrint.print(gpxPos.toString());
             streamPrint.flush();
-            try
-            {
-              streamOut.flush();
-              
-              //----------------------------------------------------------------
-              // We only store in memory as many points as we are going to draw
-              //----------------------------------------------------------------
-              int maxNumPos = lSettings.getNumberOfPositionToDraw();
-              //----------------------------------------------------------------
-              // While we have to0 many points remove the oldest point
-              //----------------------------------------------------------------
-              while (trackPoints.size() > maxNumPos)
-              {
-                  trackPoints.removeElementAt(0);
-              }
-            }
-            catch (IOException e)
-            {
-              lController.showError("Exception adding point : " + e.toString());
+            try {
+                streamOut.flush();
+
+                // ----------------------------------------------------------------
+                // We only store in memory as many points as we are going to
+                // draw
+                // ----------------------------------------------------------------
+                int maxNumPos = lSettings.getNumberOfPositionToDraw();
+                // ----------------------------------------------------------------
+                // While we have to0 many points remove the oldest point
+                // ----------------------------------------------------------------
+                while (trackPoints.size() > maxNumPos) {
+                    trackPoints.removeElementAt(0);
+                }
+            } catch (IOException e) {
+                lController.showError("Exception adding point : "
+                        + e.toString());
             }
         }
     }
@@ -352,25 +374,26 @@ public class Track implements Serializable {
     /** Add new marker */
     public void addMarker(GpsPosition marker) {
         trackMarkers.addElement(marker);
-        
-        //----------------------------------------------------------------------
+
+        // ----------------------------------------------------------------------
         // If this is a streaming trail remove old markers from memory
-        //----------------------------------------------------------------------
-        if (isStreaming)
-        {
+        // ----------------------------------------------------------------------
+        if (isStreaming) {
             Controller lController = Controller.getController();
             RecorderSettings lSettings = lController.getSettings();
             int maxNumPos = lSettings.getNumberOfPositionToDraw();
             int markerInterval = lSettings.getRecordingMarkerInterval();
             int maxNumMarkers = maxNumPos / markerInterval;
-            while (trackMarkers.size() > maxNumMarkers)
-            {
+            while (trackMarkers.size() > maxNumMarkers) {
                 trackMarkers.removeElementAt(0);
             }
         }
     }
 
-    /** Clears <b>all</b> of this Tracks Points AND Markers and resets the distance to 0.0 */
+    /**
+     * Clears <b>all</b> of this Tracks Points AND Markers and resets the
+     * distance to 0.0
+     */
     public void clear() {
         trackPoints.removeAllElements();
         trackMarkers.removeAllElements();
@@ -379,13 +402,12 @@ public class Track implements Serializable {
 
     /**
      * TODO
+     * 
      * @return
      * @throws IOException
      */
-    public String closeStream() throws IOException
-    {
-        if (isStreaming)
-        {
+    public String closeStream() throws IOException {
+        if (isStreaming) {
             StringBuffer gpxTail = new StringBuffer();
             GpxConverter.addTrailEnd(gpxTail);
             GpxConverter.addFooter(gpxTail);
@@ -395,38 +417,39 @@ public class Track implements Serializable {
             streamOut.close();
             streamConnection.close();
             isStreaming = false;
-            return streamConnection.getPath() + "/" + streamConnection.getName();
-        }
-        else
-        {
+            return streamConnection.getPath() + "/"
+                    + streamConnection.getName();
+        } else {
             return "";
         }
     }
-    
-    /** 
+
+    /**
      * Export track to file.
+     * 
      * @return Full path of file which was written to
-     *
-     * @throws java.lang.Exception 
-     * @param folder        Folder where file is written.
-     * @param waypoints     Vector containing waypoints.
-     * @param useKilometers Use meters as units?
-     * @param exportFormat  Export format.
-     * @param filename      Name of file or null if we should create a timestamp
-     * @param listener      Reference to class which wants to be notified of
-     *                      events
+     * 
+     * @throws java.lang.Exception
+     * @param folder
+     *                Folder where file is written.
+     * @param waypoints
+     *                Vector containing waypoints.
+     * @param useKilometers
+     *                Use meters as units?
+     * @param exportFormat
+     *                Export format.
+     * @param filename
+     *                Name of file or null if we should create a timestamp
+     * @param listener
+     *                Reference to class which wants to be notified of events
      */
-    public String writeToFile(String folder, 
-                            Vector waypoints,
-                            boolean useKilometers, 
-                            int exportFormat, 
-                            String filename, 
-                            AlertHandler listener)
-                                              throws Exception {
+    public String writeToFile(String folder, Vector waypoints,
+            boolean useKilometers, int exportFormat, String filename,
+            AlertHandler listener) throws Exception {
         String fullPath = "";
-        //----------------------------------------------------------------------
+        // ----------------------------------------------------------------------
         // Notify listener that we have started a long running process
-        //----------------------------------------------------------------------
+        // ----------------------------------------------------------------------
         if (listener != null) {
             String lType = "";
             switch (exportFormat) {
@@ -457,7 +480,7 @@ public class Track implements Serializable {
         // ------------------------------------------------------------------
         // Construct filename and connect to the file
         // ------------------------------------------------------------------
-        if (filename == null || filename.length()==0) {
+        if (filename == null || filename.length() == 0) {
             filename = DateTimeUtil.getCurrentDateStamp();
         }
         FileConnection connection;
@@ -492,8 +515,8 @@ public class Track implements Serializable {
             throw new Exception("writeToFile: Open output stream: "
                     + ex.toString());
         }
-        //PrintStream output = new PrintStream(out);
-        DataOutputStream output= new DataOutputStream(out);
+        // PrintStream output = new PrintStream(out);
+        DataOutputStream output = new DataOutputStream(out);
 
         // ------------------------------------------------------------------
         // Notify progress
@@ -517,10 +540,10 @@ public class Track implements Serializable {
         // ------------------------------------------------------------------
         // Save the data to a file
         // ------------------------------------------------------------------
-        
-        //faster, apparently
+
+        // faster, apparently
         output.write(exportData.getBytes());
-        //output.println(exportData);
+        // output.println(exportData);
         output.close();
         out.close();
         connection.close();
@@ -537,9 +560,9 @@ public class Track implements Serializable {
     /**
      * 
      * @throws FileIOException
-     *             if there is a problem saving to the FileSystem
+     *                 if there is a problem saving to the FileSystem
      * @throws IllegalStateException
-     *             if this trail is empty
+     *                 if this trail is empty
      */
     public void saveToRMS() throws FileIOException, IllegalStateException {
         if (this.trackMarkers.size() == 0 && this.trackPoints.size() == 0) {
@@ -560,30 +583,28 @@ public class Track implements Serializable {
 
 
     /**
-     * Utility method to 'pause' the current track to the rms
-     * Not throwing any exceptions, pausing is done on a best effort basis,
-     * If it fails there is probably nothing that can be done about it 
-     * in the circumstances 
+     * Utility method to 'pause' the current track to the rms Not throwing any
+     * exceptions, pausing is done on a best effort basis, If it fails there is
+     * probably nothing that can be done about it in the circumstances
      */
     public void pause() {
         if (this.trackMarkers.size() == 0 && this.trackPoints.size() == 0) {
             return;
         } else {
 
-        	FileSystem fs = FileSystem.getFileSystem();
-    		
-    		//If there is already a pause track, overwrite it with this one
-        	try {
-	    		if (fs.containsFile(Track.PAUSEFILENAME)) {
-	    			fs.deleteFile(Track.PAUSEFILENAME);	
-	    		}
-            
+            FileSystem fs = FileSystem.getFileSystem();
 
-				fs.saveFile(PAUSEFILENAME,
-				        getMimeType(), this, false);
-			} catch (FileIOException e) {		
-                            Logger.error("Error creating pause file " +e.getMessage());
-			}
+            // If there is already a pause track, overwrite it with this one
+            try {
+                if (fs.containsFile(Track.PAUSEFILENAME)) {
+                    fs.deleteFile(Track.PAUSEFILENAME);
+                }
+
+
+                fs.saveFile(PAUSEFILENAME, getMimeType(), this, false);
+            } catch (FileIOException e) {
+                Logger.error("Error creating pause file " + e.getMessage());
+            }
 
         }
     }
@@ -619,7 +640,7 @@ public class Track implements Serializable {
         trackPoints = new Vector(numPoints);
         for (int i = 0; i < numPoints; i++) {
             GpsPosition pos = new GpsPosition(dis);
-            if(maxSpeedPosition==null || pos.speed>maxSpeedPosition.speed) {
+            if (maxSpeedPosition == null || pos.speed > maxSpeedPosition.speed) {
                 maxSpeedPosition = pos;
             }
             trackPoints.addElement(pos);
