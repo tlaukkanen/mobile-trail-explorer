@@ -60,7 +60,7 @@ public class KmlConverter extends TrackConverter {
         String kmlContent = exportTrack(currentDateStamp, track, waypoints);
         return kmlContent;
     }
-    
+
     /** Convert waypoint to Google Eart format (KML) */
     public String convert(Waypoint waypoint, Vector waypoints,
             boolean includeWaypoints, boolean includeMarkers) {
@@ -72,9 +72,9 @@ public class KmlConverter extends TrackConverter {
     /** Convert to string */
     public String exportTrack(String dateStamp, Track track, Vector waypoints) {
         StringBuffer trackString = new StringBuffer();
-        
+
         addHeader(trackString, dateStamp);
-        
+
         Enumeration trackEnum = track.getTrackPointsEnumeration();
         while (trackEnum.hasMoreElements() == true) {
             GpsPosition pos = (GpsPosition) trackEnum.nextElement();
@@ -92,20 +92,21 @@ public class KmlConverter extends TrackConverter {
 
         return trackString.toString();
     }
+
     /** Convert to string */
     public String exportWaypoint(String dateStamp, Vector waypoints) {
         StringBuffer waypointString = new StringBuffer();
-        
+
         addHeader(waypointString, dateStamp);
         closeTrack(waypointString);
-        
+
         waypointString.append(generateWaypointData(waypoints));
 
         addFooter(waypointString);
 
         return waypointString.toString();
     }
-    
+
     public static void addHeader(StringBuffer trackString, String dateStamp) {
         trackString.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
         trackString
@@ -130,13 +131,13 @@ public class KmlConverter extends TrackConverter {
         trackString.append("<altitudeMode>clampToGround</altitudeMode>\r\n");
         trackString.append("<coordinates>\r\n");
     }
-    
+
     public static void closeTrack(StringBuffer trackString) {
         trackString.append("</coordinates>\r\n");
         trackString.append("</LineString>\r\n");
         trackString.append("</Placemark>\r\n");
     }
-    
+
     public static void addFooter(StringBuffer trackString) {
         trackString.append("</Folder>\r\n");
         trackString.append("</kml>\r\n");
@@ -182,8 +183,7 @@ public class KmlConverter extends TrackConverter {
                 speed = String.valueOf(pos.speed);
             } else {
                 double mileSpeed = UnitConverter.convertSpeed(pos.speed,
-                        UnitConverter.UNITS_KPH,
-                        UnitConverter.UNITS_MPH);
+                        UnitConverter.UNITS_KPH, UnitConverter.UNITS_MPH);
                 speed = StringUtil.valueOf(mileSpeed, 1);
                 units = " mph";
             }
@@ -220,8 +220,9 @@ public class KmlConverter extends TrackConverter {
 
         // Start position
         // String name = "";
-        try {
-            GpsPosition startPosition = track.getStartPosition();
+
+        GpsPosition startPosition = track.getStartPosition();
+        if (startPosition != null) {
             String timeStamp = DateTimeUtil
                     .convertToTimeStamp(startPosition.date);
             markerString.append("<name>Start/End/Info</name>\r\n");
@@ -242,15 +243,13 @@ public class KmlConverter extends TrackConverter {
                     ",0\r\n");
             markerString.append("</coordinates></Point>\r\n");
             markerString.append("</Placemark>\r\n");
-        } catch (NoSuchElementException e) {
-            Logger.debug(
-                    "No StartPosition found when trying to "
-                            + "generate Endpoints in KML export function");
         }
 
+
         // End position
-        try {
-            GpsPosition endPosition = track.getEndPosition();
+
+        GpsPosition endPosition = track.getEndPosition();
+        if (endPosition != null) {
             String timeStamp = DateTimeUtil
                     .convertToTimeStamp(endPosition.date);
 
@@ -270,13 +269,11 @@ public class KmlConverter extends TrackConverter {
             markerString.append("<Placemark>\r\n");
             markerString.append("<name>").append(timeStamp).append(
                     "</name>\r\n");
-            String duration = DateTimeUtil.getTimeInterval(
-                    track.getStartPosition().date, 
-                    track.getEndPosition().date);
+            String duration = DateTimeUtil.getTimeInterval(track
+                    .getStartPosition().date, track.getEndPosition().date);
             markerString.append("<description>Distance ").append(distance)
-                    .append(units).append("\r\n")
-                    .append("Duration ").append(duration)
-                    .append("</description>");
+                    .append(units).append("\r\n").append("Duration ").append(
+                            duration).append("</description>");
             markerString.append("<Style>\r\n");
             markerString.append("<IconStyle>\r\n");
             markerString.append("<scale>0.6</scale>\r\n");
@@ -292,30 +289,28 @@ public class KmlConverter extends TrackConverter {
                     ",0\r\n");
             markerString.append("</coordinates></Point>\r\n");
             markerString.append("</Placemark>\r\n");
-        } catch (NoSuchElementException e) {
-            Logger.debug(
-                    "No EndPosition found when trying to "
-                            + "generate Endpoints in KML export function");
         }
-        
+
+
         /** Max speed */
         GpsPosition maxSpeedPos = track.getMaxSpeedPosition();
-        if(maxSpeedPos!=null) {
+        if (maxSpeedPos != null) {
             String units;
             String speed;
             if (useKilometers == true) {
                 units = " km/h";
                 speed = String.valueOf(maxSpeedPos.speed);
             } else {
-                double mileSpeed = UnitConverter.convertSpeed(maxSpeedPos.speed,
-                        UnitConverter.UNITS_KPH,
+                double mileSpeed = UnitConverter.convertSpeed(
+                        maxSpeedPos.speed, UnitConverter.UNITS_KPH,
                         UnitConverter.UNITS_MPH);
                 speed = StringUtil.valueOf(mileSpeed, 1);
                 units = " mph";
-            }        
-            markerString.append(getPlaceMark(maxSpeedPos, "Max speed " + speed + " " + units));
+            }
+            markerString.append(getPlaceMark(maxSpeedPos, "Max speed " + speed
+                    + " " + units));
         }
-        
+
         // Close the start/end folder
         markerString.append("</Folder>\r\n");
         return markerString;
@@ -333,7 +328,7 @@ public class KmlConverter extends TrackConverter {
         Logger.debug("Starting to parse KML track from file");
         return null;
     }
-    
+
     /** Create KML place mark element */
     private String getPlaceMark(GpsPosition position, String name) {
         StringBuffer markBuffer = new StringBuffer();
@@ -343,14 +338,15 @@ public class KmlConverter extends TrackConverter {
         markBuffer.append("<Style>\r\n");
         markBuffer.append("<IconStyle>\r\n");
         markBuffer.append("<Icon>\r\n");
-        markBuffer.append("<href>http://maps.google.com/mapfiles/kml/pal3/icon61.png</href>\r\n");
+        markBuffer
+                .append("<href>http://maps.google.com/mapfiles/kml/pal3/icon61.png</href>\r\n");
         markBuffer.append("</Icon>\r\n");
         markBuffer.append("</IconStyle>\r\n");
         markBuffer.append("</Style>\r\n");
         markBuffer.append("<Point><coordinates>\r\n");
-        markBuffer.append(formatDegrees(position.longitude)).append(
-                ",").append(formatDegrees(position.latitude)).append(
-                ",").append((int) position.altitude).append("\r\n");
+        markBuffer.append(formatDegrees(position.longitude)).append(",")
+                .append(formatDegrees(position.latitude)).append(",").append(
+                        (int) position.altitude).append("\r\n");
         markBuffer.append("</coordinates></Point>\r\n");
         markBuffer.append("</Placemark>\r\n");
         return markBuffer.toString();
