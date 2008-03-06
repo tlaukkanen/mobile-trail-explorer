@@ -38,8 +38,18 @@ public class TileCacheManager implements Runnable {
         cacheManagerThread = new Thread(this);
         cacheManagerThread.start();
     }
-
-
+    /**
+     * Invalidates all work queues
+     */
+    public synchronized void clearWorkQueues(){
+        synchronized(File2MemQueue){
+            File2MemQueue.removeAllElements();
+        }
+        synchronized(Rms2MemQueue){
+            Rms2MemQueue.removeAllElements();
+        }
+        Logger.debug("TCM:Caches cleared");
+    }
 
     public void initialize() {
         Logger.debug("Initializing TileCacheManager, storename=" + MapProviderManager.getStoreName());
@@ -175,10 +185,11 @@ public class TileCacheManager implements Runnable {
 
                 Logger.debug("TCM: File work queue size is:"
                         + File2MemQueue.size());
-
-
-                String name = (String) File2MemQueue.firstElement();
-                File2MemQueue.removeElementAt(0);
+                String name="";
+                synchronized(File2MemQueue){
+                     name= (String) File2MemQueue.firstElement();
+                    File2MemQueue.removeElementAt(0);
+                }
                 try {
                     Tile t = fileCache.getTile(name);
                     memCache.put(t);
@@ -277,6 +288,7 @@ public class TileCacheManager implements Runnable {
             i = t.getImage();
         } catch (Exception e) {
             Logger.error("TCM: " + e.getMessage());
+            e.printStackTrace();
         }
         return i;
     }
