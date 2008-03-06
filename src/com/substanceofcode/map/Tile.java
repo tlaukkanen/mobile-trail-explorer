@@ -39,9 +39,9 @@ public class Tile implements Serializable {
     // or maybe creating the image each time is quick enough to avoid storing it?
     private byte[] imageByteArray = null;
 
-    private String destDir;
+   // private String destDir;
 
-    private String destFile;
+   // private String destFile;
 
     private Image image; // the actual tile image png data
 
@@ -57,8 +57,8 @@ public class Tile implements Serializable {
         this.z = z;
         this.url = url;
 
-        this.destDir = dir;
-        this.destFile = file;
+       // this.destDir = dir;
+       // this.destFile = file;
         this.cacheKey = storename + "-" + z + "-" + x + "-" + y;
     }
 
@@ -80,8 +80,8 @@ public class Tile implements Serializable {
         this.z = 2;
         this.url = "";
 
-        this.destDir = "";
-        this.destFile = "";
+       // this.destDir = "";
+       // this.destFile = "";
         this.cacheKey = "" + "-" + z + "-" + x + "-" + y;
     }
 
@@ -116,21 +116,21 @@ public class Tile implements Serializable {
         return image;
     }
 
-    public String getDestDir() {
-        return destDir;
-    }
+    //public String getDestDir() {
+     //   return destDir;
+   // }
 
-    public void setDestDir(String destDir) {
-        this.destDir = destDir;
-    }
+   // public void setDestDir(String destDir) {
+    //    this.destDir = destDir;
+   // }
 
-    public String getDestFile() {
-        return destFile;
-    }
+    //public String getDestFile() {
+     //   return destFile;
+   // }
 
-    public void setDestFile(String destFile) {
-        this.destFile = destFile;
-    }
+    //public void setDestFile(String destFile) {
+      //  this.destFile = destFile;
+    //}
 
     public String getMimeType() {
 
@@ -144,8 +144,8 @@ public class Tile implements Serializable {
         dos.writeInt(z);
         dos.writeUTF(url);
         dos.writeUTF(cacheKey);
-        dos.writeUTF(destDir);
-        dos.writeUTF(destFile);
+      //  dos.writeUTF(destDir);
+       // dos.writeUTF(destFile);
         dos.writeInt(imageByteArray.length);
         dos.write(imageByteArray);
         // We won't save the image, we can regenerate it from the byte array
@@ -162,8 +162,8 @@ public class Tile implements Serializable {
         z = dis.readInt();
         url = dis.readUTF();
         cacheKey = dis.readUTF();
-        destDir = dis.readUTF();
-        destFile = dis.readUTF();
+        //destDir = dis.readUTF();
+        //destFile = dis.readUTF();
         
         int arrayLength = dis.readInt();
         imageByteArray = new byte[arrayLength];
@@ -184,8 +184,8 @@ public class Tile implements Serializable {
          Logger.error("z="+z);
          Logger.error("url="+url);
          Logger.error("cacheKey="+cacheKey);
-         Logger.error("destDir="+destDir);
-         Logger.error("destFile="+destFile);
+         //Logger.error("destDir="+destDir);
+         //Logger.error("destFile="+destFile);
          }catch(Exception e){
              //ignore
          }
