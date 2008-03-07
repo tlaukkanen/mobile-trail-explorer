@@ -103,6 +103,9 @@ public class RecorderSettings {
     /** Map drawing options */
     public static final int DRAW_MAP_NONE = 0;
     public static final int DRAW_MAP_OSM = 1;
+    
+    /** Logging */
+    public static final String WRITE_LOG = "write-log";
 
     /** Creates a new instance of RecorderSettings */
     public RecorderSettings(MIDlet midlet) {
@@ -494,7 +497,7 @@ public class RecorderSettings {
     }
     
     public boolean getJsr179() {
-        return settings.getBooleanProperty(USEJSR179, true);
+        return settings.getBooleanProperty(USEJSR179, false);
     }
 
     /** Set jsr179 support */
@@ -510,6 +513,16 @@ public class RecorderSettings {
     /** Set filecache support */
     public void setFileCache(boolean value) {
         settings.setBooleanProperty(USEFILECACHE, value);
+        saveSettings();
+    }
+    
+    public boolean getWriteLog() {
+        return settings.getBooleanProperty(WRITE_LOG, false);
+    }
+
+    /** Set Logging to filesystem*/
+    public void setWriteLog(boolean value) {
+        settings.setBooleanProperty(WRITE_LOG, value);
         saveSettings();
     }
 
