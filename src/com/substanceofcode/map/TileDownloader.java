@@ -147,7 +147,7 @@ public class TileDownloader implements Runnable {
      * @return
      */
     public Image fetchTile(int x, int y, int z, boolean pushToTop) {
-        Logger.debug("FetChTile called");
+      //  Logger.debug("FetChTile called");
         Image theImage = null;
         int cacheResult=0;
         try {
@@ -157,10 +157,17 @@ public class TileDownloader implements Runnable {
             int maxtiles = (int) MathUtil.pow(2, z);
             x = x % (maxtiles);
             y = y % (maxtiles);
+            
+            //invalidate the work queues if the zoomlevel has changed
+            if(lastZoomLevel!=z){
+                tc.clearWorkQueues();
+            }
+            lastZoomLevel=z;
             try{
                  cacheResult = tc.checkCache(x, y, z);
             }catch(Exception e){
                 Logger.error("TD: checkCache error :"+e.getMessage());
+                e.printStackTrace();
             }
             if (cacheResult >= 0) {
                 // System.out.println("TD: Satisfied from Cache");
