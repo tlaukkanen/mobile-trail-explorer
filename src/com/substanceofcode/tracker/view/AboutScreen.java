@@ -85,7 +85,17 @@ public final class AboutScreen extends Canvas {
             "",
             "N.B. Altitude accuracy on GPS is similar to location (i.e. ~10metres. However since most trails do not"
                     + " rise or fall very fast the altitude track displayed may seem very jumpy, and inaccurate." };
-
+    
+    private static final String[] skyViewScreenHelpText = {
+            "The Sky View shows the visible GPS sattelite locations and signal strength",
+            "",
+            "Because it is a sky view the E and W appear back the front unless pointed at the sky",
+            "",
+            "The number shown next to Trk # is the number of sattelites currently being used for the GPS fix",
+            "",
+            "Increase or decrease the Signal SNR range for the display by pressing the 2 and 8 keys"};
+    
+    
     private static final String[] helpText = {
             "Mobile Trail Explorer not quite perfect?",
             "",
@@ -103,7 +113,7 @@ public final class AboutScreen extends Canvas {
      * be null, and must have the same number of elements.
      */
     private static final String[] TITLES = { "About", "Trail Screen",
-            "Elevation Screen", "Help" };
+            "Elevation Screen", "Sky View Screen", "Help" };
 
     /**
      * <p>
@@ -115,7 +125,7 @@ public final class AboutScreen extends Canvas {
      * be null, and must have the same number of elements.
      */
     private static final String[][] MESSAGES = { aboutText,
-            trailScreenHelpText, elevationScreenHelpText, helpText };
+            trailScreenHelpText, elevationScreenHelpText,skyViewScreenHelpText, helpText };
 
     static {
         if (TITLES == null || MESSAGES == null

@@ -39,6 +39,8 @@ public class SkyCanvas extends BaseCanvas{
     
     private final Font rowFont;
     private final Font smallRowFont;
+    private int maxSNR = 60;
+    private final double SNRKeyHeight = 0.95;
     
     
     /** Creates a new instance of SatelliteCanvas */
@@ -61,7 +63,7 @@ public class SkyCanvas extends BaseCanvas{
         try {
             int satelliteCount = controller.getSatelliteCount();
             g.drawString(
-                String.valueOf(satelliteCount),
+                "Trk " + String.valueOf(satelliteCount),
                 getWidth()-1,
                 1+titleFont.getHeight(),
                 Graphics.TOP|Graphics.RIGHT);
@@ -77,8 +79,8 @@ public class SkyCanvas extends BaseCanvas{
         int horizonY = (getHeight()-horizonDiameter)/2;
         if(horizonY < titleFont.getHeight()) horizonY = titleFont.getHeight();
         
-        if ((getHeight()-titleFont.getHeight()) < horizonDiameter) {
-            horizonDiameter = getHeight()-titleFont.getHeight()-1;
+        if ((getHeight()-titleFont.getHeight()-(int)(getHeight()*SNRKeyHeight)-rowFont.getHeight()) < horizonDiameter) {
+            horizonDiameter = getHeight()-titleFont.getHeight()-(int)(getHeight()*(1.0-SNRKeyHeight))-rowFont.getHeight()-1;
             horizonX = (getWidth()-horizonDiameter)/2;
             horizonY = titleFont.getHeight();
         }
@@ -103,9 +105,38 @@ public class SkyCanvas extends BaseCanvas{
         g.drawString("E",horizonX+1,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.LEFT);
         g.drawString("W",horizonX+horizonDiameter,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.RIGHT);
         
+        this.drawSNRkey(g,(int)(getHeight()*SNRKeyHeight),20,getHeight(),getWidth()-20);
         this.drawSatelliteData(g,horizonX,horizonY,horizonDiameter);
     }
-    
+    private int getSNRColor(int SNR){
+        int red, green, blue;
+       
+        if(SNR>maxSNR) SNR = maxSNR;
+        if(SNR<0) SNR=0;
+        red = (int)((double)SNR*(255.0/(double)maxSNR));
+        green = 0;
+        blue = (int)(255.0*(((double)maxSNR-(double)SNR)/(double)maxSNR));
+        return(red*0x10000 + green*0x100 + blue);
+    }
+    private void drawSNRkey(Graphics g, int top, int left, int bottom, int right){
+        int width;
+        int i;
+        
+        g.setFont(smallRowFont);
+        width = right-left;
+        for(i=0;i<width;i++){
+            g.setColor(getSNRColor((int)((double)maxSNR*(double)i/(double)width)));
+            g.drawLine(left+i, top, left+i, bottom);
+            
+        }
+        g.drawString(maxSNR+"+", right, top, Graphics.RIGHT|Graphics.BOTTOM);
+        g.setColor(getSNRColor(0));
+        g.drawString("0", left, top, Graphics.LEFT|Graphics.BOTTOM);
+        g.setColor(0);
+        g.drawString("Signal (SNR)", (left+right)/2, top, Graphics.HCENTER|Graphics.BOTTOM);
+        
+       
+    }
     private void drawSatelliteData(Graphics g, int xPos, int yPos, int diameter) {
         
         Vector satellites = controller.getSatellites();
@@ -123,28 +154,8 @@ public class SkyCanvas extends BaseCanvas{
                 final int Az = satellite.getAzimuth();
                 final int Elev = satellite.getElevation();
                 final int snr = satellite.getSnr();
-                int lineColor = 0x0; // Default Color is Black
-                if(snr < 0){//(snr == GpsSatellite.UNKNOWN){
-                    // Do nothing, I don't think it should ever be UNKNOWN,(or less than 0) but.... perhaps log it, and I can deal with it again, perhaps not...
-                    // Leave line color to BLACK (to indicate an Error);
-                }else if(snr < 33){
-                    // Color line RED
-                    lineColor = 0xFF0000;
-                }else if(snr < 66){
-                    // Color line Orange
-                    lineColor = 0xFB9924;
-                }else if(snr < 100){
-                    // Color line Green
-                    lineColor = 0x00FF00;
-                }else{
-                    // snr >= 100, again don't think it should ever be so, but just 
-                    // leave the line Black to indicate an error.
-                }
-                
-                // double signal = (this.getWidth() - (5+lineStartPos)) * (snr/100.0);
-                
-                g.setColor(lineColor);                
 
+                g.setColor(getSNRColor(snr));
                 double x = Math.sin(Az*Math.PI/180)*((90.0- (double)Elev)/90.0)*diameter/2 + (double)diameter/2;
                 double y = -Math.cos(Az*Math.PI/180)*((90.0-(double)Elev)/90.0)*diameter/2 + (double)diameter/2;               
 
@@ -161,9 +172,27 @@ public class SkyCanvas extends BaseCanvas{
     
     /** Key pressed handler */
     protected void keyPressed(int keyCode) {
+        int gameKey = -1;
+        try {
+            gameKey = getGameAction(keyCode);
+        } catch (Exception ex) {
+            /**
+             * We don't need to handle this error. It is only caught because
+             * getGameAction() method generates exceptions on some phones for
+             * some buttons.
+             */
+        }
         /** Handle 0 key press */
         if(keyCode==Canvas.KEY_NUM0) {
             controller.switchDisplay();
+        }
+        if (gameKey == UP || keyCode == KEY_NUM2) {
+            maxSNR+=10;
+            if(maxSNR>100) maxSNR=100;
+        }
+        if (gameKey == DOWN || keyCode == KEY_NUM8) {
+            maxSNR-=10;
+            if(maxSNR<10) maxSNR=10;
         }
  
     }
