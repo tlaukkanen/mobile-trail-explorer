@@ -79,7 +79,7 @@ public class TrailCanvas extends BaseCanvas {
     private Image compass;
     private Sprite compassArrows;
     private boolean largeDisplay;
-    
+
     private int zoom = 11; // Used by both the map and trail
 
     // Variables needed by the map generator
@@ -89,9 +89,10 @@ public class TrailCanvas extends BaseCanvas {
 
     private TileDownloader tileDownloader = null;
 
-    /** 
+    /**
      * Creates a new instance of TrailCanvas
-     * @param initialPosition 
+     * 
+     * @param initialPosition
      */
     public TrailCanvas(GpsPosition initialPosition) {
         super();
@@ -131,67 +132,73 @@ public class TrailCanvas extends BaseCanvas {
 
     /** Paint */
     public void paint(Graphics g) {
-
-        final int height = getHeight();
-        final int width = getWidth();
-
-        this.gpgsa = controller.getGPGSA();
-
-        /** Get last position from recorder */
-        final GpsPosition temp = controller.getPosition();
-        if (temp != null) {
-            this.lastPosition = controller.getPosition();
-            this.setLastPosition(lastPosition);
-        }        
-
-        /** Fill background with white */
-        g.setColor(COLOR_WHITE);
-        g.fillRect(0, 0, width, height);
-
-        RecorderSettings settings = controller.getSettings();
-
-        // Draw maps first, as they will fill the screen
-        // and we don't want to occlude other items
         try {
-            if(controller.getStatusCode() == Controller.STATUS_RECORDING){          
-                drawMaps(g, settings.getDrawMap());
+            final int height = getHeight();
+            final int width = getWidth();
+
+
+            /** Get last position from recorder */
+            final GpsPosition temp = controller.getPosition();
+            if (temp != null) {
+                this.lastPosition = controller.getPosition();
+                this.setLastPosition(lastPosition);
+                gpgsa = temp.getGpgsa();
+                if (gpgsa==null){
+                    gpgsa=lastPosition.getGpgsa();
+                }
             }
-        } catch(Exception ex) {
-            Logger.fatal(
-                    "drawMaps Exception: " + ex.getMessage());
-            ex.printStackTrace();
+            
+            /** Fill background with white */
+            g.setColor(COLOR_WHITE);
+            g.fillRect(0, 0, width, height);
+
+            RecorderSettings settings = controller.getSettings();
+
+            // Draw maps first, as they will fill the screen
+            // and we don't want to occlude other items
+            try {
+                if (controller.getStatusCode() == Controller.STATUS_RECORDING) {
+                    drawMaps(g, settings.getDrawMap());
+                }
+            } catch (Exception ex) {
+                Logger.fatal("drawMaps Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+            /** Draw status bar */
+            drawStatusBar(g);
+
+            /** Draw waypoints */
+            drawWaypoints(g);
+
+            /** Draw ghost trail */
+            // TODO: Draw all the saved tracks to 'ghost' PNGs, then display
+            // using
+            // the code used for maps
+            // This could be more efficient than drawing each track
+            Track ghostTrail = controller.getGhostTrail();
+            drawTrail(g, ghostTrail, 0xAAAAAA, true);
+
+            /** Draw current trail */
+            Track currentTrail = controller.getTrack();
+            drawTrail(g, currentTrail, 0xDD0000, settings.getDrawWholeTrail());
+
+            /** Draw current location with red dot */
+            g.drawImage(redDotImage, midWidth + horizontalMovement, midHeight
+                    + verticalMovement, Graphics.VCENTER | Graphics.HCENTER);
+
+            /** Draw compass */
+            drawCompass(g);
+
+            /** Draw zoom scale bar */
+            drawZoomScaleBar(g);
+        } catch (Exception e) {
+            Logger.debug("Caught exception:"+e.getMessage());
         }
-        /** Draw status bar */
-        drawStatusBar(g);
-        
-        /** Draw waypoints */
-        drawWaypoints(g);
-
-        /** Draw ghost trail */
-        // TODO: Draw all the saved tracks to 'ghost' PNGs, then display using
-        // the code used for maps
-        // This could be more efficient than drawing each track
-        Track ghostTrail = controller.getGhostTrail();
-        drawTrail(g, ghostTrail, 0xAAAAAA, true);
-
-        /** Draw current trail */
-        Track currentTrail = controller.getTrack();
-        drawTrail(g, currentTrail, 0xDD0000, settings.getDrawWholeTrail());
-
-        /** Draw current location with red dot */
-        g.drawImage(redDotImage, midWidth + horizontalMovement, midHeight
-                + verticalMovement, Graphics.VCENTER | Graphics.HCENTER);
-
-        /** Draw compass */
-        drawCompass(g);
-
-        /** Draw zoom scale bar */
-        drawZoomScaleBar(g);
     }
 
 
     public void setLastPosition(GpsPosition position) {
-        if(position!=null) {
+        if (position != null) {
             this.lastPosition = position;
             setLastPosition(position.latitude, position.longitude, zoom);
         }
@@ -205,18 +212,19 @@ public class TrailCanvas extends BaseCanvas {
     private void drawMaps(Graphics g, int drawMap) {
         // conditionally draw background map tiles
 
-        
+
         if (drawMap != RecorderSettings.DRAW_MAP_NONE) {
-          
+
             if (tileDownloader == null) {
                 Logger.debug("Starting TileDownloader Instance:");
-                tileDownloader = new TileDownloader();               
+                tileDownloader = new TileDownloader();
                 tileDownloader.start();
             }
             if (lastPosition != null) {
-               // System.out.println("lastPos not null");
-                if (tileDownloader != null && tileDownloader.isStarted() == true ) {
-                   // System.out.println("td not null and td was started");
+                // System.out.println("lastPos not null");
+                if (tileDownloader != null
+                        && tileDownloader.isStarted() == true) {
+                    // System.out.println("td not null and td was started");
                     int maxtiles = (int) MathUtil.pow(2, zoom);
                     int[] pt = MapLocator.conv(lastPosition.latitude,
                             lastPosition.longitude, zoom);
@@ -237,22 +245,30 @@ public class TrailCanvas extends BaseCanvas {
 
 
                     // System.out.println("zoom = "+zoom);
-                    
-                    try{
-                    mapTiles[4] = tileDownloader.fetchTile(pt[0] + m[4], pt[1] + n[4], zoom,false);                    
-                    mapTiles[1] = tileDownloader.fetchTile(pt[0] + m[1], pt[1] + n[1], zoom,false);                    
-                    mapTiles[3] = tileDownloader.fetchTile(pt[0] + m[3], pt[1] + n[3], zoom,false);                   
-                    mapTiles[5] = tileDownloader.fetchTile(pt[0] + m[5], pt[1] + n[5], zoom,false);
-                    mapTiles[7] = tileDownloader.fetchTile(pt[0] + m[7], pt[1] + n[7], zoom,false);                    
-                    mapTiles[0] = tileDownloader.fetchTile(pt[0] + m[0], pt[1] + n[0], zoom,true);
-                    mapTiles[2] = tileDownloader.fetchTile(pt[0] + m[2], pt[1] + n[2], zoom,false);
-                    mapTiles[6] = tileDownloader.fetchTile(pt[0] + m[6], pt[1] + n[6], zoom,false);                    
-                    mapTiles[8] = tileDownloader.fetchTile(pt[0] + m[8], pt[1] + n[8], zoom,false);
-                    }
-                    catch(Exception e){
+
+                    try {
+                        mapTiles[4] = tileDownloader.fetchTile(pt[0] + m[4],
+                                pt[1] + n[4], zoom, false);
+                        mapTiles[1] = tileDownloader.fetchTile(pt[0] + m[1],
+                                pt[1] + n[1], zoom, false);
+                        mapTiles[3] = tileDownloader.fetchTile(pt[0] + m[3],
+                                pt[1] + n[3], zoom, false);
+                        mapTiles[5] = tileDownloader.fetchTile(pt[0] + m[5],
+                                pt[1] + n[5], zoom, false);
+                        mapTiles[7] = tileDownloader.fetchTile(pt[0] + m[7],
+                                pt[1] + n[7], zoom, false);
+                        mapTiles[0] = tileDownloader.fetchTile(pt[0] + m[0],
+                                pt[1] + n[0], zoom, true);
+                        mapTiles[2] = tileDownloader.fetchTile(pt[0] + m[2],
+                                pt[1] + n[2], zoom, false);
+                        mapTiles[6] = tileDownloader.fetchTile(pt[0] + m[6],
+                                pt[1] + n[6], zoom, false);
+                        mapTiles[8] = tileDownloader.fetchTile(pt[0] + m[8],
+                                pt[1] + n[8], zoom, false);
+                    } catch (Exception e) {
                         e.printStackTrace();
-                            
-                        
+
+
                     }
 
                     // Alpha blending
@@ -342,7 +358,7 @@ public class TrailCanvas extends BaseCanvas {
             }
         }
     }
-    
+
     /** Set last position */
     private void setLastPosition(double lat, double lon, int zoom) {
         lastCanvasPoint = ProjectionUtil.toCanvasPoint(lat, lon, zoom);
@@ -352,54 +368,46 @@ public class TrailCanvas extends BaseCanvas {
     private CanvasPoint convertPosition(double lat, double lon) {
 
         CanvasPoint merc = ProjectionUtil.toCanvasPoint(lat, lon, zoom);
-                
-        int relativeX = (merc.X - lastCanvasPoint.X) + midWidth + horizontalMovement;
-        int relativeY = (merc.Y - lastCanvasPoint.Y) + midHeight + verticalMovement;
-        
+
+        int relativeX = (merc.X - lastCanvasPoint.X) + midWidth
+                + horizontalMovement;
+        int relativeY = (merc.Y - lastCanvasPoint.Y) + midHeight
+                + verticalMovement;
+
         // midWidth + horizontalMovement
         // midHeight + verticalMovement
-        
-        //final int TILE_SIZE = 256;
-        //double scale = (1 << zoom);
-                
-        //System.out.println("diffx: " + (int)relativeX);
-        //System.out.println("lastpoint: " + (int)(lastCanvasPoint.X));
-        
-        CanvasPoint relativePoint = new CanvasPoint(
-                (int)(relativeX), 
-                (int)(relativeY));
+
+        // final int TILE_SIZE = 256;
+        // double scale = (1 << zoom);
+
+        // System.out.println("diffx: " + (int)relativeX);
+        // System.out.println("lastpoint: " + (int)(lastCanvasPoint.X));
+
+        CanvasPoint relativePoint = new CanvasPoint((int) (relativeX),
+                (int) (relativeY));
         return relativePoint;
-        
+
         /*
-        double latitude = lat;
-        double longitude = lon;
-
-        if (lastPosition == null) {
-            return null;
-        }
-
-        double currentLatitude = lastPosition.latitude;
-        double currentLongitude = lastPosition.longitude;
-        // Current latitude will be zero, hence in the middle of the screen
-        latitude -= currentLatitude;
-        latitude *= verticalZoomFactor;
-        int y = midHeight + verticalMovement - (int) latitude;
-
-        longitude -= currentLongitude;
-        longitude *= horizontalZoomFactor;
-        int x = (int) longitude + midWidth + horizontalMovement;
-
-        CanvasPoint point = new CanvasPoint(x, y);
-        return point;
-         */ 
+         * double latitude = lat; double longitude = lon;
+         * 
+         * if (lastPosition == null) { return null; }
+         * 
+         * double currentLatitude = lastPosition.latitude; double
+         * currentLongitude = lastPosition.longitude; // Current latitude will
+         * be zero, hence in the middle of the screen latitude -=
+         * currentLatitude; latitude *= verticalZoomFactor; int y = midHeight +
+         * verticalMovement - (int) latitude;
+         * 
+         * longitude -= currentLongitude; longitude *= horizontalZoomFactor; int
+         * x = (int) longitude + midWidth + horizontalMovement;
+         * 
+         * CanvasPoint point = new CanvasPoint(x, y); return point;
+         */
     }
 
     /** Draw trail with a given color */
-    private void drawTrail(
-            Graphics g, 
-            Track trail, 
-            int color,
-            boolean drawWholeTrail ) {
+    private void drawTrail(Graphics g, Track trail, int color,
+            boolean drawWholeTrail) {
         try {
             if (trail == null) {
                 return;
@@ -434,42 +442,42 @@ public class TrailCanvas extends BaseCanvas {
                 int positionsDrawn = 0;
 
                 try {
-                    if (trail!=null && trail.getEndPosition() !=null){
-                    double lastLatitude = trail.getEndPosition().latitude;
-                    double lastLongitude = trail.getEndPosition().longitude;
+                    if (trail != null && trail.getEndPosition() != null) {
+                        double lastLatitude = trail.getEndPosition().latitude;
+                        double lastLongitude = trail.getEndPosition().longitude;
 
-                    for (int index = numPositions - 2; index >= 0; index -= increment) {
-                        GpsPosition pos = trail.getPosition(index);
+                        for (int index = numPositions - 2; index >= 0; index -= increment) {
+                            GpsPosition pos = trail.getPosition(index);
 
-                        double lat = pos.latitude;
-                        double lon = pos.longitude;
-                        CanvasPoint point1 = convertPosition(lat, lon);
-                        // debugging...
-                      //  if(index == numPositions - 2) {
-                        //    System.out.println("coord: " + point1.X + "," + point1.Y);
-                       // }
-                        CanvasPoint point2 = convertPosition(lastLatitude,
-                                lastLongitude);
+                            double lat = pos.latitude;
+                            double lon = pos.longitude;
+                            CanvasPoint point1 = convertPosition(lat, lon);
+                            // debugging...
+                            // if(index == numPositions - 2) {
+                            // System.out.println("coord: " + point1.X + "," +
+                            // point1.Y);
+                            // }
+                            CanvasPoint point2 = convertPosition(lastLatitude,
+                                    lastLongitude);
 
-                        g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
+                            g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
 
-                        lastLatitude = pos.latitude;
-                        lastLongitude = pos.longitude;
-                        positionsDrawn++;
-                        if (!drawWholeTrail
-                                && positionsDrawn > numPositionsToDraw) {
-                            break;
+                            lastLatitude = pos.latitude;
+                            lastLongitude = pos.longitude;
+                            positionsDrawn++;
+                            if (!drawWholeTrail
+                                    && positionsDrawn > numPositionsToDraw) {
+                                break;
+                            }
                         }
                     }
-                    }
-                } 
-                catch (NullPointerException npe){
+                } catch (NullPointerException npe) {
                     Logger.error("NPE while drawing trail");
                 }
             }
         } catch (Exception ex) {
-            Logger.warn(
-                    "Exception occured while drawing trail: " + ex.toString());
+            Logger.warn("Exception occured while drawing trail: "
+                    + ex.toString());
         }
     }
 
@@ -492,7 +500,7 @@ public class TrailCanvas extends BaseCanvas {
     private void drawZoomScaleBar(Graphics g) {
         String text = "", unit = "";
         double lat, lon;
-        
+
         if (lastPosition != null) {
             lat = lastPosition.latitude;
             lon = lastPosition.longitude;
@@ -516,7 +524,7 @@ public class TrailCanvas extends BaseCanvas {
 
         scaleLength = getWidth() / 2;
         pixelSize *= scaleLength;
-           
+
         if (!settings.getUnitsAsKilometers()) {
             if (pixelSize > 1600) {
                 pixelSize /= (1000 * UnitConverter.KILOMETERS_IN_A_MILE);
@@ -526,7 +534,7 @@ public class TrailCanvas extends BaseCanvas {
                 unit = "ft";
             }
         }
-        
+
         while (barDist < pixelSize)
             barDist *= 10;
         barDist /= 10;
@@ -538,9 +546,9 @@ public class TrailCanvas extends BaseCanvas {
                 barDist *= 2;
             scaleParts = 4;
         }
-        
-        scaleLength = (int)(scaleLength * barDist / pixelSize);
-        
+
+        scaleLength = (int) (scaleLength * barDist / pixelSize);
+
         g.setColor(0, 0, 0); // black color
         g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT
                 + scaleLength, getHeight() - MARGIN_BOTTOM);
@@ -595,8 +603,8 @@ public class TrailCanvas extends BaseCanvas {
         g.setColor(0, 0, 255);
 
         String satelliteCount = String.valueOf(controller.getSatelliteCount());
-        g.drawString("Status: " + controller.getStatusText() + " (" + satelliteCount + ")", 
-                1, 0, Graphics.TOP | Graphics.LEFT);
+        g.drawString("Status: " + controller.getStatusText() + " ("
+                + satelliteCount + ")", 1, 0, Graphics.TOP | Graphics.LEFT);
 
         /** Draw status */
         g.setColor(0, 0, 0);
@@ -694,14 +702,15 @@ public class TrailCanvas extends BaseCanvas {
                     units = " ml";
                 } else {
                     /** Distance in meters. */
-                    if(distanceInKilometers>5) {
+                    if (distanceInKilometers > 5) {
                         distance = StringUtil.valueOf(distanceInKilometers, 2);
                         units = " km";
                     } else {
-                        distance = StringUtil.valueOf(distanceInKilometers * 1000, 0);
+                        distance = StringUtil.valueOf(
+                                distanceInKilometers * 1000, 0);
                         units = " m";
-                    }                    
-                    
+                    }
+
                 }
                 g.drawString("DST:", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
@@ -776,20 +785,21 @@ public class TrailCanvas extends BaseCanvas {
                         fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }
-            
-            /** Debugging free mem */
-            //long freeMem = Runtime.getRuntime().freeMemory();
-            //g.drawString("Freemem:" + freeMem, 1, fontHeight * displayRow, Graphics.TOP
-            //            | Graphics.LEFT);
-            //displayRow++;
 
+            /** Debugging free mem */
+            // long freeMem = Runtime.getRuntime().freeMemory();
+            // g.drawString("Freemem:" + freeMem, 1, fontHeight * displayRow,
+            // Graphics.TOP
+            // | Graphics.LEFT);
+            // displayRow++;
             /**
              * Draw the last logged message. Split the string on a word boundary
              * and draw on separate lines. Only draw the string if it is less
              * than 10 seconds old, so that old messages aren't left on screen
              */
-            long ageOfLastMessage=System.currentTimeMillis()-Logger.getLogger().getTimeOfLastMessage();
-            if (ageOfLastMessage< 10000) {
+            long ageOfLastMessage = System.currentTimeMillis()
+                    - Logger.getLogger().getTimeOfLastMessage();
+            if (ageOfLastMessage < 10000) {
                 String lastLoggedMessage = "LOG:"
                         + Logger.getLogger().getLastMessage();
                 String[] loglines = StringUtil.chopStrings(lastLoggedMessage,
@@ -843,16 +853,16 @@ public class TrailCanvas extends BaseCanvas {
                             + " seconds";
                 }
 
-                g.drawString("Time from last fix:", 1, height - (fontHeight * 4 + 6),
-                        Graphics.TOP | Graphics.LEFT);
+                g.drawString("Time from last fix:", 1, height
+                        - (fontHeight * 4 + 6), Graphics.TOP | Graphics.LEFT);
                 g.drawString(timeSinceLastPosition + " ago.", 1, height
                         - (fontHeight * 3 + 6), Graphics.TOP | Graphics.LEFT);
 
             }
 
         } else if (controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
-            g.drawString("No GPS fix. " + counter, 1,
-                    fontHeight, Graphics.TOP | Graphics.LEFT);
+            g.drawString("No GPS fix. " + counter, 1, fontHeight, Graphics.TOP
+                    | Graphics.LEFT);
         }
 
         /** Draw error texts */
@@ -878,6 +888,7 @@ public class TrailCanvas extends BaseCanvas {
          * String gpsUrl = m_controller.getGpsUrl(); g.drawString("GPS: " +
          * gpsUrl, 1, height - (fontHeight + 2), Graphics.TOP|Graphics.LEFT );
          */
+      
     }
 
     public TrailCanvas() {
@@ -913,14 +924,16 @@ public class TrailCanvas extends BaseCanvas {
             case (KEY_POUND):
                 Logger.debug("WaypointList getPosition called");
                 GpsPosition lp = controller.getPosition();
-                if(lp!=null) {
+                if (lp != null) {
                     int waypointCount = controller.getWaypoints().size();
                     String name = "WP" + String.valueOf(waypointCount + 1);
-                    Waypoint waypoint = new Waypoint( name, lp.latitude, lp.longitude );
+                    Waypoint waypoint = new Waypoint(name, lp.latitude,
+                            lp.longitude);
                     controller.saveWaypoint(waypoint);
-                    
-                    //AlertHandler lListen = new AlertHandler(controller, this);
-                    //lListen.notifySuccess("Waypoint " + name + " created");
+
+                    // AlertHandler lListen = new AlertHandler(controller,
+                    // this);
+                    // lListen.notifySuccess("Waypoint " + name + " created");
                 }
                 break;
 
