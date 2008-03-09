@@ -47,6 +47,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     private TextField maxSpeedField;
     private TextField maxAccelerationField;
     private TextField minDistanceField;
+    private TextField uploadURLField;
     
     /** Creates a new instance of RecordingSettingsForm */
     public RecordingSettingsForm(Controller controller) {
@@ -71,6 +72,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             int maxSpeed = 310;
             int maxAcceleration = 50;
             int minDistance = 5;
+            String uploadUrl ="";
             try{
                 // TODO: Add max speed and acceleration
                 newInterval = Integer.valueOf( intervalText ).intValue();
@@ -81,7 +83,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 maxAcceleration = Integer.valueOf(maxAccelerationText).intValue();
                 String minDistanceText = minDistanceField.getString();
                 minDistance = Integer.valueOf(minDistanceText).intValue();
-                
+                uploadUrl=uploadURLField.getString();
             }catch(Exception ex) {
                 ex.printStackTrace();
                 newInterval = 10;
@@ -94,6 +96,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             settings.setMaxRecordedSpeed(maxSpeed);
             settings.setMaxAcceleration(maxAcceleration);
             settings.setMinDistance(minDistance);
+            settings.setUploadURL(uploadUrl);
             
             controller.showSettings();
         } else {
@@ -156,6 +159,13 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 6,
                 TextField.NUMERIC);
         this.append(minDistanceField);
+        
+        String uploadUrl = settings.getUploadURL();
+        uploadURLField= new TextField("Upload position info to here",
+                uploadUrl,
+                255,
+                TextField.URL);
+        this.append(uploadURLField);
     }
     
 }
