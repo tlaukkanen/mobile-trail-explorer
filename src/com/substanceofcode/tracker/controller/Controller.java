@@ -39,7 +39,6 @@ import com.substanceofcode.bluetooth.BluetoothUtility;
 import com.substanceofcode.bluetooth.Device;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
-import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.gpsdevice.GpsDevice;
 import com.substanceofcode.gpsdevice.GpsDeviceFactory;
@@ -59,6 +58,8 @@ import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.DisplaySettingsForm;
 import com.substanceofcode.tracker.view.ElevationCanvas;
 import com.substanceofcode.tracker.view.ExportSettingsForm;
+import com.substanceofcode.tracker.view.FileChooser;
+import com.substanceofcode.tracker.view.ImportTrailScreen;
 import com.substanceofcode.tracker.view.InformationCanvas;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.tracker.view.RecordingSettingsForm;
@@ -72,12 +73,10 @@ import com.substanceofcode.tracker.view.TrailActionsForm;
 import com.substanceofcode.tracker.view.TrailCanvas;
 import com.substanceofcode.tracker.view.TrailDetailsScreen;
 import com.substanceofcode.tracker.view.TrailsList;
+import com.substanceofcode.tracker.view.WaypointActionsForm;
 import com.substanceofcode.tracker.view.WaypointCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
 import com.substanceofcode.tracker.view.WaypointList;
-import com.substanceofcode.tracker.view.WaypointActionsForm;
-import com.substanceofcode.tracker.view.FileChooser;
-import com.substanceofcode.tracker.view.ImportTrailScreen;
 
 /**
  * Controller contains methods for the application flow.
@@ -624,19 +623,19 @@ public class Controller {
         if (gpsDevice == null) {
             return null;
         }
-        // Logger.getLogger().log("Controller getPosition called",Logger.DEBUG);
+       //  Logger.debug("Controller getPosition called");
         return ((GpsDevice) gpsDevice).getPosition();
     }
 
     /**
      * @return Current GpsGPGSA data object
      */
-    public synchronized GpsGPGSA getGPGSA() {
+  /*  public synchronized GpsGPGSA getGPGSA() {
         if (gpsDevice == null) {
             return null;
         }
         return ((GpsDevice) gpsDevice).getGPGSA();
-    }
+    }*/
 
     /**
      * Exit application
