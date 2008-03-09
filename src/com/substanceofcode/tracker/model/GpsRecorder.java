@@ -1,7 +1,7 @@
 /*
  * GpsRecorder.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -38,18 +38,15 @@ import javax.microedition.rms.RecordStoreException;
 import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
- * Thread based class which encapsulates recording data from a GPS device.
+ * Timer based class that encapsulates recording data from a GPS device.
  * 
- * @author Tommi
+ * @author Tommi Laukkanen
  */
-public class GpsRecorder implements Runnable {
-
-    /**
-     * Local reference to Thread running this instance.
-     */
-    private Thread recorderThread;
+public class GpsRecorder {
 
     /**
      * State : true = recording in progress, false = recording not in progress
@@ -81,10 +78,24 @@ public class GpsRecorder implements Runnable {
     private Controller controller;
     
     private HttpConnection uploadConn;
+    
+    /** Timer for worker */
+    private Timer recorderTimer;
 
+    /** Recorder helpers */
+    final GpsRmsRecorder rmsRecorder = new GpsRmsRecorder();
+    GpsPosition lastRecordedPosition = null;
+    GpsPosition lastPosition = null;
+    int secondsFromLastTrailPoint = 0;
+    int recordedCount = 0;
+    boolean isValidPosition = false;
+    GpsPosition currentPosition = null;
+    GpsGPGSA currentGPGSA = null;  
+    
     /**
      * Constructor - sets up local variables then launches the instance in a
      * thread.
+     * @param controller 
      */
     public GpsRecorder(Controller controller) {
         this.controller = controller;
@@ -92,21 +103,33 @@ public class GpsRecorder implements Runnable {
         intervalSeconds = settings.getRecordingInterval();
         intervalMarkerStep = settings.getRecordingMarkerInterval();
         uploadURL=settings.getUploadURL();
-        recorderThread = new Thread(this);
-        recorderThread.start();
+
+        /** Start recorder timer as fixed rate (in every 1 second) */
+        RecorderTask recorderTask = new RecorderTask();
+        recorderTimer = new Timer();
+        recorderTimer.scheduleAtFixedRate(recorderTask, 1000, 1000);
     }
 
-    /** Set interval for recording */
+    /** 
+     * Set interval for recording
+     * @param seconds 
+     */
     public void setInterval(int seconds) {
         intervalSeconds = seconds;
     }
 
-    /** Set interval for marker recording */
+    /** 
+     * Set interval for marker recording
+     * @param intervalStep 
+     */
     public void setIntervalForMarkers(int intervalStep) {
         intervalMarkerStep = intervalStep;
     }
 
-    /** Check status */
+    /** 
+     * Check status
+     * @return 
+     */
     public boolean isRecording() {
         return recording;
     }
@@ -116,7 +139,10 @@ public class GpsRecorder implements Runnable {
         recordedTrack.clear();
     }
 
-    /** Get track */
+    /** 
+     * Get track
+     * @return 
+     */
     public Track getTrack() {
         return recordedTrack;
     }
@@ -136,105 +162,12 @@ public class GpsRecorder implements Runnable {
         recording = false;
     }
 
-    /** Set recording status */
+    /** 
+     * Set recording status
+     * @param active 
+     */
     public void setRecording(boolean active) {
         recording = active;
-    }
-
-    /** Main recording thread */
-    public void run() {
-        final GpsRmsRecorder rmsRecorder = new GpsRmsRecorder();
-        GpsPosition lastRecordedPosition = null;
-        GpsPosition lastPosition = null;
-        int secondsFromLastTrailPoint = 0;
-        int recordedCount = 0;
-        boolean isValidPosition=false;
-        GpsPosition currentPosition=null;
-        GpsGPGSA currentGPGSA=null;
-        while (true) {
-            try {
-                Thread.sleep(1000);
-                if (recording==true){
-                //Logger.debug("GpsRecorder getPosition called");
-                currentPosition = controller.getPosition();
-                currentGPGSA = controller.getGPGSA();
-                isValidPosition = checkValidPosition(
-                        currentPosition, 
-                        lastPosition, 
-                        lastRecordedPosition);
-                }
-                if (recording == true
-                        && secondsFromLastTrailPoint >= intervalSeconds
-                        && isValidPosition) {
-
-                    secondsFromLastTrailPoint = 0;
-
-                    /**
-                     * Check if user haven't moved -> don't record the same
-                     * position
-                     */
-                    boolean stopped = false;
-                    if (lastRecordedPosition != null && currentPosition != null) {
-                        stopped = currentPosition.equals(lastRecordedPosition);
-                    }
-
-                    // Logger.debug("interval: "+ intervalSeconds + 
-                    // " currentPosition is " + (currentPosition==null?"null":"not null"));
-                    /**
-                     * Record current position if user have moved or this is a
-                     * first recorded position.
-                     */
-                    if (currentPosition != null && !stopped) {
-
-                        rmsRecorder.setGpsPosition(currentPosition);
-
-                        recordedTrack.addPosition(currentPosition,currentGPGSA);
-                        if (intervalMarkerStep > 0 && recordedCount > 0
-                                && recordedCount % intervalMarkerStep == 0) {
-                            recordedTrack.addMarker(currentPosition);
-                        }
-                        lastRecordedPosition = currentPosition;
-                        recordedCount++;
-                        
-                        //If the uploadURL is set (not "") then try to upload the
-                        //GpsPosition too.
-                        uploadURL=controller.getSettings().getUploadURL();
-                        if(uploadURL!=""){
-                            DataOutputStream dos=null;
-                            try{
-                            uploadConn= (HttpConnection) Connector.open(uploadURL);
-                            uploadConn.setRequestMethod(HttpConnection.POST);
-                            dos= uploadConn.openDataOutputStream();
-                            currentPosition.serialize(dos);
-                            dos.write("\r\n".getBytes());
-                            dos.flush();
-                            
-                            }catch(Exception e){
-                                e.printStackTrace();
-                            }finally{
-                                
-                                if(dos!=null)dos.close();
-                                if(uploadConn!=null)uploadConn.close();
-                                
-                            }
-                            
-                        }
-                        
-                        
-                    }
-                    lastPosition = currentPosition;
-                } else {
-                    secondsFromLastTrailPoint++;
-                   // Logger.debug("GpsRecorder getPosition called 2");
-                   lastPosition = controller.getPosition();
-                }
-                controller.repaintDisplay();
-            } catch (Exception ex) {
-                controller.showError("Error in recorder thread: "
-                        + ex.toString()+"\n controller is " +controller+
-                       "\n currentPosition is" +controller.getPosition()+"\n currentGPGSA is "+ controller.getGPGSA());
-            }
-        }
     }
 
     private boolean checkValidPosition(
@@ -371,7 +304,7 @@ public class GpsRecorder implements Runnable {
      * RMS, but for the time being, it ensures that there is ONLY ONE position
      * in the RMS at a time.
      * 
-     * @param xiPos
+     * @param pos 
      *            The {@link GpsPosition} to save to the RMS.
      * 
      * @see Settings#getPositionFromRMS()
@@ -449,4 +382,96 @@ public class GpsRecorder implements Runnable {
         }
         return result;
     }
+    
+    protected class RecorderTask extends TimerTask {
+        
+        public void run() {
+            try {
+
+                if (recording==true){
+                    //Logger.debug("GpsRecorder getPosition called");
+                    currentPosition = controller.getPosition();
+                    currentGPGSA = controller.getGPGSA();
+                    isValidPosition = checkValidPosition(
+                            currentPosition, 
+                            lastPosition, 
+                            lastRecordedPosition);
+                }
+                if (recording == true
+                        && secondsFromLastTrailPoint >= intervalSeconds
+                        && isValidPosition) {
+
+                    secondsFromLastTrailPoint = 0;
+
+                    /**
+                     * Check if user haven't moved -> don't record the same
+                     * position
+                     */
+                    boolean stopped = false;
+                    if (lastRecordedPosition != null && currentPosition != null) {
+                        stopped = currentPosition.equals(lastRecordedPosition);
+                    }
+
+                    // Logger.debug("interval: "+ intervalSeconds + 
+                    // " currentPosition is " + (currentPosition==null?"null":"not null"));
+                    /**
+                     * Record current position if user have moved or this is a
+                     * first recorded position.
+                     */
+                    if (currentPosition != null && !stopped) {
+
+                        rmsRecorder.setGpsPosition(currentPosition);
+
+                        recordedTrack.addPosition(currentPosition,currentGPGSA);
+                        if (intervalMarkerStep > 0 && recordedCount > 0
+                                && recordedCount % intervalMarkerStep == 0) {
+                            recordedTrack.addMarker(currentPosition);
+                        }
+                        lastRecordedPosition = currentPosition;
+                        recordedCount++;
+                        
+                        //If the uploadURL is set (not "") then try to upload the
+                        //GpsPosition too.
+                        uploadURL=controller.getSettings().getUploadURL();
+                        if(!uploadURL.equals("")){
+                            DataOutputStream dos=null;
+                            try{
+                            uploadConn= (HttpConnection) Connector.open(uploadURL);
+                            uploadConn.setRequestMethod(HttpConnection.POST);
+                            dos= uploadConn.openDataOutputStream();
+                            currentPosition.serialize(dos);
+                            dos.write("\r\n".getBytes());
+                            dos.flush();
+                            
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }finally{
+                                
+                                if(dos!=null)dos.close();
+                                if(uploadConn!=null)uploadConn.close();
+                                
+                            }
+                            
+                        }
+                        
+                        
+                    }
+                    lastPosition = currentPosition;
+                } else {
+                    secondsFromLastTrailPoint++;
+                   // Logger.debug("GpsRecorder getPosition called 2");
+                   lastPosition = controller.getPosition();
+                }
+                controller.repaintDisplay();
+            } catch (Exception ex) {
+                controller.showError("Error in recorder task: "
+                        + ex.toString()+"\n controller is " +controller+
+                       "\n currentPosition is" +controller.getPosition()+"\n currentGPGSA is "+ controller.getGPGSA());
+            }
+                    
+        }
+        
+    }
 }
+
+
