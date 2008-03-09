@@ -901,15 +901,11 @@ public class TrailCanvas extends BaseCanvas {
                     // Zoom out
                     zoom--;
                 }
-
                 break;
 
-            case (KEY_NUM0):
-                // Change screen
-                controller.switchDisplay();
-                break;
             case (' '):
-                // Change screen. Some phones 0 key defaults to space
+            case (KEY_NUM0):
+                // Change screen. Some phones 0 key defaults to space.
                 controller.switchDisplay();
                 break;
                 

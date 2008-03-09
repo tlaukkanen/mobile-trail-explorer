@@ -182,14 +182,10 @@ public class SkyCanvas extends BaseCanvas{
              * some buttons.
              */
         }
-        /** Handle 0 key press */
-        if(keyCode==Canvas.KEY_NUM0) {
+        /** Handle 0 key press. In some phones the 0 key defaults to space. */
+        if(keyCode==Canvas.KEY_NUM0 || keyCode==' ') {
             controller.switchDisplay();
         }
-        /** In some phones the 0 key defaults to space**/
-         if(keyCode==' ') {
-            controller.switchDisplay();
-        }        
         if (gameKey == UP || keyCode == KEY_NUM2) {
             maxSNR+=10;
             if(maxSNR>100) maxSNR=100;
@@ -198,7 +194,6 @@ public class SkyCanvas extends BaseCanvas{
             maxSNR-=10;
             if(maxSNR<10) maxSNR=10;
         }
- 
     }
     
 }

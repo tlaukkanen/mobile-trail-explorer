@@ -126,14 +126,10 @@ public class SatelliteCanvas extends BaseCanvas {
     
     /** Key pressed handler */
     protected void keyPressed(int keyCode) {
-        /** Handle 0 key press */
-        if(keyCode==Canvas.KEY_NUM0) {
+        /** Handle 0 key press. In some phones the 0 key defaults to space */
+        if(keyCode==Canvas.KEY_NUM0 || keyCode==' ') {
             controller.switchDisplay();
         }
-        /** In some phones the 0 key defaults to space**/
-         if(keyCode==' ') {
-            controller.switchDisplay();
-        }        
     }
     
 }

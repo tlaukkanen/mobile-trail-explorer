@@ -435,16 +435,12 @@ public class ElevationCanvas extends BaseCanvas {
                 this.xScale = (byte) (xScaleScale | xScaleType);
                 break;
 
+            case (' '):
             case (KEY_NUM0):
-                // Change screen
+                // Change screen. In Some phones the 0 key defaults to space
                 controller.switchDisplay();
                 break;
                 
-            case (' '): //In Some phones the 0 key defaults to space
-                // Change screen
-                controller.switchDisplay();
-                break;
-
             default:
         }
 
