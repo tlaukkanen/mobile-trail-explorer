@@ -20,6 +20,7 @@ v1.9 (March xth 2008)
 + File browser is used for importing trails and selecting export path (Issue 77)
 + Logger can now write to the filesystem
 + Added signal strength SNR key to Sky View and updated help screen 
++ Added code to change screen on space key as well as 0 key (Issue 56)
 
 v1.8 (December 3rd 2007)
 + Trail duration is displayed and exported to KML

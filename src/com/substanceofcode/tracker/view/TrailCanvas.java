@@ -908,7 +908,11 @@ public class TrailCanvas extends BaseCanvas {
                 // Change screen
                 controller.switchDisplay();
                 break;
-
+            case (' '):
+                // Change screen. Some phones 0 key defaults to space
+                controller.switchDisplay();
+                break;
+                
             case (KEY_STAR):
             case (KEY_POUND):
                 Logger.debug("WaypointList getPosition called");

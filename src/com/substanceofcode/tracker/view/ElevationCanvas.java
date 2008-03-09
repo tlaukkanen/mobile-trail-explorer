@@ -439,6 +439,11 @@ public class ElevationCanvas extends BaseCanvas {
                 // Change screen
                 controller.switchDisplay();
                 break;
+                
+            case (' '): //In Some phones the 0 key defaults to space
+                // Change screen
+                controller.switchDisplay();
+                break;
 
             default:
         }

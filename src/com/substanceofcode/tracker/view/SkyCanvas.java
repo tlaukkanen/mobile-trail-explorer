@@ -76,14 +76,14 @@ public class SkyCanvas extends BaseCanvas{
         //draw Horizon
         int horizonDiameter = getWidth()-1;
         int horizonX = 0;
-        int horizonY = (getHeight()-horizonDiameter)/2;
-        if(horizonY < titleFont.getHeight()) horizonY = titleFont.getHeight();
         
-        if ((getHeight()-titleFont.getHeight()-(int)(getHeight()*SNRKeyHeight)-rowFont.getHeight()) < horizonDiameter) {
-            horizonDiameter = getHeight()-titleFont.getHeight()-(int)(getHeight()*(1.0-SNRKeyHeight))-rowFont.getHeight()-1;
-            horizonX = (getWidth()-horizonDiameter)/2;
-            horizonY = titleFont.getHeight();
+        if ((getHeight()-titleFont.getHeight()-(int)(getHeight()*(1.0-SNRKeyHeight))-smallRowFont.getHeight()) < horizonDiameter) {
+            horizonDiameter = getHeight()-titleFont.getHeight()-(int)(getHeight()*(1.0-SNRKeyHeight))-smallRowFont.getHeight()-1;
+            horizonX = (getWidth()-horizonDiameter)/2; //Re center the horizon on screen
         }
+        int spaceLeft = (int)((getHeight()-(int)(getHeight()*(1.0-SNRKeyHeight)+smallRowFont.getHeight()+titleFont.getHeight()+horizonDiameter))/2);
+        int horizonY = titleFont.getHeight()+spaceLeft/2;
+
         g.setColor(COLOR_BLACK);
         g.setFont(rowFont);
 
@@ -186,6 +186,10 @@ public class SkyCanvas extends BaseCanvas{
         if(keyCode==Canvas.KEY_NUM0) {
             controller.switchDisplay();
         }
+        /** In some phones the 0 key defaults to space**/
+         if(keyCode==' ') {
+            controller.switchDisplay();
+        }        
         if (gameKey == UP || keyCode == KEY_NUM2) {
             maxSNR+=10;
             if(maxSNR>100) maxSNR=100;

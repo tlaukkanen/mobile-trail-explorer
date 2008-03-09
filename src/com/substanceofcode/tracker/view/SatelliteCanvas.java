@@ -130,6 +130,10 @@ public class SatelliteCanvas extends BaseCanvas {
         if(keyCode==Canvas.KEY_NUM0) {
             controller.switchDisplay();
         }
+        /** In some phones the 0 key defaults to space**/
+         if(keyCode==' ') {
+            controller.switchDisplay();
+        }        
     }
     
 }

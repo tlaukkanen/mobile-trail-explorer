@@ -73,6 +73,9 @@ public class WaypointCanvas extends BaseCanvas {
         if(keyCode==Canvas.KEY_NUM0) {
             controller.switchDisplay();
         }
+        if(keyCode==' ') {
+            controller.switchDisplay();
+        }
         int gameAction = getGameAction(keyCode);
         if(keyCode==Canvas.KEY_NUM2 || gameAction==Canvas.UP) {
             /** Handle up key */
