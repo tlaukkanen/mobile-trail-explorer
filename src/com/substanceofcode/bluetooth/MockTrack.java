@@ -2,6 +2,7 @@ package com.substanceofcode.bluetooth;
 
 import java.util.Date;
 
+import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
@@ -1384,7 +1385,7 @@ private final String trackData = ""
         double latitudeDouble = Double.parseDouble(coords[1]);
         Date date = new Date();
         gp=new GpsPosition(course, longitudeDouble, latitudeDouble, speed,
-                altitude, date);
+                altitude, date,null);
         }else{
             
         }
@@ -1395,14 +1396,7 @@ private final String trackData = ""
      }
         return gp;
     }
+    
 
-    public static void main(String[] args) {
-        MockTrack mt = new MockTrack();
-        int count = mt.getPositionCount();
-        for (int i = 0; i < count; i++) {
-            System.out.println(mt.getPosition(i).latitude + ", "
-                    + mt.getPosition(i).longitude);
-        }
-
-    }
+    
 }

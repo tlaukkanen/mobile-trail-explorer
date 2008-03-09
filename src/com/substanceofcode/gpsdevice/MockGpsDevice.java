@@ -1,18 +1,10 @@
 package com.substanceofcode.gpsdevice;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Date;
 
-import org.kxml2.io.KXmlParser;
-import org.xmlpull.v1.XmlPullParserException;
-
 import com.substanceofcode.bluetooth.MockTrack;
-import com.substanceofcode.data.FileIOException;
-
 import com.substanceofcode.gps.GpsPosition;
-
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.view.Logger;
 
@@ -37,8 +29,7 @@ public class MockGpsDevice extends GpsDeviceImpl {
     private double altitude;
     private int posMarker = 0;
     
-    private String address;
-    private String alias;
+    
     
     MockTrack mt;
 
@@ -57,9 +48,10 @@ public class MockGpsDevice extends GpsDeviceImpl {
     public MockGpsDevice(String address, String alias) {
         Logger.debug("MockGpsDevice constructor called 1");
         this.address = address;
-        this.alias = alias;
-       
+        this.alias = alias;  
     }
+
+
 
     public MockGpsDevice() {
         Logger.debug("MockGpsDevice constructor called 2");
@@ -77,7 +69,8 @@ public class MockGpsDevice extends GpsDeviceImpl {
             init();
         }
         return getPositionFromMockTrack();
-        // return getMadeUpPosition();
+        
+        
     }
 
    

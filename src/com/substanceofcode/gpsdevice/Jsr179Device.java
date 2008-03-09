@@ -10,7 +10,6 @@ import javax.microedition.location.LocationListener;
 import javax.microedition.location.LocationProvider;
 import javax.microedition.location.QualifiedCoordinates;
 
-import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.gps.GpsPositionParser;
 import com.substanceofcode.tracker.view.Logger;
@@ -31,7 +30,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     // GPS position variables
     private  boolean usingExternalGPS=false; 
     private String extraInfo = "";
-    private GpsGPGSA gpgsa=null;
+    //private GpsGPGSA gpgsa=null;
     GpsPosition gp=null;
     protected GpsPositionParser parser;
     
@@ -71,7 +70,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 
                 long timestamp=location.getTimestamp();                
                 gp=new GpsPosition("",(short)course,lon,lat,speed,(double)altitude,new Date(timestamp));
-                gpgsa=new GpsGPGSA(0.0f,hdop,vdop,0);
+                //gpgsa=new GpsGPGSA(0.0f,hdop,vdop,0);
             }
         }
         
@@ -223,7 +222,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
         }else{
             return getJsr179Position();
         }
-    }
+    }/*
     public GpsGPGSA getGPGSA() {
         //Logger.debug("getGPGSA called");
         if(usingExternalGPS){
@@ -231,12 +230,12 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
         }else{
             return getJsr179GPGSA();
         }
-    }
-    
+    }*/
+    /*
     public GpsGPGSA getParserGPGSA(){
       //  Logger.debug("getParserGPGSA called");
         return parser.getGPGSA();
-    }
+    }*/
 
     
     public GpsPosition getParserPosition() {
@@ -254,15 +253,6 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
         
         
         return gp;
-    }
-    public GpsGPGSA getJsr179GPGSA() {
-       // System.out.println("getJsr179GPGSA called");
-      //  System.out.println(gpgsa.getFixtype());
-      //  System.out.println(gpgsa.getHdop());
-     //   System.out.println(gpgsa.getPdop());
-    //    System.out.println(gpgsa.getVdop());
-        
-        return gpgsa;
     }
   
     public Vector getSatellites() {
