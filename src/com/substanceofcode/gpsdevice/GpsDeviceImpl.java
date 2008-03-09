@@ -23,7 +23,6 @@ package com.substanceofcode.gpsdevice;
 
 import java.util.Vector;
 
-import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.gps.GpsPositionParser;
 
@@ -35,6 +34,8 @@ import com.substanceofcode.gps.GpsPositionParser;
 public abstract class GpsDeviceImpl implements GpsDevice {
 
     
+    protected String address;
+    protected String alias;
     
     protected GpsPositionParser parser;
 
@@ -64,12 +65,12 @@ public abstract class GpsDeviceImpl implements GpsDevice {
     /* (non-Javadoc)
      * @see com.substanceofcode.bluetooth.GpsDevice#getGPGSA()
      */
-    public GpsGPGSA getGPGSA() {
+   /* public GpsGPGSA getGPGSA() {
         if (parser == null) {
             return null;
         }
         return parser.getGPGSA();
-    }
+    }*/
 
     /* (non-Javadoc)
      * @see com.substanceofcode.bluetooth.GpsDevice#getSatelliteCount()

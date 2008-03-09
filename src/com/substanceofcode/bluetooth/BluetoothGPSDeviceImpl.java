@@ -37,9 +37,6 @@ import com.substanceofcode.tracker.view.Logger;
  */
 public class BluetoothGPSDeviceImpl extends GpsDeviceImpl implements Runnable, BluetoothDevice {
     
-    protected String address;
-    protected String alias;
-    
     private StreamConnection connection;
     private InputStreamReader reader;
     
@@ -120,7 +117,7 @@ public class BluetoothGPSDeviceImpl extends GpsDeviceImpl implements Runnable, B
                     while ((input = reader.read()) != LINE_DELIMITER) {
                         output.append((char) input);
                     }
-    
+
                     try {
                         // Trim start and end of any NON-Displayable characters.
                         while (output.charAt(0) < '!' || output.charAt(0) > '~') {
@@ -134,15 +131,14 @@ public class BluetoothGPSDeviceImpl extends GpsDeviceImpl implements Runnable, B
                         // Ignore but don't bother trying to parse, just loop
                         // around to the next iteration;
                         continue;
-                    }
+                    }               
                     // only parse items begining with '$', such as "$GPRMC,..."
                     // and "$GPGSA,..." etc...
                     String nmeaString = output.toString();
                     if (parser.isValidNMEASentence(nmeaString)) {
                         parser.parse(nmeaString);
                     }
-
-
+                 
                 }
                 // Most severe type of exception. Either thrown while connecting
                 // or
@@ -152,6 +148,7 @@ public class BluetoothGPSDeviceImpl extends GpsDeviceImpl implements Runnable, B
                 // the current trail
                 //
                 catch (IOException ie) {
+                    Logger.debug("4");
                     final Controller controller = Controller.getController();
                     boolean isRecording = (controller.getStatusCode() != Controller.STATUS_STOPPED);
                     if (isRecording == false) {
@@ -191,10 +188,16 @@ public class BluetoothGPSDeviceImpl extends GpsDeviceImpl implements Runnable, B
                             }
                         }
                     }
-                } catch (Exception e) {
+                } catch (NullPointerException npe) {
                     Logger.warn(
                             "UNEXPECTED EXCEPTION Caught in BluetoothGPSDevice.run(), attempting to continue: "
-                                    + e.toString());
+                                    + npe.getMessage()+"\n"+npe.getClass());
+                    npe.printStackTrace();
+                }
+                catch (Exception e) {
+                    Logger.warn(
+                            "UNEXPECTED EXCEPTION Caught in BluetoothGPSDevice.run(), attempting to continue: "
+                                    + e.toString());                    
                 }
             }
         } catch (Throwable e) {
