@@ -41,7 +41,7 @@ public class GpsPositionParser {
    private final Logger logger = Logger.getLogger();
     
     private GpsPosition currentPosition;
-    private GpsGPGSA gpgsa;
+   // private GpsGPGSA gpgsa;
     private double lastAltitude;
     private short satelliteCount;
     private double maxSpeed;
@@ -78,13 +78,21 @@ public class GpsPositionParser {
         return currentPosition;
     }
     
-    public synchronized GpsGPGSA getGPGSA() {
+  /*  public synchronized GpsGPGSA getGPGSA() {
+        Logger.debug("GPGPSA called from GPSPositionParser");
     	return gpgsa;
+    }*/
+   /**
+    * Use this method to add gpgsa info to the position
+    * @param gpgsa
+    */
+    private synchronized void setGPGSA(GpsGPGSA gpgsa) {
+        if(currentPosition!=null){
+            currentPosition.setGpgsa(gpgsa);
+        }else{
+            Logger.debug("CurrentPosition is null, can't add gpgsa");
+        }
     }
-   
-    private synchronized void setOtherInfo(GpsGPGSA gpgsa) {
-		this.gpgsa=gpgsa;
-	}
 
     private synchronized void setGpsPosition(GpsPosition pos) {
         this.currentPosition = pos;
@@ -140,29 +148,34 @@ public class GpsPositionParser {
 
     /** Parse GPS position */
     public synchronized void parse(String record){
+      //  Logger.debug("Parsing: "+record);
         recordMetrics(record);
         //Chop the checksum off, we don't want to parse it
         record=record.substring(0,record.indexOf('*'));        
         if (record.startsWith("$GPRMC")) {
             try{
+    //            Logger.debug("5");
                 parseGPRMC(record);
             }catch(IndexOutOfBoundsException e){
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()");
             }
         }else if(record.startsWith("$GPGSA")){
             try{
+      //          Logger.debug("6");
                 parseGPGSA(record);
             }catch(IndexOutOfBoundsException e){
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()");
             }
         } else if (record.startsWith("$GPGGA")) {
             try{
+        //        Logger.debug("7");
                 parseGPGGA(record);
             }catch(IndexOutOfBoundsException e){
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()");
             }
         } else if (record.startsWith("$GPGSV")) {
             try{
+          //      Logger.debug("8");
                 parseGPGSV(record);
             }catch(IndexOutOfBoundsException e){
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()");
@@ -557,7 +570,7 @@ public class GpsPositionParser {
           	oi.setPdop(values[15]);
           	oi.setHdop(values[16]);
           	oi.setVdop(values[17]);
-	        setOtherInfo(oi);
+          	setGPGSA(oi);
           }
   
     }

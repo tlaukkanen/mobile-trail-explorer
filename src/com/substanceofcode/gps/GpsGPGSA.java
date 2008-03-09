@@ -1,5 +1,10 @@
 package com.substanceofcode.gps;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import com.substanceofcode.data.Serializable;
 import com.substanceofcode.tracker.view.Logger;
 
 /**
@@ -8,7 +13,7 @@ import com.substanceofcode.tracker.view.Logger;
  * @author gjones
  * 
  */
-public class GpsGPGSA {
+public class GpsGPGSA implements Serializable{
 
 	private float pdop;
 
@@ -28,6 +33,14 @@ public class GpsGPGSA {
 	public GpsGPGSA(){
 	    
 	}
+	
+	public GpsGPGSA(DataInputStream dis){
+            try {
+                unserialize(dis);
+            } catch (IOException e) {              
+                e.printStackTrace();
+            }
+        }
 
 	public String getFixtype() {
 		String type = "N/A";
@@ -67,5 +80,26 @@ public class GpsGPGSA {
 	public void setVdop(String vdop) {
 		this.vdop = Float.parseFloat(vdop);
 	}
+
+    public String getMimeType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void serialize(DataOutputStream dos) throws IOException {
+     
+        dos.writeFloat(pdop);
+        dos.writeFloat(hdop);
+        dos.writeFloat(vdop);
+        dos.writeInt(fixtype);
+        
+    }
+
+    public void unserialize(DataInputStream dis) throws IOException {
+        pdop=dis.readFloat();
+        hdop=dis.readFloat();
+        vdop=dis.readFloat();
+        fixtype=dis.readInt();
+    }
 
 }

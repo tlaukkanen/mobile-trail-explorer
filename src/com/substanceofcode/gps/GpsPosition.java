@@ -47,7 +47,7 @@ import com.substanceofcode.util.MathUtil;
  * @author Tommi
  * @author Barry Redmond
  */
-public final class GpsPosition implements Serializable{
+public final class GpsPosition implements Serializable {
 
     /***************************************************************************
      * 
@@ -76,59 +76,79 @@ public final class GpsPosition implements Serializable{
 
     /** A timestamp for this GpsPosition */
     public final Date date;
-    
-    public String MIMETYPE="gpsposition";
+
+    /** GpsGPGSA (pdop,hdop etc) data should also be stored here */
+    private GpsGPGSA gpgsa;
+
+    public String MIMETYPE = "gpsposition";
 
     public GpsPosition(String rawData, short course, double longitudeDouple,
-            double latitudeDouple, double speed, double altitude) {
-        this(rawData, course, longitudeDouple, latitudeDouple, speed, altitude, null);
+            double latitudeDouple, double speed, double altitude,Date date) {
+        this(rawData, course, longitudeDouple, latitudeDouple, speed, altitude,
+                date,null);
     }
+    
+    public GpsPosition(String rawData, short course, double longitudeDouple,
+            double latitudeDouple, double speed, double altitude) {
+        this(rawData, course, longitudeDouple, latitudeDouple, speed, altitude,
+                null,null);
+    }
+
     /**
      * Creates a new instance of GpsPosition
      * 
      * @param rawData
-     *            the 'raw' GPS data String, as recieved from the GPS device.
+     *                the 'raw' GPS data String, as received from the GPS
+     *                device.
      * @param course
-     *            the course/direction at this GpsPosition
+     *                the course/direction at this GpsPosition
      * @param longitudeDouple
-     *            the longitude at this GpsPosition
+     *                the longitude at this GpsPosition
      * @param latitudeDouple
-     *            the latitude at this GpsPosition
+     *                the latitude at this GpsPosition
      * @param speed
-     *            the speed at this GpsPosition
+     *                the speed at this GpsPosition
      * @param altitude
-     *            the altitude at this GpsPosition
+     *                the altitude at this GpsPosition
      */
     public GpsPosition(String rawData, short course, double longitudeDouple,
-            double latitudeDouple, double speed, double altitude, Date date) {
+            double latitudeDouple, double speed, double altitude, Date date,
+            GpsGPGSA gpgsa) {
         this.rawData = rawData;
         this.course = course;
         this.longitude = longitudeDouple;
         this.latitude = latitudeDouple;
         this.speed = speed;
         this.altitude = altitude;
-        if(date == null){
+        if (date == null) {
             this.date = new Date(System.currentTimeMillis());
-        }else{
+        } else {
             this.date = date;
         }
+        if (gpgsa == null) {
+            this.gpgsa = null;
+        } else {
+            this.gpgsa = gpgsa;
+        }
+
+
     }
 
     /**
      * Creates a new instance of GpsPosition
      * 
      * @param course
-     *            the course/direction at this GpsPosition
+     *                the course/direction at this GpsPosition
      * @param longitudeDouple
-     *            the longitude at this GpsPosition
+     *                the longitude at this GpsPosition
      * @param latitudeDouple
-     *            the latitude at this GpsPosition
+     *                the latitude at this GpsPosition
      * @param speed
-     *            the speed at this GpsPosition
+     *                the speed at this GpsPosition
      * @param altitude
-     *            the altitude at this GpsPosition
+     *                the altitude at this GpsPosition
      * @param date
-     *            the date/time of recording this GpsPosition
+     *                the date/time of recording this GpsPosition
      */
     public GpsPosition(short course, double longitudeDouble,
             double latitudeDouble, double speed, double altitude, Date date) {
@@ -139,8 +159,21 @@ public final class GpsPosition implements Serializable{
         this.speed = speed;
         this.altitude = altitude;
         this.date = date;
+        this.gpgsa = null;
     }
-
+    
+    public GpsPosition(short course, double longitudeDouble,
+            double latitudeDouble, double speed, double altitude, Date date,GpsGPGSA gpgsa) {
+        this.rawData = null;
+        this.course = course;
+        this.latitude = latitudeDouble;
+        this.longitude = longitudeDouble;
+        this.speed = speed;
+        this.altitude = altitude;
+        this.date = date;
+        this.gpgsa = gpgsa;
+    
+    }
     /**
      * <p>
      * Reads 'All' the informatino about this GpsPosition from the
@@ -153,10 +186,10 @@ public final class GpsPosition implements Serializable{
      * {@link GpsPosition#serialize(DataOutputStream)} wrote.<br>
      * 
      * @param dis
-     *            The DataInputStream to read the data from
+     *                The DataInputStream to read the data from
      * 
      * @throws IOException
-     *             if there is a problem reading from the DataInputStream
+     *                 if there is a problem reading from the DataInputStream
      * 
      * @see GpsPosition#serialize(DataOutputStream)
      */
@@ -176,6 +209,12 @@ public final class GpsPosition implements Serializable{
             date = new Date(dis.readLong());
         } else {
             date = null;
+        }
+
+        if (dis.readBoolean()) {
+            gpgsa = new GpsGPGSA(dis);
+        } else {
+            gpgsa = null;
         }
     }
 
@@ -305,10 +344,10 @@ public final class GpsPosition implements Serializable{
      * {@link GpsPosition#unserialize(DataInputStream)}..
      * 
      * @param dos
-     *            The DataOutputStream to write all the data to.
+     *                The DataOutputStream to write all the data to.
      * 
      * @throws IOException
-     *             if there is a problem writing to the DataOutputStream.
+     *                 if there is a problem writing to the DataOutputStream.
      * 
      * @see GpsPosition#unserialize(DataInputStream)
      */
@@ -332,14 +371,32 @@ public final class GpsPosition implements Serializable{
             dos.writeBoolean(true);
             dos.writeLong(date.getTime());
         }
+        if (gpgsa == null) {
+            dos.writeBoolean(false);
+        } else {
+            gpgsa.serialize(dos);
+        }
     }
+
     public String getMimeType() {
-        
+
         return MIMETYPE;
+    }
+    
+    /** 
+     * Set extra information like pdop, if available
+     * @param gpgsa
+     */
+    public void setGpgsa(GpsGPGSA gpgsa){
+        this.gpgsa=gpgsa;
+    }
+
+    public GpsGPGSA getGpgsa(){
+        return gpgsa;
     }
     public void unserialize(DataInputStream dis) throws IOException {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

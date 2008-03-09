@@ -3,7 +3,6 @@ package com.substanceofcode.gpsdevice;
 import java.util.Vector;
 
 import com.substanceofcode.bluetooth.Device;
-import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 
 /**
@@ -20,7 +19,7 @@ public interface GpsDevice extends Device {
     public GpsPosition getPosition();
 
     /** Get current position from GPS unit */
-    public GpsGPGSA getGPGSA();
+    //public GpsGPGSA getGPGSA();
 
     /** Get satellites in view count */
     public int getSatelliteCount();
