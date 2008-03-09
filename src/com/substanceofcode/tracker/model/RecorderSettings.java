@@ -166,6 +166,7 @@ public class RecorderSettings {
     
     public void setUploadURL(String url){
         settings.setStringProperty(UPLOAD_URL, url);
+        saveSettings();
     }
     
     
