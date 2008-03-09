@@ -120,19 +120,15 @@ public class GpxConverter extends TrackConverter {
     }
 
     
-    public static void addPosition(GpsPosition pos, StringBuffer gpx) {
-       addPosition(pos, gpx,null);        
-    }
-    
     /**
      * TODO
      * 
      * @return
      */
-    public static void addPosition(GpsPosition pos, StringBuffer gpx,
-            GpsGPGSA gpgsa) {
+    public static void addPosition(GpsPosition pos, StringBuffer gpx) {
         String lat = formatDegrees(pos.latitude);
         String lon = formatDegrees(pos.longitude);
+        GpsGPGSA gpgsa= pos.getGpgsa();
         // String alt = String.valueOf( pos.altitude );
         gpx.append("<trkpt lat=\"").append(lat).append("\" lon=\"").append(lon)
                 .append("\">\r\n");
@@ -145,14 +141,16 @@ public class GpxConverter extends TrackConverter {
         Date date = pos.date;
         String universalDateStamp = DateTimeUtil.getUniversalDateStamp(date);
         gpx.append("<time>").append(universalDateStamp).append("</time>\r\n");
-
+        
         if (gpgsa != null) {
             gpx.append("<hdop>").append(String.valueOf(gpgsa.getHdop()))
                     .append("</hdop>\r\n");
             gpx.append("<vdop>").append(String.valueOf(gpgsa.getVdop()))
                     .append("</vdop>\r\n");
             gpx.append("<pdop>").append(String.valueOf(gpgsa.getPdop()))
-                    .append("</pdop>\r\n");
+                    .append("</pdop>\r\n");            
+            gpx.append("<fixtype>").append(String.valueOf(gpgsa.getFixtype()))
+            .append("</fixtype>\r\n");
         }
 
 

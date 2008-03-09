@@ -314,12 +314,9 @@ public class Track implements Serializable {
      * Other Methods
      */
 
-    public void addPosition(GpsPosition pos) {
-        addPosition(pos, null);
-    }
 
     /** Add new Track Point to the end of this Track */
-    public void addPosition(GpsPosition pos, GpsGPGSA gpgsa) {
+    public void addPosition(GpsPosition pos) {
         /** Handle distance calculations */
         if (trackPoints.size() > 0) {
             // Increment Distance
@@ -347,7 +344,7 @@ public class Track implements Serializable {
             RecorderSettings lSettings = lController.getSettings();
             StringBuffer gpxPos = new StringBuffer();
             // GpxConverter.addPosition(pos, gpxPos);
-            GpxConverter.addPosition(pos, gpxPos, gpgsa);
+            GpxConverter.addPosition(pos, gpxPos);
             streamPrint.print(gpxPos.toString());
             streamPrint.flush();
             try {
