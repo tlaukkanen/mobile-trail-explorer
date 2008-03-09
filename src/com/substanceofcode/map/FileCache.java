@@ -50,6 +50,7 @@ public class FileCache implements  TileCache ,Runnable {
                 initializeCache();
             }
         };
+        initThread.setPriority(Thread.MIN_PRIORITY);
         initThread.start();
         try {
 
@@ -250,7 +251,7 @@ public class FileCache implements  TileCache ,Runnable {
           
             if (Conn!=null && streamOut==null){
                 //open the steam at the end so we can append to the file
-                System.out.println("Filesize:"+Conn.fileSize());
+                
                 OutputStream x= Conn.openOutputStream(Conn.fileSize());
                
                 streamOut = new DataOutputStream(x);
