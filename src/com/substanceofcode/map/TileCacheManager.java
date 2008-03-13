@@ -32,7 +32,7 @@ public class TileCacheManager implements Runnable {
     private Thread cacheManagerThread;
     private boolean rmsEnabled=false;
     private boolean fileCacheEnabled = true;//Controller.getController().getUseFileCache();
-
+    private static int THREADDELAY=200;
     public TileCacheManager() {
         //this.storename = storename;
         cacheManagerThread = new Thread(this);
@@ -162,7 +162,7 @@ public class TileCacheManager implements Runnable {
             try {
                 // Pause briefly. These values can be tuned once everything is
                 // working
-                Thread.sleep(1000);
+                Thread.sleep(THREADDELAY);
             } catch (InterruptedException e) {
                 Logger.debug("TCM:Thread Interrupted");
             }
@@ -266,7 +266,7 @@ public class TileCacheManager implements Runnable {
             result = -1;
 
         }
-
+     //   Logger.debug("Cache:x="+x+",y="+y+",z="+z+" result="+result);
         return result;
     }
 
