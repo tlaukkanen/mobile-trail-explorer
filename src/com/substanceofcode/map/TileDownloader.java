@@ -23,17 +23,17 @@ import com.substanceofcode.util.MathUtil;
  */
 public class TileDownloader implements Runnable {
 
-    
- 
-    public static final String RootCacheDir="file:///Memory Card/"+"MTE/cache/"; 
-    
-    //public static final int OSM = 1;
-    
-    //public static final int OSMARENDER = 2;
-    
-    //public static final int GOOGLE = 3;
-    
-    private int lastZoomLevel=0; //Used to detect a change of zoom level
+
+    public static final String RootCacheDir = "file:///Memory Card/"
+            + "MTE/cache/";
+
+    // public static final int OSM = 1;
+
+    // public static final int OSMARENDER = 2;
+
+    // public static final int GOOGLE = 3;
+
+    private int lastZoomLevel = 0; // Used to detect a change of zoom level
 
     public static final int TILE_SIZE = 256;
 
@@ -45,9 +45,9 @@ public class TileDownloader implements Runnable {
     public Image loadingFileCachedImage = null;
     private volatile boolean running = false;
 
-    private static final short THREADDELAY=500;
+    private static final short THREADDELAY = 200;
     private TileCacheManager tc;
-    
+
     private Hashtable requestLog = new Hashtable();
 
     private int nullImageCounter = 0;
@@ -61,10 +61,11 @@ public class TileDownloader implements Runnable {
 
     private volatile Thread downloaderThread;
 
-    public TileDownloader(/*int MapSource*/) {
+    public TileDownloader(/* int MapSource */) {
         Logger.debug("TileDownloader Constructer");
-        //mpm=MapProviderManager.getInstance();
-     //   setMapSource(MapSource);  // No need to do this any more, as we have a Manager in place
+        // mpm=MapProviderManager.getInstance();
+        // setMapSource(MapSource); // No need to do this any more, as we have a
+        // Manager in place
         tileQueue = new Vector();
         tc = new TileCacheManager();
         tc.initialize();
@@ -74,8 +75,8 @@ public class TileDownloader implements Runnable {
     public void start() {
         downloaderThread = new Thread(this);
 
-        Logger.debug(
-                "Starting TileDownloader Thread:" + downloaderThread.getName());
+        Logger.debug("Starting TileDownloader Thread:"
+                + downloaderThread.getName());
         running = true;
         downloaderThread.start();
 
@@ -91,44 +92,6 @@ public class TileDownloader implements Runnable {
             return true;
         return false;
     }
-
-    public void setMapSource(int source) {
-        //MapProviderManager.configure(source);
-        /*
-        switch (source) {
-            case 1:
-                configuration = TileDownloader.OSM;
-                UrlFormat = OSMUrlFormat;
-                cacheDir = OSMcacheDir;
-                storeName = OSMStoreName;
-                break;
-            
-            case 2:
-                configuration = TileDownloader.OSMARENDER;
-                UrlFormat = TahUrlFormat;
-                cacheDir = TahCacheDir;
-                storeName = TahStoreName;
-                break;
-
-            case 3:
-            //    configuration = TileDownloader.GOOGLE;
-                UrlFormat = GoogleMapsUrlFormat;
-                cacheDir = GooglecacheDir;
-                storeName = GoogleStoreName;
-                break;
-                
-            default:
-                configuration = TileDownloader.OSM;
-                UrlFormat = OSMUrlFormat;
-                cacheDir = OSMcacheDir;
-                storeName = OSMStoreName;
-                break;
-        }
-        */
-
-    }
-
-
 
     /**
      * Manages requests for tile images from the display canvas. Tiles are
@@ -147,7 +110,7 @@ public class TileDownloader implements Runnable {
      * @return
      */
     public Image fetchTile(int x, int y, int z, boolean pushToTop) {
-      //  Logger.debug("FetChTile called");
+
         Image theImage = null;
         int cacheResult=0;
         try {
@@ -158,7 +121,7 @@ public class TileDownloader implements Runnable {
             x = x % (maxtiles);
             y = y % (maxtiles);
             
-            //invalidate the work queues if the zoomlevel has changed
+            // invalidate the work queues if the zoomlevel has changed
             if(lastZoomLevel!=z){
                 tc.clearWorkQueues();
             }
@@ -174,13 +137,13 @@ public class TileDownloader implements Runnable {
                 if (cacheResult == 0) {
                     theImage = (Image) tc.getImage(x, y, z);
                 } else if (cacheResult == 1 ) {
-                    //Tile has been found in the RMS 
+                    // Tile has been found in the RMS
                     // It will get asynchronously copied into the memcache
                     // until that happens we return a loading image
                     theImage = loadingImageFromRmsCache();
                    
                 }else if (cacheResult==2){
-                   //Tile was found on filecache
+                   // Tile was found on filecache
                     theImage=loadingImageFromFileCache();
                 }
 
@@ -188,6 +151,13 @@ public class TileDownloader implements Runnable {
                 if (!requestLog.containsKey(getCacheKey(x, y, z))) {
                     System.out.println("TD: Queueing request");
                     downloadTile(x, y, z, pushToTop);
+                }else
+                {       if(tileQueue.size()==0){
+                            Logger.debug(x+"-"+y+"-"+z+" already queued, but tileQueue is empty");
+                            requestLog.clear();
+                        }else{
+                    Logger.debug(x+"-"+y+"-"+z+" already queued");
+                        }
                 }
             }
         } catch(Exception ex) {
@@ -204,60 +174,60 @@ public class TileDownloader implements Runnable {
      * queuing 100s of tiles without ever seeing them
      * 
      * @param x -
-     *            the x coordinate of the tile
+     *                the x coordinate of the tile
      * @param y -
-     *            the y coordinate of the tile
+     *                the y coordinate of the tile
      * @param zoom -
-     *            the zoom level of the tile
+     *                the zoom level of the tile
      * @param putAtTop -
-     *            If true the tile is inserted at the top of the queue, so that
-     *            it is retrieved next
+     *                If true the tile is inserted at the top of the queue, so
+     *                that it is retrieved next
      */
     public void downloadTile(int x, int y, int zoom, boolean putAtTop) {
 
         try {
             String targetUrl = MapProviderManager.makeUrl(x, y, zoom);
-            String destDir = MapProviderManager.getCacheDir() + "/" + zoom + "/" + x + "/";
+            String destDir = MapProviderManager.getCacheDir() + "/" + zoom
+                    + "/" + x + "/";
             String destFile = y + ".png";
-            Tile t = new Tile(x, y, zoom, targetUrl, destDir,
-                    destFile, MapProviderManager.getStoreName());
+            Tile t = new Tile(x, y, zoom, targetUrl, destDir, destFile,
+                    MapProviderManager.getStoreName());
             // Invalid tile requested, return a blank tile
             if (x < 0 || y < 0) {
-                Logger.error(
-                        "Invalid Tile requested x=" + x + ",y=" + y + ",zoom="
-                                + zoom);
+                Logger.error("Invalid Tile requested x=" + x + ",y=" + y
+                        + ",zoom=" + zoom);
                 tc.saveTile(t, blankImage());
                 return;
             }
-            // only download if it is not cached
-            requestLog.put(getCacheKey(x, y, zoom), "QUEUED");
+
             synchronized (tileQueue) {
-                //Check if we have just changed zoom levels. If so,
-                //delete all the tiles in the queue before adding the new one
-                if (lastZoomLevel!=zoom){
-                    Logger.debug("ZoomLevel changed, deleting all queued tiles.");
+                // Check if we have just changed zoom levels. If so,
+                // delete all the tiles in the queue before adding the new one
+                if (lastZoomLevel != zoom) {
+                    Logger
+                            .debug("ZoomLevel changed, deleting all queued tiles.");
                     tileQueue.removeAllElements();
                     requestLog.clear();
                 }
-                lastZoomLevel=zoom;
-                
+                lastZoomLevel = zoom;
+
                 if (putAtTop)
                     tileQueue.insertElementAt(t, 0);
                 else
                     tileQueue.addElement(t);
-                
+
+                // update the request log so we don't keep asking for this tile
+                requestLog.put(getCacheKey(x, y, zoom), "QUEUED");
             }
-        } catch(Exception ex) {
-            Logger.error("Error in TileDownloader.downloadTile(..):" + 
-                    ex.getMessage());
+        } catch (Exception ex) {
+            Logger.error("Error in TileDownloader.downloadTile(..):"
+                    + ex.getMessage());
             ex.printStackTrace();
         }
         // Check
         // System.out.println("Added tile to queue");
     }
 
-
-   
 
     // TODO: Use a bunch of threads
     // to download several tiles asynchronously?....
@@ -277,47 +247,45 @@ public class TileDownloader implements Runnable {
                 e1.printStackTrace();
             }
             if (tileQueue.size() > 0) {
+                Logger.debug("tileQueue size=" + tileQueue.size());
                 synchronized (tileQueue) {
                     if (tileQueue.size() > 0) {
-                        Logger.debug(
-                                "TD: queue size is:" + tileQueue.size());
+                        Logger.debug("TD: queue size is:" + tileQueue.size());
                         tile = (Tile) tileQueue.firstElement();
                         tileQueue.removeElementAt(0);
                     }
                 }
                 try {
                     if (tile != null) {
-                        Logger.debug(
-                                "TD: Requesting url " + tile.url);
+                        Logger.debug("TD: Requesting url " + tile.url);
                         conn = (HttpConnection) Connector.open(tile.url);
 
                         in = conn.openInputStream();
 
-                        Logger.debug(
-                                "TD: Response code was "
-                                        + conn.getResponseCode() + " "
-                                        + conn.getResponseMessage());
+                        Logger.debug("TD: Response code was "
+                                + conn.getResponseCode() + " "
+                                + conn.getResponseMessage());
                         if (conn.getResponseCode() == 200) {
                             try {
-                                //If we get a 200 response but then can't save the tile
+                                // If we get a 200 response but then can't save
+                                // the tile
                                 // save a blank image there instead.
-                               if(!tc.saveTile(tile, in)){
-                                   tc.saveTile(tile, blankImage());
-                               }
+                                if (!tc.saveTile(tile, in)) {
+                                    tc.saveTile(tile, blankImage());
+                                }
 
 
-                                Logger.debug(
-                                        "TD: Downloaded Tile " + tile.cacheKey);
+                                Logger.debug("TD: Downloaded Tile "
+                                        + tile.cacheKey);
                             } catch (Exception e) {
-                                Logger.debug(
-                                        "TD: Error saving tile " + tile.cacheKey
-                                                + ", " + e.getMessage());
+                                Logger
+                                        .debug("TD: Error saving tile "
+                                                + tile.cacheKey + ", "
+                                                + e.getMessage());
                             }
                         } else {
-                            Logger.debug(
-                                    "TD: Tile " + tile.cacheKey
-                                            + " got status "
-                                            + conn.getResponseCode());
+                            Logger.debug("TD: Tile " + tile.cacheKey
+                                    + " got status " + conn.getResponseCode());
                         }
                     }
                 } catch (ConnectionNotFoundException e) {
@@ -331,7 +299,7 @@ public class TileDownloader implements Runnable {
                     Logger.error("TD run(): " + e.getMessage());
                 }
             } else {
-                // Logger.getLogger().log("Nothing to download, yielding " +
+               // Logger.debug("Tilequeue is empty");
                 // tileQueue.size(),Logger.DEBUG);
                 Thread.yield();
             }
@@ -369,9 +337,9 @@ public class TileDownloader implements Runnable {
         // Draw a boundary around the image
         g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
         g.drawString("Loading..." + nullImageCounter, 10, 10, Graphics.TOP
-                    | Graphics.LEFT);
+                | Graphics.LEFT);
         Image p = loadingImage[nullImageCounter];
-        System.out.println("Returning new nullImage " + nullImageCounter);
+       // Logger.debug("Returning new nullImage " + nullImageCounter);
         nullImageCounter++;
         if (nullImageCounter > 8)
             nullImageCounter = 0;
@@ -397,9 +365,12 @@ public class TileDownloader implements Runnable {
         g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
         return blankImage;
     }
+
     /**
-     * Another placeholder image to display while fetching a tile. This one is used 
-     * to show that the image is already on the device (cached) and will be shortly available
+     * Another placeholder image to display while fetching a tile. This one is
+     * used to show that the image is already on the device (cached) and will be
+     * shortly available
+     * 
      * @return
      */
     public Image loadingImageFromRmsCache() {
@@ -412,7 +383,7 @@ public class TileDownloader implements Runnable {
         g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
         return loadingRmsCachedImage;
     }
-    
+
     public Image loadingImageFromFileCache() {
         if (loadingFileCachedImage != null) {
             return loadingFileCachedImage;
