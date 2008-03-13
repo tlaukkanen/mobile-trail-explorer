@@ -68,7 +68,7 @@ public class ImportTrailScreen extends Form implements CommandListener {
     }
 
     /** Reinitialize the form */
-    private void refreshForm() {
+    public void refreshForm() {
         this.deleteAll();
         String importFile = controller.getSettings().getImportFile();
         if (importFile == null) {

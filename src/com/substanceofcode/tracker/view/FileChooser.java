@@ -126,7 +126,6 @@ public class FileChooser extends List implements CommandListener {
                 Logger.debug("Export to: " + path);
                 RecorderSettings settings = controller.getSettings();
                 settings.setExportFolder(path);
-                this.deleteAll();
                 this.goBack();
             } else if (path != null && !selected.equals("..") && showFiles == true && !selected.endsWith("/")) {
                 // store file 
@@ -134,7 +133,6 @@ public class FileChooser extends List implements CommandListener {
                 Logger.debug("Import File: " + storefile);
                 RecorderSettings settings = controller.getSettings();
                 settings.setImportFile(storefile);
-                this.deleteAll();
                 this.goBack();
             } else {
                 if(selected.equals("..")) {
@@ -160,22 +158,19 @@ public class FileChooser extends List implements CommandListener {
                 this.updateContent();
             }
         } else if(command == cancelCommand) {
-            this.deleteAll();
-            
-            /*
-            if (showFiles == true) {
-                controller.showImportTrailsScreen(this);
-            } else {
-                controller.showSettings();
-            }
-            */
-            
             this.goBack();
-            
         }
     }
     
     private void goBack() {
+        this.deleteAll();
+        
+        if (previousScreen instanceof ImportWaypointScreen) {
+            ((ImportWaypointScreen) previousScreen).refreshForm();
+        } else if (previousScreen instanceof ImportTrailScreen) {
+            ((ImportTrailScreen) previousScreen).refreshForm();
+        }
+
         controller.setCurrentScreen(previousScreen);
     }
 }
