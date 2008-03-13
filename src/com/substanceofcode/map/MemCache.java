@@ -123,10 +123,14 @@ public class MemCache implements TileCache {
     }
 
     /**
-     * Removes the oldest tile, ie the one that was added first
+     * Removes the oldest 9 tiles, ie the ones that were added first
      */
     public void deleteOldestTile() {
-        vec.removeElementAt(0);
+        for(int i =0;i<9;i++){
+            vec.removeElementAt(0);
+        }
+       
+        
     }
 
 
