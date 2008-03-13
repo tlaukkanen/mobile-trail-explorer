@@ -39,10 +39,10 @@ public class Tile implements Serializable {
     // or maybe creating the image each time is quick enough to avoid storing it?
     private byte[] imageByteArray = null;
 
-   // private String destDir;
-
-   // private String destFile;
-
+    public long offset=0;
+    private static long lastTileOffset=0;//
+    public static long totalOffset=0;
+    
     private Image image; // the actual tile image png data
 
     public static final String MIMETYPE = "Tile"; // used by the filesystem
@@ -136,7 +136,17 @@ public class Tile implements Serializable {
 
         return MIMETYPE;
     }
-
+    /**
+     * serialize the tile to the filesystem. This version takes an offset.
+     * @param dos
+     * @param offset
+     * @throws IOException
+     */
+    public void serialize(DataOutputStream dos,long offset) throws IOException {
+        lastTileOffset=offset;
+        serialize(dos);
+    }
+    
     public void serialize(DataOutputStream dos) throws IOException {
         //Logger.debug("Tile serialize called");
         dos.writeInt(x);
@@ -144,8 +154,17 @@ public class Tile implements Serializable {
         dos.writeInt(z);
         dos.writeUTF(url);
         dos.writeUTF(cacheKey);
-      //  dos.writeUTF(destDir);
-       // dos.writeUTF(destFile);
+       
+        Logger.debug("lastTileOffset="+lastTileOffset);
+        dos.writeLong(lastTileOffset);
+        //writeUtf writes
+        lastTileOffset+=12+
+        2+url.getBytes().length+
+        2+cacheKey.getBytes().length+
+        8+
+        4+
+        imageByteArray.length;
+        
         dos.writeInt(imageByteArray.length);
         dos.write(imageByteArray);
         // We won't save the image, we can regenerate it from the byte array
@@ -162,8 +181,7 @@ public class Tile implements Serializable {
         z = dis.readInt();
         url = dis.readUTF();
         cacheKey = dis.readUTF();
-        //destDir = dis.readUTF();
-        //destFile = dis.readUTF();
+        offset=dis.readLong();
         
         int arrayLength = dis.readInt();
         imageByteArray = new byte[arrayLength];
@@ -184,10 +202,12 @@ public class Tile implements Serializable {
          Logger.error("z="+z);
          Logger.error("url="+url);
          Logger.error("cacheKey="+cacheKey);
-         //Logger.error("destDir="+destDir);
-         //Logger.error("destFile="+destFile);
+        
+         throw new IOException("Tile is borked");
          }catch(Exception e){
              //ignore
+         }finally{
+             
          }
         }
 
@@ -195,11 +215,26 @@ public class Tile implements Serializable {
 
 public static Tile getTile(DataInputStream in) throws Exception{
     Tile tempTile = new Tile();
-   
+    
+        
         tempTile.unserialize(in);
    
     return tempTile;
 }
 
+public static Tile getTileOffset(DataInputStream in) throws Exception{
+    Tile tempTile = new Tile();
+    boolean notdoneyet=true;
+    int x;
+        while(notdoneyet){
+        x = in.readInt();
+        if(x>0 && x<65000){
+            Logger.debug("Valid x read "+ x);
+            notdoneyet=false;
+        }
+        //tempTile.unserialize(in);
+        }
+    return tempTile;
+}
 
 }
