@@ -728,8 +728,8 @@ public class Controller {
     }
 
     /** Show export settings */
-    public void showExportSettings() {
-        display.setCurrent(getFileChooser());
+    public void showExportSettings(Displayable displayable) {
+        display.setCurrent(getFileChooser(displayable));
     }
 
     /** Show export settings form */
@@ -741,8 +741,8 @@ public class Controller {
     }
    
     /** Show export the file chooser */
-    private FileChooser getFileChooser() {
-        filechooser = new FileChooser(this, settings.getExportFolder(), false);
+    private FileChooser getFileChooser(Displayable displayable) {
+        filechooser = new FileChooser(this, settings.getExportFolder(), false, displayable);
 
         return filechooser;
     }

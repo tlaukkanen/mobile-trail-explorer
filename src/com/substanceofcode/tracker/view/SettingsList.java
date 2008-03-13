@@ -114,7 +114,7 @@ public class SettingsList extends List implements CommandListener {
 		break;
 
 	    case (EXPORTING):
-		controller.showExportSettings();
+		controller.showExportSettings(displayable);
 		break;
 
 	    case (RECORDING):

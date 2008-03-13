@@ -106,5 +106,50 @@ public abstract class TrackConverter {
 		}
 		return result;
 	}
+        
+        /**
+	 * Abstract method to allow for differentiated handling of different xml 
+	 * formats e.g. kml/gpx
+	 */
+	public abstract Vector importWaypoint(KXmlParser trackDescription);
+        
+        public Vector importWaypoint(FileConnection connection) {
+           Vector result = null;
+		try {
+			/* Make sure file exists and can be read */
+			if (!connection.exists()) {
+				Logger.warn("FileConnection does not exist, Waypoint Import " +
+						                   "aborted");
+				return null;
+			}
+			if (!connection.canRead()) {
+				Logger.warn("FileConnection can not be read exist, " +
+						                   "Waypoint Import aborted");
+				return null;
+			}
+
+			InputStream is = connection.openInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+
+			KXmlParser parser = new KXmlParser();
+			parser.setInput(isr);
+
+			result = importWaypoint(parser);
+
+			try {
+				isr.close();
+			} catch (IOException e) {
+			}
+			try {
+				is.close();
+			} catch (IOException e) {
+			}
+		} catch (Exception e) {
+			Logger.warn("Exception caught trying to importTrack :" + 
+					                   e.toString());
+			e.printStackTrace();
+		}
+		return result;
+        }
 
 }

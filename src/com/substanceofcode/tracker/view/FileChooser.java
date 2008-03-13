@@ -50,6 +50,8 @@ import com.substanceofcode.tracker.controller.Controller;
 public class FileChooser extends List implements CommandListener {
 
     private Controller controller;
+    
+    private Displayable previousScreen;
 
     private Command selectCommand;
     private Command cancelCommand;
@@ -58,11 +60,12 @@ public class FileChooser extends List implements CommandListener {
     private String selectDir = "<select this directory>";
     private boolean showFiles;
     
-    public FileChooser(Controller controller, String path, boolean showFiles) {
+    public FileChooser(Controller controller, String path, boolean showFiles, Displayable previousScreen) {
         super("Exporting", List.IMPLICIT);
         this.controller = controller;
         this.path = path;
         this.showFiles = showFiles;
+        this.previousScreen = previousScreen;
         
         selectCommand = new Command("Select", Command.ITEM, 1);
         cancelCommand = new Command("Cancel", Command.CANCEL, 2);
@@ -124,7 +127,7 @@ public class FileChooser extends List implements CommandListener {
                 RecorderSettings settings = controller.getSettings();
                 settings.setExportFolder(path);
                 this.deleteAll();
-                controller.showSettings();
+                this.goBack();
             } else if (path != null && !selected.equals("..") && showFiles == true && !selected.endsWith("/")) {
                 // store file 
                 String storefile = path + selected;
@@ -132,7 +135,7 @@ public class FileChooser extends List implements CommandListener {
                 RecorderSettings settings = controller.getSettings();
                 settings.setImportFile(storefile);
                 this.deleteAll();
-                controller.showImportTrailsScreen(this);
+                this.goBack();
             } else {
                 if(selected.equals("..")) {
                     final int slashIndex = path.lastIndexOf('/', path.length() - 2);
@@ -158,12 +161,21 @@ public class FileChooser extends List implements CommandListener {
             }
         } else if(command == cancelCommand) {
             this.deleteAll();
+            
+            /*
             if (showFiles == true) {
                 controller.showImportTrailsScreen(this);
             } else {
                 controller.showSettings();
             }
+            */
+            
+            this.goBack();
             
         }
+    }
+    
+    private void goBack() {
+        controller.setCurrentScreen(previousScreen);
     }
 }

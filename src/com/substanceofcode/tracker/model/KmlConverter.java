@@ -351,5 +351,13 @@ public class KmlConverter extends TrackConverter {
         markBuffer.append("</Placemark>\r\n");
         return markBuffer.toString();
     }
+    
+    /**
+     * TODO: This method returns null - its has not been implemented yet
+     */
+    public Vector importWaypoint(KXmlParser trackDescription) {
+        Logger.debug("Starting to parse KML track from file");
+        return null;
+    }
 
 }

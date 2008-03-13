@@ -43,12 +43,15 @@ public class WaypointList extends List implements CommandListener {
     
     private Controller controller;
     
+    private ImportWaypointScreen importWaypointScreen;
+    
     private Command editCommand;
     private final Command deleteCommand;
     private final Command backCommand;
     private final Command newWaypointCommand;
     private final Command exportWaypointCommand;
     private final Command exportAllWaypointsCommand;
+    private final Command importWaypointsCommand;
     
     private static final String TITLE = "Waypoints";
     
@@ -65,6 +68,7 @@ public class WaypointList extends List implements CommandListener {
         this.addCommand(newWaypointCommand = new Command("Add new waypoint", Command.ITEM, 4));
         this.addCommand(exportWaypointCommand = new Command("Export selected waypoint", Command.ITEM, 5));
         this.addCommand(exportAllWaypointsCommand = new Command("Export all waypoints", Command.ITEM, 6));
+        this.addCommand(importWaypointsCommand = new Command("Import waypoints", Command.ITEM, 7));
         this.addCommand(backCommand = new Command("Back", Command.BACK, 10));
 
         setSelectCommand(editCommand);
@@ -134,6 +138,13 @@ public class WaypointList extends List implements CommandListener {
             if(selectedWaypoint != null) {
                 controller.showWaypointActionsForm(selectedWaypoint, exportName, true);
             }
+        }
+        
+        if(command == importWaypointsCommand) {
+            if(importWaypointScreen == null){
+                    importWaypointScreen = new ImportWaypointScreen(this);
+                }
+            	controller.setCurrentScreen(importWaypointScreen);
         }
     }
     

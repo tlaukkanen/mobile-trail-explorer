@@ -182,7 +182,7 @@ public class ImportTrailScreen extends Form implements CommandListener {
             }
             
             //TODO: check file before
-            filechooser = new FileChooser(this.controller, importFile, true);
+            filechooser = new FileChooser(this.controller, importFile, true, this);
             
             controller.setCurrentScreen(filechooser);
             

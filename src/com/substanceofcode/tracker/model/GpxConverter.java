@@ -501,4 +501,126 @@ public class GpxConverter extends TrackConverter {
         }
         return null;
     }
+    
+    //TODO: patrick: import waypoints also if you import a track
+    public Vector importWaypoint(KXmlParser parser) {
+        Logger.debug("Starting to parse GPX waypoint from file");
+        Vector result = null;
+
+        try {
+            int eventType = parser.getEventType();
+
+            // ------------------------------------------------------------------------
+            // Keep stepping through tags until we find a START_TAG with the
+            // name equal to "gpx". We need the middle check against null to
+            // ensure we don't throw a null pointer exception.
+            // ------------------------------------------------------------------------
+            while (!(eventType == XmlPullParser.START_TAG
+                    && parser.getName() != null && parser.getName()
+                    .toLowerCase().equals("gpx"))) {
+
+                eventType = parser.next();
+            }
+
+            // Pass by ref result variable
+            result = new Vector();
+            parseGPXWaypoint(parser, result);
+
+            System.out.println("Finished");
+        } catch (XmlPullParserException e) {
+            Logger.warn(
+                    "XmlPullParserException caught Parsing Waypoint : "
+                            + e.toString());
+            e.printStackTrace();
+            result = null;
+        } catch (IOException e) {
+            Logger.warn(
+                    "IOException caught Parsing Waypoint : " + e.toString());
+            e.printStackTrace();
+            result = null;
+        } catch (Exception e) {
+            Logger.warn(
+                    "Exception caught Parsing Waypoint : " + e.toString());
+            e.printStackTrace();
+            result = null;
+        }
+        return result;
+    }
+    
+    private void parseGPXWaypoint(KXmlParser parser, Vector waypoints)
+            throws XmlPullParserException, IOException {
+        System.out.println("Starting parseGPXWaypoint");
+        int eventType = parser.getEventType();
+        // --------------------------------------------------------------------------
+        // Keep stepping through tags until we find a END_TAG with the
+        // name equal to "gpx". We need the middle check against null to
+        // ensure we don't throw a null pointer exception.
+        // --------------------------------------------------------------------------
+        while (!(eventType == XmlPullParser.END_TAG && parser.getName() != null && parser
+                .getName().toLowerCase().equals("gpx"))) {
+            eventType = parser.next();
+            // ------------------------------------------------------------------------
+            // If this is a "wpt" START_TAG then parse it
+            // ------------------------------------------------------------------------
+            if (eventType == XmlPullParser.START_TAG) {
+                final String type = parser.getName().toLowerCase();
+                
+                if (type.equals("wpt")) {
+                    parseWPT(parser, waypoints);
+                }
+            }
+        }
+    }
+    
+    private void parseWPT(KXmlParser parser, Vector waypoints)
+            throws XmlPullParserException, IOException {
+        System.out.println("Starting parseWPT");
+        double longitudeDouble = 0;
+        double latitudeDouble = 0;
+        String wptName = "WP_UNTITLED";
+
+        int eventType = parser.getEventType();
+        // --------------------------------------------------------------------------
+        // Check for a START_TAG with the name "wpt". We need the middle check
+        // against null to ensure we don't throw a null pointer exception.
+        // --------------------------------------------------------------------------
+        if (eventType == XmlPullParser.START_TAG && parser.getName() != null
+                && parser.getName().toLowerCase().equals("wpt")) {
+            int attributes = parser.getAttributeCount();
+            for (int i = 0; i < attributes; i++) {
+                String name = parser.getAttributeName(i).toLowerCase();
+                String value = parser.getAttributeValue(i);
+                if (name.equals("lat")) {
+                    latitudeDouble = Double.parseDouble(value);
+                } else if (name.equals("lon")) {
+                    longitudeDouble = Double.parseDouble(value);
+                }
+            }
+            
+            while (!(eventType == XmlPullParser.END_TAG
+                    && parser.getName() != null && parser.getName()
+                    .toLowerCase().equals("wpt"))) {
+                eventType = parser.next();
+                if (eventType == XmlPullParser.START_TAG) {
+                    final String name = parser.getName().toLowerCase();
+                    if (name.equals("name")) {
+                        eventType = parser.next();
+                        if (eventType == XmlPullParser.TEXT) {
+                            wptName = parser.getText();
+                        }
+                        parser.next();
+                    }
+                }
+            }
+        } else {
+            throw new XmlPullParserException("Expecting START_TAG, but found "
+                    + eventType + " instead");
+        }
+
+        System.out.println("Parsed GpsPosition: name:"+ wptName + " |lat:" + latitudeDouble
+                + " |lon:" + longitudeDouble);
+        
+        Waypoint waypoint = new Waypoint(wptName, latitudeDouble, longitudeDouble);
+        waypoints.addElement(waypoint);
+    }
 }
