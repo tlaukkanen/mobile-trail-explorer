@@ -10,6 +10,7 @@ import javax.microedition.location.LocationListener;
 import javax.microedition.location.LocationProvider;
 import javax.microedition.location.QualifiedCoordinates;
 
+import com.substanceofcode.bluetooth.Device;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.gps.GpsPositionParser;
 import com.substanceofcode.tracker.view.Logger;
@@ -32,6 +33,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     private String extraInfo = "";
     //private GpsGPGSA gpgsa=null;
     GpsPosition gp=null;
+    private static Jsr179Device _jsr179Device=null;
     protected GpsPositionParser parser;
     
     private LocationProvider locationProvider;
@@ -96,7 +98,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
         
     }
 
-    public Jsr179Device(String address, String alias) {
+    protected Jsr179Device(String address, String alias) {
         super(address, alias);
         init();
         parser = GpsPositionParser.getPositionParser();
@@ -129,8 +131,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
 
         Vector nmeaStrings = new Vector();
         Logger.info(logPrefix + "Starting Jsr179Device.run()");
-        Logger.debug("parser is " + parser);
-        Logger.debug("extraInfo is " + extraInfo);
+        
 
         while (Thread.currentThread() == thread) {
 
@@ -222,42 +223,28 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
         }else{
             return getJsr179Position();
         }
-    }/*
-    public GpsGPGSA getGPGSA() {
-        //Logger.debug("getGPGSA called");
-        if(usingExternalGPS){
-            return getParserGPGSA();
-        }else{
-            return getJsr179GPGSA();
-        }
-    }*/
-    /*
-    public GpsGPGSA getParserGPGSA(){
-      //  Logger.debug("getParserGPGSA called");
-        return parser.getGPGSA();
-    }*/
-
+    }
     
     public GpsPosition getParserPosition() {
     //    Logger.debug("getParserPosition called");
         return parser.getGpsPosition();
     }
     public GpsPosition getJsr179Position() {
-        //System.out.println("getJsr179Position called");
-        //System.out.println(gp.altitude);
-        //System.out.println(gp.latitude);
-        //System.out.println(gp.longitude);
-        //System.out.println(gp.speed);
-        //System.out.println(gp.course);
-       // System.out.println(gp.date);
-        
-        
         return gp;
     }
   
     public Vector getSatellites() {
         // these methods do not work until a sentence has been parsed.
         return parser.getSatellites();
+    }
+
+    
+    public static Device getDevice(String address, String alias) {
+        Logger.debug("getDevice called");
+       if(_jsr179Device==null) {
+           _jsr179Device=new Jsr179Device(address, alias);
+       }
+        return _jsr179Device;
     }
 
 }

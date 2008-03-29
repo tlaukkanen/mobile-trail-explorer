@@ -31,7 +31,8 @@ public class GpsDeviceFactory {
             // Create an internal (non bluetooth) gps device
             if (GpsUtilities.checkJsr179IsPresent()
                     && Controller.getController().getUseJsr179()) {
-                dev = new Jsr179Device(address, alias);
+                dev =  Jsr179Device.getDevice(address, alias);
+                Logger.debug("dev is "+dev);
 
             }
         } else if ("Mock".equals(address)) {

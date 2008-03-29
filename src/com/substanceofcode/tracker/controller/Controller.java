@@ -128,7 +128,7 @@ public class Controller {
     private RecorderSettings settings;
 
     /**
-     * Backlight maintainance object
+     * Backlight maintenance object
      */
     private Backlight backlight;
 
@@ -326,7 +326,7 @@ public class Controller {
 
 
             if (GpsUtilities.checkJsr179IsPresent()) {
-                Device dev = new Jsr179Device("internal",
+                Device dev =  Jsr179Device.getDevice("internal",
                         "Internal GPS (Jsr 179)");
                 devices.addElement(dev);
             }
@@ -1141,7 +1141,7 @@ public class Controller {
         settings.setJsr179(useJsr179);
     }
     public boolean getUseJsr179(){
-        return useJsr179;
+        return settings.getJsr179();
     }
     
     public void setUseFileCache(boolean b){
