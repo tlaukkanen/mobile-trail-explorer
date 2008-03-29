@@ -57,25 +57,25 @@ public final class GpsPosition implements Serializable {
      **************************************************************************/
 
     /** The 'raw' GPS data, as received from the GPS Device */
-    public final String rawData;
+    public  String rawData;
 
     /** The longitude at this GpsPosition */
-    public final double longitude;
+    public double longitude;
 
     /** The latitude at this GpsPosition */
-    public final double latitude;
+    public double latitude;
 
     /** The speed at this GpsPosition */
-    public final double speed;
+    public double speed;
 
     /** The course/direction at this GpsPosition */
-    public final short course;
+    public short course;
 
     /** The altitude at this GpsPosition */
-    public final double altitude;
+    public double altitude;
 
     /** A timestamp for this GpsPosition */
-    public final Date date;
+    public Date date;
 
     /** GpsGPGSA (pdop,hdop etc) data should also be stored here */
     private GpsGPGSA gpgsa;
@@ -395,8 +395,22 @@ public final class GpsPosition implements Serializable {
         return gpgsa;
     }
     public void unserialize(DataInputStream dis) throws IOException {
-        // TODO Auto-generated method stub
-
+        if (dis.readBoolean()) {
+            rawData=dis.readUTF();
+        } 
+        longitude = dis.readDouble();
+        latitude = dis.readDouble();
+        speed = dis.readDouble();
+        course = dis.readShort();
+        altitude = dis.readDouble();
+        if ( dis.readBoolean()) {
+            date =new Date(dis.readLong());
+        } 
+        if (dis.readBoolean()) {
+            
+        } else {
+            gpgsa.unserialize(dis);
+        }
     }
 
 }
