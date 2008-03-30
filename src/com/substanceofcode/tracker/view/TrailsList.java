@@ -113,9 +113,9 @@ public class TrailsList extends List implements CommandListener{
                         controller.loadTrack(trail);
                         controller.showTrail();
                     } catch (IOException e) {
+                        Logger.getLogger().error("Unable to load trail: " + e.getMessage());
                         controller.showError("An Exception was thrown when attempting to load " +
                                              "the Trail from the RMS!");
-                        e.printStackTrace();
                     }
                 }else{
                     // Do nothing. Well, perhaps this should "go-back", hmmmm, conundrum.

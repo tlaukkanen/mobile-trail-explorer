@@ -72,7 +72,7 @@ public class ImportWaypointScreen extends Form implements CommandListener {
         if (importFile == null) {
             importFile = "E:/";
         }
-        importFileField = new TextField("File Location", importFile, 50,
+        importFileField = new TextField("File Location (GPX)", importFile, 50,
                 TextField.ANY);
         this.append(importFileField);
     }
