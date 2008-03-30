@@ -73,7 +73,7 @@ public class Track implements Serializable {
     /**
      * The MIME type for all Tracks stored XXX : mchr : What is this for?
      */
-    private static final String MIME_TYPE = "Mobile Trail Trail";
+    public static final String MIME_TYPE = "Mobile Trail Trail";
 
     /** A Vector of {@link GpsPosition}s representing this 'Trails' route. */
     private Vector trackPoints;
@@ -521,12 +521,14 @@ public class Track implements Serializable {
         if (listener != null) {
             listener.notifyProgress(2);
         }
-
+        long start = System.currentTimeMillis();
+        long end;
         // ------------------------------------------------------------------
         // Convert the data into a String
         // ------------------------------------------------------------------
         String exportData = converter.convert(this, waypoints, true, true);
-
+        end = System.currentTimeMillis();
+        Logger.debug("Converted track in " +(end-start)+"ms");
         // ------------------------------------------------------------------
         // Notify progress
         // ------------------------------------------------------------------
@@ -540,7 +542,8 @@ public class Track implements Serializable {
 
         // faster, apparently
         output.write(exportData.getBytes());
-        // output.println(exportData);
+        end = System.currentTimeMillis();
+        Logger.debug("Wrote file in " +(end-start)+"ms");
         output.close();
         out.close();
         connection.close();
