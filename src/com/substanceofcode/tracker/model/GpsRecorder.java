@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,6 +41,7 @@ import javax.microedition.rms.RecordStoreException;
 import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.view.Logger;
 
 /**
  * Timer based class that encapsulates recording data from a GPS device.
@@ -388,7 +390,7 @@ public class GpsRecorder {
             try {
 
                 if (recording==true){
-                    //Logger.debug("GpsRecorder getPosition called");
+               //     Logger.debug("GpsRecorder getPosition called");
                     currentPosition = controller.getPosition();
                     if (currentPosition !=null){
                         currentGPGSA = currentPosition.getGpgsa();
@@ -413,8 +415,8 @@ public class GpsRecorder {
                         stopped = currentPosition.equals(lastRecordedPosition);
                     }
 
-                    // Logger.debug("interval: "+ intervalSeconds + 
-                    // " currentPosition is " + (currentPosition==null?"null":"not null"));
+                     Logger.debug("interval: "+ intervalSeconds + 
+                     " currentPosition is " + (currentPosition==null?"null":"not null"));
                     /**
                      * Record current position if user have moved or this is a
                      * first recorded position.
@@ -434,16 +436,23 @@ public class GpsRecorder {
                         //If the uploadURL is set (not "") then try to upload the
                         //GpsPosition too.
                         uploadURL=controller.getSettings().getUploadURL();
+                        Logger.debug("UploadUrl is "+uploadURL);
                         if(!uploadURL.equals("")){
                             DataOutputStream dos=null;
                             try{
                                 conn= (HttpConnection) Connector.open(uploadURL);
                                 conn.setRequestMethod(HttpConnection.POST);
-                            dos= conn.openDataOutputStream();
-                            currentPosition.serialize(dos);
-                            dos.write("\r\n".getBytes());
-                            dos.flush();
-                            
+                                dos= conn.openDataOutputStream();
+                                currentPosition.serialize(dos);
+                                dos.write("\r\n".getBytes());
+                                dos.flush();
+                                InputStream dis = conn.openInputStream();
+                                int ch;
+                                StringBuffer b = new StringBuffer();
+                                while ( ( ch = dis.read() ) != -1 ) {
+                                    b= b.append( ( char ) ch );
+                                }
+                                Logger.debug(b.toString());
                             }catch(Exception e){
                                 e.printStackTrace();
                             }finally{
