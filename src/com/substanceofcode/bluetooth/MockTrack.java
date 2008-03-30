@@ -2,12 +2,12 @@ package com.substanceofcode.bluetooth;
 
 import java.util.Date;
 
-import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
 
-public class MockTrack{
+public class MockTrack extends Track{
 private final String trackData = ""
 + "-3.384551,50.86268,61.3\n"
 + "-3.384568,50.862671,60.3\n"
