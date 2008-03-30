@@ -148,8 +148,8 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                     synchronized (extraInfo) {
                         if (nmeaStrings.size() == 0 && extraInfo != null
                                 && extraInfo.length() > 0) {
-                            nmeaStrings = StringUtil.splitToVector(extraInfo,
-                                    (char) LINE_DELIMITER);
+                            
+                            nmeaStrings = StringUtil.splitToNMEAVector(extraInfo);
                         }
                         // Only continue if we have some strings to parse
                         if (nmeaStrings.size() > 0) {

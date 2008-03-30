@@ -103,6 +103,35 @@ public class StringUtil {
         }
         return result;
     }
+    
+    /**
+         * Split a Set of NMEA Strings and put the results into a vector
+         * @param original
+         * @return
+         */
+    
+        synchronized static public Vector splitToNMEAVector(String original){
+           
+            Vector nodes = new Vector();
+            String separator = "$";
+           
+            // Parse nodes into vector
+            int index = original.indexOf(separator);
+            original =  original.substring(index + separator.length());
+            index = original.indexOf(separator);
+            while (index >= 0) {
+                
+                nodes.addElement(separator + original.substring(0, index));
+                
+                original = original.substring(index + separator.length());
+                index = original.indexOf(separator);
+            }
+            // Get the last node
+            nodes.addElement(separator + original);
+            
+            return nodes;
+        }   
+    
 
     /**
      * Chops up the 'original' string into 1 or more strings which have a width <=
