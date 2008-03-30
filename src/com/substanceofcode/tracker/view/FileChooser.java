@@ -1,7 +1,7 @@
 /*
  * FileChooser.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,9 @@ import com.substanceofcode.tracker.controller.Controller;
  * - include testfolder function
  * @author steinerp
  */
-public class FileChooser extends List implements CommandListener {
+public class FileChooser 
+        extends List 
+        implements CommandListener {
 
     private Controller controller;
     
@@ -60,7 +62,13 @@ public class FileChooser extends List implements CommandListener {
     private String selectDir = "<select this directory>";
     private boolean showFiles;
     
-    public FileChooser(Controller controller, String path, boolean showFiles, Displayable previousScreen) {
+    private Thread updateThread;
+    
+    public FileChooser(
+            Controller controller, 
+            String path, 
+            boolean showFiles, 
+            Displayable previousScreen) {
         super("Exporting", List.IMPLICIT);
         this.controller = controller;
         this.path = path;
@@ -74,7 +82,16 @@ public class FileChooser extends List implements CommandListener {
 
         setCommandListener(this);
 
-        this.updateContent();
+        updateThread = new Thread() {
+
+            public void run() {
+                super.run();
+                updateContent();
+            }
+            
+        };
+
+        updateThread.start();
     }
 
     private void updateContent() {

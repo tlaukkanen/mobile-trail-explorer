@@ -1,7 +1,7 @@
 /*
  * SettingsList.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
@@ -37,111 +36,106 @@ import javax.microedition.lcdui.List;
 public class SettingsList extends List implements CommandListener {
 
     private Controller controller;
-
     /** Commands */
     private Command selectCommand;
-
     private Command backCommand;
-
     private final static int GPS = 0;
-
     private final static int EXPORTING = 1;
-
     private final static int RECORDING = 2;
-
     private final static int DISPLAY = 3;
-    
     private final static int DEVELOPMENT_MENU = 4;
-
     private final static int ABOUT = 5;
-    
     private final static int SMS = 6;
     private final static boolean SMS_AVAILABLE;
-    
-    static{
+
+    static {
         SMS_AVAILABLE = smsAvailable();
-        if(!SMS_AVAILABLE){
-            Logger.debug("The API required to send Messages (SMS etc) is unavailable on this phone. SMS menu option has been disabled"); 
+        if (!SMS_AVAILABLE) {
+            Logger.debug("The API required to send Messages (SMS etc) is " +
+                "unavailable on this phone. SMS menu option has been disabled");
         }
     }
-    private static boolean smsAvailable(){
+
+    private static boolean smsAvailable() {
         boolean result;
-        try{
+        try {
             Class.forName("javax.wireless.messaging.TextMessage");
             result = true;
-        }catch(ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             result = false;
         }
-        
+
         return result;
     }
 
-    /** Creates a new instance of SettingsList */
+    /** 
+     * Creates a new instance of SettingsList
+     * @param controller 
+     */
     public SettingsList(Controller controller) {
-	super("Settings", List.IMPLICIT);
-	this.controller = controller;
+        super("Settings", List.IMPLICIT);
+        this.controller = controller;
 
-	// List initialization
-	this.append("GPS", null);
-	this.append("Exporting", null);
-	this.append("Recording", null);
-	this.append("Display", null);
+        // List initialization
+        this.append("GPS", null);
+        this.append("Export folder", null);
+        this.append("Recording", null);
+        this.append("Display", null);
         this.append("Development Menu", null);
-	this.append("About/Help", null);
-        if(SMS_AVAILABLE){
+        this.append("About/Help", null);
+        if (SMS_AVAILABLE) {
             this.append("SMS", null);
         }
 
-	// Commands
-	selectCommand = new Command("Select", Command.OK, 1);
-	addCommand(selectCommand);
-	setSelectCommand(selectCommand);
+        // Commands
+        selectCommand = new Command("Select", Command.OK, 1);
+        addCommand(selectCommand);
+        setSelectCommand(selectCommand);
 
-	backCommand = new Command("Back", Command.BACK, 4);
-	addCommand(backCommand);
+        backCommand = new Command("Back", Command.BACK, 4);
+        addCommand(backCommand);
 
-	setCommandListener(this);
+        setCommandListener(this);
 
     }
 
     /** Command listener */
     public void commandAction(Command command, Displayable displayable) {
-	if (command == selectCommand) {
-	    int selectedIndex = this.getSelectedIndex();
-	    switch (selectedIndex) {
-	    case (GPS):
-		controller.showDevices();
-		break;
+        if (command == selectCommand) {
+            int selectedIndex = this.getSelectedIndex();
+            switch (selectedIndex) {
+                case (GPS):
+                    controller.showDevices();
+                    break;
 
-	    case (EXPORTING):
-		controller.showExportSettings(displayable);
-		break;
+                case (EXPORTING):
+                    controller.showExportSettings(displayable);
+                    break;
 
-	    case (RECORDING):
-		controller.showRecordingSettings();
-		break;
+                case (RECORDING):
+                    controller.showRecordingSettings();
+                    break;
 
-	    case (DISPLAY):
-		controller.showDisplaySettings();
-		break;
+                case (DISPLAY):
+                    controller.showDisplaySettings();
+                    break;
 
-            case (DEVELOPMENT_MENU):
-                controller.showDevelopmentMenu();
-                break;
-                
-	    case (ABOUT):
-		controller.showAboutScreen();
-		break;
-            case(SMS):
-                controller.showSMSScreen();
-                break;
+                case (DEVELOPMENT_MENU):
+                    controller.showDevelopmentMenu();
+                    break;
 
-	    default:
-	    }
-	}
-	if (command == backCommand) {
-	    controller.showTrail();
-	}
+                case (ABOUT):
+                    controller.showAboutScreen();
+                    break;
+                case (SMS):
+                    controller.showSMSScreen();
+                    break;
+
+                default:
+            }
+        }
+        if (command == backCommand) {
+            controller.showTrail();
+        }
     }
-
 }

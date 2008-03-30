@@ -728,8 +728,22 @@ public class Controller {
     }
 
     /** Show export settings */
-    public void showExportSettings(Displayable displayable) {
-        display.setCurrent(getFileChooser(displayable));
+    public void showExportSettings(final Displayable displayable) {
+        
+        /** 
+         * Trying to avoid deadlock by displaying the FileChooser in another
+         * thread. Otherwise you'll be getting the following warning:
+         *     To avoid potential deadlock, operations that may block, such as 
+         *     networking, should be performed in a different thread than the 
+         *     commandAction() handler.
+         */
+        Thread t = new Thread() {
+            public void run() {
+                super.run();
+                display.setCurrent(getFileChooser(displayable));
+            }
+        };
+        t.start();
     }
 
     /** Show export settings form */

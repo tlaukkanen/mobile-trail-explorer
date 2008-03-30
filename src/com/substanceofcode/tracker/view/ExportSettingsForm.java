@@ -22,7 +22,6 @@
 
 package com.substanceofcode.tracker.view;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;

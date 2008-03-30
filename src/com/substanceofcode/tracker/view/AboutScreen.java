@@ -1,7 +1,7 @@
 /*
  * AboutForm.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Created on August 14th 2006
@@ -65,7 +65,7 @@ public final class AboutScreen extends Canvas {
 
     private static final String[] aboutText = { "Mobile Trail Explorer,",
             "Version: " + TrailExplorerMidlet.VERSION.toString(),
-            "Copyright (C) 2005-2007", "Tommi Laukkanen", "",
+            "Copyright (C) 2005-2008", "Tommi Laukkanen", "",
             "Licensed under the GPL", "", "For more information visit:",
             "www.substanceofcode.com" };
 
