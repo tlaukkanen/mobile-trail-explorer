@@ -44,34 +44,21 @@ public abstract class GpsDeviceImpl implements GpsDevice {
     }
 
     /** Creates a new instance of GpsDevice */
-    public GpsDeviceImpl(String address, String alias) {
-        //super(address, alias);
-    
-        // lastPosition = new PositionBuffer();
+    public GpsDeviceImpl(String address, String alias) {      
         parser = GpsPositionParser.getPositionParser();
-        // lastSatelliteCount = 0;
     }
 
-   
-
-   
     /* (non-Javadoc)
      * @see com.substanceofcode.bluetooth.GpsDevice#getPosition()
      */
     public GpsPosition getPosition() {
-        return parser.getGpsPosition();
-    }
-
-    /* (non-Javadoc)
-     * @see com.substanceofcode.bluetooth.GpsDevice#getGPGSA()
-     */
-   /* public GpsGPGSA getGPGSA() {
-        if (parser == null) {
+        if (parser != null) {
+            return parser.getGpsPosition();
+        } else {
             return null;
         }
-        return parser.getGPGSA();
-    }*/
-
+    }
+    
     /* (non-Javadoc)
      * @see com.substanceofcode.bluetooth.GpsDevice#getSatelliteCount()
      */
@@ -87,15 +74,22 @@ public abstract class GpsDeviceImpl implements GpsDevice {
      * @see com.substanceofcode.bluetooth.GpsDevice#getSatellites()
      */
     public Vector getSatellites() {
-        // return satellites;
-        return parser.getSatellites();
+        if (parser != null) {
+            return parser.getSatellites();
+        } else {
+            return null;
+        }
     }
 
     /* (non-Javadoc)
      * @see com.substanceofcode.bluetooth.GpsDevice#getParserMetrics()
      */
     public String[] getParserMetrics() {
-        return parser.getMetrics();
+        if (parser != null) {
+            return parser.getMetrics();
+        } else {
+            return null;
+        }
     }
 
 
