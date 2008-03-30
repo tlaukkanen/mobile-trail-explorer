@@ -53,30 +53,30 @@ public class ImportTrailScreen extends Form implements CommandListener {
     /** Creates a new instance of ExportSettingsForm */
     public ImportTrailScreen(Displayable previousScreen) {
         super("Import Trail");
-        this.controller = Controller.getController();
+        controller = Controller.getController();
         this.previousScreen = previousScreen;
 
         // Initialize commands
-        this.addCommand(okCommand = new Command("OK", Command.SCREEN, 1));
-        this.addCommand(cancelCommand = new Command("Cancel",
+        addCommand(okCommand = new Command("OK", Command.SCREEN, 1));
+        addCommand(cancelCommand = new Command("Cancel",
                 Command.SCREEN, 2));
-        this.addCommand(browseCommand = new Command("Browse",
+        addCommand(browseCommand = new Command("Browse",
                 Command.SCREEN, 3));
-        this.setCommandListener(this);
+        setCommandListener(this);
 
-        this.refreshForm();
+        refreshForm();
     }
 
     /** Reinitialize the form */
     public void refreshForm() {
-        this.deleteAll();
+        deleteAll();
         String importFile = controller.getSettings().getImportFile();
         if (importFile == null) {
             importFile = "E:/";
         }
         importFileField = new TextField("File Location", importFile, 50,
                 TextField.ANY);
-        this.append(importFileField);
+        append(importFileField);
     }
 
     /** Handle commands */

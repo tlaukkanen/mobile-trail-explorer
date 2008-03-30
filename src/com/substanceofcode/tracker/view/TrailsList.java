@@ -31,6 +31,7 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 import com.substanceofcode.data.FileSystem;
+import com.substanceofcode.gpsdevice.MockGpsDevice;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.Track;
@@ -51,6 +52,7 @@ public class TrailsList extends List implements CommandListener{
     private final Command showDetailsCommand;
     private final Command newTrailCommand;
     private final Command newStreamTrailCommand;
+    private final Command useAsMockTrackCommand;
     private final Command backCommand;
     private final Command useAsGhostTrailCommand;    
     private final Command importTrailCommand;
@@ -64,27 +66,28 @@ public class TrailsList extends List implements CommandListener{
         super("Trails List", List.IMPLICIT);
         this.controller = controller;
 
-        this.addCommand(showDetailsCommand = new Command("Show Details", Command.ITEM, 1));
-        this.addCommand(loadCommand = new Command("Load", Command.OK, 2));
-        this.addCommand(deleteCommand = new Command("Delete", Command.ITEM, 3));
-        this.addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
-        this.addCommand(newTrailCommand = new Command("New Trail", Command.ITEM, 5));
-        this.addCommand(newStreamTrailCommand = new Command("New GPX Stream", Command.ITEM, 6));
-        this.addCommand(useAsGhostTrailCommand = new Command("Use as ghost trail", Command.ITEM, 7));
-        this.addCommand(importTrailCommand = new Command("Import a trail", Command.ITEM, 8));
-        this.addCommand(exportTrailCommand = new Command("Export trail", Command.ITEM, 9));
-        this.addCommand(backCommand = new Command("Cancel", Command.BACK, 10));
+        addCommand(showDetailsCommand = new Command("Show Details", Command.ITEM, 1));
+        addCommand(loadCommand = new Command("Load", Command.OK, 2));
+        addCommand(deleteCommand = new Command("Delete", Command.ITEM, 3));
+        addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
+        addCommand(newTrailCommand = new Command("New Trail", Command.ITEM, 5));
+        addCommand(newStreamTrailCommand = new Command("New GPX Stream", Command.ITEM, 6));
+        addCommand(useAsMockTrackCommand = new Command("Use as mock track", Command.ITEM, 7));
+        addCommand(useAsGhostTrailCommand = new Command("Use as ghost trail", Command.ITEM, 8));
+        addCommand(importTrailCommand = new Command("Import a trail", Command.ITEM, 9));
+        addCommand(exportTrailCommand = new Command("Export trail", Command.ITEM, 10));
+        addCommand(backCommand = new Command("Cancel", Command.BACK, 11));
 
-        this.refresh();
+        refresh();
         
-        this.setCommandListener(this);
+        setCommandListener(this);
         
     }
     
     public void refresh(){
-        this.deleteAll();
-        Vector files = FileSystem.getFileSystem().listFiles(new Track().getMimeType());
-        this.trailsFound = files.size() != 0;
+        deleteAll();
+        Vector files = FileSystem.getFileSystem().listFiles( Track.MIME_TYPE);
+        trailsFound = files.size() != 0;
         if( ! trailsFound){
             this.append("No Trails Found", null);
             this.removeCommand(showDetailsCommand);
@@ -105,8 +108,8 @@ public class TrailsList extends List implements CommandListener{
 
     public void commandAction(Command command, Displayable disp) {
         if(disp == this){
-            if(command == this.loadCommand){
-                if(this.trailsFound){
+            if(command == loadCommand){
+                if(trailsFound){
                     final String selectedTrailName = this.getString(this.getSelectedIndex());
                     try {
                         final Track trail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
@@ -121,34 +124,34 @@ public class TrailsList extends List implements CommandListener{
                     // Do nothing. Well, perhaps this should "go-back", hmmmm, conundrum.
                 }
             }else if(command == showDetailsCommand){
-                final String selectedTrailName = this.getString(this.getSelectedIndex());
+                final String selectedTrailName = getString(getSelectedIndex());
                 controller.showTrailDetails(selectedTrailName);
                 
             }else if(command == saveCurrentCommand){
                 controller.saveTrail(new AlertHandler(controller, this));
-                this.refresh();
-            }else if(command == this.backCommand){
+                refresh();
+            }else if(command == backCommand){
                 controller.showTrail();
-            }else if(command == this.newTrailCommand){
+            }else if(command == newTrailCommand){
                 controller.loadTrack(null);
                 controller.showTrail();
-            }else if(command == this.deleteCommand){
+            }else if(command == deleteCommand){
                 try {
-                    FileSystem.getFileSystem().deleteFile(this.getString(this.getSelectedIndex()));
+                    FileSystem.getFileSystem().deleteFile(getString(getSelectedIndex()));
                 } catch (IOException e) {
                     controller.showAlert("ERROR! An Exception was thrown when attempting to delete " +
                             "the Trail from the RMS!  " +  e.toString(), 5, AlertType.ERROR);
                 }
                 this.refresh();
-            }else if(command ==  this.useAsGhostTrailCommand) {
+            }else if(command ==  useAsGhostTrailCommand) {
                 try {
-                    String selectedTrailName = this.getString(this.getSelectedIndex());
+                    String selectedTrailName = getString(getSelectedIndex());
                     Track selectedTrail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
                     if(selectedTrail!=null) {
                         controller.setGhostTrail(selectedTrail);
                     }
                     controller.showTrail();
-                } catch(IOException e) {
+                } catch(Exception e) {
                     controller.showAlert("ERROR! An Exception was thrown when attempting to set ghost " +
                             "trail from the RMS!  " +  e.toString(), 5, AlertType.ERROR);
                 }
@@ -158,12 +161,12 @@ public class TrailsList extends List implements CommandListener{
                 }
             	controller.setCurrentScreen(importTrailScreen);
             }else if(command == exportTrailCommand){
-                String selectedTrailName = this.getString(this.getSelectedIndex());
+                String selectedTrailName = getString(getSelectedIndex());
                 Track selectedTrail = getSelectedTrack();
                 if(selectedTrail!=null) {
                     controller.showTrailActionsForm(selectedTrail, selectedTrailName);
                 }                
-            }else if(command == this.newStreamTrailCommand){
+            }else if(command == newStreamTrailCommand){
                 if (controller.getSettings().getStreamingStarted()) {
                     controller.showStreamRecovery();
                 } else {
@@ -188,6 +191,19 @@ public class TrailsList extends List implements CommandListener{
                         controller.showError("Error : " + e.toString());
                     }
                 }
+            }else if (command == useAsMockTrackCommand) {
+                try {                    
+                    String name=getString(getSelectedIndex());
+                    Logger.debug("Filename is "+name);
+                    Track selectedTrail = new Track(FileSystem.getFileSystem().getFile(name));
+                    if(selectedTrail!=null) {
+                        MockGpsDevice.setTrack(selectedTrail);
+                    }
+                } catch (IOException e) {  
+                    Logger.debug(e.getMessage());
+                    e.printStackTrace();
+                }
+                controller.showTrail();   
             }
         }
         
@@ -196,7 +212,7 @@ public class TrailsList extends List implements CommandListener{
     /** Get selected track */
     private Track getSelectedTrack() {
         try {
-            String selectedTrailName = this.getString(this.getSelectedIndex());
+            String selectedTrailName = getString(getSelectedIndex());
             Track selectedTrail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
             return selectedTrail;
         } catch (Exception ex) {
