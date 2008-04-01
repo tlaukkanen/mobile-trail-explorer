@@ -984,6 +984,11 @@ public class Controller {
         waypoints.removeElement(wp);
     }
     
+    /** Remove all waypoints */
+    public void removeAllWaypoints() {
+        waypoints.removeAllElements();
+    }
+    
     /**
      * @param Waypoint
      *                Waypoint object to display

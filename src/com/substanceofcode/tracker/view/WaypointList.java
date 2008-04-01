@@ -47,6 +47,7 @@ public class WaypointList extends List implements CommandListener {
     
     private Command editCommand;
     private final Command deleteCommand;
+    private final Command deleteAllCommand;
     private final Command backCommand;
     private final Command newWaypointCommand;
     private final Command exportWaypointCommand;
@@ -65,6 +66,7 @@ public class WaypointList extends List implements CommandListener {
         
         this.addCommand(editCommand = new Command("Edit", Command.OK, 1));
         this.addCommand(deleteCommand = new Command("Remove", Command.SCREEN, 2));
+        this.addCommand(deleteAllCommand = new Command("Remove All", Command.SCREEN, 3));
         this.addCommand(newWaypointCommand = new Command("Add new waypoint", Command.ITEM, 4));
         this.addCommand(exportWaypointCommand = new Command("Export selected waypoint", Command.ITEM, 5));
         this.addCommand(exportAllWaypointsCommand = new Command("Export all waypoints", Command.ITEM, 6));
@@ -105,6 +107,12 @@ public class WaypointList extends List implements CommandListener {
             controller.removeWaypoint(wp);
             int selectedIndex = this.getSelectedIndex();
             this.delete(selectedIndex);
+        }
+        
+        if(command == deleteAllCommand) {
+            /** Delete all waypoints */
+            controller.removeAllWaypoints();
+            this.deleteAll();
         }
         
         if(command == newWaypointCommand) {
