@@ -13,10 +13,13 @@ Patrick Steiner
 
 Release Notes:
 
-v1.9 (March xth 2008)
+v1.10 (May xxx 2008)
++ ...
+
+v1.9 (April 1st 2008)
 + Changed the Export Settings page to use a generated list of options 
 + Changed the trail projection to mercator, same as for maps (Issue 68)
-+ Both trail and map are now zoomed with same keys (1 and 2)
++ Both trail and map are now zoomed with same keys (1 and 3)
 + File browser is used for importing trails and selecting export path (Issue 77)
 + Logger can now write to the filesystem
 + Added signal strength SNR key to Sky View and updated help screen 
