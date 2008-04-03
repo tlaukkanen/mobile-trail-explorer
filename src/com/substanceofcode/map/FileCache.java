@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.lcdui.Image;
@@ -73,7 +72,7 @@ public class FileCache implements TileCache, Runnable {
      */
     public void initializeCache() {
         Logger.debug("Initializing FileCache");
-
+        
 
         try {
             Conn = (FileConnection) Connector.open(fullPath);
@@ -184,7 +183,7 @@ public class FileCache implements TileCache, Runnable {
             }
 
             if (streamOut != null) {
-                // streamOut.
+
                 boolean firstTile = true;
                 while (fileProcessQueue.size() > 0) {
 
@@ -192,7 +191,8 @@ public class FileCache implements TileCache, Runnable {
                     // buffer=t.getImageByteArray();
                     fileProcessQueue.removeElementAt(0);
 
-                  
+                   //Only serialize tile we know are not already serialized...
+                  if(checkCache(t.cacheKey)){
                     //The first tile will not have the correct offset if the file is
                     //not empty, so we should give it the offset
                     if (firstTile) {
@@ -215,6 +215,9 @@ public class FileCache implements TileCache, Runnable {
                             new Long(Tile.totalOffset));
                     Logger.debug("availableTileList size="
                             + availableTileList.size());
+                  }else{
+                      Logger.debug("Not Writing tile, already serialized:" +t.cacheKey);
+                  }
                 }
             } else {
                 Logger.debug("File: output stream is null");
@@ -305,10 +308,10 @@ public class FileCache implements TileCache, Runnable {
 
     public boolean checkCache(String name) {
         if (availableTileList.containsKey(name)) {
-            Logger.debug("Found tile in filecache: " + name);
+         //   Logger.debug("Found tile in filecache: " + name);
             return true;
         } else {
-            Logger.debug("Didn't find tile in filecache: " + name);
+           // Logger.debug("Didn't find tile in filecache: " + name);
             return false;
         }
     }
