@@ -29,8 +29,9 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 /**
- * 
- * @author Tommi
+ * Parser class for parsing NMEA sentences. Small tutorial about the NMEA can
+ * be found from http://home.mira.net/~gnb/gps/nmea.html
+ * @author Tommi Laukkanen
  */
 public class GpsPositionParser {
 
@@ -41,7 +42,8 @@ public class GpsPositionParser {
    private final Logger logger = Logger.getLogger();
     
     private GpsPosition currentPosition;
-   // private GpsGPGSA gpgsa;
+    private GpsGPGSA currentDilutionOfPrecision;
+    
     private double lastAltitude;
     private short satelliteCount;
     private double maxSpeed;
@@ -78,22 +80,6 @@ public class GpsPositionParser {
         return currentPosition;
     }
     
-  /*  public synchronized GpsGPGSA getGPGSA() {
-        Logger.debug("GPGPSA called from GPSPositionParser");
-    	return gpgsa;
-    }*/
-   /**
-    * Use this method to add gpgsa info to the position
-    * @param gpgsa
-    */
-    private synchronized void setGPGSA(GpsGPGSA gpgsa) {
-        if(currentPosition!=null){
-            currentPosition.setGpgsa(gpgsa);
-        }else{
-            Logger.debug("CurrentPosition is null, can't add gpgsa");
-        }
-    }
-
     private synchronized void setGpsPosition(GpsPosition pos) {
         this.currentPosition = pos;
     }
@@ -327,8 +313,9 @@ public class GpsPositionParser {
         }
 
         if (warning.equals("A")) {
-            GpsPosition pos = new GpsPosition(record, (short) course, longitudeDouble,
-                    latitudeDouble, speed, getLastAltitude());
+            GpsPosition pos = new GpsPosition(record, (short) course, 
+                    longitudeDouble, latitudeDouble, speed, getLastAltitude());
+            pos.setGpgsa(currentDilutionOfPrecision);
             this.setGpsPosition(pos);
         } else {
             Logger.debug("$GPRMC: Warning NOT A, so no position written: (" + warning + ")");
@@ -570,7 +557,8 @@ public class GpsPositionParser {
           	oi.setPdop(values[15]);
           	oi.setHdop(values[16]);
           	oi.setVdop(values[17]);
-          	setGPGSA(oi);
+            
+            currentDilutionOfPrecision = oi;
           }
   
     }

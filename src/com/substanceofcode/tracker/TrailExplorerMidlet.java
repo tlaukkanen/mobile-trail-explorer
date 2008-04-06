@@ -42,6 +42,9 @@ public class TrailExplorerMidlet extends MIDlet {
      */
     public static final Version VERSION = new Version(1, 10, 0);
     
+    /** Beta flag */
+    public static final boolean BETA = true;
+    
     /**
      * Local Controller object
      */

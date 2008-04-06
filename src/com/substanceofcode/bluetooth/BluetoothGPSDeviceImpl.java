@@ -35,14 +35,14 @@ import com.substanceofcode.tracker.view.Logger;
  * This class represents bluetooth devices that provide gps information
  * @author gareth
  */
-public class BluetoothGPSDeviceImpl extends GpsDeviceImpl implements Runnable, BluetoothDevice {
+public class BluetoothGPSDeviceImpl 
+        extends GpsDeviceImpl 
+        implements Runnable, BluetoothDevice {
     
     private StreamConnection connection;
     private InputStreamReader reader;
     
-    private Thread thread;
-    
-    
+    private Thread thread;    
    
     /** 
      * Explicit no arg constructor to allow for mock implementations
@@ -50,8 +50,6 @@ public class BluetoothGPSDeviceImpl extends GpsDeviceImpl implements Runnable, B
      *
      */
     public  BluetoothGPSDeviceImpl() {
-        
-    	
     }
     
     /** Creates a new instance of BluetoothDevice */
@@ -112,7 +110,6 @@ public class BluetoothGPSDeviceImpl extends GpsDeviceImpl implements Runnable, B
 
                     // Read one line and try to parse it.
                     int input;
-                 //   Logger.debug ("Reader is "+ reader+ ", Parser is "+ parser);
                     
                     while ((input = reader.read()) != LINE_DELIMITER) {
                         output.append((char) input);

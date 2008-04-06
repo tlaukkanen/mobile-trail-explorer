@@ -34,12 +34,12 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.ImageUtil;
-import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.util.Version;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.Font;
 
 /**
  * Splash canvas for Trail Explorer application. This class also deals with any updates
@@ -68,6 +68,9 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
      * Specifies wheather an update to the RMS/FileSystem or anything esle is required
      */
     private boolean updateRequired;
+    
+    /** Version text */
+    private String versionText;
     
     /** Creates a new instance of SplashAndUpdateCanvas */
     public SplashAndUpdateCanvas() {
@@ -99,7 +102,11 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         timeoutThread = new Thread(this);
         timeoutThread.start();
 
-
+        Version version = TrailExplorerMidlet.VERSION;
+        versionText = version.toString();
+        if(TrailExplorerMidlet.BETA) {
+            versionText += " (BETA)";
+        }
     }
 
     /** Paint canvas */
@@ -123,7 +130,11 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
             String title = "Trail Explorer";
             g.drawString(title, titleX, titleY, Graphics.HCENTER|Graphics.VCENTER);
         }
-      
+        
+        // Version info
+        g.setColor(0xAAAAAA);
+        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+        g.drawString(versionText, 1, 1, Graphics.TOP|Graphics.LEFT);        
         
         if(updateRequired){
             g.setColor(0xFF0000);
@@ -134,7 +145,10 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
 
 
     
-    /** Key pressed */
+    /** 
+     * Specified key pressed event handler.
+     * @param keyCode   code of the pressed key
+     */
     protected void keyPressed(int keyCode) {
         // Leave the Splash Screen if any key is pressed
         quitSplash();
@@ -146,8 +160,9 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
     }
     
     /**
-     * This is the run() method for the thread, it simply exits the SplashAndUpdateCanvas to 
-     * the Trail Screen after 'displayTime' milliseconds have passed.
+     * This is the run() method for the thread, it simply exits the 
+     * SplashAndUpdateCanvas to the Trail Screen after 'displayTime' 
+     * milliseconds have passed.
      */
     public void run() {
         long waitMiliSeconds = this.displayTime;

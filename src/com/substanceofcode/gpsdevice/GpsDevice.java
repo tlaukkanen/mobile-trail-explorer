@@ -15,18 +15,28 @@ public interface GpsDevice extends Device {
     public static final long BREAK = 2000;
     public static final int LINE_DELIMITER = 13;
 
-    /** Get current position from GPS unit */
+    /** 
+     * Get current position from GPS unit
+     * @return  current position
+     */
     public GpsPosition getPosition();
 
-    /** Get current position from GPS unit */
-    //public GpsGPGSA getGPGSA();
-
-    /** Get satellites in view count */
+    /** 
+     * Get satellites in view count
+     * @return  current count of satellites
+     */
     public int getSatelliteCount();
 
-    /** Get satellites */
+    /** 
+     * Get satellites
+     * @return  current satellites
+     */
     public Vector getSatellites();
 
+    /**
+     * Get parser metrics.
+     * @return  parser metrics
+     */
     public String[] getParserMetrics();
 
 }

@@ -384,17 +384,17 @@ public class GpsRecorder {
         return result;
     }
     
+    /** 
+     * Timer task for performing the actual recording: Add current position to
+     * current trail.
+     */
     protected class RecorderTask extends TimerTask {
         
         public void run() {
             try {
 
                 if (recording==true){
-               //     Logger.debug("GpsRecorder getPosition called");
                     currentPosition = controller.getPosition();
-                    if (currentPosition !=null){
-                        currentGPGSA = currentPosition.getGpgsa();
-                    }
                     isValidPosition = checkValidPosition(
                             currentPosition, 
                             lastPosition, 
