@@ -42,6 +42,7 @@ import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.StringUtil;
 
 /**
  * Timer based class that encapsulates recording data from a GPS device.
@@ -440,12 +441,24 @@ public class GpsRecorder {
                         if(!uploadURL.equals("")){
                             DataOutputStream dos=null;
                             try{
-                                conn= (HttpConnection) Connector.open(uploadURL);
+                                boolean serialize = true;
+                                if(uploadURL.indexOf("@LAT@")>0) {
+                                    String lat = String.valueOf(currentPosition.latitude);
+                                    uploadURL = StringUtil.replace(uploadURL, "@LAT@", lat);
+                                    String lon = String.valueOf(currentPosition.longitude);
+                                    uploadURL = StringUtil.replace(uploadURL, "@LON@", lon);
+                                    String alt = String.valueOf(currentPosition.altitude);
+                                    uploadURL = StringUtil.replace(uploadURL, "@ALT@", alt);
+                                    serialize = false;
+                                }
+                                conn = (HttpConnection) Connector.open(uploadURL);
                                 conn.setRequestMethod(HttpConnection.POST);
-                                dos= conn.openDataOutputStream();
-                                currentPosition.serialize(dos);
-                                dos.write("\r\n".getBytes());
-                                dos.flush();
+                                if(serialize) {
+                                    dos= conn.openDataOutputStream();
+                                    currentPosition.serialize(dos);
+                                    dos.write("\r\n".getBytes());
+                                    dos.flush();
+                                }
                                 InputStream dis = conn.openInputStream();
                                 int ch;
                                 StringBuffer b = new StringBuffer();
