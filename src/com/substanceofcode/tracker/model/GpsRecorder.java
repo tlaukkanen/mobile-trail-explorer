@@ -449,6 +449,8 @@ public class GpsRecorder {
                                     uploadURL = StringUtil.replace(uploadURL, "@LON@", lon);
                                     String alt = String.valueOf(currentPosition.altitude);
                                     uploadURL = StringUtil.replace(uploadURL, "@ALT@", alt);
+                                    String id = String.valueOf(recordedTrack.getId());
+                                    uploadURL = StringUtil.replace(uploadURL, "@TRAILID@", id);
                                     serialize = false;
                                 }
                                 conn = (HttpConnection) Connector.open(uploadURL);

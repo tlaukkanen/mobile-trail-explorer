@@ -42,6 +42,7 @@ import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.util.StringUtil;
 import java.util.Date;
 
 /**
@@ -109,6 +110,10 @@ public class Track implements Serializable {
      */
     private boolean isStreaming = false;
 
+    
+    /** Unique identifer of the track */
+    private long id;
+    
     /**
      * Creates a new instance of Track which will be saved at the end
      */
@@ -117,6 +122,10 @@ public class Track implements Serializable {
         trackMarkers = new Vector();
         distance = 0.0;
         name = "";
+        /** Create unique identifier for the track */
+        String dateStamp = DateTimeUtil.getCurrentDateStamp();
+        dateStamp = StringUtil.replace(dateStamp, "_", "");
+        id = Long.parseLong(dateStamp);
     }
 
     /**
@@ -190,6 +199,7 @@ public class Track implements Serializable {
      * Instantiate a Track from a DataInputStream
      */
     public Track(DataInputStream dis) throws IOException {
+        this();
         this.unserialize(dis);
     }
 
@@ -201,6 +211,14 @@ public class Track implements Serializable {
         return isStreaming;
     }
 
+    /** 
+     * Get track identifier
+     * @return Track identifier
+     */
+    public long getId() {
+        return id;
+    }
+    
     /** Get position count */
     public int getPositionCount() {
         int positionCount = trackPoints.size();
