@@ -136,7 +136,7 @@ public class GpsRecorder {
 
     /** Clear track */
     public void clearTrack() {
-        recordedTrack.clear();
+        recordedTrack = new Track();
     }
 
     /** 
