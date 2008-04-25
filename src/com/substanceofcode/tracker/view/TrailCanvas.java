@@ -97,45 +97,33 @@ public class TrailCanvas extends BaseCanvas {
     public TrailCanvas(GpsPosition initialPosition) {
         super();
         this.setLastPosition(initialPosition);
-
-        counter = 0;
-
-        midWidth = this.getWidth() / 2;
-        midHeight = this.getHeight() / 2;
-        movementSize = this.getWidth() / 8;
+        
         verticalMovement = 0;
         horizontalMovement = 0;
 
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
+        counter = 0;
 
-        Image tempCompassArrows = ImageUtil
-                .loadImage("/images/compass-arrows.png");
-        compass = ImageUtil.loadImage("/images/compass.png");
-        // Check for high resolution (eg. N80 352x416)
-        if (this.getWidth() > 250) {
-            // Double the compass size
-            largeDisplay = true;
-            compass = ImageUtil.scale(compass, compass.getWidth() * 2, compass
-                    .getHeight() * 2);
-            tempCompassArrows = ImageUtil.scale(tempCompassArrows,
-                    tempCompassArrows.getWidth() * 2, tempCompassArrows
-                            .getHeight() * 2);
-            compassArrows = new Sprite(tempCompassArrows, 22, 22);
-            compassArrows.setPosition(this.getWidth() - 44, 22);
-        } else {
-            largeDisplay = false;
-            compassArrows = new Sprite(tempCompassArrows, 11, 11);
-            compassArrows.setPosition(this.getWidth() - 22, 11);
-        }
-
+        calculateDisplaySize(getWidth(),getHeight()) ;        
     }
 
-    /** Paint */
+    /** 
+     * Paint trails and maps
+     * @param g 
+     */
     public void paint(Graphics g) {
         try {
             final int height = getHeight();
             final int width = getWidth();
 
+            /** 
+             * Some phones like N95 can resize their screen 
+             * (e.g rotating the Display)
+             */
+            if(width/2 != midWidth || height/2 !=midHeight ) {
+                calculateDisplaySize(width,height) ;
+            }
+            
 
             /** Get last position from recorder */
             final GpsPosition temp = controller.getPosition();
@@ -204,6 +192,33 @@ public class TrailCanvas extends BaseCanvas {
         }
     }
 
+    private void calculateDisplaySize(int width, int height) {
+        midWidth = width / 2;
+        midHeight = height / 2;
+        movementSize = width / 8;              
+
+        Image tempCompassArrows = ImageUtil
+                .loadImage("/images/compass-arrows.png");
+        compass = ImageUtil.loadImage("/images/compass.png");
+        
+         // Check for high resolution (eg. N80 352x416)
+        if (width > 250) {
+            // Double the compass size
+            largeDisplay = true;
+            compass = ImageUtil.scale(compass, compass.getWidth() * 2, compass
+                    .getHeight() * 2);
+            tempCompassArrows = ImageUtil.scale(tempCompassArrows,
+                    tempCompassArrows.getWidth() * 2, tempCompassArrows
+                            .getHeight() * 2);
+            compassArrows = new Sprite(tempCompassArrows, 22, 22);
+            compassArrows.setPosition(width - 44, 22);
+        } else {
+            largeDisplay = false;
+            compassArrows = new Sprite(tempCompassArrows, 11, 11);
+            compassArrows.setPosition(width - 22, 11);
+        }
+    }
+    
     /**
      * 
      * @param g
@@ -894,7 +909,10 @@ public class TrailCanvas extends BaseCanvas {
     public TrailCanvas() {
     }
 
-    /** Handle key presses */
+    /** 
+     * Handle key presses.
+     * @param keyCode 
+     */
     public void keyPressed(int keyCode) {
         System.out.println("key=" + keyCode);
 
@@ -970,6 +988,5 @@ public class TrailCanvas extends BaseCanvas {
         }
         this.repaint();
     }
-
 
 }
