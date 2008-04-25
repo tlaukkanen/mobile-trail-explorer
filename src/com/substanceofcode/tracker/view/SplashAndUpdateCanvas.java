@@ -50,7 +50,7 @@ import javax.microedition.lcdui.Font;
  */
 public class SplashAndUpdateCanvas extends Canvas implements Runnable {
     
-    private static final long SPLASH_SCREEN_TIMEOUT = 6000; // 6 seconds.
+    private static final long SPLASH_SCREEN_TIMEOUT = 2000; // 1 second.
     
     /** Images */
     private Image splashImage;
@@ -72,6 +72,10 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
     /** Version text */
     private String versionText;
     
+    /** Is the application initialized? */
+    private boolean isAppInitialized;
+        
+   
     /** Creates a new instance of SplashAndUpdateCanvas */
     public SplashAndUpdateCanvas() {
         // Load title image
@@ -80,10 +84,14 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         // Set fullscreen
         setFullScreenMode( true );
         
-        Version settingsVersion = Controller.getController().getSettings().getVersionNumber();
+        isAppInitialized = false;
+        // Start initializing app
+        Controller controller = Controller.getController();
+        
+        Version settingsVersion = controller.getSettings().getVersionNumber();
         if(settingsVersion == null){
-            // The last version before a Version number was implemented was 1.6
-            settingsVersion = new Version(1,6,0);
+            // This is fresh install use current version
+            settingsVersion = TrailExplorerMidlet.VERSION;
         }
         
         Version difference = TrailExplorerMidlet.VERSION.compareVersion(settingsVersion);
@@ -134,24 +142,16 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         // Version info
         g.setColor(0xAAAAAA);
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-        g.drawString(versionText, 1, 1, Graphics.TOP|Graphics.LEFT);        
+        String info = versionText;
+        if(!isAppInitialized) {
+            info += " Starting up...";
+        }
+        g.drawString(info, 1, 1, Graphics.TOP|Graphics.LEFT);
         
         if(updateRequired){
             g.setColor(0xFF0000);
             g.drawString("Updating MTE", getWidth()/2, getHeight()-5, Graphics.BOTTOM | Graphics.HCENTER);
         }
-    }
-
-
-
-    
-    /** 
-     * Specified key pressed event handler.
-     * @param keyCode   code of the pressed key
-     */
-    protected void keyPressed(int keyCode) {
-        // Leave the Splash Screen if any key is pressed
-        quitSplash();
     }
 
     private void updateFinished(){
@@ -165,9 +165,10 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
      * milliseconds have passed.
      */
     public void run() {
-        long waitMiliSeconds = this.displayTime;
+        long waitMilliSeconds = this.displayTime;
         try{
-        	Thread.sleep(waitMiliSeconds);
+        	Thread.sleep(waitMilliSeconds);
+            Controller.getController().initialize();
         }catch (InterruptedException ex) {
             ex.printStackTrace();
         }
@@ -305,5 +306,6 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         
         return new GpsPosition(rawData, course, longitude, latitude, speed, altitude, date);
     }
+    
     
 }

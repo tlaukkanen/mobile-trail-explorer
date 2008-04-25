@@ -107,7 +107,10 @@ public class RecorderSettings {
     /** Logging */
     public static final String WRITE_LOG = "write-log";
 
-    /** Creates a new instance of RecorderSettings */
+    /** 
+     * Creates a new instance of RecorderSettings
+     * @param midlet 
+     */
     public RecorderSettings(MIDlet midlet) {
         try {
             settings = Settings.getInstance(midlet);
@@ -274,7 +277,10 @@ public class RecorderSettings {
         return waypoints;
     }
 
-    /** Set waypoints */
+    /** 
+     * Set waypoints
+     * @param waypoints 
+     */
     public void setWaypoints(Vector waypoints) {
         String waypointString = "";
         Enumeration wpEnum = waypoints.elements();
@@ -482,6 +488,7 @@ public class RecorderSettings {
 
     /**
      * XXX : mchr : What does this mean? How can we set the Version number?
+     * @param version 
      */
     public void setVersionNumber(Version version) {
         settings.setStringProperty(VERSION_NUMBER, version.toString());

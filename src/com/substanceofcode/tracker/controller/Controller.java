@@ -198,6 +198,8 @@ public class Controller {
      * <li> Load any existing waypoints
      * <li> Apply backlight settings
      * </ul>
+     * @param midlet
+     * @param display 
      */
     public Controller(MIDlet midlet, Display display) {
         Controller.controller = this;
@@ -205,9 +207,17 @@ public class Controller {
         this.display = display;
         status = STATUS_NOTCONNECTED;
         settings = new RecorderSettings(midlet);
+        
+        // Do mandatory initializations
+        
         // Initialize Logger, as it must have an instance of RecorderSettings on
         // it's first call.
         Logger.init(settings);
+        
+    }
+    
+    public void initialize() {
+        
         // logger = Logger.getLogger(settings);
         // XXX : mchr : Dependency from Logger to getTrailCanvas prevents this
         // array definition from being any higher - we have to tell the Logger

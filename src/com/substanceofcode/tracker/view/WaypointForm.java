@@ -25,8 +25,6 @@ package com.substanceofcode.tracker.view;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Waypoint;
 
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
@@ -56,7 +54,10 @@ public class WaypointForm extends Form implements CommandListener {
     private boolean editing;
     private String oldWaypointName;
     
-    /** Creates a new instance of WaypointForm */
+    /** 
+     * Creates a new instance of WaypointForm
+     * @param controller 
+     */
     public WaypointForm(Controller controller) {
         super("Waypoint");
         this.controller = controller;
