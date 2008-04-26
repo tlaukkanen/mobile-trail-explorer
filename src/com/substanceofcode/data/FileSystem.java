@@ -189,12 +189,15 @@ public class FileSystem {
         }
         byte[] resultArray;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        String state = "";
         try {
+            state = "Getting filetable";
             FileLocator fl = (FileLocator) (fileTable.get(filename));
+            state = "Getting record store name";
             String recordStoreName = fl.recordStores[0];
             RecordStore recordStore = RecordStore.openRecordStore(recordStoreName, false);
             for (int i = 0; i < fl.recordStores.length; i++) {
-                if (recordStoreName.equalsIgnoreCase(fl.recordStores[i])) {
+                if (!recordStoreName.equals(fl.recordStores[i])) {
                     recordStoreName = fl.recordStores[i];
                     recordStore.closeRecordStore();
                     RecordStore.openRecordStore(fl.recordStores[i], false);
@@ -295,7 +298,7 @@ public class FileSystem {
             String recordStoreName = fl.recordStores[0];
             RecordStore recordStore = RecordStore.openRecordStore(recordStoreName, false);
             for (int i = 0; i < fl.recordStores.length; i++) {
-                if (recordStoreName != fl.recordStores[i]) {
+                if (!recordStoreName.equals(fl.recordStores[i])) {
                     recordStoreName = fl.recordStores[i];
                     recordStore.closeRecordStore();
                     RecordStore.openRecordStore(fl.recordStores[i], false);
