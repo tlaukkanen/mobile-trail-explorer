@@ -28,6 +28,7 @@ import java.util.Date;
 
 import com.substanceofcode.data.Serializable;
 import com.substanceofcode.util.MathUtil;
+import java.io.EOFException;
 
 /**
  * <p>
@@ -225,6 +226,8 @@ public final class GpsPosition implements Serializable {
      * 
      * Positions are considered to be equal IF both their latitudes AND their
      * longitudes are exactly equal.
+     * @param position
+     * @return 
      */
     public boolean equals(GpsPosition position) {
         if (longitude == position.longitude && latitude == position.latitude) {
@@ -313,6 +316,8 @@ public final class GpsPosition implements Serializable {
      * Calculate distance from given position.
      * </p>
      * Using formula from: http://williams.best.vwh.net/avform.htm#Dist
+     * @param position
+     * @return 
      */
     public double getDistanceFromPosition(GpsPosition position) {
         return getDistanceFromPosition(position.latitude, position.longitude);
@@ -320,6 +325,9 @@ public final class GpsPosition implements Serializable {
 
     /**
      * Calculate distance from given coordinates
+     * @param latitude
+     * @param longitude
+     * @return 
      */
     public double getDistanceFromPosition(double latitude, double longitude) {
         double lat1 = (Math.PI / 180.0) * this.latitude;
@@ -374,6 +382,7 @@ public final class GpsPosition implements Serializable {
         if (gpgsa == null) {
             dos.writeBoolean(false);
         } else {
+            dos.writeBoolean(true);
             gpgsa.serialize(dos);
         }
     }
@@ -395,21 +404,23 @@ public final class GpsPosition implements Serializable {
         return gpgsa;
     }
     public void unserialize(DataInputStream dis) throws IOException {
-        if (dis.readBoolean()) {
-            rawData=dis.readUTF();
-        } 
-        longitude = dis.readDouble();
-        latitude = dis.readDouble();
-        speed = dis.readDouble();
-        course = dis.readShort();
-        altitude = dis.readDouble();
-        if ( dis.readBoolean()) {
-            date =new Date(dis.readLong());
-        } 
-        if (dis.readBoolean()) {
-            
-        } else {
-            gpgsa.unserialize(dis);
+        try {
+            if (dis.readBoolean()) {
+                rawData=dis.readUTF();
+            } 
+            longitude = dis.readDouble();
+            latitude = dis.readDouble();
+            speed = dis.readDouble();
+            course = dis.readShort();
+            altitude = dis.readDouble();
+            if ( dis.readBoolean()) {
+                date =new Date(dis.readLong());
+            } 
+            if (dis.readBoolean()) {
+                gpgsa.unserialize(dis);
+            }
+        } catch(EOFException ex) {
+            throw new EOFException("EOF while unserializing position: " + ex.getMessage());
         }
     }
 
