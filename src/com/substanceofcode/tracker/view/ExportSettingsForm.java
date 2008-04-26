@@ -197,49 +197,4 @@ public class ExportSettingsForm extends Form implements CommandListener {
         this.append(exportFolderField);
     }
     
-    /*
-    void showCurrDir() 
-    {
-      Enumeration e;
-      FileConnection currDir = null;
-      List browser;
-      try 
-      {
-        if (MEGA_ROOT.equals(currDirName)) 
-        {
-          e = FileSystemRegistry.listRoots();
-          browser = new List(currDirName, List.IMPLICIT);
-        } 
-        else 
-        {
-          currDir = (FileConnection)Connector.open(
-            "file://localhost/" + currDirName);
-          e = currDir.list();
-          browser = new List(currDirName, List.IMPLICIT);
-          browser.append(UP_DIRECTORY,null);
-        }
-        while (e.hasMoreElements()) 
-        {
-          String fileName = (String)e.nextElement();
-          if (fileName.charAt(fileName.length()-1) == SEP) 
-          {
-            browser.append(fileName,null);
-          } 
-          else 
-          {
-            browser.append(fileName,null);
-          }
-        }
-        browser.setSelectCommand(view);
-        browser.addCommand(exit);
-        browser.setCommandListener(this);
-        if (currDir != null) 
-        {
-          currDir.close();
-        }
-       
-      } 
-      catch (IOException ioe) 
-      {}
-    }*/
 }

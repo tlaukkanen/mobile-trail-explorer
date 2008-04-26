@@ -550,12 +550,14 @@ public class Controller {
      * @param xiListener
      *                TODO
      */
-    public void saveTrail(AlertHandler xiListener) {
+    public void saveTrail(AlertHandler xiListener, String name) {
         // XXX : mchr : Vulnerable to NPE...
         xiListener.notifyProgressStart("Saving Trail to RMS");
         xiListener.notifyProgress(2);
         try {
-            recorder.getTrack().saveToRMS();
+            Track track = recorder.getTrack();
+            track.setName(name);
+            track.saveToRMS();
             if (xiListener != null) {
                 xiListener.notifySuccess("RMS : Save succeeded");
             }
@@ -869,8 +871,7 @@ public class Controller {
             try {
                 pos = track.getEndPosition();
             } catch (NoSuchElementException e) {
-                Logger
-                        .debug("No EndPosition found when trying to call Controller.loadTrack(Track). Setting to null");
+                Logger.debug("No EndPosition found when trying to call Controller.loadTrack(Track). Setting to null");
                 pos = null;
             }
             this.trailCanvas.setLastPosition(pos);

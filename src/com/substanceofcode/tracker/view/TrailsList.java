@@ -36,6 +36,8 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.DateTimeUtil;
+import java.io.DataInputStream;
+import java.io.EOFException;
 
 /**
  * <p>Displays a list of Trails, and gives options as to what the user wants to do with the selected Trail.</p>
@@ -111,24 +113,38 @@ public class TrailsList extends List implements CommandListener{
             if(command == loadCommand){
                 if(trailsFound){
                     final String selectedTrailName = this.getString(this.getSelectedIndex());
+                    String state = "";
                     try {
-                        final Track trail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
+                        FileSystem fileSystem = FileSystem.getFileSystem();
+                        state = "Get input stream";
+                        DataInputStream dis = fileSystem.getFile(selectedTrailName);
+                        state = "Deserialize track from stream";
+                        final Track trail = new Track( dis );
+                        state = "Set current track";
                         controller.loadTrack(trail);
+                        state = "Show track";
                         controller.showTrail();
+                    } catch (EOFException eof) {
+                        Logger.error("Unable to load trail: " + eof.getMessage());
+                        controller.showError("An EOFException was thrown when attempting to load " +
+                                             "the Trail from the RMS! " + eof.getMessage() +
+                                             " State: " + state);
                     } catch (IOException e) {
-                        Logger.getLogger().error("Unable to load trail: " + e.getMessage());
-                        controller.showError("An Exception was thrown when attempting to load " +
-                                             "the Trail from the RMS!");
+                        Logger.error("Unable to load trail: " + e.getMessage());
+                        controller.showError("An IOException was thrown when attempting to load " +
+                                             "the Trail from the RMS! " + e.getMessage() +
+                                             " State: " + state);
                     }
                 }else{
-                    // Do nothing. Well, perhaps this should "go-back", hmmmm, conundrum.
+                    controller.showError("No trails found");
                 }
             }else if(command == showDetailsCommand){
                 final String selectedTrailName = getString(getSelectedIndex());
                 controller.showTrailDetails(selectedTrailName);
                 
             }else if(command == saveCurrentCommand){
-                controller.saveTrail(new AlertHandler(controller, this));
+                String name = "";
+                controller.saveTrail(new AlertHandler(controller, this), name);
                 refresh();
             }else if(command == backCommand){
                 controller.showTrail();

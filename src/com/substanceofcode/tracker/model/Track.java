@@ -37,12 +37,12 @@ import javax.microedition.io.file.FileConnection;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.data.Serializable;
-import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
+import java.io.EOFException;
 import java.util.Date;
 
 /**
@@ -242,6 +242,9 @@ public class Track implements Serializable {
 
     /** @return the first position */
     public GpsPosition getStartPosition() {
+        if( trackPoints==null || trackPoints.size()==0) {
+            return null;
+        }
         GpsPosition startPosition = null;
         try {
             startPosition = (GpsPosition) trackPoints.firstElement();
@@ -256,8 +259,10 @@ public class Track implements Serializable {
      *         position
      */
     public GpsPosition getEndPosition() {
+        if( trackPoints==null || trackPoints.size()==0) {
+            return null;
+        }        
         GpsPosition endPosition = null;
-
         try {
             endPosition = (GpsPosition) trackPoints.lastElement();
         } catch (NoSuchElementException nsee) {
@@ -313,7 +318,10 @@ public class Track implements Serializable {
         return distance;
     }
 
-    /** Gets this Track's Name */
+    /** 
+     * Gets this Track's Name
+     * @return name
+     */
     public String getName() {
         return name;
     }
@@ -322,7 +330,9 @@ public class Track implements Serializable {
     /*
      * Setter methods
      */
-    /** Sets this Track's Name */
+    /** Sets this Track's Name
+     * @param name 
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -629,6 +639,7 @@ public class Track implements Serializable {
 
     /**
      * Serialize this object to a DataOutputStream
+     * @throws java.io.IOException 
      */
     public void serialize(DataOutputStream dos) throws IOException {
         final int numPoints = trackPoints.size();
@@ -652,6 +663,7 @@ public class Track implements Serializable {
 
     /**
      * UnSerialize this object from a DataOutputStream
+     * @throws java.io.IOException 
      */
     public void unserialize(DataInputStream dis) throws IOException {
         final int numPoints = dis.readInt();
@@ -671,9 +683,14 @@ public class Track implements Serializable {
         }
         distance = dis.readDouble();
         if (dis.readBoolean()) {
-            this.name = dis.readUTF();
+            try {
+                this.name = dis.readUTF();
+            } catch(EOFException ex) {
+                this.name = DateTimeUtil.getCurrentDateStamp();
+                //throw new EOFException("Can't read trail name:" + ex.getMessage());
+            }
         } else {
-            this.name = null;
+            this.name = "";
         }
     }
 

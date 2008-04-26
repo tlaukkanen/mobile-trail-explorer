@@ -74,7 +74,10 @@ public class TrailActionsForm extends Form implements CommandListener,
      */
     private final Track track;
 
-    /** Creates a new instance of TrailActionsForm */
+    /** 
+     * Creates a new instance of TrailActionsForm
+     * @param controller 
+     */
     public TrailActionsForm(Controller controller) {
         super("Trail Actions");
         this.saveIsAnOption = true;
@@ -90,6 +93,9 @@ public class TrailActionsForm extends Form implements CommandListener,
     /** 
      * Creates a new instance of TrailActionForm for when
      * exporting from a 'saved' Trail.
+     * @param controller
+     * @param track
+     * @param trackName 
      */
     public TrailActionsForm(Controller controller, Track track, String trackName) {
         super("Trail Actions");
@@ -117,8 +123,7 @@ public class TrailActionsForm extends Form implements CommandListener,
     /** Initialize commands */
     private void initializeCommands() {
         this.addCommand(saveCommand = new Command("Save", Command.SCREEN, 1));
-        this
-                .addCommand(cancelCommand = new Command("Cancel", Command.BACK,
+        this.addCommand(cancelCommand = new Command("Cancel", Command.BACK,
                         100));
     }
 
@@ -197,7 +202,8 @@ public class TrailActionsForm extends Form implements CommandListener,
                         exportTrail(RecorderSettings.EXPORT_FORMAT_GPX, lListen);
                     }
                     if (saveIsAnOption && actionsGroup.isSelected(2)) {
-                        controller.saveTrail(lListen);
+                        String trackName = trailNameField.getString();
+                        controller.saveTrail(lListen, trackName);
                     }
                     if (track.isStreaming() && actionsGroup.isSelected(3)) {
                         try {
