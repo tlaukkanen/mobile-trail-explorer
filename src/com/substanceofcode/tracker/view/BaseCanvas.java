@@ -102,7 +102,11 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
 
     }
 
-    /** Handle commands */
+    /** 
+     * Handle commands.
+     * @param command       Activated command.
+     * @param displayable   Displayable object.
+     */
     public void commandAction(Command command, Displayable displayable) {
         if (displayable == this) {
             if (command == startStopCommand) {
@@ -120,5 +124,15 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
             }
         }
     }
-
+    
+    /** 
+     * Key pressed handler
+     * @param keyCode 
+     */
+    protected void keyPressed(int keyCode) {
+        /** Handle 0 key press. In some phones the 0 key defaults to space */
+        if(keyCode==Canvas.KEY_NUM0 || keyCode==' ') {
+            controller.switchDisplay();
+        } 
+    }
 }

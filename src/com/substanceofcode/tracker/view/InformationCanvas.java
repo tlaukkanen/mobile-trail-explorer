@@ -43,6 +43,9 @@ import javax.microedition.lcdui.Graphics;
 public class InformationCanvas extends BaseCanvas{
     
     private int lineRow;
+    private int firstRow;
+    private int totalTextHeight;
+    private int displayHeight;
 
     private final static Font BIG_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
     private final static Font SMALL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
@@ -51,18 +54,29 @@ public class InformationCanvas extends BaseCanvas{
     /** Creates a new instance of InformationCanvas */
     public InformationCanvas() {
         super();
+        firstRow = 0;
+        totalTextHeight = 0;
+        displayHeight = this.getHeight();
     }    
     
-    /** Paint information canvas */
+    /** 
+     * Paint information canvas
+     * @param g Graphics
+     */
     protected void paint(Graphics g) {
-                
-	g.setColor(255,255,255);
-	g.fillRect(0,0,getWidth(),getHeight());
+        
+        displayHeight = getHeight();
+        totalTextHeight = 0;
+        
+        g.setColor(255,255,255);
+        g.fillRect(0,0,getWidth(),getHeight());
         
         // Draw the title
         g.setColor(COLOR_TITLE);
         g.setFont(titleFont);
-        g.drawString("Information", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
+        if(firstRow==0) {
+            g.drawString("Information", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
+        }
         
         final int titleHeight = 2 + titleFont.getHeight();
         Logger.debug("InformationCanvas getPosition called");
@@ -112,7 +126,8 @@ public class InformationCanvas extends BaseCanvas{
             
         }
         int infoPos = BIG_FONT.stringWidth("LAT:_:");
-        lineRow = titleHeight;
+        lineRow = titleHeight - firstRow;
+        totalTextHeight = titleHeight;
         
         drawNextHeader(g, "Position");        
         drawNextString(g, "LAT:", lat);
@@ -132,27 +147,60 @@ public class InformationCanvas extends BaseCanvas{
     }
     
     private void drawNextString(Graphics g, String name, String value) {
+        if(lineRow<-BIG_FONT.getHeight()) {
+            return;
+        }
         g.setFont(BIG_FONT);
         g.setColor(32,128,32);
         g.drawString(name, 1, lineRow, Graphics.TOP|Graphics.LEFT);
         g.setColor(0,0,0);
         g.drawString(value, VALUE_COL, lineRow, Graphics.TOP|Graphics.LEFT);
         lineRow += BIG_FONT.getHeight();
+        totalTextHeight += BIG_FONT.getHeight();
     }
     
     private void drawNextHeader(Graphics g, String header) {
+        if(lineRow<-SMALL_FONT.getHeight()) {
+            return;
+        }
         g.setFont(SMALL_FONT);
         g.setColor(128,32,32);
         g.drawString(header, getWidth()/2, lineRow, Graphics.TOP|Graphics.HCENTER);
         lineRow += SMALL_FONT.getHeight();
+        totalTextHeight += SMALL_FONT.getHeight();
     }
     
     /** Key pressed handler */
     protected void keyPressed(int keyCode) {
-        /** Handle 0 key press. In some phones the 0 key defaults to space */
-        if(keyCode==Canvas.KEY_NUM0 || keyCode==' ') {
-            controller.switchDisplay();
-        } 
+        super.keyPressed(keyCode); 
+        handleKeys(keyCode);
+    }
+
+    /** 
+     * Key pressed many times
+     * @param keyCode 
+     */
+    protected void keyRepeated(int keyCode) {
+        super.keyRepeated(keyCode);
+        handleKeys(keyCode);
+    }
+
+    /** Handle up/down keys */
+    private void handleKeys(int keyCode) {
+        int gameKey = getGameAction(keyCode);
+        /** Handle up/down presses so that informations are scrolled */
+        if(gameKey==Canvas.UP) {
+            firstRow -= BIG_FONT.getHeight();
+            if(firstRow<0) {
+                firstRow = 0;
+            }
+        }
+        /** Handle up/down presses so that informations are scrolled */
+        if(gameKey==Canvas.DOWN) {
+            if(firstRow < totalTextHeight-displayHeight) {
+                firstRow += BIG_FONT.getHeight();
+            }
+        }        
     }
     
 }
