@@ -1,7 +1,7 @@
 /*
  * BluetoothDevice.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This library is free software; you can redistribute it and/or

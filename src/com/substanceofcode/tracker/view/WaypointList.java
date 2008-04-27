@@ -1,7 +1,7 @@
 /*
  * WaypointList.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -59,7 +59,9 @@ public class WaypointList extends List implements CommandListener {
     private Vector waypoints;
     
     
-    /** Creates a new instance of WaypointList */
+    /** Creates a new instance of WaypointList
+     * @param controller 
+     */
     public WaypointList(Controller controller) {
         super(TITLE, List.IMPLICIT);        
         this.controller = controller;
@@ -78,7 +80,10 @@ public class WaypointList extends List implements CommandListener {
         this.setCommandListener(this);
     }
     
-    /** Set waypoints */
+    /** 
+     * Set waypoints
+     * @param waypoints 
+     */
     public void setWaypoints(Vector waypoints) {
         this.waypoints = waypoints;
         Enumeration waypointEnum = waypoints.elements();

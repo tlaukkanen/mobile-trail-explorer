@@ -1,7 +1,7 @@
 /*
  * Controller.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -529,12 +529,17 @@ public class Controller {
         }
     }
 
-    /** Get waypoints */
+    /** 
+     * Get waypoints.
+     * @return Get waypoints.
+     */
     public Vector getWaypoints() {
         return waypoints;
     }
 
-    /** Save new waypoint */
+    /** Save new waypoint
+     * @param waypoint Waypoint to be saved.
+     */
     public void saveWaypoint(Waypoint waypoint) {
         if (waypoints == null) {
             waypoints = new Vector();
@@ -549,6 +554,7 @@ public class Controller {
      * 
      * @param xiListener
      *                TODO
+     * @param name 
      */
     public void saveTrail(AlertHandler xiListener, String name) {
         // XXX : mchr : Vulnerable to NPE...
@@ -576,7 +582,11 @@ public class Controller {
         }
     }
 
-    /** Mark new waypoint */
+    /** 
+     * Mark new waypoint
+     * @param lat
+     * @param lon 
+     */
     public void markWaypoint(String lat, String lon) {
         if (waypointForm == null) {
             waypointForm = new WaypointForm(this);
@@ -592,8 +602,15 @@ public class Controller {
         display.setCurrent(waypointForm);
     }
 
-    /** Edit waypoint */
+    /** 
+     * Edit waypoint
+     * @param wp 
+     */
     public void editWaypoint(Waypoint wp) {
+        if(wp==null) {
+            showError("Selected waypoint is null");
+            return;
+        }
         if (waypointForm == null) {
             waypointForm = new WaypointForm(this);
         }
@@ -826,8 +843,8 @@ public class Controller {
     }
 
     /**
-     * @param xiDisplayable
-     *                Screen to display
+     * Show displayable object.
+     * @param displayable 
      */
     public void showDisplayable(Displayable displayable) {
         display.setCurrent(displayable);

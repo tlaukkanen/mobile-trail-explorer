@@ -1,3 +1,24 @@
+/*
+ * MockTrack.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 package com.substanceofcode.bluetooth;
 
 import java.util.Date;
@@ -20,7 +41,8 @@ private final String trackData = ""
 + "-3.384578,50.862668,57.0\n"
 + "-3.384545,50.86269,56.1\n"
 + "-3.384535,50.862691,56.1\n"
-+ "-3.384553,50.86266,54.4\n"
++ "-3.384553,50.86266,54.4\n";
+/*
 + "-3.384554,50.862671,55.6\n"
 + "-3.38455,50.862691,56.5\n"
 + "-3.384548,50.8627,57.1\n"
@@ -1357,7 +1379,7 @@ private final String trackData = ""
 + "-2.853533,51.403151,4.1\n"
 + "-2.85353,51.403223,5.9\n"
 + "-2.853521,51.403255,6.1\n";
-
+*/
     String[] pos;
 
     public MockTrack() {

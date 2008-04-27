@@ -1,7 +1,7 @@
 /*
  * WayPoint.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import java.util.Vector;
 import java.io.DataOutputStream;
 import java.io.OutputStream;
 
-
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
@@ -35,60 +34,71 @@ import com.substanceofcode.util.DateTimeUtil;
 
 /**
  * WayPoint contains information of a single waypoint. Waypoint has a name and 
- * a position.
+ * a position (lat/lon).
  *
  * @author Tommi Laukkanen
  */
 public class Waypoint {
     
-    /**
-     * Name of waypoint
-     */
+    /** Name of waypoint */
     private String name;
     
-    /**
-     * Latitude of waypoint
-     */
+    /** Latitude of waypoint */
     private double latitude;
     
-    /** 
-     * Longitude of waypoint
-     */
+    /** Longitude of waypoint */
     private double longitude;
     
-    /** Constructor */
+    /** 
+     * Constructor.
+     * @param name      Name of this waypoint.
+     * @param latitude  Latitude position value of this waypoint.
+     * @param longitude Longitude position value of this waypoint. 
+     */
     public Waypoint(String name, double latitude, double longitude) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
     }
     
-    /** Get waypoint name */
+    /** Get waypoint name
+     * @return Name of this waypoint.
+     */
     public String getName() {
         return name;
     }
     
-    /** Set waypoint name */
+    /** Set waypoint name
+     * @param name Name of this waypoint.
+     */
     public void setName(String name) {
        this.name = name;
     }
     
-    /** Get latitude */
+    /** Get latitude
+     * @return Latitude value.
+     */
     public double getLatitude() {
         return latitude;
     }
     
-    /** Set latitude */
+    /** Set latitude
+     * @param lat Latitude value.
+     */
     public void setLatitude(double lat) {
         latitude = lat;
     }
     
-    /** Get longitude */
+    /** Get longitude
+     * @return Longitude value.
+     */
     public double getLongitude() {
         return longitude;
     }
     
-    /** Set longitude */
+    /** Set longitude
+     * @param lon Longitude value.
+     */
     public void setLongitude(double lon) {
         longitude = lon;
     }

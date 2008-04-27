@@ -52,7 +52,7 @@ public class FileCache implements TileCache, Runnable {
                 initializeCache();
             }
         };
-        initThread.setPriority(Thread.MIN_PRIORITY);
+        //initThread.setPriority(Thread.MIN_PRIORITY);
         initThread.start();
         try {
 
@@ -62,7 +62,7 @@ public class FileCache implements TileCache, Runnable {
             e1.printStackTrace();
         }
         cacheThread = new Thread(this);
-        cacheThread.setPriority(Thread.MIN_PRIORITY);
+        //cacheThread.setPriority(Thread.MIN_PRIORITY);
         cacheThread.start();
     }
 

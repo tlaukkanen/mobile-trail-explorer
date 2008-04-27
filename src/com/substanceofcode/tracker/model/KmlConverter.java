@@ -28,7 +28,6 @@ import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
 
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import org.kxml2.io.KXmlParser;
@@ -48,12 +47,20 @@ public class KmlConverter extends TrackConverter {
      */
     private boolean useKilometers;
 
-    /** Creates a new instance of KmlConverter */
+    /** Creates a new instance of KmlConverter
+     * @param useKilometers Are we using kilometers as units?
+     */
     public KmlConverter(boolean useKilometers) {
         this.useKilometers = useKilometers;
     }
 
-    /** Convert track to Google Eart format (KML) */
+    /** Convert track to Google Eart format (KML)
+     * @param track             Track that is converted.
+     * @param waypoints         Vector full of waypoints.
+     * @param includeWaypoints  Should we include waypoints?
+     * @param includeMarkers    Should we include markers?
+     * @return 
+     */
     public String convert(Track track, Vector waypoints,
             boolean includeWaypoints, boolean includeMarkers) {
         String currentDateStamp = DateTimeUtil.getCurrentDateStamp();
@@ -61,7 +68,12 @@ public class KmlConverter extends TrackConverter {
         return kmlContent;
     }
 
-    /** Convert waypoint to Google Eart format (KML) */
+    /** Convert waypoint to Google Eart format (KML)
+     * @param waypoint
+     * @param waypoints
+     * @param includeWaypoints
+     * @param includeMarkers 
+     */
     public String convert(Waypoint waypoint, Vector waypoints,
             boolean includeWaypoints, boolean includeMarkers) {
         String currentDateStamp = DateTimeUtil.getCurrentDateStamp();
