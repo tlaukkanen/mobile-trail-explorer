@@ -77,6 +77,7 @@ import com.substanceofcode.tracker.view.WaypointActionsForm;
 import com.substanceofcode.tracker.view.WaypointCanvas;
 import com.substanceofcode.tracker.view.WaypointForm;
 import com.substanceofcode.tracker.view.WaypointList;
+import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
 
 /**
  * Controller contains methods for the application flow.
@@ -369,6 +370,10 @@ public class Controller {
                     + ex.toString());
             ex.printStackTrace();
         }
+    }
+
+    public void showWebRecordingSettings() {
+        display.setCurrent( new WebRecordingSettingsForm( this ) );
     }
 
     /**

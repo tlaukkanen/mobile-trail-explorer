@@ -95,13 +95,13 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                 controller.showTrailsList();
             } else if (command == saveCommand) {
                 final String newTitle = titleBox.getString();
-                controller.showTrailsList();
                 try {
                     FileSystem.getFileSystem().renameFile(this.getTitle(), newTitle);
                 } catch (FileIOException e) {
                     controller.showError("An exception was caught when trying to rename the file: " + e.toString());
                 }
                 this.setTitle(newTitle);
+                controller.showTrailsList();
             } else if (command == deleteCommand) {
                 final String selectedTrailName = this.getTitle();
                 try {
@@ -114,8 +114,8 @@ public class TrailDetailsScreen extends Form implements CommandListener {
             } else if (command == loadCommand) {
                 final String selectedTrailName = this.getTitle();
                 try {
-                    final Track trail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
-                    controller.loadTrack(trail);
+                    final Track loadedTrail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
+                    controller.loadTrack(loadedTrail);
                     controller.showTrail();
                 } catch (IOException e) {
                     controller.showAlert("ERROR! An Exception was thrown when attempting to load " + "the Trail from the RMS!  " + e.toString(), 5, AlertType.ERROR);
@@ -124,8 +124,8 @@ public class TrailDetailsScreen extends Form implements CommandListener {
             } else if (command == exportCommand) {
                 final String selectedTrailName = this.getTitle();
                 try {
-                    final Track trail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
-                    final TrailActionsForm taf = new TrailActionsForm(controller, trail, this.getTitle());
+                    final Track exportedTrail = new Track(FileSystem.getFileSystem().getFile(selectedTrailName));
+                    final TrailActionsForm taf = new TrailActionsForm(controller, exportedTrail, this.getTitle());
                     controller.setCurrentScreen(taf);
                 } catch (IOException e) {
                     controller.showAlert("ERROR! An Exception was thrown when attempting to export " + "the Trail from the RMS!  " + e.toString(), 5, AlertType.ERROR);

@@ -436,9 +436,10 @@ public class GpsRecorder {
                         
                         //If the uploadURL is set (not "") then try to upload the
                         //GpsPosition too.
-                        uploadURL=controller.getSettings().getUploadURL();
-                        Logger.debug("UploadUrl is "+uploadURL);
-                        if(!uploadURL.equals("")){
+                        RecorderSettings settings = controller.getSettings();
+                        boolean uploadToWeb = settings.getWebRecordingUsage();
+                        uploadURL = controller.getSettings().getUploadURL();
+                        if(uploadToWeb && !uploadURL.equals("")){
                             DataOutputStream dos=null;
                             try{
                                 boolean serialize = true;

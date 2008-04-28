@@ -42,10 +42,11 @@ public class SettingsList extends List implements CommandListener {
     private final static int GPS = 0;
     private final static int EXPORTING = 1;
     private final static int RECORDING = 2;
-    private final static int DISPLAY = 3;
-    private final static int DEVELOPMENT_MENU = 4;
-    private final static int ABOUT = 5;
-    private final static int SMS = 6;
+    private final static int WEB_RECORDING = 3;
+    private final static int DISPLAY = 4;
+    private final static int DEVELOPMENT_MENU = 5;
+    private final static int ABOUT = 6;
+    private final static int SMS = 7;
     private final static boolean SMS_AVAILABLE;
 
     static {
@@ -78,8 +79,9 @@ public class SettingsList extends List implements CommandListener {
 
         // List initialization
         this.append("GPS", null);
-        this.append("Export folder", null);
+        this.append("Export Folder", null);
         this.append("Recording", null);
+        this.append("Web Recording", null);
         this.append("Display", null);
         this.append("Development Menu", null);
         this.append("About/Help", null);
@@ -116,6 +118,10 @@ public class SettingsList extends List implements CommandListener {
                     controller.showRecordingSettings();
                     break;
 
+                case (WEB_RECORDING):
+                    controller.showWebRecordingSettings();
+                    break;
+                    
                 case (DISPLAY):
                     controller.showDisplaySettings();
                     break;

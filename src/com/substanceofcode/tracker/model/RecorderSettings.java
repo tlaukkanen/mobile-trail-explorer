@@ -75,6 +75,7 @@ public class RecorderSettings {
     private static final String RECORDING_MAX_ACCELERATION = "recording-max-acceleration";
     private static final String RECORDING_MIN_DISTANCE = "recording-min-distance";
     private static final String UPLOAD_URL = "upload-url";
+    private static final String UPLOAD_USE = "upload-use";
 
     /** Display setting keys */
     public static final String DISPLAY_COORDINATES = "display-coordinates";
@@ -129,9 +130,26 @@ public class RecorderSettings {
                 RECORDING_MAX_ACCELERATION_DEFAULT);
         return maxAcc;
     }
+
+    /**
+     * Get web recording usage.
+     * @return
+     */
+    public boolean getWebRecordingUsage() {
+        return settings.getBooleanProperty(UPLOAD_USE, false);
+    }
+    /**
+     * Set web recording usage.
+     * @param useWebRecording   true if we are uploading position to web.
+     */
+    public void setWebRecordingUsage(boolean useWebRecording) {
+        settings.setBooleanProperty(UPLOAD_USE, useWebRecording);
+        saveSettings();
+    }
     
     public void setMaxAcceleration(int maxAcceleration) {
         settings.setIntProperty(RECORDING_MAX_ACCELERATION, maxAcceleration);
+        saveSettings();
     }
     
     /** 
@@ -146,6 +164,7 @@ public class RecorderSettings {
     
     public void setMaxRecordedSpeed(int maxSpeed) {
         settings.setIntProperty(RECORDING_MAX_SPEED, maxSpeed);
+        saveSettings();
     }
     
     
@@ -159,6 +178,7 @@ public class RecorderSettings {
 
     public void setMinDistance(int minDistance) {
         settings.setIntProperty(RECORDING_MIN_DISTANCE, minDistance);
+        saveSettings();
     }
     
 
