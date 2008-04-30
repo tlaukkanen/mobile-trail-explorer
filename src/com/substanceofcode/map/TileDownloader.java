@@ -298,6 +298,8 @@ public class TileDownloader implements Runnable {
                     e.printStackTrace();
                     Logger.error("TD run(): " + e.getMessage());
                 }
+                // Force garbage collecting
+                System.gc();
             } else {
                // Logger.debug("Tilequeue is empty");
                 // tileQueue.size(),Logger.DEBUG);
