@@ -922,6 +922,9 @@ public class TrailCanvas extends BaseCanvas {
                 if (zoom < MAX_ZOOM) {
                     // Zoom in
                     zoom++;
+                    // Calculate last position so that it recalculates the
+                    // canvas positions.
+                    setLastPosition(lastPosition);
                 }
                 break;
 
@@ -929,6 +932,9 @@ public class TrailCanvas extends BaseCanvas {
                 if (zoom > MIN_ZOOM) {
                     // Zoom out
                     zoom--;
+                    // Calculate last position so that it recalculates the
+                    // canvas positions.
+                    setLastPosition(lastPosition);
                 }
                 break;
 
