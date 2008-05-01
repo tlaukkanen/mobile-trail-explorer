@@ -19,6 +19,7 @@ v1.10 (May xxx 2008)
 + Support for uploading position to web server (Issue 78)
 + Scrolling (up/down) works on the information screen (Issue 73)
 + Fixed the saving/loading of trails (Issue 89)
++ Import trails from KML files
 
 v1.9 (April 1st 2008)
 + Changed the Export Settings page to use a generated list of options 

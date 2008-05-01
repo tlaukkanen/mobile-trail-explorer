@@ -172,9 +172,7 @@ public class TrailsList extends List implements CommandListener{
                             "trail from the RMS!  " +  e.toString(), 5, AlertType.ERROR);
                 }
             }else if(command == importTrailCommand){
-                if(importTrailScreen == null){
-                    importTrailScreen = new ImportTrailScreen(this);
-                }
+                importTrailScreen = new ImportTrailScreen(this);
             	controller.setCurrentScreen(importTrailScreen);
             }else if(command == exportTrailCommand){
                 String selectedTrailName = getString(getSelectedIndex());

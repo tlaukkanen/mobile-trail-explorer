@@ -27,10 +27,15 @@ import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
 
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
 import org.kxml2.io.KXmlParser;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  * Class to convert a Track/Waypoint to KML (google-earth) format.
@@ -335,10 +340,53 @@ public class KmlConverter extends TrackConverter {
 
     /**
      * TODO: This method returns null - its has not been implemented yet
+     * @param parser    XML parser that is parsing KML file
+     * @return Track
      */
-    public Track importTrack(KXmlParser trackDescription) {
+    public Track importTrack(KXmlParser parser) {
         Logger.debug("Starting to parse KML track from file");
-        return null;
+        Track result = null;
+
+        try {
+            int eventType = parser.getEventType();
+
+            // ------------------------------------------------------------------------
+            // Keep stepping through tags until we find a START_TAG with the
+            // name equal to "Placemark". We need the middle check against null to
+            // ensure we don't throw a null pointer exception.
+            // ------------------------------------------------------------------------
+            while (!(eventType == XmlPullParser.START_TAG
+                    && parser.getName() != null 
+                    && parser.getName().toLowerCase().equals("placemark"))
+                    && eventType != XmlPullParser.END_DOCUMENT ) {
+                Logger.debug("Found <Placemark>");
+                eventType = parser.next();
+            }
+
+            // Pass by ref result variable
+            result = new Track();
+            String name = DateTimeUtil.getCurrentDateStamp();
+            result.setName(name);
+            parseKmlPlacemark(parser, result);
+
+            System.out.println("Finished");
+        } catch (XmlPullParserException e) {
+            Logger.warn(
+                    "XmlPullParserException caught: " + e.toString());
+            e.printStackTrace();
+            result = null;
+        } catch (IOException e) {
+            Logger.warn(
+                    "IOException caught Parsing Track : " + e.toString());
+            e.printStackTrace();
+            result = null;
+        } catch (Exception e) {
+            Logger.warn(
+                    "Exception caught Parsing Track : " + e.toString());
+            e.printStackTrace();
+            result = null;
+        }
+        return result;
     }
 
     /** Create KML place mark element */
@@ -370,6 +418,69 @@ public class KmlConverter extends TrackConverter {
     public Vector importWaypoint(KXmlParser trackDescription) {
         Logger.debug("Starting to parse KML track from file");
         return null;
+    }
+
+    private void parseCoordinages(String[] coords, Track track) {
+        short course = 0;
+        double speed = 0;
+        double alt = 0;
+        Date date = Calendar.getInstance().getTime();
+        for(int i=0; i<coords.length; i++) {
+            String[] params = StringUtil.split(coords[i], ",");
+            if(params!=null && params.length>1) {
+                double longitude = Double.parseDouble( params[0] );
+                double latitude = Double.parseDouble( params[1] );
+                GpsPosition pos = new GpsPosition(
+                        course, longitude, latitude, speed, alt, date);
+                track.addPosition(pos);
+            }            
+        }
+    }
+
+    private void parseKmlPlacemark(KXmlParser parser, Track result) 
+            throws XmlPullParserException, IOException {
+        int eventType = parser.getEventType();
+        
+        while (!(eventType == XmlPullParser.END_TAG 
+                && parser.getName() != null 
+                && parser.getName().toLowerCase().equals("linestring"))
+                && eventType != XmlPullParser.END_DOCUMENT) {        
+        
+            if (eventType == XmlPullParser.START_TAG) {
+                Logger.debug("START_TAG");
+                final String type = parser.getName().toLowerCase();
+                
+                /** Parse trail coordinates */
+                if (type.equals("coordinates")) {
+                    Logger.debug("Found <coordinates>");
+                    try {
+                        String coordinateString = parser.nextText();
+                        
+                        String[] coords = StringUtil.split(coordinateString, " ");
+                        if(coords==null || coords.length==0) {
+                            coords = StringUtil.split(coordinateString, "\n");
+                        }
+                        if(coords==null || coords.length==0) {
+                            throw new Exception("Couldn't find any coords");
+                        }
+                        parseCoordinages(coords, result);                        
+                    } catch (Exception e) {
+                        Logger.debug(
+                                "Failed to Parse 'coordinates'" + e.toString());
+                    }
+                }
+                
+                /** Parse trail name */
+                if(type.equals("name")) {
+                    Logger.debug("Found <name>");
+                    String name = parser.nextText();
+                    if(name!=null && name.length()>0) {
+                        result.setName(name);
+                    }
+                }
+            }        
+            eventType = parser.next();
+        }
     }
 
 }

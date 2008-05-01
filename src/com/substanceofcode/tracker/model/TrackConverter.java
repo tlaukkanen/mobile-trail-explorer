@@ -59,7 +59,10 @@ public abstract class TrackConverter {
 	/**
 	 * Abstract method to allow for differentiated handling of different xml 
 	 * formats e.g. kml/gpx
-	 */
+     * 
+     * @param trackDescription
+     * @return 
+     */
 	public abstract Track importTrack(KXmlParser trackDescription);
 
 	/**
@@ -67,7 +70,10 @@ public abstract class TrackConverter {
 	 * a KXmlParser using the resulting InputStreamReader - This is then passed
 	 * to abstract method importTrack(...) which will handle the file in an
 	 * appropriate way.
-	 */
+     * 
+     * @param connection FileConnection to an imported file
+     * @return 
+     */
 	public Track importTrack(FileConnection connection) {
 		Track result = null;
 		try {

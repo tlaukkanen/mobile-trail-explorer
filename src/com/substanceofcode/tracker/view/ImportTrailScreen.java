@@ -79,7 +79,10 @@ public class ImportTrailScreen extends Form implements CommandListener {
         append(importFileField);
     }
 
-    /** Handle commands */
+    /** Handle commands
+     * @param command
+     * @param displayable 
+     */
     public void commandAction(Command command, Displayable displayable) {
         if (command == okCommand) {
             /* Put this IO stuff in it's own thread to avoid locking the UI */
@@ -90,9 +93,15 @@ public class ImportTrailScreen extends Form implements CommandListener {
                         // Save export folder
                         final String importFile = "file:///"
                                 + importFileField.getString();
+
+                        //final String importFile = importFileField.getString();
+                        
                         int lastDot = importFile.lastIndexOf('.');
-                        String fileExtension = importFile.substring(lastDot,
+                        String fileExtension = "";
+                        if(lastDot>0) {
+                            fileExtension = importFile.substring(lastDot,
                                 importFile.length()).toLowerCase();
+                        }
 
                         /* Figure out which TrackConverter to use. */
                         if (fileExtension.equals(".kml")) {
@@ -177,15 +186,13 @@ public class ImportTrailScreen extends Form implements CommandListener {
             if (!importFile.endsWith("/")); {
                 while (!importFile.endsWith("/")) {
                     importFile = importFile.substring(0, importFile.length() -1);
-                }
-                
+                }                
             }
             
             //TODO: check file before
-            filechooser = new FileChooser(this.controller, importFile, true, this);
-            
-            controller.setCurrentScreen(filechooser);
-            
+            boolean showFiles = true;
+            filechooser = new FileChooser(controller, importFile, showFiles, this);            
+            controller.setCurrentScreen(filechooser);            
             this.refreshForm();
         }
     }
