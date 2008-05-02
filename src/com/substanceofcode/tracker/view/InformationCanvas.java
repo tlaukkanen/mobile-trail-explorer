@@ -50,6 +50,7 @@ public class InformationCanvas extends BaseCanvas{
     private final static Font BIG_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_MEDIUM);
     private final static Font SMALL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
     private final static int VALUE_COL = BIG_FONT.stringWidth("LAT:_:");
+    private final static int BIG_VALUE_COL = BIG_FONT.stringWidth("LAT ALT:_:");
     
     /** Creates a new instance of InformationCanvas */
     public InformationCanvas() {
@@ -94,6 +95,9 @@ public class InformationCanvas extends BaseCanvas{
         String durationTime = "";
         String maximumSpeed = "";
         String averageSpeed = "";
+        
+        Track currentTrack = controller.getTrack();
+        LengthFormatter lengthFormatter = new LengthFormatter( controller.getSettings() );
         if(position!=null) {
             lat = StringUtil.valueOf(position.latitude, 4);
             lon = StringUtil.valueOf(position.longitude, 4);
@@ -103,10 +107,9 @@ public class InformationCanvas extends BaseCanvas{
             
             hea = position.getHeadingString();
             
-            LengthFormatter lengthFormatter = new LengthFormatter( controller.getSettings() );
+            
             alt = lengthFormatter.getLengthString(position.altitude, false);
             
-            Track currentTrack = controller.getTrack();
             if(currentTrack!=null) {
                 dst = lengthFormatter.getLengthString(currentTrack.getDistance(), true);            
                 durationTime = DateTimeUtil.getTimeInterval(
@@ -130,19 +133,29 @@ public class InformationCanvas extends BaseCanvas{
         totalTextHeight = titleHeight;
         
         drawNextHeader(g, "Position");        
-        drawNextString(g, "LAT:", lat);
-        drawNextString(g, "LON:", lon);
-        drawNextString(g, "ALT:", alt);
-        drawNextString(g, "HEA:", hea);
+        drawNextString(g, "LAT", lat);
+        drawNextString(g, "LON", lon);
+        drawNextString(g, "ALT", alt);
+        drawNextString(g, "HEA", hea);
         
         drawNextHeader(g, "Speed");        
-        drawNextString(g, "SPD:", spd);
-        drawNextString(g, "AVG:", averageSpeed);
-        drawNextString(g, "MAX:", maximumSpeed);
+        drawNextString(g, "SPD", spd);
+        drawNextString(g, "AVG", averageSpeed);
+        drawNextString(g, "MAX", maximumSpeed);
 
         drawNextHeader(g, "Trail");
-        drawNextString(g, "DST:", dst);
-        drawNextString(g, "DUR:", durationTime);
+        drawNextString(g, "DST", dst);
+        drawNextString(g, "DUR", durationTime);
+        if(currentTrack!=null) {
+            if(currentTrack.getMinAltitudePosition()!=null) {
+                double minAltitude = currentTrack.getMinAltitudePosition().altitude;
+                String minAltString = lengthFormatter.getLengthString(minAltitude, false);
+                double maxAltitude = currentTrack.getMaxAltitudePosition().altitude;
+                String maxAltString = lengthFormatter.getLengthString(maxAltitude, false);
+                String trailAltitude = minAltString + " - " + maxAltString;
+                drawNextString(g, "ALT", trailAltitude);
+            }
+        }
       
     }
     
@@ -154,7 +167,8 @@ public class InformationCanvas extends BaseCanvas{
         g.setColor(32,128,32);
         g.drawString(name, 1, lineRow, Graphics.TOP|Graphics.LEFT);
         g.setColor(0,0,0);
-        g.drawString(value, VALUE_COL, lineRow, Graphics.TOP|Graphics.LEFT);
+        int column = (name.length()>4 ? BIG_VALUE_COL : VALUE_COL);
+        g.drawString(value, column, lineRow, Graphics.TOP|Graphics.LEFT);
         lineRow += BIG_FONT.getHeight();
         totalTextHeight += BIG_FONT.getHeight();
     }

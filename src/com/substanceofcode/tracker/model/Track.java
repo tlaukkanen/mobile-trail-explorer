@@ -88,6 +88,8 @@ public class Track implements Serializable {
     /** The Track statistics */
     private double distance;
     private GpsPosition maxSpeedPosition;
+    private GpsPosition maxAltitude;
+    private GpsPosition minAltitude;
 
     /** The Tracks name */
     private String name = null;
@@ -275,6 +277,16 @@ public class Track implements Serializable {
     public GpsPosition getMaxSpeedPosition() {
         return maxSpeedPosition;
     }
+    
+    /** @return the position of minimum altitude */
+    public GpsPosition getMinAltitudePosition() {
+        return minAltitude;
+    }
+    
+    /** @return the position of maximum altitude */
+    public GpsPosition getMaxAltitudePosition() {
+        return maxAltitude;
+    }
 
     /** @return the track duration in milliseconds */
     public long getDurationMilliSeconds() {
@@ -351,11 +363,23 @@ public class Track implements Serializable {
             final GpsPosition lastPosition = getEndPosition();
             double tripLength = lastPosition.getDistanceFromPosition(pos);
             distance += tripLength;
+        } else {
+            maxSpeedPosition = pos;
+            maxAltitude = pos;
+            minAltitude = pos;
         }
 
         /** Check for max speed */
-        if (maxSpeedPosition == null || maxSpeedPosition.speed < pos.speed) {
+        if( maxSpeedPosition.speed < pos.speed ) {
             maxSpeedPosition = pos;
+        }
+        
+        /** Check for min/max altitude */
+        if( minAltitude.altitude > pos.altitude ) {
+            minAltitude = pos;
+        }
+        if( maxAltitude.altitude < pos.altitude ) {
+            maxAltitude = pos;
         }
 
         trackPoints.addElement(pos);
@@ -670,16 +694,14 @@ public class Track implements Serializable {
         trackPoints = new Vector(numPoints);
         for (int i = 0; i < numPoints; i++) {
             GpsPosition pos = new GpsPosition(dis);
-            if (maxSpeedPosition == null || pos.speed > maxSpeedPosition.speed) {
-                maxSpeedPosition = pos;
-            }
-            trackPoints.addElement(pos);
+            this.addPosition(pos);
         }
 
         final int numMarkers = dis.readInt();
         trackMarkers = new Vector(numMarkers);
         for (int i = 0; i < numMarkers; i++) {
-            trackMarkers.addElement(new GpsPosition(dis));
+            GpsPosition marker = new GpsPosition(dis);
+            this.addMarker(marker);
         }
         distance = dis.readDouble();
         if (dis.readBoolean()) {
