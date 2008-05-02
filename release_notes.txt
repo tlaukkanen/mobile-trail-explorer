@@ -18,8 +18,10 @@ v1.10 (May xxx 2008)
 + Improved startup time
 + Support for uploading position to web server (Issue 78)
 + Scrolling (up/down) works on the information screen (Issue 73)
-+ Fixed the saving/loading of trails (Issue 89)
++ Fixed the saving/loading of trails using RMS (Issue 89)
 + Import trails from KML files
++ Import waypoints from KML files
++ Fixed waypoint editing when handling quickly added or imported waypoints
 
 v1.9 (April 1st 2008)
 + Changed the Export Settings page to use a generated list of options 

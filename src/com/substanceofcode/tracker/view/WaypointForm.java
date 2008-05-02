@@ -112,12 +112,24 @@ public class WaypointForm extends Form implements CommandListener {
     
     /** Initialize controls with waypoint values. */
     public void setValues(Waypoint wp) {
+        Logger.debug("Setting values");
+        Logger.debug("Setting name: " + wp.getName());
         nameField.setString(wp.getName());
+        Logger.debug("Setting latitude: " + wp.getLatitude());
         String latitude = String.valueOf( wp.getLatitude() );
+        if(latitude.length()>16) {
+            latitude = latitude.substring(0, 16);
+        }
+        Logger.debug("Setting longitude: " + wp.getLongitude());
         String longitude = String.valueOf( wp.getLongitude() );
+        if(longitude.length()>16) {
+            longitude = longitude.substring(0, 16);
+        }
+        Logger.debug("Setting strings");
         latitudeField.setString( latitude );
         longitudeField.setString( longitude );
         oldWaypointName = wp.getName();
+        Logger.debug("WP values set. Name: " + oldWaypointName);
     }
 
     /** Handle commands */

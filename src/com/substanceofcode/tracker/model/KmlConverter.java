@@ -413,11 +413,53 @@ public class KmlConverter extends TrackConverter {
     }
     
     /**
-     * TODO: This method returns null - its has not been implemented yet
+     * Import waypoints from KML file.
+     * @param parser kXML parser that is parsing KML file
+     * @return Return Vector full of waypoints
      */
-    public Vector importWaypoint(KXmlParser trackDescription) {
-        Logger.debug("Starting to parse KML track from file");
-        return null;
+    public Vector importWaypoint(KXmlParser parser) {
+        Logger.debug("Starting to parse KML waypoints from file");
+        Vector waypoints = new Vector();
+            
+        try {
+            int eventType = parser.getEventType();
+
+            // ------------------------------------------------------------------------
+            // Keep stepping through tags until we find a START_TAG with the
+            // name equal to "Placemark". We need the middle check against null to
+            // ensure we don't throw a null pointer exception.
+            // ------------------------------------------------------------------------
+            while ( eventType != XmlPullParser.END_DOCUMENT ) {
+                
+                if( eventType == XmlPullParser.START_TAG 
+                 && parser.getName() != null 
+                 && parser.getName().toLowerCase().equals("placemark")) {
+                    Logger.debug("Found <Placemark>");
+                    Waypoint wp = parseKmlPlacemark(parser);
+                    if(wp!=null) {
+                        Logger.debug("Got valid waypoint");
+                        waypoints.addElement(wp);
+                    } else {
+                        Logger.debug("Got invalid waypoint");
+                    }
+                }                
+                eventType = parser.next();
+            }
+            System.out.println("Finished");
+        } catch (XmlPullParserException e) {
+            Logger.warn(
+                    "XmlPullParserException caught: " + e.toString());
+            e.printStackTrace();
+        } catch (IOException e) {
+            Logger.warn(
+                    "IOException caught Parsing Track : " + e.toString());
+            e.printStackTrace();
+        } catch (Exception e) {
+            Logger.warn(
+                    "Exception caught Parsing Track : " + e.toString());
+            e.printStackTrace();
+        }
+        return waypoints;
     }
 
     private void parseCoordinages(String[] coords, Track track) {
@@ -481,6 +523,65 @@ public class KmlConverter extends TrackConverter {
             }        
             eventType = parser.next();
         }
+    }
+
+    private Waypoint parseKmlPlacemark(KXmlParser parser) throws 
+            XmlPullParserException, 
+            IOException {
+        int eventType = parser.getEventType();
+        String name = "";
+        double longitude = 0.0;
+        double latitude = 0.0;
+        boolean foundCoordinates = false;
+        
+        while (!(eventType == XmlPullParser.END_TAG 
+                && parser.getName() != null 
+                && parser.getName().toLowerCase().equals("point"))
+                && eventType != XmlPullParser.END_DOCUMENT) {        
+        
+            if (eventType == XmlPullParser.START_TAG) {
+                Logger.debug("START_TAG");
+                final String type = parser.getName().toLowerCase();
+
+                /** Parse trail name */
+                if(type.equals("name")) {
+                    Logger.debug("Found <name>");
+                    name = parser.nextText();
+                    if(name==null) {
+                        name = "Imported";
+                    }
+                }
+                
+                /** Parse trail coordinates */
+                if (type.equals("coordinates")) {
+                    Logger.debug("Found <coordinates>");
+                    try {
+                        String coordinateString = parser.nextText();        
+                        if(coordinateString.indexOf(" ")>0) {
+                            Logger.debug("Waypoint should only have one coord");
+                        }
+                        String[] params = StringUtil.split(coordinateString, ",");
+                        if(params!=null && params.length>1) {
+                            Logger.debug("Parsing coordinates");
+                            longitude = Double.parseDouble( params[0] );
+                            latitude = Double.parseDouble( params[1] );
+                            foundCoordinates = true;
+                        }            
+                    } catch (Exception e) {
+                        Logger.debug(
+                                "Failed to Parse 'coordinates'" + e.toString());
+                    }
+                }
+                
+                if(name!=null && name.length()>0 && foundCoordinates==true) {
+                    Logger.debug("Creating new waypoint");
+                    return new Waypoint(name, latitude, longitude);
+                }
+                
+            }        
+            eventType = parser.next();
+        }
+        return null;
     }
 
 }

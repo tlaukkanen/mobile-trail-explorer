@@ -612,6 +612,7 @@ public class Controller {
      * @param wp 
      */
     public void editWaypoint(Waypoint wp) {
+        Logger.debug("Editing waypoint");
         if(wp==null) {
             showError("Selected waypoint is null");
             return;
@@ -621,6 +622,7 @@ public class Controller {
         }
         waypointForm.setValues(wp);
         waypointForm.setEditingFlag(true);
+        Logger.debug("Setting current display to display waypoint details");
         display.setCurrent(waypointForm);
     }
 
