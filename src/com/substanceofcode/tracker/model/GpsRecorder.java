@@ -56,33 +56,25 @@ public class GpsRecorder {
      */
     private boolean recording = false;
 
-    /**
-     * Current track being recorded to
-     */
+    /** Current track being recorded to */
     private Track recordedTrack = new Track();
 
-    /**
-     * Interval between recorded positions
-     */
+    /** Interval between recorded positions */
     private int intervalSeconds;
 
-    /**
-     * Interval between recorded Markers
-     */
+    /** Interval between recorded Markers */
     private int intervalMarkerStep;
 
-    /**
-     * Url to upload recorded points to
-     */
+    /** Url to upload recorded points to */
     private String uploadURL;
-    /**
-     * Reference to controller object
-     */
+    
+    /** Reference to controller object */
     private Controller controller;
     
     /** Timer for worker */
     private Timer recorderTimer;
     private HttpConnection conn;
+    
     /** Recorder helpers */
     final GpsRmsRecorder rmsRecorder = new GpsRmsRecorder();
     GpsPosition lastRecordedPosition = null;
@@ -92,7 +84,8 @@ public class GpsRecorder {
     boolean isValidPosition = false;
     GpsPosition currentPosition = null;
     GpsGPGSA currentGPGSA = null;  
-        /**
+        
+    /**
      * Constructor - sets up local variables then launches the instance in a
      * thread.
      * @param controller 
@@ -456,6 +449,7 @@ public class GpsRecorder {
                                 }
                                 conn = (HttpConnection) Connector.open(uploadURL);
                                 conn.setRequestMethod(HttpConnection.POST);
+                                conn.setRequestProperty("Content-Type","text/plain");
                                 if(serialize) {
                                     dos= conn.openDataOutputStream();
                                     currentPosition.serialize(dos);
