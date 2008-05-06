@@ -455,6 +455,8 @@ public class GpsRecorder {
                                     currentPosition.serialize(dos);
                                     dos.write("\r\n".getBytes());
                                     dos.flush();
+                                } else {
+                                    conn.setRequestProperty("Content-Length", "0");
                                 }
                                 InputStream dis = conn.openInputStream();
                                 int ch;
