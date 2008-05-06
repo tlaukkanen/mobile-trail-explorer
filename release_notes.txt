@@ -13,7 +13,7 @@ Patrick Steiner
 
 Release Notes:
 
-v1.10 (May xxx 2008)
+v1.10 (May 6th 2008)
 + Support varying screen sizes like rotating screen on N95 (Issue 90)
 + Improved startup time
 + Support for uploading position to web server (Issue 78)
