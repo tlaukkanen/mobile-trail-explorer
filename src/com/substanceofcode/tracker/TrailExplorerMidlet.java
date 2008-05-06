@@ -1,7 +1,7 @@
 /*
  * TrailExplorerMidlet.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Created on August 14th 2006
@@ -32,7 +32,7 @@ import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.Version;
 
 /**
- * TODO
+ * MIDlet class for the Mobile Trail Explorer application.
  * @author  Tommi Laukkanen
  */
 public class TrailExplorerMidlet extends MIDlet {
@@ -40,10 +40,10 @@ public class TrailExplorerMidlet extends MIDlet {
     /** 
      * The current Version of this Mobile Trail Explorer. (Major, Minor, Build) 
      */
-    public static final Version VERSION = new Version(1, 10, 0);
+    public static final Version VERSION = new Version(1, 11, 0);
     
     /** Beta flag */
-    public static final boolean BETA = false;
+    public static final boolean BETA = true;
     
     /**
      * Local Controller object
