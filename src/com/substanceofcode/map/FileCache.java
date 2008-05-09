@@ -223,10 +223,12 @@ public class FileCache implements TileCache, Runnable {
                       Logger.debug("Not Writing tile, already serialized:" +t.cacheKey);
                   }
                 }
+                streamOut.close();
             } else {
                 Logger.debug("File: output stream is null");
             }
-            streamOut.close();
+            
+            
             streamOut = null;
 
         } catch (IOException e) {
