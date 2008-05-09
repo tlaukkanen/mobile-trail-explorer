@@ -153,9 +153,13 @@ public class FileCache implements TileCache, Runnable {
             // ------------------------------------------------------------------
 
             // Logger.debug("FILE: path is " + fullPath);
-            if (Conn == null) {
-                Conn = (FileConnection) Connector.open(fullPath);
-            }
+            
+            //Conn will be created once, in the initCache method
+            // if Conn is subsequently lost, too bad, we won't try to recreate it
+            
+            //if (Conn == null) {
+            //    Conn = (FileConnection) Connector.open(fullPath);
+           // }
             try {
                 // Create file
                 if (Conn != null && !Conn.exists()) {
