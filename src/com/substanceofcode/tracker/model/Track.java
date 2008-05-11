@@ -55,7 +55,7 @@ import java.util.Date;
  * <ul>
  * <li>The Track: An ordered list of {@link GpsPosition}s which is <b>the
  * Track</b>
- * <li>The Markers: An ordered list of Markers (or Waypoints). Markers should,
+ * <li>The Markers: An ordered list of Markers (or Places). Markers should,
  * to be of use, be relavent to the Track, but this is not a strict requirement.
  * </ul>
  * 
@@ -81,7 +81,7 @@ public class Track implements Serializable {
 
     /**
      * A Vector of {@link GpsPosition}s representing this 'Trails' Markers or
-     * WayPoints.
+     * Places.
      */
     private Vector trackMarkers;
 
@@ -481,8 +481,8 @@ public class Track implements Serializable {
      * @throws java.lang.Exception
      * @param folder
      *                Folder where file is written.
-     * @param waypoints
-     *                Vector containing waypoints.
+     * @param places
+     *                Vector containing places.
      * @param useKilometers
      *                Use meters as units?
      * @param exportFormat
@@ -492,7 +492,7 @@ public class Track implements Serializable {
      * @param listener
      *                Reference to class which wants to be notified of events
      */
-    public String writeToFile(String folder, Vector waypoints,
+    public String writeToFile(String folder, Vector places,
             boolean useKilometers, int exportFormat, String filename,
             AlertHandler listener) throws Exception {
         String fullPath = "";
@@ -578,7 +578,7 @@ public class Track implements Serializable {
         // ------------------------------------------------------------------
         // Convert the data into a String
         // ------------------------------------------------------------------
-        String exportData = converter.convert(this, waypoints, true, true);
+        String exportData = converter.convert(this, places, true, true);
         end = System.currentTimeMillis();
         Logger.debug("Converted track in " +(end-start)+"ms");
         // ------------------------------------------------------------------

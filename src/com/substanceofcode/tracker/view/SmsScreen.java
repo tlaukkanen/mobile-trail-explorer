@@ -3,8 +3,6 @@ package com.substanceofcode.tracker.view;
 import java.util.NoSuchElementException;
 
 import javax.microedition.io.Connector;
-import javax.microedition.lcdui.Alert;
-import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -20,7 +18,7 @@ import javax.wireless.messaging.TextMessage;
 
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.model.Place;
 
 /**
  * <p>The SmsScreen is the form used to send an SMS with GPS information in it.</p>
@@ -37,14 +35,14 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
 
     private static final int CURRENT_POSITION = 0;
     private static final int END_OF_TRAIL = 1;
-    private static final int EXISTING_WAYPOINT = 2;
-    private static final int NEW_WAYPOINT = 3;
+    private static final int EXISTING_PLACE = 2;
+    private static final int NEW_PLACE = 3;
     
     private static final int TEXT_MESSAGE = 0;
     private static final int MTE_MESSAGE = 1;
 
     private final ChoiceGroup positionType;
-    private final StringItem waypointNameText;
+    private final StringItem placeNameText;
     private final TextField latField;
     private final TextField lonField;
     private final TextField altField;
@@ -55,10 +53,10 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
 
     private final Command sendCommand;
     private final Command cancelCommand;
-    private final Command nextWaypointCommand;
-    private final Command previousWaypointCommand;
+    private final Command nextPlaceCommand;
+    private final Command previousPlaceCommand;
     
-    private int currentWaypointIndex;
+    private int currentPlaceIndex;
 
     public SmsScreen() {
         super("SMS");
@@ -66,17 +64,17 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         positionType = new ChoiceGroup("Position", ChoiceGroup.EXCLUSIVE);
         positionType.append("Current Position", null);
         positionType.append("End Of Current Trail", null);
-        positionType.append("Existing Waypoint", null);
-        positionType.append("New Waypoint", null);
+        positionType.append("Existing Place", null);
+        positionType.append("New Place", null);
         positionType.setSelectedIndex(0, true);
         
-        waypointNameText = new StringItem("Waypoint", "");
-        waypointNameText.addCommand(nextWaypointCommand = new Command("Next Waypoint", Command.OK, 2));
-        waypointNameText.addCommand(previousWaypointCommand = new Command("Previous Waypoint", Command.ITEM, 3));
-        waypointNameText.setDefaultCommand(nextWaypointCommand);
-        waypointNameText.setItemCommandListener(this);
+        placeNameText = new StringItem("Place", "");
+        placeNameText.addCommand(nextPlaceCommand = new Command("Next Place", Command.OK, 2));
+        placeNameText.addCommand(previousPlaceCommand = new Command("Previous Place", Command.ITEM, 3));
+        placeNameText.setDefaultCommand(nextPlaceCommand);
+        placeNameText.setItemCommandListener(this);
         
-        currentWaypointIndex = 0;
+        currentPlaceIndex = 0;
         
         latField = new TextField("Lat", "0.0", 15, TextField.DECIMAL);
         lonField = new TextField("Long", "0.0", 15, TextField.DECIMAL);
@@ -117,10 +115,10 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         // this.append(typeChoice);
         this.append(positionType);
         final int position = positionType.getSelectedIndex();
-        if(position == EXISTING_WAYPOINT){
-            refreshWaypointName();
-            this.append(waypointNameText);
-        }else if(position == NEW_WAYPOINT){
+        if(position == EXISTING_PLACE){
+            refreshPlaceName();
+            this.append(placeNameText);
+        }else if(position == NEW_PLACE){
             this.append(latField);
             this.append(lonField);
             this.append(altField);
@@ -142,14 +140,14 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         }
     }
     
-    private void refreshWaypointName(){
+    private void refreshPlaceName(){
         String waypointName;
         try{
-            waypointName = ((Waypoint)Controller.getController().getWaypoints().elementAt(this.currentWaypointIndex)).getName();
+            waypointName = ((Place)Controller.getController().getPlaces().elementAt(this.currentPlaceIndex)).getName();
         }catch(IndexOutOfBoundsException e){
             waypointName = "No Waypoints Found";
         }
-        this.waypointNameText.setText(waypointName);
+        this.placeNameText.setText(waypointName);
     }
 
     public void commandAction(Command command, Displayable disp) {
@@ -237,10 +235,10 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
                     pos = null;
                 }
                 break;
-            case (EXISTING_WAYPOINT):
-                Waypoint waypoint;
+            case (EXISTING_PLACE):
+                Place waypoint;
                 try{
-                    waypoint = (Waypoint)Controller.getController().getWaypoints().elementAt(this.currentWaypointIndex);
+                    waypoint = (Place)Controller.getController().getPlaces().elementAt(this.currentPlaceIndex);
                 }catch(IndexOutOfBoundsException e){
                     waypoint = null;
                 }
@@ -253,7 +251,7 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
                     pos = null;
                 }
                 break;
-            case (NEW_WAYPOINT):
+            case (NEW_PLACE):
                 lat = 0.0;
                 lon = 0.0;
                 alt = 0.0;
@@ -295,22 +293,22 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
     }
 
     public void commandAction(Command command, Item item) {
-        if(item == this.waypointNameText){
-            if(command == nextWaypointCommand){
-                this.currentWaypointIndex++;
-                if(currentWaypointIndex >= Controller.getController().getWaypoints().size()){
-                    currentWaypointIndex = 0;
+        if(item == this.placeNameText){
+            if(command == nextPlaceCommand){
+                this.currentPlaceIndex++;
+                if(currentPlaceIndex >= Controller.getController().getPlaces().size()){
+                    currentPlaceIndex = 0;
                 }
-            }else if(command == previousWaypointCommand){
-                this.currentWaypointIndex--;
-                if(currentWaypointIndex < 0){
-                    currentWaypointIndex = Controller.getController().getWaypoints().size()-1;
+            }else if(command == previousPlaceCommand){
+                this.currentPlaceIndex--;
+                if(currentPlaceIndex < 0){
+                    currentPlaceIndex = Controller.getController().getPlaces().size()-1;
                 }
-                if(currentWaypointIndex < 0){
-                    currentWaypointIndex = 0;
+                if(currentPlaceIndex < 0){
+                    currentPlaceIndex = 0;
                 }
             }
-            refreshWaypointName();
+            refreshPlaceName();
             this.refreshMessage();
         }
     }

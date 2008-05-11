@@ -259,16 +259,16 @@ public class TrailActionsForm extends Form implements CommandListener,
         }
         try {
             RecorderSettings settings = controller.getSettings();
-            final Vector waypoints;
+            final Vector places;
             if (saveIsAnOption) {
-                waypoints = controller.getWaypoints();
+                places = controller.getPlaces();
             } else {
-                waypoints = null;
+                places = null;
             }
             boolean useKilometers = settings.getUnitsAsKilometers();
             String exportFolder = settings.getExportFolder();
             String trackName = trailNameField.getString();
-            track.writeToFile(exportFolder, waypoints, useKilometers,
+            track.writeToFile(exportFolder, places, useKilometers,
                     exportFormat, trackName, xiListen);
             if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX
                     && controller.getSettings().getStreamingStarted()) {

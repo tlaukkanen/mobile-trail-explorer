@@ -50,7 +50,7 @@ import com.substanceofcode.tracker.model.Backlight;
 import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
-import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.tracker.view.AboutScreen;
 import com.substanceofcode.tracker.view.BaseCanvas;
 import com.substanceofcode.tracker.view.DevelopmentMenu;
@@ -62,6 +62,7 @@ import com.substanceofcode.tracker.view.FileChooser;
 import com.substanceofcode.tracker.view.ImportTrailScreen;
 import com.substanceofcode.tracker.view.InformationCanvas;
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.tracker.view.PlaceList;
 import com.substanceofcode.tracker.view.RecordingSettingsForm;
 import com.substanceofcode.tracker.view.SatelliteCanvas;
 import com.substanceofcode.tracker.view.SettingsList;
@@ -73,10 +74,10 @@ import com.substanceofcode.tracker.view.TrailActionsForm;
 import com.substanceofcode.tracker.view.TrailCanvas;
 import com.substanceofcode.tracker.view.TrailDetailsScreen;
 import com.substanceofcode.tracker.view.TrailsList;
-import com.substanceofcode.tracker.view.WaypointActionsForm;
-import com.substanceofcode.tracker.view.WaypointCanvas;
-import com.substanceofcode.tracker.view.WaypointForm;
-import com.substanceofcode.tracker.view.WaypointList;
+import com.substanceofcode.tracker.view.PlaceActionsForm;
+import com.substanceofcode.tracker.view.PlacesCanvas;
+import com.substanceofcode.tracker.view.PlaceForm;
+import com.substanceofcode.tracker.view.PlaceList;
 import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
 
 /**
@@ -119,9 +120,9 @@ public class Controller {
     private GpsRecorder recorder;
 
     /**
-     * Current waypoints in use XXX : mchr : shouldn't this be in the model?
+     * Current places in use XXX : mchr : shouldn't this be in the model?
      */
-    private Vector waypoints;
+    private Vector places;
 
     /**
      * Settings object
@@ -151,8 +152,8 @@ public class Controller {
     private ExportSettingsForm exportSettingsForm;
     private FileChooser filechooser;
     private DisplaySettingsForm displaySettingsForm;
-    private WaypointForm waypointForm;
-    private WaypointList waypointList;
+    private PlaceForm placeForm;
+    private PlaceList placesList;
     private TrailsList trailsList;
     private DevelopmentMenu developmentMenu;
     private TrailActionsForm trailActionsForm;
@@ -196,7 +197,7 @@ public class Controller {
      * <li> Status = NOT_CONNECTED
      * <li> Constructs a GpsRecorder
      * <li> Constucts a GPS Device
-     * <li> Load any existing waypoints
+     * <li> Load any existing places
      * <li> Apply backlight settings
      * </ul>
      * @param midlet
@@ -224,7 +225,7 @@ public class Controller {
         // array definition from being any higher - we have to tell the Logger
         // class about the RecorderSettings which in turn depend on midlet
         screens = new BaseCanvas[] { getTrailCanvas(), getElevationCanvas(),
-                new InformationCanvas(), new WaypointCanvas(),
+                new InformationCanvas(), new PlacesCanvas(),
                 new SatelliteCanvas(), new SkyCanvas() };
         String gpsAddress = settings.getGpsDeviceConnectionString();
 
@@ -246,10 +247,10 @@ public class Controller {
 
         }
 
-        /** Waypoints */
-        waypoints = settings.getWaypoints();
-        if (waypoints == null) {
-            waypoints = new Vector();
+        /** Places */
+        places = settings.getPlaces();
+        if (places == null) {
+            places = new Vector();
         }
 
         /** Backlight class is used to keep backlight always on */
@@ -538,20 +539,20 @@ public class Controller {
      * Get waypoints.
      * @return Get waypoints.
      */
-    public Vector getWaypoints() {
-        return waypoints;
+    public Vector getPlaces() {
+        return places;
     }
 
     /** Save new waypoint
-     * @param waypoint Waypoint to be saved.
+     * @param waypoint Place to be saved.
      */
-    public void saveWaypoint(Waypoint waypoint) {
-        if (waypoints == null) {
-            waypoints = new Vector();
+    public void savePlace(Place waypoint) {
+        if (places == null) {
+            places = new Vector();
         }
-        waypoints.addElement(waypoint);
+        places.addElement(waypoint);
 
-        saveWaypoints(); // Save waypoints immediately to RMS
+        savePlaces(); // Save waypoints immediately to RMS
     }
 
     /**
@@ -592,38 +593,38 @@ public class Controller {
      * @param lat
      * @param lon 
      */
-    public void markWaypoint(String lat, String lon) {
-        if (waypointForm == null) {
-            waypointForm = new WaypointForm(this);
+    public void markPlace(String lat, String lon) {
+        if (placeForm == null) {
+            placeForm = new PlaceForm(this);
         }
         /**
          * Autofill the waypoint form fields with current location and
          * autonumber (1,2,3...).
          */
-        int waypointCount = waypoints.size();
-        waypointForm.setValues("WP" + String.valueOf(waypointCount + 1), lat,
+        int waypointCount = places.size();
+        placeForm.setValues("WP" + String.valueOf(waypointCount + 1), lat,
                 lon);
-        waypointForm.setEditingFlag(false);
-        display.setCurrent(waypointForm);
+        placeForm.setEditingFlag(false);
+        display.setCurrent(placeForm);
     }
 
     /** 
      * Edit waypoint
      * @param wp 
      */
-    public void editWaypoint(Waypoint wp) {
+    public void editPlace(Place wp) {
         Logger.debug("Editing waypoint");
         if(wp==null) {
             showError("Selected waypoint is null");
             return;
         }
-        if (waypointForm == null) {
-            waypointForm = new WaypointForm(this);
+        if (placeForm == null) {
+            placeForm = new PlaceForm(this);
         }
-        waypointForm.setValues(wp);
-        waypointForm.setEditingFlag(true);
+        placeForm.setValues(wp);
+        placeForm.setEditingFlag(true);
         Logger.debug("Setting current display to display waypoint details");
-        display.setCurrent(waypointForm);
+        display.setCurrent(placeForm);
     }
 
     /**
@@ -692,7 +693,7 @@ public class Controller {
         if (status == STATUS_RECORDING) {
             controller.startStop();
         }
-        saveWaypoints();
+        savePlaces();
         midlet.notifyDestroyed();
     }
 
@@ -833,12 +834,12 @@ public class Controller {
     }
 
     /** Show waypoint list */
-    public void showWaypointList() {
-        if (waypointList == null) {
-            waypointList = new WaypointList(this);
+    public void showPlacesList() {
+        if (placesList == null) {
+            placesList = new PlaceList(this);
         }
-        waypointList.setWaypoints(waypoints);
-        display.setCurrent(waypointList);
+        placesList.setPlaces(places);
+        display.setCurrent(placesList);
     }
 
     /** Show dev menu */
@@ -995,43 +996,44 @@ public class Controller {
     }
 
     /** Update selected waypoint */
-    public void updateWaypoint(String m_oldWaypointName, Waypoint newWaypoint) {
-        Enumeration waypointEnum = waypoints.elements();
+    public void updateWaypoint(String m_oldWaypointName, Place newWaypoint) {
+        Enumeration waypointEnum = places.elements();
         while (waypointEnum.hasMoreElements()) {
-            Waypoint wp = (Waypoint) waypointEnum.nextElement();
+            Place wp = (Place) waypointEnum.nextElement();
             String currentName = wp.getName();
             if (currentName.equals(m_oldWaypointName)) {
-                int updateIndex = waypoints.indexOf(wp);
-                waypoints.setElementAt(newWaypoint, updateIndex);
+                int updateIndex = places.indexOf(wp);
+                places.setElementAt(newWaypoint, updateIndex);
                 return;
             }
         }
-        saveWaypoints(); // Save waypoints immediately to RMS
+        savePlaces(); // Save waypoints immediately to RMS
     }
 
     /** Save waypoints to persistent storage */
-    private void saveWaypoints() {
-        settings.setWaypoints(waypoints);
+    private void savePlaces() {
+        settings.setPlaces(places);
     }
 
-    /** Remove selected waypoint */
-    public void removeWaypoint(Waypoint wp) {
-        waypoints.removeElement(wp);
+    /** Remove selected waypoint
+     * @param wp 
+     */
+    public void removePlace(Place wp) {
+        places.removeElement(wp);
     }
     
     /** Remove all waypoints */
-    public void removeAllWaypoints() {
-        waypoints.removeAllElements();
+    public void removeAllPlaces() {
+        places.removeAllElements();
     }
     
     /**
-     * @param Waypoint
-     *                Waypoint object to display
-     * @param WaypointName
-     *                Name of waypoint
+     * @param place         Place object to display
+     * @param placeName     Name of waypoint
+     * @param exportAllWps  Are we exporting all places?
      */
-    public void showWaypointActionsForm(Waypoint waypoint, String waypointName, boolean exportAllWps) {
-        WaypointActionsForm form = new WaypointActionsForm(this, waypoint, waypointName, exportAllWps);
+    public void showPlaceActionsForm(Place place, String placeName, boolean exportAllWps) {
+        PlaceActionsForm form = new PlaceActionsForm(this, place, placeName, exportAllWps);
         display.setCurrent(form);
     }
 
@@ -1175,7 +1177,7 @@ public class Controller {
         try {
             boolean useKilometers = settings.getUnitsAsKilometers();
             String exportFolder = settings.getExportFolder();
-            recordedTrack.writeToFile(exportFolder, waypoints, useKilometers,
+            recordedTrack.writeToFile(exportFolder, places, useKilometers,
                     exportFormat, trackName, null);
         } catch (Exception ex) {
             Logger.error(ex.toString());

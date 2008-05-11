@@ -262,7 +262,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         }
         
         /*
-         * Update all saved Waypoints.
+         * Update all saved places.
          * 
          * Seems there's no need, as they are currently saved as a string, which is not affected by the
          * recent changes to GPS Position.

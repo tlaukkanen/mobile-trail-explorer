@@ -1,5 +1,5 @@
 /*
- * WaypointCanvas.java
+ * PlacesCanvas.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -24,7 +24,7 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.model.LengthFormatter;
-import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.model.Place;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Canvas;
@@ -35,14 +35,14 @@ import javax.microedition.lcdui.Graphics;
  *
  * @author Tommi
  */
-public class WaypointCanvas extends BaseCanvas {
+public class PlacesCanvas extends BaseCanvas {
     
     private static Font rowFont;
     private int firstRowIndex;
     private boolean allowScrollingDown;
     
-    /** Creates a new instance of WaypointCanvas */
-    public WaypointCanvas() {
+    /** Creates a new instance of PlacesCanvas */
+    public PlacesCanvas() {
         super();     
         firstRowIndex = 0;
         allowScrollingDown = false;
@@ -59,11 +59,11 @@ public class WaypointCanvas extends BaseCanvas {
         /** Draw title */
         g.setColor(COLOR_TITLE);
         g.setFont(titleFont);
-        g.drawString("Waypoints", getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
+        g.drawString("Places", getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
                 
-        /** Draw waypoints */
+        /** Draw places */
         g.setFont(rowFont);
-        paintWaypoints(g, titleFont.getHeight()+2);
+        paintPlaces(g, titleFont.getHeight()+2);
         
     }
     
@@ -94,25 +94,23 @@ public class WaypointCanvas extends BaseCanvas {
     }
 
     /** Render waypoint rows */
-    private void paintWaypoints(Graphics g, int y) {
+    private void paintPlaces(Graphics g, int y) {
         g.setColor(0,0,0);
-        Vector waypoints = controller.getWaypoints();
+        Vector places = controller.getPlaces();
         
         int rowHeight = rowFont.getHeight() + 1;
         int currentLine = y;
-        Logger.debug("WaypointCanvas getPosition called");
         GpsPosition currentPosition = controller.getPosition();
                
         allowScrollingDown = false;
-        Enumeration waypointEnum = waypoints.elements();
+        Enumeration placeEnum = places.elements();
         int waypointIndex = 0;
-        System.out.println("first: " + firstRowIndex);
-        while(waypointEnum.hasMoreElements()==true) {
+        while(placeEnum.hasMoreElements()==true) {
             if((currentLine+rowHeight)>getHeight()) {
                 allowScrollingDown = true;
                 break;
             }
-            Waypoint wp = (Waypoint)waypointEnum.nextElement();
+            Place wp = (Place)placeEnum.nextElement();
             if(waypointIndex>=firstRowIndex) {
 
                 g.drawString(wp.getName(),1,currentLine,Graphics.TOP|Graphics.LEFT);

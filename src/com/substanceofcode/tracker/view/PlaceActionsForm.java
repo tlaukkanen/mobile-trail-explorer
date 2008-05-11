@@ -1,5 +1,5 @@
 /*
- * WaypointActionsForm.java
+ * PlaceActionsForm.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -34,7 +34,7 @@ import com.substanceofcode.util.DateTimeUtil;
  *
  * @author Patrick Steiner
  */
-public class WaypointActionsForm extends Form implements CommandListener {
+public class PlaceActionsForm extends Form implements CommandListener {
     
     private static final String[] ALL_ACTIONS = { "Export to KML",
                                                   "Export to GPX" };
@@ -44,10 +44,10 @@ public class WaypointActionsForm extends Form implements CommandListener {
     private Command saveCommand;
     private Command cancelCommand;
     
-    private final Waypoint waypoint;
+    private final Place place;
     private ChoiceGroup actionsGroup;
     
-    private TextField waypointNameField;
+    private TextField placeNameField;
     
     private boolean exportAllWaypoints;
     
@@ -57,13 +57,17 @@ public class WaypointActionsForm extends Form implements CommandListener {
     private boolean noSaveErrors = true;
 
     /** 
-     * Creates a new instance of WaypointActionForm for when
-     * exporting from a 'saved' Waypoint.
+     * Creates a new instance of PlaceActionForm for when
+     * exporting from a 'saved' Place.
+     * @param controller
+     * @param place
+     * @param placeName
+     * @param exportAllWaypoints 
      */
-    public WaypointActionsForm(Controller controller, Waypoint waypoint, String waypointName, boolean exportAllWaypoints) {
-        super("Trail Actions");
-        this.waypoint = waypoint;
-        String name = waypointName;
+    public PlaceActionsForm(Controller controller, Place place, String placeName, boolean exportAllWaypoints) {
+        super("Place Actions");
+        this.place = place;
+        String name = placeName;
         if(name == null || name.length() == 0) {
             name = DateTimeUtil.getCurrentDateStamp();
         }
@@ -73,7 +77,7 @@ public class WaypointActionsForm extends Form implements CommandListener {
             name = name + "_" + dateStr;
         }
 
-        this.waypointNameField = new TextField("Name", name, 64, TextField.ANY);
+        this.placeNameField = new TextField("Name", name, 64, TextField.ANY);
         this.exportAllWaypoints = exportAllWaypoints;
         this.initialize(controller);
     }
@@ -117,13 +121,13 @@ public class WaypointActionsForm extends Form implements CommandListener {
             selectedFlags[i] = allSelectedFlags[i];
         }
         /** Add waypoint name field first */
-        this.append(waypointNameField);        
+        this.append(placeNameField);        
         
         //-----------------------------------------------------------------------
         // Construct choice group
         //-----------------------------------------------------------------------
         actionsGroup = new ChoiceGroup(
-                "Please select the next actions for the current waypoint. Multiple "
+                "Please select the next actions for the current place. Multiple "
                         + "actions are possible:", ChoiceGroup.MULTIPLE,
                 actions, null);
 
@@ -161,7 +165,7 @@ public class WaypointActionsForm extends Form implements CommandListener {
                     if (noSaveErrors) {
                         System.out.println("goBack()");
                         lListen.join();
-                        WaypointActionsForm.this.goBack();
+                        PlaceActionsForm.this.goBack();
                     }
                 }
             }).start();
@@ -188,27 +192,27 @@ public class WaypointActionsForm extends Form implements CommandListener {
 
             boolean useKilometers = settings.getUnitsAsKilometers();
             String exportFolder = settings.getExportFolder();
-            String waypointName = waypointNameField.getString();
+            String waypointName = placeNameField.getString();
             
             Vector waypoints = new Vector();
             
             if(exportAllWaypoints) {
-                waypoints = settings.getWaypoints();
+                waypoints = settings.getPlaces();
             } else {
-                String name = waypoint.getName();
-                double latValue = waypoint.getLatitude();
-                double lonValue = waypoint.getLongitude();
+                String name = place.getName();
+                double latValue = place.getLatitude();
+                double lonValue = place.getLongitude();
             
                 System.out.println("Waypointname: " + name +
                                    " Latitude: " + latValue +
                                    " Longitude: " + lonValue);
                 
-                Waypoint selectedWaypoint = new Waypoint(name, lonValue, latValue);
+                Place selectedWaypoint = new Place(name, lonValue, latValue);
 
                 waypoints.addElement(selectedWaypoint);
             }
             
-            waypoint.writeToFile(exportFolder, waypoints, useKilometers,
+            place.writeToFile(exportFolder, waypoints, useKilometers,
                     exportFormat, waypointName, xiListen);
             
             if (xiListen != null) {
@@ -226,7 +230,7 @@ public class WaypointActionsForm extends Form implements CommandListener {
     
     /** Back to previous Form */
     private void goBack() {
-        controller.showWaypointList();
+        controller.showPlacesList();
     }
     
     /* (non-Javadoc)

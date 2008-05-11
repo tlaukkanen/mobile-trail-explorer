@@ -182,8 +182,8 @@ public class FileChooser
     private void goBack() {
         this.deleteAll();
         
-        if (previousScreen instanceof ImportWaypointScreen) {
-            ((ImportWaypointScreen) previousScreen).refreshForm();
+        if (previousScreen instanceof ImportPlaceScreen) {
+            ((ImportPlaceScreen) previousScreen).refreshForm();
         } else if (previousScreen instanceof ImportTrailScreen) {
             ((ImportTrailScreen) previousScreen).refreshForm();
         }

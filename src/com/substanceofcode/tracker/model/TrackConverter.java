@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 package com.substanceofcode.tracker.model;
 
 import java.io.IOException;
@@ -42,120 +41,121 @@ import com.substanceofcode.tracker.view.Logger;
 // FIXME: it would make sense for this to extend KXmlParser.( I think anyway)
 public abstract class TrackConverter {
 
-  /**
-  * Abstract method to allow for differentiated handling of different xml 
-  * formats e.g. kml/gpx
-  */
-	public abstract String convert(Track track, 
-			                           Vector waypoints,
-			                           boolean includeWaypoints, 
-			                           boolean includeMarkers);
-        
-        public abstract String convert(Waypoint waypoint, 
-			                           Vector waypoints,
-			                           boolean includeWaypoints, 
-			                           boolean includeMarkers);
+    /**
+     * Abstract method to allow for differentiated handling of different xml 
+     * formats e.g. kml/gpx
+     */
+    public abstract String convert(
+            Track track,
+            Vector places,
+            boolean includePlaces,
+            boolean includeMarkers);
 
-	/**
-	 * Abstract method to allow for differentiated handling of different xml 
-	 * formats e.g. kml/gpx
+    public abstract String convert(
+            Place place,
+            Vector places,
+            boolean includePlaces,
+            boolean includeMarkers);
+
+    /**
+     * Abstract method to allow for differentiated handling of different xml 
+     * formats e.g. kml/gpx
      * 
      * @param trackDescription
      * @return 
      */
-	public abstract Track importTrack(KXmlParser trackDescription);
+    public abstract Track importTrack(KXmlParser trackDescription);
 
-	/**
-	 * TrackConverter : Open File using provided FileConnection and construct
-	 * a KXmlParser using the resulting InputStreamReader - This is then passed
-	 * to abstract method importTrack(...) which will handle the file in an
-	 * appropriate way.
+    /**
+     * TrackConverter : Open File using provided FileConnection and construct
+     * a KXmlParser using the resulting InputStreamReader - This is then passed
+     * to abstract method importTrack(...) which will handle the file in an
+     * appropriate way.
      * 
      * @param connection FileConnection to an imported file
      * @return 
      */
-	public Track importTrack(FileConnection connection) {
-		Track result = null;
-		try {
-			/* Make sure file exists and can be read */
-			if (!connection.exists()) {
-				Logger.warn("FileConnection does not exist, Track Import " +
-						                   "aborted");
-				return null;
-			}
-			if (!connection.canRead()) {
-				Logger.warn("FileConnection can not be read exist, " +
-						                   "Track Import aborted");
-				return null;
-			}
+    public Track importTrack(FileConnection connection) {
+        Track result = null;
+        try {
+            /* Make sure file exists and can be read */
+            if (!connection.exists()) {
+                Logger.warn("FileConnection does not exist, Track Import " +
+                        "aborted");
+                return null;
+            }
+            if (!connection.canRead()) {
+                Logger.warn("FileConnection can not be read exist, " +
+                        "Track Import aborted");
+                return null;
+            }
 
-			InputStream is = connection.openInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
+            InputStream is = connection.openInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
 
-			KXmlParser parser = new KXmlParser();
-			parser.setInput(isr);
+            KXmlParser parser = new KXmlParser();
+            parser.setInput(isr);
 
-			result = importTrack(parser);
+            result = importTrack(parser);
 
-			try {
-				isr.close();
-			} catch (IOException e) {
-			}
-			try {
-				is.close();
-			} catch (IOException e) {
-			}
-		} catch (Exception e) {
-			Logger.warn("Exception caught trying to importTrack :" + 
-					                   e.toString());
-			e.printStackTrace();
-		}
-		return result;
-	}
-        
-        /**
-	 * Abstract method to allow for differentiated handling of different xml 
-	 * formats e.g. kml/gpx
-	 */
-	public abstract Vector importWaypoint(KXmlParser trackDescription);
-        
-        public Vector importWaypoint(FileConnection connection) {
-           Vector result = null;
-		try {
-			/* Make sure file exists and can be read */
-			if (!connection.exists()) {
-				Logger.warn("FileConnection does not exist, Waypoint Import " +
-						                   "aborted");
-				return null;
-			}
-			if (!connection.canRead()) {
-				Logger.warn("FileConnection can not be read exist, " +
-						                   "Waypoint Import aborted");
-				return null;
-			}
-
-			InputStream is = connection.openInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-
-			KXmlParser parser = new KXmlParser();
-			parser.setInput(isr);
-
-			result = importWaypoint(parser);
-
-			try {
-				isr.close();
-			} catch (IOException e) {
-			}
-			try {
-				is.close();
-			} catch (IOException e) {
-			}
-		} catch (Exception e) {
-			Logger.warn("Exception caught trying to importTrack :" + 
-					                   e.toString());
-			e.printStackTrace();
-		}
-		return result;
+            try {
+                isr.close();
+            } catch (IOException e) {
+            }
+            try {
+                is.close();
+            } catch (IOException e) {
+            }
+        } catch (Exception e) {
+            Logger.warn("Exception caught trying to importTrack :" +
+                    e.toString());
+            e.printStackTrace();
         }
+        return result;
+    }
 
+    /**
+     * Abstract method to allow for differentiated handling of different xml 
+     * formats e.g. kml/gpx
+     */
+    public abstract Vector importPlace(KXmlParser trackDescription);
+
+    public Vector importPlace(FileConnection connection) {
+        Vector result = null;
+        try {
+            /* Make sure file exists and can be read */
+            if (!connection.exists()) {
+                Logger.warn("FileConnection does not exist, Place Import " +
+                        "aborted");
+                return null;
+            }
+            if (!connection.canRead()) {
+                Logger.warn("FileConnection can not be read exist, " +
+                        "Place Import aborted");
+                return null;
+            }
+
+            InputStream is = connection.openInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+
+            KXmlParser parser = new KXmlParser();
+            parser.setInput(isr);
+
+            result = importPlace(parser);
+
+            try {
+                isr.close();
+            } catch (IOException e) {
+            }
+            try {
+                is.close();
+            } catch (IOException e) {
+            }
+        } catch (Exception e) {
+            Logger.warn("Exception caught trying to importTrack :" +
+                    e.toString());
+            e.printStackTrace();
+        }
+        return result;
+    }
 }

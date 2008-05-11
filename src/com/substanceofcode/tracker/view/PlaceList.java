@@ -1,5 +1,5 @@
 /*
- * WaypointList.java
+ * PlaceList.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -24,7 +24,7 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.util.StringUtil;
 
 import java.util.Enumeration;
@@ -39,40 +39,40 @@ import javax.microedition.lcdui.List;
  * @author Tommi Laukkanen
  * @author Patrick Steiner
  */
-public class WaypointList extends List implements CommandListener {
+public class PlaceList extends List implements CommandListener {
     
     private Controller controller;
     
-    private ImportWaypointScreen importWaypointScreen;
+    private ImportPlaceScreen importPlaceScreen;
     
     private Command editCommand;
     private final Command deleteCommand;
     private final Command deleteAllCommand;
     private final Command backCommand;
-    private final Command newWaypointCommand;
-    private final Command exportWaypointCommand;
-    private final Command exportAllWaypointsCommand;
-    private final Command importWaypointsCommand;
+    private final Command newPlaceCommand;
+    private final Command exportPlaceCommand;
+    private final Command exportAllPlacesCommand;
+    private final Command importPlacesCommand;
     
-    private static final String TITLE = "Waypoints";
+    private static final String TITLE = "Places";
     
-    private Vector waypoints;
+    private Vector places;
     
     
-    /** Creates a new instance of WaypointList
+    /** Creates a new instance of PlaceList
      * @param controller 
      */
-    public WaypointList(Controller controller) {
+    public PlaceList(Controller controller) {
         super(TITLE, List.IMPLICIT);        
         this.controller = controller;
         
         this.addCommand(editCommand = new Command("Edit", Command.OK, 1));
         this.addCommand(deleteCommand = new Command("Remove", Command.SCREEN, 2));
         this.addCommand(deleteAllCommand = new Command("Remove All", Command.SCREEN, 3));
-        this.addCommand(newWaypointCommand = new Command("Add new waypoint", Command.ITEM, 4));
-        this.addCommand(exportWaypointCommand = new Command("Export selected waypoint", Command.ITEM, 5));
-        this.addCommand(exportAllWaypointsCommand = new Command("Export all waypoints", Command.ITEM, 6));
-        this.addCommand(importWaypointsCommand = new Command("Import waypoints", Command.ITEM, 7));
+        this.addCommand(newPlaceCommand = new Command("Add new place", Command.ITEM, 4));
+        this.addCommand(exportPlaceCommand = new Command("Export selected place", Command.ITEM, 5));
+        this.addCommand(exportAllPlacesCommand = new Command("Export all places", Command.ITEM, 6));
+        this.addCommand(importPlacesCommand = new Command("Import places", Command.ITEM, 7));
         this.addCommand(backCommand = new Command("Back", Command.BACK, 10));
 
         setSelectCommand(editCommand);
@@ -81,15 +81,15 @@ public class WaypointList extends List implements CommandListener {
     }
     
     /** 
-     * Set waypoints
-     * @param waypoints 
+     * Set places
+     * @param places 
      */
-    public void setWaypoints(Vector waypoints) {
-        this.waypoints = waypoints;
-        Enumeration waypointEnum = waypoints.elements();
+    public void setPlaces(Vector places) {
+        this.places = places;
+        Enumeration plcEnum = places.elements();
         this.deleteAll();
-        while(waypointEnum.hasMoreElements()) {
-            Waypoint wp = (Waypoint)waypointEnum.nextElement();
+        while(plcEnum.hasMoreElements()) {
+            Place wp = (Place)plcEnum.nextElement();
             this.append(wp.getName(), null);
         }        
     }
@@ -101,29 +101,28 @@ public class WaypointList extends List implements CommandListener {
         }
         
         if(command == editCommand) {
-            /** Display selected waypoint */
-            Waypoint wp = getSelectedWaypoint();
-            controller.editWaypoint(wp);
+            /** Display selected place */
+            Place wp = getSelectedPlace();
+            controller.editPlace(wp);
         }
         
         if(command == deleteCommand) {
-            /** Delete selected waypoint */
-            Waypoint wp = getSelectedWaypoint();
-            controller.removeWaypoint(wp);
+            /** Delete selected place */
+            Place wp = getSelectedPlace();
+            controller.removePlace(wp);
             int selectedIndex = this.getSelectedIndex();
             this.delete(selectedIndex);
         }
         
         if(command == deleteAllCommand) {
-            /** Delete all waypoints */
-            controller.removeAllWaypoints();
+            /** Delete all places */
+            controller.removeAllPlaces();
             this.deleteAll();
         }
         
-        if(command == newWaypointCommand) {
+        if(command == newPlaceCommand) {
             String latString = "";
             String lonString = "";
-            Logger.debug("WaypointList getPosition called");
             GpsPosition lastPosition = controller.getPosition();
             if(lastPosition!=null) {
                 double lat = lastPosition.latitude;
@@ -133,39 +132,39 @@ public class WaypointList extends List implements CommandListener {
                 lonString = StringUtil.valueOf(lon,5);
             }
             
-            controller.markWaypoint(latString, lonString);
+            controller.markPlace(latString, lonString);
         }
         
-        if(command == exportWaypointCommand) {
-            String selectedWaypointName = this.getString(this.getSelectedIndex());
-            Waypoint selectedWaypoint = getSelectedWaypoint();
-            if(selectedWaypoint != null) {
-                controller.showWaypointActionsForm(selectedWaypoint, selectedWaypointName, false);
+        if(command == exportPlaceCommand) {
+            String selectedPlaceName = this.getString(this.getSelectedIndex());
+            Place selectedPlace = getSelectedPlace();
+            if(selectedPlace != null) {
+                controller.showPlaceActionsForm(selectedPlace, selectedPlaceName, false);
             }
             
         }
         
-        if(command == exportAllWaypointsCommand) {
+        if(command == exportAllPlacesCommand) {
             String exportName = "WP_ALL";
-            Waypoint selectedWaypoint = getSelectedWaypoint();
-            if(selectedWaypoint != null) {
-                controller.showWaypointActionsForm(selectedWaypoint, exportName, true);
+            Place selectedPlace = getSelectedPlace();
+            if(selectedPlace != null) {
+                controller.showPlaceActionsForm(selectedPlace, exportName, true);
             }
         }
         
-        if(command == importWaypointsCommand) {
-            if(importWaypointScreen == null){
-                    importWaypointScreen = new ImportWaypointScreen(this);
+        if(command == importPlacesCommand) {
+            if(importPlaceScreen == null){
+                    importPlaceScreen = new ImportPlaceScreen(this);
                 }
-            	controller.setCurrentScreen(importWaypointScreen);
+            	controller.setCurrentScreen(importPlaceScreen);
         }
     }
     
     /** Get selected waypoint */
-    private Waypoint getSelectedWaypoint() {
+    private Place getSelectedPlace() {
         if( this.size()>0 )  {
             int selectedIndex = this.getSelectedIndex();
-            Waypoint selectedWaypoint = (Waypoint)waypoints.elementAt( selectedIndex );
+            Place selectedWaypoint = (Place)places.elementAt( selectedIndex );
             return selectedWaypoint;
         }
         return null;

@@ -61,7 +61,7 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     private Command settingsCommand;
     private Command exitCommand;
     private Command manageTrailsCommand;
-    private Command manageWaypointsCommand;
+    private Command managePlacesCommand;
 
     /*
      * private Command markWaypointCommand; private Command
@@ -85,8 +85,8 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         addCommand(startStopCommand);
 
         // Waypoints command
-        manageWaypointsCommand = new Command("Manage Waypoints", Command.ITEM, 2);
-        addCommand(manageWaypointsCommand);
+        managePlacesCommand = new Command("Manage Places", Command.ITEM, 2);
+        addCommand(managePlacesCommand);
 
         // Trails command
         manageTrailsCommand = new Command("Manage Trails", Command.ITEM, 3);
@@ -113,8 +113,8 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
                 controller.startStop();
             } else if (command == manageTrailsCommand) {
                 controller.showTrailsList();
-            } else if (command == manageWaypointsCommand) {
-                controller.showWaypointList();
+            } else if (command == managePlacesCommand) {
+                controller.showPlacesList();
             }
             if (command == settingsCommand) {
                 controller.showSettings();

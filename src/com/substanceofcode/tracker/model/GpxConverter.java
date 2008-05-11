@@ -38,7 +38,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**
- * GpxConverter writes track/waypoint data in GPX format.
+ * GpxConverter writes track/place data in GPX format.
  * 
  * @author Tommi Laukkanen
  * @author Mario Sansone
@@ -46,15 +46,21 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class GpxConverter extends TrackConverter {
 
-    /** Convert trail to GPX format. */
-    public String convert(Track track, Vector waypoints,
-            boolean includeWaypoints, boolean includeMarkers) {
+    /** Convert trail to GPX format.
+     * @param track
+     * @param places 
+     * @param includePlaces
+     * @param includeMarkers
+     * @return 
+     */
+    public String convert(Track track, Vector places,
+            boolean includePlaces, boolean includeMarkers) {
 
         StringBuffer gpx = new StringBuffer();
         addHeader(gpx);
 
-        // Create waypoints
-        gpx.append(createWaypoints(waypoints));
+        // Create places
+        gpx.append(createPlaceMarks(places));
 
         // Create trail
         addTrailStart(gpx);
@@ -71,15 +77,19 @@ public class GpxConverter extends TrackConverter {
         return gpx.toString();
     }
     
-    /** Convert waypoint to GPX format. */
-    public String convert(Waypoint waypoint, Vector waypoints,
-            boolean includeWaypoints, boolean includeMarkers) {
+    /** Convert place to GPX format.
+     * @param waypoint
+     * @param includeMarkers 
+     * @param includeWaypoints
+     */
+    public String convert(Place place, Vector places,
+            boolean includePlaces, boolean includeMarkers) {
 
         StringBuffer gpx = new StringBuffer();
         addHeader(gpx);
 
-        // Create waypoints
-        gpx.append(createWaypoints(waypoints));
+        // Create places
+        gpx.append(createPlaceMarks(places));
 
         // Finalize the GPX
         addFooter(gpx);
@@ -165,7 +175,7 @@ public class GpxConverter extends TrackConverter {
     }
 
     /** Export waypoints to GPX format */
-    private String createWaypoints(Vector waypoints) {
+    private String createPlaceMarks(Vector waypoints) {
         if (waypoints == null) {
             return "";
         }
@@ -173,7 +183,7 @@ public class GpxConverter extends TrackConverter {
 
         Enumeration waypointEnum = waypoints.elements();
         while (waypointEnum.hasMoreElements()) {
-            Waypoint wp = (Waypoint) waypointEnum.nextElement();
+            Place wp = (Place) waypointEnum.nextElement();
             String lat = formatDegrees(wp.getLatitude());
             String lon = formatDegrees(wp.getLongitude());
             String name = wp.getName();
@@ -503,7 +513,7 @@ public class GpxConverter extends TrackConverter {
     }
     
     //TODO: patrick: import waypoints also if you import a track
-    public Vector importWaypoint(KXmlParser parser) {
+    public Vector importPlace(KXmlParser parser) {
         Logger.debug("Starting to parse GPX waypoint from file");
         Vector result = null;
 
@@ -620,7 +630,7 @@ public class GpxConverter extends TrackConverter {
         System.out.println("Parsed GpsPosition: name:"+ wptName + " |lat:" + latitudeDouble
                 + " |lon:" + longitudeDouble);
         
-        Waypoint waypoint = new Waypoint(wptName, latitudeDouble, longitudeDouble);
+        Place waypoint = new Place(wptName, latitudeDouble, longitudeDouble);
         waypoints.addElement(waypoint);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * WayPoint.java
+ * Place.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -33,43 +33,43 @@ import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
 
 /**
- * WayPoint contains information of a single waypoint. Waypoint has a name and 
+ * Place contains information of a single location. Place has a name and 
  * a position (lat/lon).
  *
  * @author Tommi Laukkanen
  */
-public class Waypoint {
+public class Place {
     
-    /** Name of waypoint */
+    /** Name of this place */
     private String name;
     
-    /** Latitude of waypoint */
+    /** Latitude of place */
     private double latitude;
     
-    /** Longitude of waypoint */
+    /** Longitude of place */
     private double longitude;
     
     /** 
      * Constructor.
-     * @param name      Name of this waypoint.
-     * @param latitude  Latitude position value of this waypoint.
-     * @param longitude Longitude position value of this waypoint. 
+     * @param name      Name of this place.
+     * @param latitude  Latitude position value of this place.
+     * @param longitude Longitude position value of this place. 
      */
-    public Waypoint(String name, double latitude, double longitude) {
+    public Place(String name, double latitude, double longitude) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
     }
     
-    /** Get waypoint name
-     * @return Name of this waypoint.
+    /** Get place name
+     * @return Name of this place.
      */
     public String getName() {
         return name;
     }
     
-    /** Set waypoint name
-     * @param name Name of this waypoint.
+    /** Set place name
+     * @param name Name of this place.
      */
     public void setName(String name) {
        this.name = name;
@@ -104,12 +104,12 @@ public class Waypoint {
     }
     
     /** 
-     * Export waypoint to file.
+     * Export place to file.
      * @return Full path of file which was written to
      *
      * @throws java.lang.Exception 
      * @param folder        Folder where file is written.
-     * @param waypoints     Vector containing waypoints.
+     * @param places     Vector containing places.
      * @param useKilometers Use meters as units?
      * @param exportFormat  Export format.
      * @param filename      Name of file or null if we should create a timestamp
@@ -117,7 +117,7 @@ public class Waypoint {
      *                      events
      */
     public String writeToFile(String folder,
-                            Vector waypoints,
+                            Vector places,
                             boolean useKilometers, 
                             int exportFormat, 
                             String filename, 
@@ -205,7 +205,7 @@ public class Waypoint {
         // ------------------------------------------------------------------
         // Convert the data into a String
         // ------------------------------------------------------------------
-        String exportData = converter.convert(this, waypoints, true, true);
+        String exportData = converter.convert(this, places, true, true);
 
         // ------------------------------------------------------------------
         // Notify progress

@@ -1,5 +1,5 @@
 /*
- * WaypointForm.java
+ * PlaceForm.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -23,7 +23,7 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.Waypoint;
+import com.substanceofcode.tracker.model.Place;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -32,13 +32,13 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
 /**
- * WaypointForm contains user interface for adding and editing waypoint 
+ * PlaceForm contains user interface for adding and editing waypoint 
  * information. 
  *
  * @author Tommi Laukkanen
  * @author Mario Sansone
  */
-public class WaypointForm extends Form implements CommandListener {
+public class PlaceForm extends Form implements CommandListener {
     
     private Controller controller;
     
@@ -52,14 +52,14 @@ public class WaypointForm extends Form implements CommandListener {
     private Command cancelCommand;
     
     private boolean editing;
-    private String oldWaypointName;
+    private String oldPlaceName;
     
     /** 
-     * Creates a new instance of WaypointForm
+     * Creates a new instance of PlaceForm
      * @param controller 
      */
-    public WaypointForm(Controller controller) {
-        super("Waypoint");
+    public PlaceForm(Controller controller) {
+        super("Place");
         this.controller = controller;
         
         initializeControls();
@@ -68,19 +68,19 @@ public class WaypointForm extends Form implements CommandListener {
         this.setCommandListener(this);
         
         editing = false;
-        oldWaypointName = "";
+        oldPlaceName = "";
     }
     
     /** 
      * Set editing flag value.
      *
-     * @param   editing     If true then we are editing existing waypoint. 
+     * @param   editing     If true then we are editing existing place. 
      */
     public void setEditingFlag(boolean editing) {
         this.editing = editing;
     }
 
-    /** Initialize waypoint fields (name, lon and lat) */
+    /** Initialize place fields (name, lon and lat) */
     private void initializeControls() {
         
         nameField = new TextField("Name", "", 16, TextField.ANY);
@@ -102,16 +102,16 @@ public class WaypointForm extends Form implements CommandListener {
         this.addCommand( cancelCommand );
     }
     
-    /** Set values according to a waypoint object */
+    /** Set values according to a place object */
     public void setValues(String name, String lat, String lon) {
         nameField.setString( name );
         latitudeField.setString( lat );
         longitudeField.setString( lon );
-        oldWaypointName = name;
+        oldPlaceName = name;
     }
     
-    /** Initialize controls with waypoint values. */
-    public void setValues(Waypoint wp) {
+    /** Initialize controls with place values. */
+    public void setValues(Place wp) {
         Logger.debug("Setting values");
         Logger.debug("Setting name: " + wp.getName());
         nameField.setString(wp.getName());
@@ -128,8 +128,8 @@ public class WaypointForm extends Form implements CommandListener {
         Logger.debug("Setting strings");
         latitudeField.setString( latitude );
         longitudeField.setString( longitude );
-        oldWaypointName = wp.getName();
-        Logger.debug("WP values set. Name: " + oldWaypointName);
+        oldPlaceName = wp.getName();
+        Logger.debug("WP values set. Name: " + oldPlaceName);
     }
 
     /** Handle commands */
@@ -148,16 +148,16 @@ public class WaypointForm extends Form implements CommandListener {
                                      "[-]xxx.xxxxx");
                 return;
             }
-            Waypoint waypoint = new Waypoint( name, latitude, longitude );
+            Place place = new Place( name, latitude, longitude );
             
             if(editing==false) {
                 /** Create new waypoint */
-                controller.saveWaypoint(waypoint);
+                controller.savePlace( place );
                 controller.showTrail();                
             } else {
                 /** Update existing waypoint */
-                controller.updateWaypoint( oldWaypointName, waypoint );
-                controller.showWaypointList();
+                controller.updateWaypoint( oldPlaceName, place );
+                controller.showPlacesList();
             }
 
         }

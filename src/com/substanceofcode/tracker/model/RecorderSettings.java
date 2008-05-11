@@ -49,7 +49,7 @@ public class RecorderSettings {
     // String Constants
     // --------------------------------------------------------------------------
     private static final String GPS_DEVICE_STRING = "gps-device";
-    private static final String WAYPOINTS = "waypoints";
+    private static final String PLACES = "waypoints";
     private static final String UNITS = "units";
     private static final String BACKLIGHT = "backlight";
     private static final String POSITIONS_TO_DRAW = "number-of-position-to-draw";
@@ -265,22 +265,22 @@ public class RecorderSettings {
         saveSettings();
     }
 
-    /** Get waypoints */
-    public Vector getWaypoints() {
-        String encodedWaypoints = settings.getStringProperty(WAYPOINTS, "");
+    /** Get places */
+    public Vector getPlaces() {
+        String encodedPlaces = settings.getStringProperty(PLACES, "");
 
-        // Return empty Vector if we don't have any waypoints
-        if (encodedWaypoints.length() == 0) {
+        // Return empty Vector if we don't have any places
+        if (encodedPlaces.length() == 0) {
             return new Vector();
         }
 
-        // Parse waypoints
-        Vector waypoints = new Vector();
-        String[] waypointLines = StringUtil.split(encodedWaypoints, "\n");
-        int waypointCount = waypointLines.length;
-        for (int waypointIndex = 0; waypointIndex < waypointCount; waypointIndex++) {
+        // Parse places
+        Vector places = new Vector();
+        String[] placeLines = StringUtil.split(encodedPlaces, "\n");
+        int placeCount = placeLines.length;
+        for (int placeIndex = 0; placeIndex < placeCount; placeIndex++) {
 
-            String[] values = StringUtil.split(waypointLines[waypointIndex],
+            String[] values = StringUtil.split(placeLines[placeIndex],
                     "|");
             if (values.length == 3) {
                 String lat = values[0];
@@ -290,31 +290,31 @@ public class RecorderSettings {
                 double latValue = Double.parseDouble(lat);
                 double lonValue = Double.parseDouble(lon);
 
-                Waypoint newWaypoint = new Waypoint(name, latValue, lonValue);
-                waypoints.addElement(newWaypoint);
+                Place newPlace = new Place(name, latValue, lonValue);
+                places.addElement( newPlace );
             }
         }
-        return waypoints;
+        return places;
     }
 
     /** 
-     * Set waypoints
-     * @param waypoints 
+     * Set places
+     * @param places 
      */
-    public void setWaypoints(Vector waypoints) {
-        String waypointString = "";
-        Enumeration wpEnum = waypoints.elements();
+    public void setPlaces(Vector places) {
+        String placeString = "";
+        Enumeration wpEnum = places.elements();
         while (wpEnum.hasMoreElements() == true) {
-            Waypoint wp = (Waypoint) wpEnum.nextElement();
+            Place wp = (Place) wpEnum.nextElement();
 
             String latString = String.valueOf(wp.getLatitude());
             String lonString = String.valueOf(wp.getLongitude());
 
-            waypointString += latString + "|" + lonString + "|" + wp.getName()
+            placeString += latString + "|" + lonString + "|" + wp.getName()
                     + "\n";
 
         }
-        settings.setStringProperty(WAYPOINTS, waypointString);
+        settings.setStringProperty(PLACES, placeString);
         saveSettings();
     }
 

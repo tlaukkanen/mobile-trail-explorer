@@ -35,7 +35,7 @@ import com.substanceofcode.tracker.model.*;
  *
  * @author Patrick Steiner
  */
-public class ImportWaypointScreen extends Form implements CommandListener {
+public class ImportPlaceScreen extends Form implements CommandListener {
     
     private final Controller controller;
     
@@ -49,8 +49,8 @@ public class ImportWaypointScreen extends Form implements CommandListener {
     
     private FileChooser filechooser;
     
-    public ImportWaypointScreen(Displayable previousScreen) {
-        super("Import Waypoint(s)");
+    public ImportPlaceScreen(Displayable previousScreen) {
+        super("Import Place(s)");
         this.controller = Controller.getController();
         this.previousScreen = previousScreen;
         
@@ -109,30 +109,30 @@ public class ImportWaypointScreen extends Form implements CommandListener {
                         
                         FileConnection connection = (FileConnection) Connector
                                 .open(importFile);
-                        Vector waypoints = converter.importWaypoint(connection);
+                        Vector places = converter.importPlace(connection);
                         try {
                             connection.close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        if (waypoints.isEmpty()) {
+                        if (places.isEmpty()) {
                             controller
-                                    .showError("Unable to retrieve specified waypoint. See log for details");
+                                    .showError("Unable to retrieve specified place. See log for details");
                             Logger.debug(
-                                            "Unable to retrieve specified waypoint, previous statements should explain.");
+                                            "Unable to retrieve specified place, previous statements should explain.");
                         } else {
                             try {
-                                Enumeration wpEnum = waypoints.elements();
+                                Enumeration wpEnum = places.elements();
                                 while (wpEnum.hasMoreElements() == true) {
-                                    Waypoint wp = (Waypoint) wpEnum.nextElement();
-                                    controller.saveWaypoint(wp);
+                                    Place wp = (Place) wpEnum.nextElement();
+                                    controller.savePlace( wp );
                                 }
 
                             } catch (IllegalStateException e) {
                                 Logger.warn(
-                                        "Unable to save 'Empty Waypoint' "
+                                        "Unable to save 'Empty Place' "
                                                 + e.toString());
-                                controller.showError("Can not save \"Empty\" Waypoint. " +
+                                controller.showError("Can not save \"Empty\" Place. " +
                                             "must record at least 1 point");
                             }
                         }
@@ -146,7 +146,7 @@ public class ImportWaypointScreen extends Form implements CommandListener {
                                         + e.toString());
                         e.printStackTrace();
                     } finally {
-                        ImportWaypointScreen.this.goBack();
+                        ImportPlaceScreen.this.goBack();
                     }
                 }
             }).start();
@@ -181,6 +181,6 @@ public class ImportWaypointScreen extends Form implements CommandListener {
     }
     
     private void goBack() {
-        controller.showWaypointList();
+        controller.showPlacesList();
     }
 }

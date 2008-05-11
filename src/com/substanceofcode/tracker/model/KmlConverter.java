@@ -38,7 +38,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**
- * Class to convert a Track/Waypoint to KML (google-earth) format.
+ * Class to convert a Track/Place to KML (google-earth) format.
  * 
  * @author Tommi Laukkanen
  * @author Barry Redmond
@@ -61,28 +61,28 @@ public class KmlConverter extends TrackConverter {
 
     /** Convert track to Google Eart format (KML)
      * @param track             Track that is converted.
-     * @param waypoints         Vector full of waypoints.
-     * @param includeWaypoints  Should we include waypoints?
+     * @param places            Vector full of places.
+     * @param includePlaceMarks Should we include places?
      * @param includeMarkers    Should we include markers?
      * @return 
      */
-    public String convert(Track track, Vector waypoints,
-            boolean includeWaypoints, boolean includeMarkers) {
+    public String convert(Track track, Vector places,
+            boolean includePlaceMarks, boolean includeMarkers) {
         String currentDateStamp = DateTimeUtil.getCurrentDateStamp();
-        String kmlContent = exportTrack(currentDateStamp, track, waypoints);
+        String kmlContent = exportTrack(currentDateStamp, track, places);
         return kmlContent;
     }
 
-    /** Convert waypoint to Google Eart format (KML)
-     * @param waypoint
-     * @param waypoints
-     * @param includeWaypoints
+    /** Convert places to Google Eart format (KML)
+     * @param place
+     * @param places
+     * @param includePlaces
      * @param includeMarkers 
      */
-    public String convert(Waypoint waypoint, Vector waypoints,
-            boolean includeWaypoints, boolean includeMarkers) {
+    public String convert(Place place, Vector places,
+            boolean includePlaces, boolean includeMarkers) {
         String currentDateStamp = DateTimeUtil.getCurrentDateStamp();
-        String kmlContent = exportWaypoint(currentDateStamp, waypoints);
+        String kmlContent = exportPlaceMark(currentDateStamp, places);
         return kmlContent;
     }
 
@@ -101,7 +101,7 @@ public class KmlConverter extends TrackConverter {
         }
         closeTrack(trackString);
 
-        trackString.append(generateWaypointData(waypoints));
+        trackString.append(generatePlaceMarkData(waypoints));
         trackString.append(generateMarkers(track.getTrackMarkersEnumeration()));
         trackString.append(generateEndpoints(track));
 
@@ -110,18 +110,22 @@ public class KmlConverter extends TrackConverter {
         return trackString.toString();
     }
 
-    /** Convert to string */
-    public String exportWaypoint(String dateStamp, Vector waypoints) {
-        StringBuffer waypointString = new StringBuffer();
+    /** Convert to string
+     * @param dateStamp
+     * @param places
+     * @return 
+     */
+    public String exportPlaceMark(String dateStamp, Vector places) {
+        StringBuffer placeString = new StringBuffer();
 
-        addHeader(waypointString, dateStamp);
-        closeTrack(waypointString);
+        addHeader(placeString, dateStamp);
+        closeTrack(placeString);
 
-        waypointString.append(generateWaypointData(waypoints));
+        placeString.append(generatePlaceMarkData(places));
 
-        addFooter(waypointString);
+        addFooter(placeString);
 
-        return waypointString.toString();
+        return placeString.toString();
     }
 
     public static void addHeader(StringBuffer trackString, String dateStamp) {
@@ -160,29 +164,29 @@ public class KmlConverter extends TrackConverter {
         trackString.append("</kml>\r\n");
     }
 
-    /** Generate waypoint data */
-    private StringBuffer generateWaypointData(Vector waypoints) {
-        if (waypoints == null) {
+    /** Generate place data */
+    private StringBuffer generatePlaceMarkData(Vector places) {
+        if (places == null) {
             return new StringBuffer();
         }
-        StringBuffer waypointString = new StringBuffer();
-        Enumeration waypointEnum = waypoints.elements();
-        waypointString.append("<Folder>\r\n");
-        waypointString.append("<name>Waypoints</name>\r\n");
-        while (waypointEnum.hasMoreElements() == true) {
-            Waypoint wp = (Waypoint) waypointEnum.nextElement();
+        StringBuffer placeString = new StringBuffer();
+        Enumeration placeEnum = places.elements();
+        placeString.append("<Folder>\r\n");
+        placeString.append("<name>Places</name>\r\n");
+        while (placeEnum.hasMoreElements() == true) {
+            Place wp = (Place) placeEnum.nextElement();
 
-            waypointString.append("<Placemark>\r\n");
-            waypointString.append("<name>").append(wp.getName()).append(
+            placeString.append("<Placemark>\r\n");
+            placeString.append("<name>").append(wp.getName()).append(
                     "</name>\r\n");
-            waypointString.append("<Point><coordinates>\r\n");
-            waypointString.append(formatDegrees(wp.getLongitude())).append(",")
+            placeString.append("<Point><coordinates>\r\n");
+            placeString.append(formatDegrees(wp.getLongitude())).append(",")
                     .append(formatDegrees(wp.getLatitude())).append(",0\r\n");
-            waypointString.append("</coordinates></Point>\r\n");
-            waypointString.append("</Placemark>\r\n");
+            placeString.append("</coordinates></Point>\r\n");
+            placeString.append("</Placemark>\r\n");
         }
-        waypointString.append("</Folder>\r\n");
-        return waypointString;
+        placeString.append("</Folder>\r\n");
+        return placeString;
     }
 
     /** Export markers */
@@ -417,7 +421,7 @@ public class KmlConverter extends TrackConverter {
      * @param parser kXML parser that is parsing KML file
      * @return Return Vector full of waypoints
      */
-    public Vector importWaypoint(KXmlParser parser) {
+    public Vector importPlace(KXmlParser parser) {
         Logger.debug("Starting to parse KML waypoints from file");
         Vector waypoints = new Vector();
             
@@ -435,7 +439,7 @@ public class KmlConverter extends TrackConverter {
                  && parser.getName() != null 
                  && parser.getName().toLowerCase().equals("placemark")) {
                     Logger.debug("Found <Placemark>");
-                    Waypoint wp = parseKmlPlacemark(parser);
+                    Place wp = parseKmlPlacemark(parser);
                     if(wp!=null) {
                         Logger.debug("Got valid waypoint");
                         waypoints.addElement(wp);
@@ -525,7 +529,7 @@ public class KmlConverter extends TrackConverter {
         }
     }
 
-    private Waypoint parseKmlPlacemark(KXmlParser parser) throws 
+    private Place parseKmlPlacemark(KXmlParser parser) throws 
             XmlPullParserException, 
             IOException {
         int eventType = parser.getEventType();
@@ -575,7 +579,7 @@ public class KmlConverter extends TrackConverter {
                 
                 if(name!=null && name.length()>0 && foundCoordinates==true) {
                     Logger.debug("Creating new waypoint");
-                    return new Waypoint(name, latitude, longitude);
+                    return new Place(name, latitude, longitude);
                 }
                 
             }        

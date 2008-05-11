@@ -38,10 +38,10 @@ import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.map.MapLocator;
 import com.substanceofcode.map.TileDownloader;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
-import com.substanceofcode.tracker.model.Waypoint;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.MathUtil;
@@ -155,8 +155,8 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw status bar */
             drawStatusBar(g);
 
-            /** Draw waypoints */
-            drawWaypoints(g);
+            /** Draw places */
+            drawPlaceMarks(g);
 
             /** Draw ghost trail */
             // TODO: Draw all the saved tracks to 'ghost' PNGs, then display
@@ -348,26 +348,26 @@ public class TrailCanvas extends BaseCanvas {
         }
     }
 
-    /** Draw waypoints */
-    private void drawWaypoints(Graphics g) {
+    /** Draw places */
+    private void drawPlaceMarks(Graphics g) {
 
         // Draw information about the waypoints
-        Vector waypoints = controller.getWaypoints();
-        if (waypoints == null) {
+        Vector places = controller.getPlaces();
+        if (places == null) {
             return;
         }
 
-        // Draw waypoints
-        int waypointCount = waypoints.size();
+        // Draw places
+        int waypointCount = places.size();
         g.setColor(50, 200, 50);
-        for (int waypointIndex = 0; waypointIndex < waypointCount; waypointIndex++) {
+        for (int placeIndex = 0; placeIndex < waypointCount; placeIndex++) {
 
-            Waypoint waypoint = (Waypoint) waypoints.elementAt(waypointIndex);
-            double lat = waypoint.getLatitude();
-            double lon = waypoint.getLongitude();
+            Place place = (Place) places.elementAt(placeIndex);
+            double lat = place.getLatitude();
+            double lon = place.getLongitude();
             CanvasPoint point = convertPosition(lat, lon);
             if (point != null) {
-                g.drawString(waypoint.getName(), point.X + 2, point.Y - 1,
+                g.drawString(place.getName(), point.X + 2, point.Y - 1,
                         Graphics.BOTTOM | Graphics.LEFT);
                 g.drawRect(point.X - 1, point.Y - 1, 2, 2);
             }
@@ -792,11 +792,11 @@ public class TrailCanvas extends BaseCanvas {
                 // displayRow++;
             }
 
-            Vector waypoints = controller.getWaypoints();
-            if (waypoints != null) {
+            Vector places = controller.getPlaces();
+            if (places != null) {
                 g.drawString("WP:", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
-                g.drawString(String.valueOf(waypoints.size()), positionAdd,
+                g.drawString(String.valueOf(places.size()), positionAdd,
                         fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }
@@ -949,15 +949,11 @@ public class TrailCanvas extends BaseCanvas {
                 Logger.debug("WaypointList getPosition called");
                 GpsPosition lp = controller.getPosition();
                 if (lp != null) {
-                    int waypointCount = controller.getWaypoints().size();
+                    int waypointCount = controller.getPlaces().size();
                     String name = "WP" + String.valueOf(waypointCount + 1);
-                    Waypoint waypoint = new Waypoint(name, lp.latitude,
+                    Place waypoint = new Place(name, lp.latitude,
                             lp.longitude);
-                    controller.saveWaypoint(waypoint);
-
-                    // AlertHandler lListen = new AlertHandler(controller,
-                    // this);
-                    // lListen.notifySuccess("Waypoint " + name + " created");
+                    controller.savePlace(waypoint);
                 }
                 break;
 
