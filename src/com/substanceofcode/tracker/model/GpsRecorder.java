@@ -445,6 +445,10 @@ public class GpsRecorder {
                                     uploadURL = StringUtil.replace(uploadURL, "@ALT@", alt);
                                     String id = String.valueOf(recordedTrack.getId());
                                     uploadURL = StringUtil.replace(uploadURL, "@TRAILID@", id);
+                                    String hea = String.valueOf(currentPosition.course);
+                                    uploadURL = StringUtil.replace(uploadURL, "@HEA@", hea);
+                                    String spd = String.valueOf(currentPosition.speed);
+                                    uploadURL = StringUtil.replace(uploadURL, "@SPD@", spd);                                    
                                     serialize = false;
                                 }
                                 conn = (HttpConnection) Connector.open(uploadURL);
