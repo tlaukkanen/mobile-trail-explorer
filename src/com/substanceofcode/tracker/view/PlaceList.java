@@ -66,9 +66,9 @@ public class PlaceList extends List implements CommandListener {
         super(TITLE, List.IMPLICIT);        
         this.controller = controller;
         
-        this.addCommand(editCommand = new Command("Edit", Command.OK, 1));
-        this.addCommand(deleteCommand = new Command("Remove", Command.SCREEN, 2));
-        this.addCommand(deleteAllCommand = new Command("Remove All", Command.SCREEN, 3));
+        this.addCommand(editCommand = new Command("Edit place", Command.OK, 1));
+        this.addCommand(deleteCommand = new Command("Remove place", Command.SCREEN, 2));
+        this.addCommand(deleteAllCommand = new Command("Remove all places", Command.SCREEN, 3));
         this.addCommand(newPlaceCommand = new Command("Add new place", Command.ITEM, 4));
         this.addCommand(exportPlaceCommand = new Command("Export selected place", Command.ITEM, 5));
         this.addCommand(exportAllPlacesCommand = new Command("Export all places", Command.ITEM, 6));
