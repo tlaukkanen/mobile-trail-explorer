@@ -31,9 +31,11 @@ import com.substanceofcode.tracker.model.*;
 import com.substanceofcode.util.DateTimeUtil;
 
 /**
- *
+ * Global Actions Form for Place
+ * 
  * @author Patrick Steiner
  */
+
 public class PlaceActionsForm extends Form implements CommandListener {
     
     private static final String[] ALL_ACTIONS = { "Export to KML",
@@ -41,20 +43,37 @@ public class PlaceActionsForm extends Form implements CommandListener {
     
     private Controller controller;
     
-    private Command saveCommand;
+    private Command okCommand;
     private Command cancelCommand;
     
     private final Place place;
     private ChoiceGroup actionsGroup;
+    private StringItem infoStringItem;
     
     private TextField placeNameField;
     
-    private boolean exportAllWaypoints;
+    private int actionType;
+    
+    /**
+     * Available action types
+     * 
+     * 0 = export selected place
+     * 1 = export all places
+     * 2 = remove all places
+     */
+    public final static int EXPORT_SELECTED = 0;
+    public final static int EXPORT_ALL = 1;
+    public final static int REMOVE_ALL = 2;
     
     /**
      * State for whether there were any errors during the save
      */
     private boolean noSaveErrors = true;
+    
+    /**
+     * State for whether there were any errors during removing
+     */
+    private boolean noRemoveErrors = true;
 
     /** 
      * Creates a new instance of PlaceActionForm for when
@@ -64,7 +83,7 @@ public class PlaceActionsForm extends Form implements CommandListener {
      * @param placeName
      * @param exportAllWaypoints 
      */
-    public PlaceActionsForm(Controller controller, Place place, String placeName, boolean exportAllWaypoints) {
+    public PlaceActionsForm(Controller controller, Place place, String placeName, int actionType) {
         super("Place Actions");
         this.place = place;
         String name = placeName;
@@ -72,18 +91,18 @@ public class PlaceActionsForm extends Form implements CommandListener {
             name = DateTimeUtil.getCurrentDateStamp();
         }
 
-        if(exportAllWaypoints) {
+        if(actionType == EXPORT_ALL) {
             String dateStr = DateTimeUtil.getCurrentDateStamp();
             name = name + "_" + dateStr;
         }
 
         this.placeNameField = new TextField("Name", name, 64, TextField.ANY);
-        this.exportAllWaypoints = exportAllWaypoints;
+        this.actionType = actionType;
         this.initialize(controller);
     }
     
     /**
-     * The common core function for initializing all WaypointActionForms
+     * The common core function for initializing all PlaceActionForms
      *
      */
     private void initialize(Controller controller) {
@@ -95,87 +114,122 @@ public class PlaceActionsForm extends Form implements CommandListener {
     
     /** Initialize commands */
     private void initializeCommands() {
-        this.addCommand(saveCommand = new Command("Save", Command.SCREEN, 1));
+        
+        String btnLabelOk = "Save";
+        
+        if(actionType == REMOVE_ALL) {
+            btnLabelOk = "Remove";
+        }
+        this.addCommand(okCommand = new Command(btnLabelOk, Command.SCREEN, 1));
         this.addCommand(cancelCommand = new Command("Cancel", Command.BACK, 100));
     }
     
     /** Initialize form controls */
     private void initializeControls() {
-        int numActions = 2;
+        //----------------------------------------------------------------------
+        // Construct string info item
+        //----------------------------------------------------------------------
+        if(actionType == REMOVE_ALL) {
+            infoStringItem = new StringItem("Info","Are you sure that you want "
+                    + "to permanently delete all places? ");
         
-        //----------------------------------------------------------------------
-        // Construct default checked array
-        //----------------------------------------------------------------------
-        final boolean kml = Controller.getController().getSettings()
+            this.append(infoStringItem);
+        } else {
+            int numActions = 2;
+        
+            //------------------------------------------------------------------
+            // Construct default checked array
+            //------------------------------------------------------------------
+            final boolean kml = Controller.getController().getSettings()
                 .getExportToKML();
-        final boolean gpx = Controller.getController().getSettings()
+            final boolean gpx = Controller.getController().getSettings()
                 .getExportToGPX();
-        final boolean[] allSelectedFlags = { kml, gpx, true };
-        //----------------------------------------------------------------------
-        // Copy values into correct sized arrays for this form
-        //----------------------------------------------------------------------
-        final String[] actions = new String[numActions];
-        boolean[] selectedFlags = new boolean[numActions];
-        for (int i = 0; i < actions.length; i++) {
-            actions[i] = ALL_ACTIONS[i];
-            selectedFlags[i] = allSelectedFlags[i];
-        }
-        /** Add waypoint name field first */
-        this.append(placeNameField);        
+            final boolean[] allSelectedFlags = { kml, gpx, true };
+            //------------------------------------------------------------------
+            // Copy values into correct sized arrays for this form
+            //------------------------------------------------------------------
+            final String[] actions = new String[numActions];
+            boolean[] selectedFlags = new boolean[numActions];
+            for (int i = 0; i < actions.length; i++) {
+                actions[i] = ALL_ACTIONS[i];
+                selectedFlags[i] = allSelectedFlags[i];
+            }
+            /** Add place name field first */
+            this.append(placeNameField);        
         
-        //-----------------------------------------------------------------------
-        // Construct choice group
-        //-----------------------------------------------------------------------
-        actionsGroup = new ChoiceGroup(
+            //------------------------------------------------------------------
+            // Construct choice group
+            //------------------------------------------------------------------
+            actionsGroup = new ChoiceGroup(
                 "Please select the next actions for the current place. Multiple "
                         + "actions are possible:", ChoiceGroup.MULTIPLE,
                 actions, null);
 
-        actionsGroup.setSelectedFlags(selectedFlags);
+            actionsGroup.setSelectedFlags(selectedFlags);
 
-        this.append(actionsGroup);
+            this.append(actionsGroup);
+        }
     }
     
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-        if (command == saveCommand) {
+        if (command == okCommand) {
             final Displayable lThis = this;
             // do IO operations in another thread to prevent UI freezing.
-            new Thread(new Runnable() {
-                public void run() {
-                    noSaveErrors = true;
-                    // Do specified actions for this trail:
-                    // 0 = Export waypoint to KML file
-                    // 1 = Export waypoint to GPX file
-                    AlertHandler lListen = new AlertHandler(controller, lThis);
-                    if (actionsGroup.isSelected(0)) {
-                        exportWaypoint(RecorderSettings.EXPORT_FORMAT_KML, lListen);
+            
+            if(actionType == REMOVE_ALL) {
+                new Thread(new Runnable() {
+                    public void run() {
+                        noRemoveErrors = true;
+                        AlertHandler lListen = new AlertHandler(controller, lThis);
+                        controller.removeAllPlaces();
+                        
+                        System.out.println("Finished remove process");
+                        System.out.println("No Errors : " + noRemoveErrors);
+                        
+                        if (noRemoveErrors) {
+                            System.out.println("goBack()");
+                            lListen.join();
+                            PlaceActionsForm.this.goBack();
+                        }
                     }
-                    if (actionsGroup.isSelected(1)) {
-                        exportWaypoint(RecorderSettings.EXPORT_FORMAT_GPX, lListen);
+                }).start();
+            } else {
+                new Thread(new Runnable() {
+                    public void run() {
+                        noSaveErrors = true;
+                        // Do specified actions for this trail:
+                        // 0 = Export place to KML file
+                        // 1 = Export place to GPX file
+                        AlertHandler lListen = new AlertHandler(controller, lThis);
+                        if (actionsGroup.isSelected(0)) {
+                            exportWaypoint(RecorderSettings.EXPORT_FORMAT_KML, lListen);
+                        }
+                        if (actionsGroup.isSelected(1)) {
+                            exportWaypoint(RecorderSettings.EXPORT_FORMAT_GPX, lListen);
+                        }
+
+                        System.out.println("Finished save process");
+                        System.out.println("No Errors : " + noSaveErrors);
+
+                        //------------------------------------------------------
+                        // After doing all actions, we return to the normal 
+                        // previous Screen
+                        //------------------------------------------------------
+                        if (noSaveErrors) {
+                            System.out.println("goBack()");
+                            lListen.join();
+                            PlaceActionsForm.this.goBack();
+                        }
                     }
-
-                    System.out.println("Finished save process");
-                    System.out.println("No Errors : " + noSaveErrors);
-
-                    //----------------------------------------------------------
-                    // After doing all actions, we return to the normal 
-                    // previous Screen
-                    //----------------------------------------------------------
-                    if (noSaveErrors) {
-                        System.out.println("goBack()");
-                        lListen.join();
-                        PlaceActionsForm.this.goBack();
-                    }
-                }
-            }).start();
-
+                }).start();
+            }
         } else if (command == cancelCommand) {
             this.goBack();
         }
     }
     
-    /** Export the selected waypoint to a file with the specified format */
+    /** Export the selected place to a file with the specified format */
     private void exportWaypoint(int exportFormat, AlertHandler xiListen) {
         String lType = "";
         switch(exportFormat) {
@@ -196,7 +250,7 @@ public class PlaceActionsForm extends Form implements CommandListener {
             
             Vector waypoints = new Vector();
             
-            if(exportAllWaypoints) {
+            if(actionType == EXPORT_ALL) {
                 waypoints = settings.getPlaces();
             } else {
                 String name = place.getName();
@@ -240,5 +294,4 @@ public class PlaceActionsForm extends Form implements CommandListener {
         System.out.println("Error During Save");
         noSaveErrors = false;
     }
-
 }

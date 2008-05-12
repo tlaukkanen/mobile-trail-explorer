@@ -1032,8 +1032,8 @@ public class Controller {
      * @param placeName     Name of waypoint
      * @param exportAllWps  Are we exporting all places?
      */
-    public void showPlaceActionsForm(Place place, String placeName, boolean exportAllWps) {
-        PlaceActionsForm form = new PlaceActionsForm(this, place, placeName, exportAllWps);
+    public void showPlaceActionsForm(Place place, String placeName, int actionType) {
+        PlaceActionsForm form = new PlaceActionsForm(this, place, placeName, actionType);
         display.setCurrent(form);
     }
 

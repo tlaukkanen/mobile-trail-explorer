@@ -35,7 +35,8 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 /**
- *
+ * Displays a list of all places
+ * 
  * @author Tommi Laukkanen
  * @author Patrick Steiner
  */
@@ -116,8 +117,10 @@ public class PlaceList extends List implements CommandListener {
         
         if(command == deleteAllCommand) {
             /** Delete all places */
-            controller.removeAllPlaces();
-            this.deleteAll();
+            Place selectedPlace = getSelectedPlace();
+            if(selectedPlace != null) {
+                controller.showPlaceActionsForm(selectedPlace, "", 2);
+            }
         }
         
         if(command == newPlaceCommand) {
@@ -139,16 +142,16 @@ public class PlaceList extends List implements CommandListener {
             String selectedPlaceName = this.getString(this.getSelectedIndex());
             Place selectedPlace = getSelectedPlace();
             if(selectedPlace != null) {
-                controller.showPlaceActionsForm(selectedPlace, selectedPlaceName, false);
+                controller.showPlaceActionsForm(selectedPlace, selectedPlaceName, 1);
             }
             
         }
         
         if(command == exportAllPlacesCommand) {
-            String exportName = "WP_ALL";
+            String exportName = "PLACES_ALL";
             Place selectedPlace = getSelectedPlace();
             if(selectedPlace != null) {
-                controller.showPlaceActionsForm(selectedPlace, exportName, true);
+                controller.showPlaceActionsForm(selectedPlace, exportName, 1);
             }
         }
         
@@ -160,7 +163,7 @@ public class PlaceList extends List implements CommandListener {
         }
     }
     
-    /** Get selected waypoint */
+    /** Get selected place */
     private Place getSelectedPlace() {
         if( this.size()>0 )  {
             int selectedIndex = this.getSelectedIndex();
@@ -169,5 +172,4 @@ public class PlaceList extends List implements CommandListener {
         }
         return null;
     }
-    
 }
