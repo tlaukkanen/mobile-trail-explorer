@@ -33,7 +33,7 @@ import javax.microedition.lcdui.Graphics;
 
 /**
  *
- * @author Tommi
+ * @author Tommi Laukkanen
  */
 public class PlacesCanvas extends BaseCanvas {
     
@@ -53,11 +53,11 @@ public class PlacesCanvas extends BaseCanvas {
     /** Paint waypoint list and distances to each waypoint */
     protected void paint(Graphics g) {
         /** Clear background */
-        g.setColor(255,255,255);
+        g.setColor(Theme.getColor(Theme.TYPE_BACKGROUND));
         g.fillRect(0,0,getWidth(),getHeight());
         
         /** Draw title */
-        g.setColor(COLOR_TITLE);
+        g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
         g.drawString("Places", getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
                 
@@ -95,7 +95,7 @@ public class PlacesCanvas extends BaseCanvas {
 
     /** Render waypoint rows */
     private void paintPlaces(Graphics g, int y) {
-        g.setColor(0,0,0);
+        g.setColor(Theme.getColor(Theme.TYPE_TEXT));
         Vector places = controller.getPlaces();
         
         int rowHeight = rowFont.getHeight() + 1;

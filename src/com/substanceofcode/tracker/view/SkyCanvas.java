@@ -1,7 +1,7 @@
 /*
  * SkyCanvas.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,10 +53,10 @@ public class SkyCanvas extends BaseCanvas{
     }
     
     protected void paint(Graphics g) {
-        g.setColor(COLOR_WHITE);
+        g.setColor( Theme.getColor(Theme.TYPE_BACKGROUND) );
         g.fillRect(0,0,getWidth(),getHeight());
         
-        g.setColor(COLOR_TITLE);
+        g.setColor(Theme.getColor(Theme.TYPE_TITLE) );
         g.setFont(titleFont);
         g.drawString("Sky View", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
 

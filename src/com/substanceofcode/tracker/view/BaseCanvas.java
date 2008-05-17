@@ -48,8 +48,6 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     /** The color Black, in it's integer value form. */
     protected static final int COLOR_BLUE = 0x0000FF;
 
-    /** The color all BaseCanvas subclass titles should be. */
-    protected static final int COLOR_TITLE = 0x008000;
     /** The Font all CbasCanvas subclass titles should be. */
     protected static final Font titleFont = Font.getFont(Font.FACE_SYSTEM,
             Font.STYLE_BOLD, Font.SIZE_SMALL);
@@ -134,5 +132,6 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         if(keyCode==Canvas.KEY_NUM0 || keyCode==' ') {
             controller.switchDisplay();
         } 
+
     }
 }

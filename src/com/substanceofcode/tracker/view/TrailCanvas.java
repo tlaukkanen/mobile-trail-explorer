@@ -137,7 +137,7 @@ public class TrailCanvas extends BaseCanvas {
             }
             
             /** Fill background with white */
-            g.setColor(COLOR_WHITE);
+            g.setColor( Theme.getColor(Theme.TYPE_BACKGROUND) );
             g.fillRect(0, 0, width, height);
 
             RecorderSettings settings = controller.getSettings();
@@ -164,11 +164,11 @@ public class TrailCanvas extends BaseCanvas {
             // the code used for maps
             // This could be more efficient than drawing each track
             Track ghostTrail = controller.getGhostTrail();
-            drawTrail(g, ghostTrail, 0xAAAAAA, true);
+            drawTrail(g, ghostTrail, Theme.getColor(Theme.TYPE_GHOSTTRAIL), true);
 
             /** Draw current trail */
             Track currentTrail = controller.getTrack();
-            drawTrail(g, currentTrail, 0xDD0000, settings.getDrawWholeTrail());
+            drawTrail(g, currentTrail, Theme.getColor(Theme.TYPE_TRAIL), settings.getDrawWholeTrail());
 
             /** Draw current location with red dot */
             g.drawImage(redDotImage, midWidth + horizontalMovement, midHeight
@@ -351,16 +351,16 @@ public class TrailCanvas extends BaseCanvas {
     /** Draw places */
     private void drawPlaceMarks(Graphics g) {
 
-        // Draw information about the waypoints
+        // Draw information about the places
         Vector places = controller.getPlaces();
         if (places == null) {
             return;
         }
 
         // Draw places
-        int waypointCount = places.size();
-        g.setColor(50, 200, 50);
-        for (int placeIndex = 0; placeIndex < waypointCount; placeIndex++) {
+        int placeCount = places.size();
+        g.setColor( Theme.getColor(Theme.TYPE_PLACEMARK));
+        for (int placeIndex = 0; placeIndex < placeCount; placeIndex++) {
 
             Place place = (Place) places.elementAt(placeIndex);
             double lat = place.getLatitude();
@@ -564,7 +564,7 @@ public class TrailCanvas extends BaseCanvas {
 
         scaleLength = (int) (scaleLength * barDist / pixelSize);
 
-        g.setColor(0, 0, 0); // black color
+        g.setColor( Theme.getColor(Theme.TYPE_LINE) ); // black color
         g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT
                 + scaleLength, getHeight() - MARGIN_BOTTOM);
         g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT,
@@ -615,14 +615,14 @@ public class TrailCanvas extends BaseCanvas {
         int fontHeight = currentFont.getHeight();
 
         /** Draw status */
-        g.setColor(0, 0, 255);
+        g.setColor( Theme.getColor(Theme.TYPE_TEXTVALUE));
 
         String satelliteCount = String.valueOf(controller.getSatelliteCount());
         g.drawString("Status: " + controller.getStatusText() + " ("
                 + satelliteCount + ")", 1, 0, Graphics.TOP | Graphics.LEFT);
 
         /** Draw status */
-        g.setColor(0, 0, 0);
+        g.setColor( Theme.getColor(Theme.TYPE_TEXT));
         if (lastPosition != null) {
 
             int positionAdd = currentFont.stringWidth("LAN:O");
@@ -792,6 +792,7 @@ public class TrailCanvas extends BaseCanvas {
                 // displayRow++;
             }
 
+            /*
             Vector places = controller.getPlaces();
             if (places != null) {
                 g.drawString("WP:", 1, fontHeight * displayRow, Graphics.TOP
@@ -799,7 +800,7 @@ public class TrailCanvas extends BaseCanvas {
                 g.drawString(String.valueOf(places.size()), positionAdd,
                         fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
-            }
+            }*/
 
             /** Debugging free mem */
             // long freeMem = Runtime.getRuntime().freeMemory();
@@ -812,6 +813,8 @@ public class TrailCanvas extends BaseCanvas {
              * and draw on separate lines. Only draw the string if it is less
              * than 10 seconds old, so that old messages aren't left on screen
              */
+            
+            g.setColor( Theme.getColor(Theme.TYPE_ERROR) );
             long ageOfLastMessage = System.currentTimeMillis()
                     - Logger.getLogger().getTimeOfLastMessage();
             if (ageOfLastMessage < 10000) {
@@ -881,7 +884,7 @@ public class TrailCanvas extends BaseCanvas {
         }
 
         /** Draw error texts */
-        g.setColor(255, 0, 0);
+        g.setColor( Theme.getColor( Theme.TYPE_ERROR) );
         if (error != null) {
             g.drawString("" + error, 1, height - (fontHeight * 3 + 2),
                     Graphics.TOP | Graphics.LEFT);
@@ -914,7 +917,7 @@ public class TrailCanvas extends BaseCanvas {
      * @param keyCode 
      */
     public void keyPressed(int keyCode) {
-        System.out.println("key=" + keyCode);
+        super.keyPressed(keyCode);
 
         /** Handle zooming keys */
         switch (keyCode) {
@@ -938,11 +941,10 @@ public class TrailCanvas extends BaseCanvas {
                 }
                 break;
 
-            case (' '):
-            case (KEY_NUM0):
-                // Change screen. Some phones 0 key defaults to space.
-                controller.switchDisplay();
-                break;
+            case (KEY_NUM7):
+                // Change theme
+                Theme.switchTheme();
+                break;       
                 
             case (KEY_STAR):
             case (KEY_POUND):

@@ -50,14 +50,14 @@ public class SatelliteCanvas extends BaseCanvas {
     }
     
     protected void paint(Graphics g) {
-        g.setColor(COLOR_WHITE);
+        g.setColor(Theme.getColor(Theme.TYPE_BACKGROUND));
         g.fillRect(0,0,getWidth(),getHeight());
         
-        g.setColor(COLOR_TITLE);
+        g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
         g.drawString("Satellites", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
         
-        g.setColor(COLOR_BLACK);
+        g.setColor(Theme.getColor(Theme.TYPE_TEXT));
         g.setFont(rowFont);
         g.drawString(
             "Satellite count ",

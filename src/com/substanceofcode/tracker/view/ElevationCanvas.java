@@ -1,7 +1,7 @@
 /*
  * ElevationCanvas.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -107,7 +107,7 @@ public class ElevationCanvas extends BaseCanvas {
     }
 
     protected void paint(Graphics g) {
-        g.setColor(0xFFFFFF);
+        g.setColor( Theme.getColor(Theme.TYPE_BACKGROUND) );
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
         final int top = drawTitle(g, 0);
@@ -136,7 +136,7 @@ public class ElevationCanvas extends BaseCanvas {
      */
     private int drawTitle(Graphics g, int yPos) {
         g.setFont(titleFont);
-        g.setColor(COLOR_TITLE);
+        g.setColor( Theme.getColor(Theme.TYPE_TITLE) );
         final String title = "Elevation";
         g.drawString(title, this.getWidth() / 2, yPos, Graphics.TOP
                 | Graphics.HCENTER);
@@ -144,7 +144,7 @@ public class ElevationCanvas extends BaseCanvas {
     }
 
     private void drawYAxis(Graphics g, final int top, final int bottom) {
-        g.setColor(0x0);
+        g.setColor( Theme.getColor(Theme.TYPE_LINE) );
         // Draw the vertical Axis
         g.drawLine(MARGIN, top, MARGIN, bottom);
 
@@ -185,7 +185,7 @@ public class ElevationCanvas extends BaseCanvas {
                 | Graphics.LEFT);
         if (this.gridOn) {
             final int color = g.getColor();
-            g.setColor(0xCCCCCC);
+            g.setColor( Theme.getColor(Theme.TYPE_SUBLINE));
             final int right = this.getWidth() - (2 * MARGIN);
             g.drawLine(2 * (MARGIN - 1) + 1, pixel, right, pixel);
             g.setColor(color);
@@ -226,7 +226,7 @@ public class ElevationCanvas extends BaseCanvas {
 
     private void drawXAxis(Graphics g, final int left, final int right,
             final int top, final int bottom) {
-        g.setColor(0x0);
+        g.setColor(Theme.getColor(Theme.TYPE_LINE));
         g.drawLine(left, bottom, right, bottom);
 
         String time = null;
@@ -251,7 +251,7 @@ public class ElevationCanvas extends BaseCanvas {
                 | Graphics.HCENTER);
         if (this.gridOn) {
             final int color = g.getColor();
-            g.setColor(0xCCCCCC);
+            g.setColor(Theme.getColor(Theme.TYPE_SUBLINE));
             g.drawLine(pixel, top, pixel, bottom - MARGIN);
             g.setColor(color);
         }
@@ -290,7 +290,7 @@ public class ElevationCanvas extends BaseCanvas {
                 numPositions = track.getPositionCount();
 
                 // Draw trail with blue color
-                g.setColor(0, 0, 222);
+                g.setColor(Theme.getColor(Theme.TYPE_TRAIL));
 
                 final int numPositionsToDraw = controller.getSettings()
                         .getNumberOfPositionToDraw();
@@ -343,7 +343,7 @@ public class ElevationCanvas extends BaseCanvas {
                     Graphics.VCENTER | Graphics.HCENTER);
 
         } catch (Exception ex) {
-            g.setColor(255, 0, 0);
+            g.setColor( Theme.getColor(Theme.TYPE_ERROR) );
             g.drawString("ERR: " + ex.toString(), 1, 120, Graphics.TOP
                     | Graphics.LEFT);
 
@@ -386,6 +386,8 @@ public class ElevationCanvas extends BaseCanvas {
     }
 
     public void keyPressed(int keyCode) {
+        super.keyPressed(keyCode);
+        
         /** Handle zooming keys */
         switch (keyCode) {
             case (KEY_NUM1):
@@ -435,12 +437,6 @@ public class ElevationCanvas extends BaseCanvas {
                 this.xScale = (byte) (xScaleScale | xScaleType);
                 break;
 
-            case (' '):
-            case (KEY_NUM0):
-                // Change screen. In Some phones the 0 key defaults to space
-                controller.switchDisplay();
-                break;
-                
             default:
         }
 

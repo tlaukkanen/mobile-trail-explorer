@@ -69,11 +69,11 @@ public class InformationCanvas extends BaseCanvas{
         displayHeight = getHeight();
         totalTextHeight = 0;
         
-        g.setColor(255,255,255);
+        g.setColor(Theme.getColor(Theme.TYPE_BACKGROUND));
         g.fillRect(0,0,getWidth(),getHeight());
         
         // Draw the title
-        g.setColor(COLOR_TITLE);
+        g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
         if(firstRow==0) {
             g.drawString("Information", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
@@ -164,9 +164,9 @@ public class InformationCanvas extends BaseCanvas{
             return;
         }
         g.setFont(BIG_FONT);
-        g.setColor(32,128,32);
+        g.setColor( Theme.getColor(Theme.TYPE_TEXT) );
         g.drawString(name, 1, lineRow, Graphics.TOP|Graphics.LEFT);
-        g.setColor(0,0,0);
+        g.setColor( Theme.getColor(Theme.TYPE_TEXTVALUE) );
         int column = (name.length()>4 ? BIG_VALUE_COL : VALUE_COL);
         g.drawString(value, column, lineRow, Graphics.TOP|Graphics.LEFT);
         lineRow += BIG_FONT.getHeight();
@@ -178,7 +178,7 @@ public class InformationCanvas extends BaseCanvas{
             return;
         }
         g.setFont(SMALL_FONT);
-        g.setColor(128,32,32);
+        g.setColor( Theme.getColor(Theme.TYPE_SUBTITLE) );
         g.drawString(header, getWidth()/2, lineRow, Graphics.TOP|Graphics.HCENTER);
         lineRow += SMALL_FONT.getHeight();
         totalTextHeight += SMALL_FONT.getHeight();

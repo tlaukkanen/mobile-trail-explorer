@@ -1,7 +1,7 @@
 /*
  * CanvasPoint.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,10 @@ public class CanvasPoint {
     public int X;
     public int Y;
     
-    /** Creates a new instance of CanvasPoint */
+    /** Creates a new instance of CanvasPoint
+     * @param x Coordinate on x axis
+     * @param y Coordinate on y axis
+     */
     public CanvasPoint(int x, int y) {
         X = x;
         Y = y;
