@@ -215,7 +215,9 @@ public abstract class DateTimeUtil {
      * @return Time interval in format hh:mm:ss
      */
     public static String getTimeInterval(Date startDate, Date endDate) {
-        long intervalSeconds = (endDate.getTime() - startDate.getTime()) / 1000;
+        long interval = (endDate.getTime() - startDate.getTime());
+        if(interval == 0) { return "00:00:00"; }
+        long intervalSeconds = interval / 1000;
         long hours = intervalSeconds / 3600;
         long minutes = (intervalSeconds % 3600) / 60;
         long seconds = intervalSeconds % 60;

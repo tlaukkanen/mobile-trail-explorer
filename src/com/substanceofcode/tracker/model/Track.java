@@ -290,15 +290,21 @@ public class Track implements Serializable {
 
     /** @return the track duration in milliseconds */
     public long getDurationMilliSeconds() {
-        Date startDate = this.getStartPosition().date;
-        Date endDate = this.getEndPosition().date;
-        return (endDate.getTime() - startDate.getTime());
+        if(this.getStartPosition()!=null && this.getEndPosition()!=null) {
+            Date startDate = this.getStartPosition().date;
+            Date endDate = this.getEndPosition().date;
+            return (endDate.getTime() - startDate.getTime());
+        } else {
+            return 0;
+        }
     }
 
     /** @return the average speed (kmh) */
     public double getAverageSpeed() {
         double distanceKm = getDistance();
-        double hours = getDurationMilliSeconds() / 3600000.0;
+        double durationMilliSeconds = getDurationMilliSeconds();
+        if (durationMilliSeconds == 0) { return 0; }
+        double hours = durationMilliSeconds / 3600000.0;
         if (distanceKm > 0.01) {
             return distanceKm / hours;
         } else {

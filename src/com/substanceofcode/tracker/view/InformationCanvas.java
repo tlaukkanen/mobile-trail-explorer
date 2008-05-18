@@ -107,26 +107,29 @@ public class InformationCanvas extends BaseCanvas{
             
             hea = position.getHeadingString();
             
-            
             alt = lengthFormatter.getLengthString(position.altitude, false);
-            
+
             if(currentTrack!=null) {
-                dst = lengthFormatter.getLengthString(currentTrack.getDistance(), true);            
-                durationTime = DateTimeUtil.getTimeInterval(
-                    currentTrack.getStartPosition().date, 
-                    currentTrack.getEndPosition().date);
-                
-                maximumSpeed = UnitConverter.getSpeedString(
-                    currentTrack.getMaxSpeedPosition().speed, 
-                    controller.getSettings().getUnitsAsKilometers(),
-                    true);
-                
-                averageSpeed = UnitConverter.getSpeedString(
+                dst = lengthFormatter.getLengthString(currentTrack.getDistance(), true); 
+                if(currentTrack.getStartPosition()!=null &&
+                        currentTrack.getEndPosition()!=null) {
+                    durationTime = DateTimeUtil.getTimeInterval(
+                        currentTrack.getStartPosition().date, 
+                        currentTrack.getEndPosition().date);   
+                }
+                if(currentTrack.getMaxSpeedPosition()!=null) {
+                    maximumSpeed = UnitConverter.getSpeedString(
+                        currentTrack.getMaxSpeedPosition().speed, 
+                        controller.getSettings().getUnitsAsKilometers(),
+                        true);
+                }
+                if(currentTrack.getAverageSpeed()!= 0) {
+                    averageSpeed = UnitConverter.getSpeedString(
                     currentTrack.getAverageSpeed(), 
                     controller.getSettings().getUnitsAsKilometers(),
                     true);
+                }
             }
-            
         }
         int infoPos = BIG_FONT.stringWidth("LAT:_:");
         lineRow = titleHeight - firstRow;
