@@ -72,7 +72,7 @@ public final class AboutScreen extends Canvas {
     private static final String[] trailScreenHelpText = {
             "Pan the Trail Screen using either the arrow keys, or", "2 for UP",
             "4 for LEFT", "5 for CENTRE", "6 for RIGHT", "8 for DOWN", "",
-            "1 is Zoom In", "3 is Zoom Out" };
+            "1 is Zoom In", "3 is Zoom Out","","Use 7 for switching between Day of Night Theme." };
 
     private static final String[] elevationScreenHelpText = {
             "Scroll the Elevation Diagram LEFT or RIGHT using the 4 and 6 keys respectivly.",
