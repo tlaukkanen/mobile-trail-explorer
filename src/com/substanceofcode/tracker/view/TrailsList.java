@@ -69,8 +69,8 @@ public class TrailsList extends List implements CommandListener{
         this.controller = controller;
 
         addCommand(showDetailsCommand = new Command("Show Details", Command.ITEM, 1));
-        addCommand(loadCommand = new Command("Load", Command.OK, 2));
-        addCommand(deleteCommand = new Command("Delete", Command.ITEM, 3));
+        addCommand(loadCommand = new Command("Load Trail", Command.OK, 2));
+        addCommand(deleteCommand = new Command("Delete Trail", Command.ITEM, 3));
         addCommand(saveCurrentCommand = new Command("Save Current Trail", Command.ITEM, 4));
         addCommand(newTrailCommand = new Command("New Trail", Command.ITEM, 5));
         addCommand(newStreamTrailCommand = new Command("New GPX Stream", Command.ITEM, 6));
@@ -78,12 +78,11 @@ public class TrailsList extends List implements CommandListener{
         addCommand(useAsGhostTrailCommand = new Command("Use as ghost trail", Command.ITEM, 8));
         addCommand(importTrailCommand = new Command("Import a trail", Command.ITEM, 9));
         addCommand(exportTrailCommand = new Command("Export trail", Command.ITEM, 10));
-        addCommand(backCommand = new Command("Cancel", Command.BACK, 11));
+        addCommand(backCommand = new Command("Back", Command.BACK, 11));
 
         refresh();
         
         setCommandListener(this);
-        
     }
     
     public void refresh(){

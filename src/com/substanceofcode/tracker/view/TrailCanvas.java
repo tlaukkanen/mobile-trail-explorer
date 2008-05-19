@@ -614,13 +614,13 @@ public class TrailCanvas extends BaseCanvas {
         GpsPosition currentPosition = controller.getPosition();
         
         double distance = currentPosition.getDistanceFromPosition(
-                        controller.getNavigationPlace().getLatitude(), 
-                        controller.getNavigationPlace().getLongitude());
+                controller.getNavigationPlace().getLatitude(), 
+                controller.getNavigationPlace().getLongitude());
         
         LengthFormatter formatter = new LengthFormatter(controller.getSettings());
         String distanceString = formatter.getLengthString(distance, true);
 
-        g.drawString("Distance: " + distanceString,
+        g.drawString("Distance:" + distanceString,
                 midWidth + horizontalMovement,
                 midHeight + verticalMovement, Graphics.TOP | Graphics.HCENTER);
     }
@@ -653,9 +653,6 @@ public class TrailCanvas extends BaseCanvas {
             RecorderSettings settings = controller.getSettings();
 
             Date now = Calendar.getInstance().getTime();
-
-            /** Draw current time */
-
 
             /** Draw coordinates information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES) == true) {
