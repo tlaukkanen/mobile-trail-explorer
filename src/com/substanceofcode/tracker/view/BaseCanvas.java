@@ -60,6 +60,7 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     private Command exitCommand;
     private Command manageTrailsCommand;
     private Command managePlacesCommand;
+    private Command switchThemeCommand;
 
     /*
      * private Command markWaypointCommand; private Command
@@ -93,6 +94,10 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         // Settings command for showing settings list
         settingsCommand = new Command("Settings", Command.SCREEN, 5);
         addCommand(settingsCommand);
+        
+        // Switch between day or night theme
+        switchThemeCommand = new Command("Switch Theme", Command.ITEM, 6);
+        addCommand(switchThemeCommand);
 
         // Exit command
         exitCommand = new Command("Exit", Command.EXIT, 10);
@@ -116,6 +121,9 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
             }
             if (command == settingsCommand) {
                 controller.showSettings();
+            }
+            if (command == switchThemeCommand) {
+                Theme.switchTheme();
             }
             if (command == exitCommand) {
                 controller.exit();

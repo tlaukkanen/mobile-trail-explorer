@@ -132,5 +132,4 @@ public class PlacesCanvas extends BaseCanvas {
             waypointIndex++;
         }
     }
-
 }
