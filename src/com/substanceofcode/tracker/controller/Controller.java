@@ -192,6 +192,16 @@ public class Controller {
     private boolean useFileCache=false;
     
     /**
+     *  Enable navigation
+     */
+    private boolean navigationOn=false;
+    
+    /**
+     * Navigation Place
+     */
+    private Place navpnt;
+    
+    /**
      * Creates a new instance of Controller which performs the following:
      * <ul>
      * <li> Status = NOT_CONNECTED
@@ -1207,5 +1217,21 @@ public class Controller {
     public boolean getUseFileCache(){
         return useFileCache;
     }
-
+    
+    public boolean getNavigationStatus() {
+        return navigationOn;
+    }
+    
+    public void setNavigationStatus(boolean b) {
+        navigationOn=b;
+    }
+    
+    public void setNavigationPlace(Place input) {
+        navpnt = new Place("NAVPL", input.getLatitude(), input.getLongitude());
+        setNavigationStatus(true);
+    }
+    
+    public Place getNavigationPlace() {
+        return navpnt;
+    }
 }

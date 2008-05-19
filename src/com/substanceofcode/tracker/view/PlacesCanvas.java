@@ -116,9 +116,9 @@ public class PlacesCanvas extends BaseCanvas {
                 g.drawString(wp.getName(),1,currentLine,Graphics.TOP|Graphics.LEFT);
                 if(currentPosition!=null) {
                     double distance = currentPosition.getDistanceFromPosition(
-                        wp.getLatitude(), 
+                        wp.getLatitude(),
                         wp.getLongitude());
-                    LengthFormatter formatter = new LengthFormatter( controller.getSettings() );
+                    LengthFormatter formatter = new LengthFormatter(controller.getSettings());
                     String distanceString = formatter.getLengthString(distance, true);
                     g.drawString(
                         distanceString, 

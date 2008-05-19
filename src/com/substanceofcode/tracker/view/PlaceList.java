@@ -54,6 +54,7 @@ public class PlaceList extends List implements CommandListener {
     private final Command exportPlaceCommand;
     private final Command exportAllPlacesCommand;
     private final Command importPlacesCommand;
+    private final Command navigatePlaceCommand;
     
     private static final String TITLE = "Places";
     
@@ -74,6 +75,7 @@ public class PlaceList extends List implements CommandListener {
         this.addCommand(exportPlaceCommand = new Command("Export selected place", Command.ITEM, 5));
         this.addCommand(exportAllPlacesCommand = new Command("Export all places", Command.ITEM, 6));
         this.addCommand(importPlacesCommand = new Command("Import places", Command.ITEM, 7));
+        this.addCommand(navigatePlaceCommand = new Command("Navigate to place", Command.ITEM, 8));
         this.addCommand(backCommand = new Command("Back", Command.BACK, 10));
 
         setSelectCommand(editCommand);
@@ -160,6 +162,13 @@ public class PlaceList extends List implements CommandListener {
                     importPlaceScreen = new ImportPlaceScreen(this);
                 }
             	controller.setCurrentScreen(importPlaceScreen);
+        }
+        
+        if(command == navigatePlaceCommand) {
+            Place selectedPlace = getSelectedPlace();
+            if(selectedPlace != null) {
+                controller.setNavigationPlace(selectedPlace);
+            }
         }
     }
     

@@ -42,6 +42,7 @@ import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
+import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.MathUtil;
@@ -173,6 +174,11 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw current location with red dot */
             g.drawImage(redDotImage, midWidth + horizontalMovement, midHeight
                     + verticalMovement, Graphics.VCENTER | Graphics.HCENTER);
+            
+            /** Draw naviagation arrow */
+            if(controller.getNavigationStatus() == true) {
+                drawNavigationArrow(g);
+            }
 
             /** Draw compass */
             drawCompass(g);
@@ -602,6 +608,22 @@ public class TrailCanvas extends BaseCanvas {
                 getHeight() - MARGIN_BOTTOM - 2, Graphics.BOTTOM
                         | Graphics.LEFT);
     }
+    
+    /** Draw navigation arrow */
+    private void drawNavigationArrow(Graphics g) {
+        GpsPosition currentPosition = controller.getPosition();
+        
+        double distance = currentPosition.getDistanceFromPosition(
+                        controller.getNavigationPlace().getLatitude(), 
+                        controller.getNavigationPlace().getLongitude());
+        
+        LengthFormatter formatter = new LengthFormatter(controller.getSettings());
+        String distanceString = formatter.getLengthString(distance, true);
+
+        g.drawString("Distance: " + distanceString,
+                midWidth + horizontalMovement,
+                midHeight + verticalMovement, Graphics.TOP | Graphics.HCENTER);
+    }
 
     /** Draw status bar */
     private void drawStatusBar(Graphics g) {
@@ -763,7 +785,6 @@ public class TrailCanvas extends BaseCanvas {
 
 
             /** Draw any other gps info */
-
             if (gpgsa != null) {
                 g.drawString("FIX:", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
