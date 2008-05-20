@@ -33,7 +33,7 @@ public class Theme {
     private static int[][] colors = new int[][] {
         // Backgr.  Title     Trail     Text      Line      Subline   Error     Ghosttr.  Waypoint  Value     Subtitle
         { 0xffffff, 0x008000, 0xdd0000, 0x000000, 0x000000, 0xcccccc, 0xff0000, 0xaaaaaa, 0x00dd00, 0x0000ff, 0xaa2222 }, // Default theme
-        { 0x110066, 0xaaddaa, 0xdd9999, 0x9999cc, 0xddffff, 0xcccccc, 0xff4444, 0xaaaaaa, 0xaaffaa, 0xaaaadd, 0xccaaaa }  // Night theme
+        { 0x110066, 0xaaddaa, 0xdd9999, 0xaaaaee, 0xddffff, 0xcccccc, 0xff4444, 0xaaaaaa, 0xaaffaa, 0xaaaadd, 0xccaaaa }  // Night theme
     };
     
     public static int TYPE_BACKGROUND = 0;

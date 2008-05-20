@@ -47,6 +47,7 @@ public class ElevationCanvas extends BaseCanvas {
     private static final int X_SCALE_DISTANCE = 1;
     private static final int X_MIN_ZOOM = Integer.MAX_VALUE & X_SCALE_SCALE_MASK;
     private static final int X_MAX_ZOOM = 0;
+    private static final int MAX_ZOOM_ALT = 14000;
 
     private final int MARGIN = this.getWidth() > 200 ? 5 : 2;
 
@@ -394,9 +395,15 @@ public class ElevationCanvas extends BaseCanvas {
                 // Zoom in vertically
                 manualZoom = true;
                 if (maxAltitude - minAltitude > 20) {
-                    maxAltitude -= altitudeZoomIncrement;
-                    minAltitude += altitudeZoomIncrement;
-                    altitudeZoomIncrement /= 2;
+                    if((maxAltitude - altitudeZoomIncrement)<minAltitude) {
+                        maxAltitude -= altitudeZoomIncrement;
+                        minAltitude += altitudeZoomIncrement;
+                        altitudeZoomIncrement /= 2;
+                    } else {
+                        setMinMaxValues();
+                        altitudeZoomIncrement = 10;
+                    }                    
+                    
                 }
                 break;
 
@@ -409,10 +416,17 @@ public class ElevationCanvas extends BaseCanvas {
 
             case (KEY_NUM3):
                 // Zoom out vertically
-                manualZoom = true;
-                maxAltitude += altitudeZoomIncrement;
-                minAltitude -= altitudeZoomIncrement;
-                altitudeZoomIncrement *= 2;
+                if(maxAltitude<MAX_ZOOM_ALT) {
+                    manualZoom = true;
+                    maxAltitude += altitudeZoomIncrement;
+                    if(minAltitude>0) {
+                        minAltitude -= altitudeZoomIncrement;
+                    }
+                    if(minAltitude<0) {
+                        minAltitude = 0;
+                    }
+                    altitudeZoomIncrement *= 2;
+                }
                 break;
 
             case (KEY_NUM7):
