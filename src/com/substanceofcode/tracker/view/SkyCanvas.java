@@ -41,7 +41,7 @@ public class SkyCanvas extends BaseCanvas{
     private final Font smallRowFont;
     private int maxSNR = 60;
     private final double SNRKeyHeight = 0.95;
-    
+    private int maxSNRRecieved=0;
     
     /** Creates a new instance of SatelliteCanvas */
     public SkyCanvas() {
@@ -143,6 +143,7 @@ public class SkyCanvas extends BaseCanvas{
         
         g.setFont(smallRowFont);
         if(satellites!=null) {
+            maxSNRRecieved=0;
             int satelliteIndex = 0;
             Enumeration satelliteEnum = satellites.elements();
             int lineStartPos = smallRowFont.stringWidth("sat 000");
@@ -154,7 +155,8 @@ public class SkyCanvas extends BaseCanvas{
                 final int Az = satellite.getAzimuth();
                 final int Elev = satellite.getElevation();
                 final int snr = satellite.getSnr();
-
+                if(snr>maxSNRRecieved) maxSNRRecieved=snr;
+                
                 g.setColor(getSNRColor(snr));
                 double x = Math.sin(Az*Math.PI/180)*((90.0- (double)Elev)/90.0)*diameter/2 + (double)diameter/2;
                 double y = -Math.cos(Az*Math.PI/180)*((90.0-(double)Elev)/90.0)*diameter/2 + (double)diameter/2;               
@@ -192,6 +194,10 @@ public class SkyCanvas extends BaseCanvas{
         }
         if (gameKey == DOWN || keyCode == KEY_NUM8) {
             maxSNR-=10;
+            if(maxSNR<10) maxSNR=10;
+        }
+        if (gameKey == FIRE || keyCode == KEY_NUM5) {
+            maxSNR=maxSNRRecieved;
             if(maxSNR<10) maxSNR=10;
         }
     }
