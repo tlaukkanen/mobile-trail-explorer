@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 package com.substanceofcode.tracker.controller;
 
 import java.io.IOException;
@@ -93,47 +92,39 @@ public class Controller {
      * perhaps this class should be a proper singleton pattern?
      */
     private static Controller controller;
-
     /** Status codes */
     public final static int STATUS_STOPPED = 0;
     public final static int STATUS_RECORDING = 1;
     public final static int STATUS_NOTCONNECTED = 2;
-
+    public final static int STATUS_CONNECTING = 3;
     /**
      * Vector of devices found during a bluetooth search
      */
     private Vector devices;
-
     /**
      * Current status value
      */
     private int status;
-
     /**
      * GPS device being used
      */
     private Device gpsDevice;
-
     /**
      * GpsRecorder which will do the actual logging
      */
     private GpsRecorder recorder;
-
     /**
      * Current places in use XXX : mchr : shouldn't this be in the model?
      */
     private Vector places;
-
     /**
      * Settings object
      */
     private RecorderSettings settings;
-
     /**
      * Backlight maintenance object
      */
     private Backlight backlight;
-
     /**
      * Ghost Track
      */
@@ -159,48 +150,40 @@ public class Controller {
     private TrailActionsForm trailActionsForm;
     private SmsScreen smsScreen;
     private ImportTrailScreen importTrailScreen;
-
     /**
      * Display which we are drawing to
      */
     private Display display;
-
     /**
      * Array of defined screens XXX : mchr : It would be nice to instantiate the
      * contents here but there are dependancies in the Constructor
      */
     private BaseCanvas[] screens;
-
     /**
      * Index into mScreens of currently active screen
      */
     private int currentDisplayIndex = 0;
-
     /**
      * XXX : mchr : What error does this hold?
      */
     private String error;
-    
     /**
      *  Controls whether jsr179 is used or not
      */
-    private boolean useJsr179=false;
-
+    private boolean useJsr179 = false;
     /**
      *  Controls whether FileCache is used or not
      */
-    private boolean useFileCache=false;
-    
+    private boolean useFileCache = false;
     /**
      *  Enable navigation
      */
-    private boolean navigationOn=false;
-    
+    private boolean navigationOn = false;
     /**
      * Navigation Place
      */
     private Place navpnt;
-    
+
     /**
      * Creates a new instance of Controller which performs the following:
      * <ul>
@@ -219,24 +202,25 @@ public class Controller {
         this.display = display;
         status = STATUS_NOTCONNECTED;
         settings = new RecorderSettings(midlet);
-        
+
         // Do mandatory initializations
-        
+
         // Initialize Logger, as it must have an instance of RecorderSettings on
         // it's first call.
         Logger.init(settings);
-        
+
     }
-    
+
     public void initialize() {
-        
+
         // logger = Logger.getLogger(settings);
         // XXX : mchr : Dependency from Logger to getTrailCanvas prevents this
         // array definition from being any higher - we have to tell the Logger
         // class about the RecorderSettings which in turn depend on midlet
-        screens = new BaseCanvas[] { getTrailCanvas(), getElevationCanvas(),
-                new InformationCanvas(), new PlacesCanvas(),
-                new SatelliteCanvas(), new SkyCanvas() };
+        screens = new BaseCanvas[]{getTrailCanvas(), getElevationCanvas(),
+                    new InformationCanvas(), new PlacesCanvas(),
+                    new SatelliteCanvas(), new SkyCanvas()
+                };
         String gpsAddress = settings.getGpsDeviceConnectionString();
 
         recorder = new GpsRecorder(this);
@@ -245,8 +229,7 @@ public class Controller {
             try {
                 gpsDevice = GpsDeviceFactory.createDevice(gpsAddress, "GPS");
             } catch (java.lang.SecurityException se) {
-                Logger
-                        .warn("GpsDevice could not be created because permission was not granted.");
+                Logger.warn("GpsDevice could not be created because permission was not granted.");
             }
 
         } else {
@@ -254,7 +237,6 @@ public class Controller {
             // Causes exception since getcurrentScreen returns null at this
             // point in time.
             // showError("Please choose a bluetooth device from Settings->GPS");
-
         }
 
         /** Places */
@@ -270,7 +252,7 @@ public class Controller {
         if (settings.getBacklightOn()) {
             backlight.backlightOn();
         }
-        useJsr179=settings.getJsr179();
+        useJsr179 = settings.getJsr179();
     }
 
     /**
@@ -311,7 +293,7 @@ public class Controller {
 
     public void repaintDisplay() {
         Displayable disp = display.getCurrent();
-        if(  disp instanceof BaseCanvas ) {
+        if (disp instanceof BaseCanvas) {
             BaseCanvas canvas = (BaseCanvas) disp;
             canvas.repaint();
         }
@@ -323,36 +305,34 @@ public class Controller {
         // So really we only want to do one of these searches, ie use the
         // location api if
         // it is present, search bluetooth devices if it isn't
-        if(useJsr179 && GpsUtilities.checkJsr179IsPresent())
-        {
+        if (useJsr179 && GpsUtilities.checkJsr179IsPresent()) {
             Logger.debug("Using JSR179 for Location services");
             searchDevicesByJsr();
-        }
-        else{
+        } else {
             Logger.debug("Using bluetooth for Location services");
             searchBTDevices();
         }
     }
 
-
     /**
      * See if there are any supported JSRs that provide a location api ie Jsr179
      */
     public void searchDevicesByJsr() {
-    
+
         if (devices == null) {
             devices = new Vector();
-        }else{
+        } else {
             devices.removeAllElements();
         }
 
 
-            if (GpsUtilities.checkJsr179IsPresent()) {
-                Device dev =  Jsr179Device.getDevice("internal",
-                        "Internal GPS (Jsr 179)");
-                devices.addElement(dev);
-            }
+        if (GpsUtilities.checkJsr179IsPresent()) {
+            Device dev = Jsr179Device.getDevice("internal",
+                    "Internal GPS (Jsr 179)");
+            devices.addElement(dev);
+        }
     }
+
     /**
      * Search for all available bluetooth devices
      */
@@ -375,16 +355,15 @@ public class Controller {
             }
             System.out.println("Getting devices.");
             //addDevices(devices, bt.getDevices());
-            devices=bt.getDevices();
+            devices = bt.getDevices();
         } catch (Exception ex) {
-            System.err.println("Error in Controller.searchDevices: "
-                    + ex.toString());
+            System.err.println("Error in Controller.searchDevices: " + ex.toString());
             ex.printStackTrace();
         }
     }
 
     public void showWebRecordingSettings() {
-        display.setCurrent( new WebRecordingSettingsForm( this ) );
+        display.setCurrent(new WebRecordingSettingsForm(this));
     }
 
     /**
@@ -397,19 +376,19 @@ public class Controller {
      *                returns Vector A vector containing the sum of src and dest
      */
     private Vector addDevices(Vector dest, Vector src) {
-        
+
         if (dest == null) {
             dest = new Vector();
             Logger.debug("dest was null, creating.");
-        }      
-     
-        int endIdx = dest.size() - 1;      
-        endIdx=(endIdx<0)?0:endIdx;
-      
-        for (int i = 0; i < src.size(); i++) {     
+        }
+
+        int endIdx = dest.size() - 1;
+        endIdx = (endIdx < 0) ? 0 : endIdx;
+
+        for (int i = 0; i < src.size(); i++) {
             dest.insertElementAt(src.elementAt(i), endIdx + i);
         }
-     
+
         return dest;
     }
 
@@ -468,10 +447,33 @@ public class Controller {
             case STATUS_NOTCONNECTED:
                 statusText = "NOT CONNECTED";
                 break;
+            case STATUS_CONNECTING:
+                statusText = "CONNECTING";
+                break;
             default:
                 statusText = "UNKNOWN";
         }
         return statusText;
+    }
+
+    /** Connect to a GPS device */
+    public void connectToGpsDevice() {
+        if(gpsDevice==null) {
+            return;
+        }
+        new Thread() {
+            public void run() {
+                try {
+                    if (gpsDevice instanceof BluetoothDevice) {
+                        ((BluetoothDevice) gpsDevice).connect();
+                        status = STATUS_STOPPED;
+                    }
+                } catch (Exception ex) {
+                    Logger.error("Error while connection to GPS: " + ex.toString());
+                    showError("Error while connection to GPS: " + ex.toString());
+                }
+            }
+        }.start();
     }
 
     /** Method for starting and stopping the recording */
@@ -486,30 +488,22 @@ public class Controller {
             if (gpsDevice == null) {
                 showError("Please select a GPS device first");
             } else {
-                // Connect to a GPS device
-                try {
-
-                    if (gpsDevice instanceof BluetoothDevice) {
-                        ((BluetoothDevice) gpsDevice).connect();
-                    }
-                    recorder.startRecording();
-                    status = STATUS_RECORDING;
-                } catch (Exception ex) {
-                    Logger.error("Error while connection to GPS: "
-                            + ex.toString());
-                    showError("Error while connection to GPS: " + ex.toString());
+                if( status==STATUS_NOTCONNECTED ) {
+                    connectToGpsDevice();
                 }
+                recorder.startRecording();
+                status = STATUS_RECORDING;
             }
-        }
-        // --------------------------------------------------------------------------
+        } // --------------------------------------------------------------------------
         // Stop Recording
         // --------------------------------------------------------------------------
         else {
             Logger.info("Stopping Recording");
             // Stop recording the track
             recorder.stopRecording();
+            status = STATUS_STOPPED;
             // Disconnect from GPS device
-            this.disconnect();
+            //this.disconnect();
             // Show trail actions screen
             // XXX : HACK(disabled)
             // Track lTest = new Track();
@@ -520,28 +514,24 @@ public class Controller {
             }
             display.setCurrent(trailActionsForm);
         }
-
     }
 
     /**
      * Disconnect from the GPS device. This will change our state ->
-     * STATUS_STOPPED
+     * STATUS_NOTCONNECTED
      */
     private void disconnect() {
         // First, we have to set the status to "STOPPED", because otherwise
         // the GpsDevice thread tries to reconnect when gpsDevice.disconnect()
         // is called
-        status = STATUS_STOPPED;
-
+        status = STATUS_NOTCONNECTED;
         try {
-
             // Disconnect from bluetooth GPS
             if (gpsDevice instanceof BluetoothDevice) {
                 ((BluetoothDevice) gpsDevice).disconnect();
             }
         } catch (Exception e) {
-            showError("Error while disconnecting from GPS device: "
-                    + e.toString());
+            showError("Error while disconnecting from GPS device: " + e.toString());
         }
     }
 
@@ -563,6 +553,7 @@ public class Controller {
         places.addElement(waypoint);
 
         savePlaces(); // Save waypoints immediately to RMS
+
     }
 
     /**
@@ -586,14 +577,12 @@ public class Controller {
         } catch (IllegalStateException e) {
             if (xiListener != null) {
                 xiListener.notifyError(
-                        "RMS : Can not save \"Empty\" Trail. must record at "
-                                + "least 1 point", null);
+                        "RMS : Can not save \"Empty\" Trail. must record at " + "least 1 point", null);
             }
         } catch (FileIOException e) {
             if (xiListener != null) {
                 xiListener.notifyError(
-                        "RMS : An Exception was thrown when attempting to save "
-                                + "the Trail to the RMS!", e);
+                        "RMS : An Exception was thrown when attempting to save " + "the Trail to the RMS!", e);
             }
         }
     }
@@ -624,7 +613,7 @@ public class Controller {
      */
     public void editPlace(Place wp) {
         Logger.debug("Editing waypoint");
-        if(wp==null) {
+        if (wp == null) {
             showError("Selected waypoint is null");
             return;
         }
@@ -670,20 +659,19 @@ public class Controller {
         if (gpsDevice == null) {
             return null;
         }
-       //  Logger.debug("Controller getPosition called");
+        //  Logger.debug("Controller getPosition called");
         return ((GpsDevice) gpsDevice).getPosition();
     }
 
     /**
      * @return Current GpsGPGSA data object
      */
-  /*  public synchronized GpsGPGSA getGPGSA() {
-        if (gpsDevice == null) {
-            return null;
-        }
-        return ((GpsDevice) gpsDevice).getGPGSA();
+    /*  public synchronized GpsGPGSA getGPGSA() {
+    if (gpsDevice == null) {
+    return null;
+    }
+    return ((GpsDevice) gpsDevice).getGPGSA();
     }*/
-
     /**
      * Exit application
      * <ul>
@@ -745,6 +733,7 @@ public class Controller {
             try {
                 initialPosition = this.recorder.getPositionFromRMS();
             } catch (Exception anyException) {/* discard */
+
             }
             trailCanvas = new TrailCanvas(initialPosition);
         }
@@ -763,6 +752,7 @@ public class Controller {
             try {
                 initialPosition = this.recorder.getPositionFromRMS();
             } catch (Exception anyException) { /* discard */
+
             }
             elevationCanvas = new ElevationCanvas(initialPosition);
         }
@@ -776,7 +766,7 @@ public class Controller {
 
     /** Show export settings */
     public void showExportSettings(final Displayable displayable) {
-        
+
         /** 
          * Trying to avoid deadlock by displaying the FileChooser in another
          * thread. Otherwise you'll be getting the following warning:
@@ -785,6 +775,7 @@ public class Controller {
          *     commandAction() handler.
          */
         Thread t = new Thread() {
+
             public void run() {
                 super.run();
                 display.setCurrent(getFileChooser(displayable));
@@ -800,18 +791,19 @@ public class Controller {
         }
         return exportSettingsForm;
     }
-   
+
     /** Show export the file chooser */
     private FileChooser getFileChooser(Displayable displayable) {
         filechooser = new FileChooser(this, settings.getExportFolder(), false, displayable);
 
         return filechooser;
     }
+
     public void showImportTrailsScreen(Displayable displayable) {
-         if(importTrailScreen == null){
-             importTrailScreen = new ImportTrailScreen(displayable);
-         }
-         controller.setCurrentScreen(importTrailScreen);
+        if (importTrailScreen == null) {
+            importTrailScreen = new ImportTrailScreen(displayable);
+        }
+        controller.setCurrentScreen(importTrailScreen);
     }
 
     /** Set about screens as current display */
@@ -922,8 +914,7 @@ public class Controller {
         try {
             display.setCurrent(new TrailDetailsScreen(this, trailName));
         } catch (IOException e) {
-            showError("An error occured when trying to retrieve the trail from the RMS!"
-                    + e.toString());
+            showError("An error occured when trying to retrieve the trail from the RMS!" + e.toString());
         }
     }
 
@@ -950,19 +941,18 @@ public class Controller {
     public Alert showAlert(final String message, final int seconds,
             AlertType type) {
         final Alert alert = new Alert("Error", message, null, AlertType.ERROR);
-        alert
-                .setTimeout(seconds == 0 || seconds == Alert.FOREVER ? Alert.FOREVER
-                        : seconds * 1000);
+        alert.setTimeout(seconds == 0 || seconds == Alert.FOREVER ? Alert.FOREVER
+                : seconds * 1000);
         // Put it into a thread as 2 calls to this method in quick succession
         // would otherwise fail... miserably.
         final Thread t = new Thread(new Runnable() {
+
             public void run() {
                 try {
                     Display.getDisplay(midlet).setCurrent(alert);
                 } catch (IllegalArgumentException e) {
                     // do nothing just log
-                    Logger.warn("IllegalArgumetException occured "
-                            + "in showAlert");
+                    Logger.warn("IllegalArgumetException occured " + "in showAlert");
                 }
             }
         });
@@ -997,6 +987,7 @@ public class Controller {
         // Put it into a thread as 2 calls to this method in quick succession
         // would otherwise fail... miserably.
         final Thread t = new Thread(new Runnable() {
+
             public void run() {
                 Display.getDisplay(midlet).setCurrent(alert);
             }
@@ -1018,6 +1009,7 @@ public class Controller {
             }
         }
         savePlaces(); // Save waypoints immediately to RMS
+
     }
 
     /** Save waypoints to persistent storage */
@@ -1031,12 +1023,12 @@ public class Controller {
     public void removePlace(Place wp) {
         places.removeElement(wp);
     }
-    
+
     /** Remove all waypoints */
     public void removeAllPlaces() {
         places.removeAllElements();
     }
-    
+
     /**
      * @param place         Place object to display
      * @param placeName     Name of waypoint
@@ -1192,45 +1184,47 @@ public class Controller {
         } catch (Exception ex) {
             Logger.error(ex.toString());
             showError(ex.getMessage());
-            // XXX : mchr : Do something more sensible with some exceptions?
-            // or perhaps have a test write feature when setting up path to
-            // try and avoid exceptions
+        // XXX : mchr : Do something more sensible with some exceptions?
+        // or perhaps have a test write feature when setting up path to
+        // try and avoid exceptions
         }
     }
 
     public int getNumAlphaLevels() {
         return display.numAlphaLevels();
     }
-    
-    public void setUseJsr179(boolean b){
-        useJsr179=b;
+
+    public void setUseJsr179(boolean b) {
+        useJsr179 = b;
         settings.setJsr179(useJsr179);
     }
-    public boolean getUseJsr179(){
+
+    public boolean getUseJsr179() {
         return settings.getJsr179();
     }
-    
-    public void setUseFileCache(boolean b){
-        useFileCache=b;
+
+    public void setUseFileCache(boolean b) {
+        useFileCache = b;
         settings.setFileCache(useFileCache);
     }
-    public boolean getUseFileCache(){
+
+    public boolean getUseFileCache() {
         return useFileCache;
     }
-    
+
     public boolean getNavigationStatus() {
         return navigationOn;
     }
-    
+
     public void setNavigationStatus(boolean b) {
-        navigationOn=b;
+        navigationOn = b;
     }
-    
+
     public void setNavigationPlace(Place input) {
         navpnt = new Place("NAVPL", input.getLatitude(), input.getLongitude());
         setNavigationStatus(true);
     }
-    
+
     public Place getNavigationPlace() {
         return navpnt;
     }

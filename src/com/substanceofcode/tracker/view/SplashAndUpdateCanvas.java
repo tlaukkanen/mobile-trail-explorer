@@ -185,7 +185,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
                 Thread.sleep(50);
             }catch (InterruptedException ex) {
                 ex.printStackTrace();
-            }   
+            }
         }
         // Make sure the SplashAndUpdateCanvas is being displayed.
         if(this.isShown()){
@@ -197,7 +197,8 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
             if (settings.getStreamingStarted()) {
                 controller.showStreamRecovery();
             } else {
-                Controller.getController().showTrail();
+                controller.connectToGpsDevice();
+                controller.showTrail();
             }
         }
     }
