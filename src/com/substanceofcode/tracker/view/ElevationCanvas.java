@@ -104,7 +104,6 @@ public class ElevationCanvas extends BaseCanvas {
         } catch (NullPointerException e) {
             // ignore.
         }
-
     }
 
     protected void paint(Graphics g) {

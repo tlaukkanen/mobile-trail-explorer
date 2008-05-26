@@ -70,9 +70,17 @@ public final class AboutScreen extends Canvas {
             "www.substanceofcode.com" };
 
     private static final String[] trailScreenHelpText = {
-            "Pan the Trail Screen using either the arrow keys, or", "2 for UP",
-            "4 for LEFT", "5 for CENTRE", "6 for RIGHT", "8 for DOWN", "",
-            "1 is Zoom In", "3 is Zoom Out","","Use 7 for switching between Day of Night Theme." };
+            "Pan the Trail Screen using either the arrow keys, or",
+            "2 for UP",
+            "4 for LEFT",
+            "5 for CENTRE",
+            "6 for RIGHT",
+            "8 for DOWN",
+            "",
+            "1 is Zoom In",
+            "3 is Zoom Out",
+            "",
+            "Use 7 for switching between Day of Night Theme." };
 
     private static final String[] elevationScreenHelpText = {
             "Scroll the Elevation Diagram LEFT or RIGHT using the 4 and 6 keys respectivly.",
@@ -93,7 +101,9 @@ public final class AboutScreen extends Canvas {
             "",
             "The number shown next to Trk # is the number of sattelites currently being used for the GPS fix",
             "",
-            "Increase or decrease the Signal SNR range for the display by pressing the 2 and 8 keys"};
+            "Increase or decrease the Signal SNR range for the display by pressing the 2 and 8 keys",
+            "",
+            "Press 5 for automatic SNR range selection" };
     
     
     private static final String[] helpText = {
