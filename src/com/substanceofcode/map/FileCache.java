@@ -196,7 +196,7 @@ public class FileCache implements TileCache, Runnable {
                     fileProcessQueue.removeElementAt(0);
 
                    //Only serialize tile we know are not already serialized...
-                  if(checkCache(t.cacheKey)){
+                  if(!checkCache(t.cacheKey)){
                     //The first tile will not have the correct offset if the file is
                     //not empty, so we should give it the offset
                     if (firstTile) {
@@ -314,10 +314,10 @@ public class FileCache implements TileCache, Runnable {
 
     public boolean checkCache(String name) {
         if (availableTileList.containsKey(name)) {
-         //   Logger.debug("Found tile in filecache: " + name);
+            Logger.debug("Found tile in filecache: " + name);
             return true;
         } else {
-           // Logger.debug("Didn't find tile in filecache: " + name);
+            Logger.debug("Didn't find tile in filecache: " + name);
             return false;
         }
     }
