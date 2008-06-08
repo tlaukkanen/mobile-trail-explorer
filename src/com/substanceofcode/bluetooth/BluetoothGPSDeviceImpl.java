@@ -144,8 +144,7 @@ public class BluetoothGPSDeviceImpl
                 // This happens quite often on my N80, and it spells death for
                 // the current trail
                 //
-                catch (IOException ie) {
-                    Logger.debug("4");
+                catch (IOException ie) {                    
                     final Controller controller = Controller.getController();
                     boolean isRecording = (controller.getStatusCode() != Controller.STATUS_STOPPED);
                     if (isRecording == false) {
