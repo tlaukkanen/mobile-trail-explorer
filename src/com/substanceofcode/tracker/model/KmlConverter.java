@@ -1,7 +1,7 @@
 /*
  * KmlConverter.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -196,7 +196,8 @@ public class KmlConverter extends TrackConverter {
         markerString.append("<Folder>\r\n");
         markerString.append("<name>Markers</name>\r\n");
         while (markerEnum.hasMoreElements() == true) {
-            GpsPosition pos = (GpsPosition) markerEnum.nextElement();
+            Marker marker = (Marker) markerEnum.nextElement();
+            GpsPosition pos = marker.getPosition();
             String units;
             String speed;
             if (useKilometers == true) {
@@ -209,11 +210,14 @@ public class KmlConverter extends TrackConverter {
                 units = " mph";
             }
 
-            String name = "";
             String timeStamp = DateTimeUtil.convertToTimeStamp(pos.date);
-            name = timeStamp + ", " + speed + units;
-            markerString.append("<Placemark>\r\n");
-            markerString.append("<name>" + name + "</name>\r\n");
+            String name = marker.getName();
+            String description = timeStamp + ", " + speed + units;
+            markerString.append("<Placemark>\r\n")
+                    .append("<name>" + name + "</name>\r\n")
+                    .append("<description>")
+                    .append(description)
+                    .append("</description>\r\n");
             markerString.append("<IconStyle>\r\n");
             markerString.append("<Icon>\r\n");
             markerString

@@ -45,11 +45,13 @@ import com.substanceofcode.gpsdevice.GpsUtilities;
 import com.substanceofcode.gpsdevice.Jsr179Device;
 import com.substanceofcode.gpsdevice.MockGpsDevice;
 import com.substanceofcode.tracker.model.AlertHandler;
+import com.substanceofcode.tracker.model.AudioShortcutAction;
 import com.substanceofcode.tracker.model.Backlight;
 import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.tracker.model.ShortcutAction;
 import com.substanceofcode.tracker.view.AboutScreen;
 import com.substanceofcode.tracker.view.BaseCanvas;
 import com.substanceofcode.tracker.view.DevelopmentMenu;
@@ -209,6 +211,12 @@ public class Controller {
         // it's first call.
         Logger.init(settings);
 
+    }
+
+    public void executeStarShortcut() {
+        // TODO: Get shortcut from settings
+        ShortcutAction action = new AudioShortcutAction();
+        action.execute();        
     }
 
     public void initialize() {

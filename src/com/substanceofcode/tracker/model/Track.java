@@ -327,8 +327,8 @@ public class Track implements Serializable {
      * @param markerNumber ,
      *                the index of the Marker to return
      */
-    public GpsPosition getMarker(int markerNumber) {
-        return (GpsPosition) trackMarkers.elementAt(markerNumber);
+    public Marker getMarker(int markerNumber) {
+        return (Marker) trackMarkers.elementAt(markerNumber);
     }
 
     /** @return the Trackss distance in kilometers */
@@ -426,8 +426,10 @@ public class Track implements Serializable {
         }
     }
 
-    /** Add new marker */
-    public void addMarker(GpsPosition marker) {
+    /** Add new marker
+     * @param marker    Marker on a trail.
+     */
+    public void addMarker(Marker marker) {
         trackMarkers.addElement(marker);
 
         // ----------------------------------------------------------------------
@@ -706,7 +708,7 @@ public class Track implements Serializable {
         final int numMarkers = dis.readInt();
         trackMarkers = new Vector(numMarkers);
         for (int i = 0; i < numMarkers; i++) {
-            GpsPosition marker = new GpsPosition(dis);
+            Marker marker = new Marker(dis);
             this.addMarker(marker);
         }
         distance = dis.readDouble();
@@ -726,4 +728,5 @@ public class Track implements Serializable {
     public String getMimeType() {
         return MIME_TYPE;
     }
+
 }

@@ -964,7 +964,7 @@ public class TrailCanvas extends BaseCanvas {
                 Theme.switchTheme();
                 break;       
                 
-            case (KEY_STAR):
+            //case (KEY_STAR):
             case (KEY_POUND):
                 Logger.debug("WaypointList getPosition called");
                 GpsPosition lp = controller.getPosition();

@@ -62,6 +62,11 @@ public class GpxConverter extends TrackConverter {
         // Create places
         gpx.append(createPlaceMarks(places));
 
+        // Create markers
+        if(includeMarkers) {
+            gpx.append(createMarkers(track));
+        }
+        
         // Create trail
         addTrailStart(gpx);
 
@@ -103,8 +108,7 @@ public class GpxConverter extends TrackConverter {
      */
     public static void addHeader(StringBuffer gpx) {
         gpx.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-        gpx
-                .append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\" creator=\"Mobile Trail Explorer\">\r\n");
+        gpx.append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\" creator=\"Mobile Trail Explorer\">\r\n");
     }
 
     /**
@@ -174,6 +178,30 @@ public class GpxConverter extends TrackConverter {
         return String.valueOf(((int) (degrees * 1000000)) / 1000000.0);
     }
 
+    /** Export markers to GPX format */
+    private String createMarkers(Track track) {
+        StringBuffer gpx = new StringBuffer();
+
+        int markerCount = track.getMarkerCount();
+        for(int i=0; i<markerCount; i++) {
+            Marker marker = track.getMarker(i);
+            GpsPosition pos = marker.getPosition();
+            String lat = formatDegrees(pos.latitude);
+            String lon = formatDegrees(pos.longitude);
+            String name = marker.getName();
+            String link = marker.getReference();
+
+            gpx.append("<wpt lat=\"").append(lat).append("\" lon=\"").append(
+                    lon).append("\">\r\n");
+            gpx.append(" <name>").append(name).append("</name>\r\n");
+            gpx.append(" <sym>Marker</sym>\r\n");
+            gpx.append(" <link href=\"").append(link).append("\" />");
+            gpx.append("</wpt>\r\n");
+        }
+
+        return gpx.toString();
+    }    
+    
     /** Export waypoints to GPX format */
     private String createPlaceMarks(Vector waypoints) {
         if (waypoints == null) {

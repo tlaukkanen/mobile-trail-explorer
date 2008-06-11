@@ -422,7 +422,11 @@ public class GpsRecorder {
                         recordedTrack.addPosition(currentPosition);
                         if (intervalMarkerStep > 0 && recordedCount > 0
                                 && recordedCount % intervalMarkerStep == 0) {
-                            recordedTrack.addMarker(currentPosition);
+                            Marker marker = new Marker(
+                                    currentPosition, 
+                                    "",
+                                    "");
+                            recordedTrack.addMarker( marker );
                         }
                         lastRecordedPosition = currentPosition;
                         recordedCount++;

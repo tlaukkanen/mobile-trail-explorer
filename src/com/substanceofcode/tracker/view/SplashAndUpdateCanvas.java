@@ -31,6 +31,7 @@ import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.tracker.TrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.Marker;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.ImageUtil;
@@ -280,7 +281,8 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
 
         final int numMarkers = dis.readInt();
         for (int i = 0; i < numMarkers; i++) {
-            track.addMarker( read1_6position(dis)  );
+            Marker marker = new Marker(read1_6position(dis), "", "");
+            track.addMarker( marker );
         }
         
         dis.readDouble(); // Distance, ignore will be recalculated automatically.

@@ -139,7 +139,11 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         /** Handle 0 key press. In some phones the 0 key defaults to space */
         if(keyCode==Canvas.KEY_NUM0 || keyCode==' ') {
             controller.switchDisplay();
-        } 
+        }
+        /** Handle * key press (shortcutkey) */
+        if(keyCode==Canvas.KEY_STAR) {
+            controller.executeStarShortcut();
+        }
 
     }
 }
