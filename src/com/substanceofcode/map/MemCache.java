@@ -17,7 +17,7 @@ import com.substanceofcode.tracker.view.Logger;
  */
 public class MemCache implements TileCache {
 
-    private static int MAXSIZE = 50;// Arbitrary value, I can fit Max 120 tiles
+    private static int MAXSIZE = 18;// Arbitrary value, I can fit Max 120 tiles
                                     // on my device (N81)
     private Vector vec = null;
     protected String threadName;
@@ -113,7 +113,7 @@ public class MemCache implements TileCache {
 
 
             vec.addElement(tile);
-            Logger.debug(threadName + " Storing tile to memcache 2, size="
+            Logger.debug(threadName + " Storing tile to memcache, size="
                     + vec.size());
         }
     }
