@@ -1,6 +1,7 @@
 package com.substanceofcode.gpsdevice;
 
 import java.io.IOException;
+import java.util.Date;
 
 import com.substanceofcode.bluetooth.MockTrack;
 import com.substanceofcode.gps.GpsPosition;
@@ -21,6 +22,12 @@ public class MockGpsDevice extends GpsDeviceImpl {
     private static Track mt;
    
     private int mtMark=0;
+    
+    private GpsPosition lastPosition;
+    
+    private long lastCallTime; 
+    
+    private final long INTERVAL=1000;
 
     public synchronized void connect() throws IOException {
     }
@@ -33,8 +40,6 @@ public class MockGpsDevice extends GpsDeviceImpl {
         this.address = address;
         this.alias = alias;  
     }
-
-
 
     public static Track getTrack() {
         return mt;
@@ -56,18 +61,24 @@ public class MockGpsDevice extends GpsDeviceImpl {
     }
 
     public GpsPosition getPosition() {
-       // Logger.getLogger().log("MockGpsDevice getPosition called",Logger.DEBUG);
+        
         if (mt==null){
             init();
         }
-        return getPositionFromMockTrack();
         
-        
+     
+        long time=System.currentTimeMillis();
+        if (time-lastCallTime<INTERVAL){
+            return lastPosition;
+        }
+        else{
+            GpsPosition gp =getPositionFromMockTrack();
+            lastCallTime=time;
+            lastPosition=gp;
+            return gp;
+        }        
     }
-
-   
-
-    
+  
     private GpsPosition getPositionFromMockTrack() {
        // Logger.getLogger().log("MockGpsDevice getPositionFromMockTrack called",Logger.DEBUG);
         GpsPosition gps=null;
@@ -90,6 +101,5 @@ public class MockGpsDevice extends GpsDeviceImpl {
     public String getAlias() {
         return alias;
     }
-
 
 }
