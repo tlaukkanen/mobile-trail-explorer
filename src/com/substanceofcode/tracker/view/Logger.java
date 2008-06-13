@@ -110,6 +110,9 @@ public class Logger extends Form implements CommandListener {
 
     private FileConnection logConnection;
 
+    // Assume first that file writing is possible
+    private boolean fileWritingPossible = true;
+
     public static void init(RecorderSettings settings) {
         if (logger == null) {
             logger = new Logger(settings);
@@ -135,15 +138,15 @@ public class Logger extends Form implements CommandListener {
     }
 
     public static void info(String message) {
-        logger.log(message, DEBUG);
+        logger.log(message, INFO);
     }
 
     public static void warn(String message) {
-        logger.log(message, DEBUG);
+        logger.log(message, WARN);
     }
 
     public static void error(String message) {
-        logger.log(message, DEBUG);
+        logger.log(message, ERROR);
     }
 
     public static void fatal(String message) {
@@ -161,7 +164,7 @@ public class Logger extends Form implements CommandListener {
         this.addCommand(refreshCommand = new Command("Refresh", Command.OK, 1));
         this.addCommand(backCommand = new Command("Back", Command.BACK, 2));
         this
-                .addCommand(offCommand = new Command("Loggin Off",
+                .addCommand(offCommand = new Command("Logging Off",
                         Command.ITEM, 3));
         this.addCommand(fatalCommand = new Command("Fatal", Command.ITEM, 4));
         this.addCommand(errorCommand = new Command("Error++", Command.ITEM, 5));
@@ -333,6 +336,11 @@ public class Logger extends Form implements CommandListener {
      * @return
      */
     public void writeToFileSystem(String message) {
+	    // If file writing isn't possible give up immediately
+	    if (!fileWritingPossible) {
+		    return;
+	    }
+	    
         String fullPath = "";
         String exportFolder = Controller.getController().getSettings()
                 .getExportFolder();
@@ -359,12 +367,14 @@ public class Logger extends Form implements CommandListener {
                     logConnection.create();
                 }
                 }catch(IOException e){
+                	fileWritingPossible = false;
                     Logger.debug("WriteLog failed to create connection:"+fullPath+":"+e.getMessage());
+                	logConnection = null;
                 }
             }
 
-            if (logConnection != null && streamOut == null) {
-                // open the steam at the end so we can append to the file
+            if (logConnection != null && streamOut == null) {  // XXX: streamOut is always null here?
+                // open the stream at the end so we can append to the file
                 System.out.println("Filesize:" + logConnection.fileSize());
                 OutputStream x = logConnection.openOutputStream(logConnection.fileSize());
                 streamOut = new DataOutputStream(x); 
@@ -376,11 +386,13 @@ public class Logger extends Form implements CommandListener {
                 streamOut.close();
                 streamOut = null;
             } else {
+        	    fileWritingPossible = false;
                 Logger.debug("Logger: output stream is null");
             }
     
 
         } catch (IOException e) {
+        	fileWritingPossible = false;
             Logger.debug("Logger: error:" + e.getMessage());
             e.printStackTrace();
         }
