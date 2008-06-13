@@ -155,7 +155,7 @@ public class TileDownloader implements Runnable {
                 {       if(tileQueue.size()==0){
                             Logger.debug(x+"-"+y+"-"+z+" Downloaded, but not yet saved");                            
                         }else{
-                    Logger.debug(x+"-"+y+"-"+z+" already queued");
+                    //Logger.debug(x+"-"+y+"-"+z+" already queued");
                         }
                 }
             }

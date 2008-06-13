@@ -317,7 +317,7 @@ public class FileCache implements TileCache, Runnable {
             Logger.debug("Found tile in filecache: " + name);
             return true;
         } else {
-            Logger.debug("Didn't find tile in filecache: " + name);
+          //  Logger.debug("Didn't find tile in filecache: " + name);
             return false;
         }
     }
