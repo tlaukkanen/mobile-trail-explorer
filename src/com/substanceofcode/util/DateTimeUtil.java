@@ -84,7 +84,11 @@ public abstract class DateTimeUtil {
         if (minute.length() == 1) {
             minute = "0" + minute;
         }
-        String dateStamp = year + month + day + "_" + hour + minute;
+        String second = String.valueOf(cal.get(Calendar.SECOND));
+        if (second.length() == 1) {
+            second = "0" + second;
+        }        
+        String dateStamp = year + month + day + "_" + hour + minute + second;
         return dateStamp;
     }
     
