@@ -87,6 +87,9 @@ public final class MapProviderManager {
         return selectedProvider.getStoreName();
     }
 
+    public static int validateZoomLevel(int z){
+        return selectedProvider.validateZoomLevel(z);
+    }
     
     
     public static String makeUrl(int x, int y ,int z){

@@ -109,5 +109,14 @@ public abstract class AbstractMapProvider implements MapProvider {
         return z;
     }
     
+    /**
+     * Default implementation
+     * @param z
+     * @return
+     */
+    public int validateZoomLevel(int z){
+        return z;
+    }
+    
 }
 

@@ -12,4 +12,5 @@ public interface MapProvider {
     public String getCacheDir();
     public String getUrlFormat();
     public String makeurl(int x, int y, int z);
+    public int validateZoomLevel(int z);
 }

@@ -8,7 +8,8 @@ import com.substanceofcode.tracker.view.Logger;
  *
  */
 public class TahMapProvider extends AbstractMapProvider {
-
+    private final int maxZoomLevel=17;
+    private final int minZoomLevel=0;
     
     public TahMapProvider(){
         Logger.debug("Constructing TahMapProvider");
@@ -17,4 +18,14 @@ public class TahMapProvider extends AbstractMapProvider {
         cacheDir=""; //Not used any more, now we have the FileCache
         displayString="Draw T@H Maps";
     }
+    
+    public int validateZoomLevel(int z){
+        if(z>maxZoomLevel)
+            z=maxZoomLevel;
+        if(z<minZoomLevel)
+            z=minZoomLevel;
+        
+        return z;
+    }
+    
 }

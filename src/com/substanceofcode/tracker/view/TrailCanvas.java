@@ -36,6 +36,8 @@ import javax.microedition.lcdui.game.Sprite;
 import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.map.MapLocator;
+import com.substanceofcode.map.MapProvider;
+import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.map.TileDownloader;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Place;
@@ -943,6 +945,10 @@ public class TrailCanvas extends BaseCanvas {
                 if (zoom < MAX_ZOOM) {
                     // Zoom in
                     zoom++;
+                    //if we are drawing maps...
+                    if(controller.getSettings().getDrawMap() != RecorderSettings.DRAW_MAP_NONE){
+                        zoom=MapProviderManager.validateZoomLevel(zoom);
+                    }
                     // Calculate last position so that it recalculates the
                     // canvas positions.
                     setLastPosition(lastPosition);
