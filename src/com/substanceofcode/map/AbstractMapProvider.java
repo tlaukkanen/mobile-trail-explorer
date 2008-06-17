@@ -38,8 +38,14 @@ public abstract class AbstractMapProvider implements MapProvider {
  
     
     /**
-     * Constructs the url request for the given tile. Override this if the format is significantly different.
-     * 
+     * Constructs the url request for the given tile. 
+     * Urls should be defined in extending classes by setting the UrlFormat variable
+     * eg UrlFormat="http://tah.openstreetmap.org/Tiles/tile/X/X/X.png"; The 'X' characters are delimiters used to 
+     * indicate the position of the z,x and y coordinates respectively.
+     * Override this method if the format is significantly different.
+     * This function internally calls setX ,setY and setZ methods for each of the passed arguments, 
+     * if the map provider needs further processing before constructing the url add the relevant code to the setN methods.
+     *  
      * @param format
      * @param x the X tile coordinate
      * @param y the y tile coordinate
@@ -49,27 +55,31 @@ public abstract class AbstractMapProvider implements MapProvider {
      */
 
 
-    public String makeurl(int a, int b, int c) {
-        int x=setX(a);
-        int y=setY(b);
-        int z=setZ(c);
+    public String makeurl(int x, int y, int z) {
+        int coords[] =  configureCoords(x,y,z);        
         StringBuffer output=null;
         String[] bits = StringUtil.split(UrlFormat, "X");
         try{
          output= new StringBuffer(bits[0]);
         
         
-            output.append(z);
+            output.append(coords[2]);
             output.append(bits[1]);
-            output.append(x);
+            output.append(coords[0]);
             output.append(bits[2]);
-            output.append(y);
+            output.append(coords[1]);
             output.append(bits[3]);
         }catch(ArrayIndexOutOfBoundsException aioobe){
-            Logger.error("makeurl: a="+a+",b="+b+",c="+c+"\nUrl="+UrlFormat);
+            Logger.error("makeurl: x="+x+",y="+y+",z="+z+"\nUrl="+UrlFormat);
             
         }
         return output.toString();
+    }
+    
+    private final int[] configureCoords(int x , int y, int z){              
+        int[] a = { setX(x),setY(y),setZ(z)};
+        return a;
+        
     }
     
     /**
