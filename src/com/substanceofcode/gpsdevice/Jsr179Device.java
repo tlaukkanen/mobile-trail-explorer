@@ -46,10 +46,13 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 
                 //Guessing that if there is no nmea data present, the Location API is giving us an internal
                 //GPS or a network
-                if(extraInfo!=null){
-                   usingExternalGPS=true;
-                   Logger.debug("using ExternalGps is "+usingExternalGPS);
-                }
+                //if(extraInfo!=null){
+                //   usingExternalGPS=true;
+                //   Logger.debug("using ExternalGps is "+usingExternalGPS);
+                //}
+                // mccormackaj removed the code above. Internal GPS recievers
+                // also give extraInfo so it makes no sense. 
+                // Had to do this to get it working on Blackberry 8820 emulator.
                 
                 float course=location.getCourse();
                 float speed=location.getSpeed();
@@ -116,7 +119,10 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
             }
             Logger.debug(logPrefix + "LocationProvider state: "
                     + locationProvider.getState());
-            locationProvider.setLocationListener(locationListener, -1, -1, -1);
+            locationProvider.setLocationListener(locationListener, 1, 1, 1);
+            //mccormackaj changed from -1,-1,-1 to 1,1,1 to get it working on Blackberry
+            //8820 emulator. It must have an issue with the default values. 1s update should be
+            //ok for all platforms.
         } catch (LocationException e) {
             Logger.fatal(logPrefix + "Device failed to initialise:"
                     + e.getMessage());
