@@ -341,6 +341,45 @@ public final class GpsPosition implements Serializable {
                 * MathUtil.pow(Math.sin((lon1 - lon2) / 2), 2)));
         return distance * 6371.0;
     }
+    
+    /**
+     * Calculate course from given coordinates
+     * @param latitude
+     * @param longitude
+     * @return 
+     */
+    public double getCourseFromPosition(double latitude, double longitude) {
+        
+        double lat1 = this.latitude;
+        double lon1 = this.longitude;
+        double lat2 = latitude;
+        double lon2 = longitude;
+        
+        double alpha = 0;
+        
+        if(lon1 != lon2 && lat1 != lat2) {
+            alpha = (MathUtil.acos((lat2 - lat1) / (Math.sqrt(MathUtil.pow(lat2 - lat1, 2) + MathUtil.pow(lon2 - lon1, 2)))) * 180 / Math.PI);
+            if(lon1 > lon2) {
+                alpha = 360 - alpha;
+            }
+        } else {
+            alpha = 0;
+        }
+        
+        return alpha;
+    }
+    public int getCourseCourseIndex(double course) {
+        final double sector = 22.5; // = 360 degrees / 16 sectors
+        final int[] compass = { 1 /* NNE */, 2 /* NE */, 3 /* ENE */,
+                4 /* E */, 5 /* ESE */, 6 /* SE */, 7 /* SSE */,
+                8 /* S */, 9 /* SSW */, 10 /* SW */, 11 /* WSW */,
+                12 /* W */, 13 /* WNW */, 14 /* NW */, 15 /* NNW */, 0 /* N */};
+        int heading = 0;
+
+        final int directionIndex = (int) Math.floor(course / sector);
+        heading = compass[directionIndex];
+        return heading;
+    }
 
     /**
      * <p>

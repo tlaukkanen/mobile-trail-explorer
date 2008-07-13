@@ -81,6 +81,7 @@ public class TrailCanvas extends BaseCanvas {
     private Image redDotImage;
     private Image compass;
     private Sprite compassArrows;
+    private Sprite navigationArrows;
     private boolean largeDisplay;
 
     private int zoom = 11; // Used by both the map and trail
@@ -139,7 +140,7 @@ public class TrailCanvas extends BaseCanvas {
                 }
             }
             
-            /** Fill background with white */
+            /** Fill background with backgroundcolor */
             g.setColor( Theme.getColor(Theme.TYPE_BACKGROUND) );
             g.fillRect(0, 0, width, height);
 
@@ -177,9 +178,9 @@ public class TrailCanvas extends BaseCanvas {
             g.drawImage(redDotImage, midWidth + horizontalMovement, midHeight
                     + verticalMovement, Graphics.VCENTER | Graphics.HCENTER);
             
-            /** Draw naviagation arrow */
+            /** Draw naviagation status */
             if(controller.getNavigationStatus() == true) {
-                drawNavigationArrow(g);
+                drawNavigationStatus(g);
             }
 
             /** Draw compass */
@@ -612,19 +613,58 @@ public class TrailCanvas extends BaseCanvas {
     }
     
     /** Draw navigation arrow */
-    private void drawNavigationArrow(Graphics g) {
+    private void drawNavigationArrow(Graphics g, double course) {
+        
+        int spriteSize;
+        
+         Image tempNaviArrows = ImageUtil.loadImage("/images/compass-arrows.png");
+        
+        if(largeDisplay) {
+            spriteSize = 22;
+            
+            ImageUtil.scale(tempNaviArrows, tempNaviArrows.getWidth() * 2,
+                    tempNaviArrows.getHeight() * 2);
+            
+        } else {
+            spriteSize = 11;
+        }
+
+        navigationArrows = new Sprite(tempNaviArrows, spriteSize, spriteSize);
+        navigationArrows.setPosition(midWidth + horizontalMovement - (spriteSize / 2), midHeight + verticalMovement - (spriteSize / 2));
+
+        navigationArrows.setFrame(lastPosition.getCourseCourseIndex(course));
+        navigationArrows.paint(g);
+    }
+    
+    /** Draw navigation arrow */
+    private void drawNavigationStatus(Graphics g) {
         GpsPosition currentPosition = controller.getPosition();
         
         double distance = currentPosition.getDistanceFromPosition(
                 controller.getNavigationPlace().getLatitude(), 
                 controller.getNavigationPlace().getLongitude());
         
+        double course = currentPosition.getCourseFromPosition(
+                controller.getNavigationPlace().getLatitude(), 
+                controller.getNavigationPlace().getLongitude());
+        
+        /* draw the arrow */
+        drawNavigationArrow(g, course);
+        
+        String courseString = StringUtil.valueOf(course, 2);
+        
         LengthFormatter formatter = new LengthFormatter(controller.getSettings());
         String distanceString = formatter.getLengthString(distance, true);
+        
+        Font currentFont = g.getFont();
+        int fontHeight = currentFont.getHeight();
 
         g.drawString("Distance:" + distanceString,
                 midWidth + horizontalMovement,
-                midHeight + verticalMovement, Graphics.TOP | Graphics.HCENTER);
+                midHeight + verticalMovement + fontHeight, Graphics.TOP | Graphics.HCENTER);
+        g.drawString("Course:" + courseString,
+                midWidth + horizontalMovement,
+                midHeight + verticalMovement + (fontHeight * 2), Graphics.TOP | Graphics.HCENTER);
     }
 
     /** Draw status bar */
@@ -925,8 +965,7 @@ public class TrailCanvas extends BaseCanvas {
         /*
          * String gpsUrl = m_controller.getGpsUrl(); g.drawString("GPS: " +
          * gpsUrl, 1, height - (fontHeight + 2), Graphics.TOP|Graphics.LEFT );
-         */
-      
+         */      
     }
 
     public TrailCanvas() {
