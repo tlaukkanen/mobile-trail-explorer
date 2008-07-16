@@ -333,10 +333,10 @@ public class GpsRecorder {
                 positionStore.addRecord(data, 0, data.length);
                 positionStore.closeRecordStore();
             } catch (RecordStoreException e) {
-                // XXX : mchr : Log/display this exception?
+                Logger.error("GpsRecorder RecordStoreException:"+e.getMessage());
                 e.printStackTrace();
             } catch (IOException e) {
-                // XXX : mchr : Log/display this exception?
+                Logger.error("GpsRecorder IOError:"+ e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -409,8 +409,8 @@ public class GpsRecorder {
                         stopped = currentPosition.equals(lastRecordedPosition);
                     }
 
-                     Logger.debug("interval: "+ intervalSeconds + 
-                     " currentPosition is " + (currentPosition==null?"null":"not null"));
+                //     Logger.debug("interval: "+ intervalSeconds + 
+                  //   " currentPosition is " + (currentPosition==null?"null":"not null"));
                     /**
                      * Record current position if user have moved or this is a
                      * first recorded position.
