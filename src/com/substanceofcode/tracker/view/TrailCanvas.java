@@ -36,7 +36,6 @@ import javax.microedition.lcdui.game.Sprite;
 import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.map.MapLocator;
-import com.substanceofcode.map.MapProvider;
 import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.map.TileDownloader;
 import com.substanceofcode.tracker.controller.Controller;
@@ -47,7 +46,6 @@ import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
-import com.substanceofcode.util.MathUtil;
 import com.substanceofcode.util.ProjectionUtil;
 import com.substanceofcode.util.StringUtil;
 
@@ -87,9 +85,17 @@ public class TrailCanvas extends BaseCanvas {
     private int zoom = 11; // Used by both the map and trail
 
     // Variables needed by the map generator
+    // Order of map tile indexes:
+    // 0 1 2
+    // 3 4 5
+    // 6 7 8
     private Image mapTiles[] = new Image[9];
-    public int m[] = new int[] { 0, 1, 2, 0, 1, 2, 0, 1, 2 };
-    public int n[] = new int[] { 0, 0, 0, 1, 1, 1, 2, 2, 2 };
+    // Offsets for the map tile indexes in the horizontal direction
+    static private final int m[] = new int[] { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
+    // Offsets for the map tile indexes in the vertical direction
+    static private final int n[] = new int[] { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
+    // The priority order of downloading the tiles. These are the indexes as depicted above
+    static private final int tilePriorities[] = new int[] { 4, 1, 3, 5, 7, 0, 2, 6, 8 };
 
     private TileDownloader tileDownloader = null;
 
@@ -249,50 +255,18 @@ public class TrailCanvas extends BaseCanvas {
                 if (tileDownloader != null
                         && tileDownloader.isStarted() == true) {
                     // System.out.println("td not null and td was started");
-                    int maxtiles = (int) MathUtil.pow(2, zoom);
-                    int[] pt = MapLocator.conv(lastPosition.latitude,
-                            lastPosition.longitude, zoom);
-
-
-                    if (pt[0] == 0 && zoom != 1) {
-                        pt[0] = maxtiles;
-                    } else {
-                        pt[0] = pt[0] - 1;
-                    }
-
-
-                    if (pt[1] == 0 && zoom != 1) {
-                        pt[1] = maxtiles;
-                    } else {
-                        pt[1] = pt[1] - 1;
-                    }
-
+                    int[] pt = MapLocator.conv(lastPosition.latitude, lastPosition.longitude, zoom);
 
                     // System.out.println("zoom = "+zoom);
 
+                    // Get the tile images in the priority order. Unavailable images are returned as null
+                    for (int i = 0; i < tilePriorities.length; i++) {
                     try {
-                        mapTiles[4] = tileDownloader.fetchTile(pt[0] + m[4],
-                                pt[1] + n[4], zoom, false);
-                        mapTiles[1] = tileDownloader.fetchTile(pt[0] + m[1],
-                                pt[1] + n[1], zoom, false);
-                        mapTiles[3] = tileDownloader.fetchTile(pt[0] + m[3],
-                                pt[1] + n[3], zoom, false);
-                        mapTiles[5] = tileDownloader.fetchTile(pt[0] + m[5],
-                                pt[1] + n[5], zoom, false);
-                        mapTiles[7] = tileDownloader.fetchTile(pt[0] + m[7],
-                                pt[1] + n[7], zoom, false);
-                        mapTiles[0] = tileDownloader.fetchTile(pt[0] + m[0],
-                                pt[1] + n[0], zoom, true);
-                        mapTiles[2] = tileDownloader.fetchTile(pt[0] + m[2],
-                                pt[1] + n[2], zoom, false);
-                        mapTiles[6] = tileDownloader.fetchTile(pt[0] + m[6],
-                                pt[1] + n[6], zoom, false);
-                        mapTiles[8] = tileDownloader.fetchTile(pt[0] + m[8],
-                                pt[1] + n[8], zoom, false);
+                		    int imageIndex = tilePriorities[i];
+                		    mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], zoom, false);
                     } catch (Exception e) {
                         e.printStackTrace();
-
-
+                	    }
                     }
 
                     // Alpha blending
@@ -304,47 +278,16 @@ public class TrailCanvas extends BaseCanvas {
                      * g.drawRGB(rgbData,0,256,0,0,256,256,true);
                      * 
                      */
-                    g.drawImage(mapTiles[0], midWidth - pt[2]
-                            + horizontalMovement - TileDownloader.TILE_SIZE,
-                            midHeight - pt[3] + verticalMovement
-                                    - TileDownloader.TILE_SIZE, Graphics.TOP
-                                    | Graphics.LEFT);
-                    g.drawImage(mapTiles[1], midWidth - pt[2]
-                            + horizontalMovement, midHeight - pt[3]
-                            + verticalMovement - TileDownloader.TILE_SIZE,
-                            Graphics.TOP | Graphics.LEFT);
-                    g.drawImage(mapTiles[2], midWidth - pt[2]
-                            + horizontalMovement + TileDownloader.TILE_SIZE,
-                            midHeight - pt[3] + verticalMovement
-                                    - TileDownloader.TILE_SIZE, Graphics.TOP
-                                    | Graphics.LEFT);
-
-                    g.drawImage(mapTiles[3], midWidth - pt[2]
-                            + horizontalMovement - TileDownloader.TILE_SIZE,
-                            midHeight - pt[3] + verticalMovement, Graphics.TOP
-                                    | Graphics.LEFT);
-                    g.drawImage(mapTiles[4], midWidth - pt[2]
-                            + horizontalMovement, midHeight - pt[3]
-                            + verticalMovement, Graphics.TOP | Graphics.LEFT);
-                    g.drawImage(mapTiles[5], midWidth - pt[2]
-                            + horizontalMovement + TileDownloader.TILE_SIZE,
-                            midHeight - pt[3] + verticalMovement, Graphics.TOP
-                                    | Graphics.LEFT);
-
-                    g.drawImage(mapTiles[6], midWidth - pt[2]
-                            + horizontalMovement - TileDownloader.TILE_SIZE,
-                            midHeight - pt[3] + verticalMovement
-                                    + TileDownloader.TILE_SIZE, Graphics.TOP
-                                    | Graphics.LEFT);
-                    g.drawImage(mapTiles[7], midWidth - pt[2]
-                            + horizontalMovement, midHeight - pt[3]
-                            + verticalMovement + TileDownloader.TILE_SIZE,
-                            Graphics.TOP | Graphics.LEFT);
-                    g.drawImage(mapTiles[8], midWidth - pt[2]
-                            + horizontalMovement + TileDownloader.TILE_SIZE,
-                            midHeight - pt[3] + verticalMovement
-                                    + TileDownloader.TILE_SIZE, Graphics.TOP
-                                    | Graphics.LEFT);
+                    
+                    // Blit the images to the canvas
+                    int x = midWidth - pt[2] + horizontalMovement; // The top left corner
+                    int y = midHeight - pt[3] + verticalMovement;  // of the middle tile
+                    int anchor = Graphics.TOP | Graphics.LEFT;
+                    for (int i = 0; i < 9; i++) {
+                	    if (mapTiles[i] != null) {
+                		    g.drawImage(mapTiles[i], x + (m[i] * TileDownloader.TILE_SIZE), y + (n[i] * TileDownloader.TILE_SIZE), anchor);
+                	    }
+                    }
                 }
 
             }

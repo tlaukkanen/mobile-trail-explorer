@@ -1220,6 +1220,14 @@ public class Controller {
         return useFileCache;
     }
 
+    public void setUseBTFix(boolean b) {
+	    settings.setUseBTFix(b);
+    }
+    
+    public boolean getUseBTFix() {
+	    return settings.getUseBTFix();
+    }
+
     public boolean getNavigationStatus() {
         return navigationOn;
     }

@@ -682,7 +682,7 @@ public class Track implements Serializable {
         final int numMarkers = trackMarkers.size();
         dos.writeInt(numMarkers);
         for (int i = 0; i < numMarkers; i++) {
-            ((GpsPosition) trackMarkers.elementAt(i)).serialize(dos);
+            ((Marker) trackMarkers.elementAt(i)).serialize(dos);
         }
         dos.writeDouble(distance);
         if (this.name == null) {
@@ -720,7 +720,7 @@ public class Track implements Serializable {
                 //throw new EOFException("Can't read trail name:" + ex.getMessage());
             }
         } else {
-            this.name = "";
+            this.name = null;
         }
     }
 

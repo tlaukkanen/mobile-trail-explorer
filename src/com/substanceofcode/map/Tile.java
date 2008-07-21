@@ -18,15 +18,15 @@ import com.substanceofcode.tracker.view.Logger;
  * 
  */
 public class Tile implements Serializable {
-    public int x;
+    public int x = 0;
 
-    public int y;
+    public int y = 0;
 
-    public int z;
+    public int z = 0;
 
-    public String url;
+    public String url = null;
 
-    public String cacheKey;
+    public String cacheKey = null;
 
     // Ideally we don't want to have to store this along with the Image object,
     // as it is cleaner to store an Image created from this byteArray.
@@ -43,7 +43,7 @@ public class Tile implements Serializable {
     private static long lastTileOffset=0;//
     public static long totalOffset=0;
     
-    private Image image; // the actual tile image png data
+    private Image image = null; // the actual tile image png data
 
     public static final String MIMETYPE = "Tile"; // used by the filesystem
 
@@ -74,7 +74,8 @@ public class Tile implements Serializable {
        // checkUnserializeWorked();
     }
  
-    public Tile(String name) {
+    // Seems that this constructor is not needed?
+    /*public Tile(String name) {
         this.x = 0;
         this.y = 1;
         this.z = 2;
@@ -83,7 +84,7 @@ public class Tile implements Serializable {
        // this.destDir = "";
        // this.destFile = "";
         this.cacheKey = "" + "-" + z + "-" + x + "-" + y;
-    }
+    }*/
 
     public void setImageByteArray(byte[] in) {
 
@@ -111,7 +112,11 @@ public class Tile implements Serializable {
             Logger.error("Tile: tile has no ByteArray!");            
         }
         if (image == null && imageByteArray != null) {
+            try {
             image = Image.createImage(imageByteArray, 0, imageByteArray.length);
+            } catch (IllegalArgumentException iae) {  // Sometimes invalid data gets in to the byte array. This should be checked
+        	    iae.printStackTrace();
+            }
         }
         return image;
     }
@@ -152,17 +157,23 @@ public class Tile implements Serializable {
         dos.writeInt(x);
         dos.writeInt(y);
         dos.writeInt(z);
-        dos.writeUTF(url);
-        dos.writeUTF(cacheKey);
+        // Write the length of the string byte array as a short followed by the bytes of the strings
+        byte[] urlBytes = url.getBytes();
+        dos.writeShort(urlBytes.length);
+        dos.write(urlBytes);
+        
+        byte[] keyBytes = cacheKey.getBytes();
+        dos.writeShort(keyBytes.length);
+        dos.write(keyBytes);
        
         Logger.debug("lastTileOffset="+lastTileOffset);
         dos.writeLong(lastTileOffset);
-        //writeUtf writes
-        lastTileOffset+=12+
-        2+url.getBytes().length+
-        2+cacheKey.getBytes().length+
-        8+
-        4+
+
+        lastTileOffset += 12 +      // x, y and z
+        2 + urlBytes.length +       // strings and their lengths
+        2 + keyBytes.length +
+        8 +                         // tile offset (long)
+        4 +                         // image byte array length (int)
         imageByteArray.length;
         
         dos.writeInt(imageByteArray.length);
@@ -179,8 +190,18 @@ public class Tile implements Serializable {
         x = dis.readInt();
         y = dis.readInt();
         z = dis.readInt();
-        url = dis.readUTF();
-        cacheKey = dis.readUTF();
+        	
+        	// Read strings. First the length and then the data
+        	short len = dis.readShort();
+	        byte[] bytes = new byte[len];
+	        dis.read(bytes, 0, len);
+	        url = new String(bytes);
+	        
+	        len = dis.readShort();
+	        bytes = new byte[len];
+	        dis.read(bytes, 0, len);
+	        cacheKey = new String(bytes);
+	        
         offset=dis.readLong();
         
         int arrayLength = dis.readInt();

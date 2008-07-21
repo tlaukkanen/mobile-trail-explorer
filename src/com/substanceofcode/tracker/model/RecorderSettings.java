@@ -59,6 +59,7 @@ public class RecorderSettings {
     private static final String VERSION_NUMBER = "version-number";
     private static final String USEJSR179="jsr179";
     private static final String USEFILECACHE="fileCache";
+    private static final String USE_BLUETOOTH_FIX = "bluetoothFix";
 
     /** Importing settings keys */
     private static final String IMPORT_FILE = "import-file";
@@ -542,6 +543,17 @@ public class RecorderSettings {
     public void setFileCache(boolean value) {
         settings.setBooleanProperty(USEFILECACHE, value);
         saveSettings();
+    }
+    
+    /** Get bluetooth reading fix */
+    public boolean getUseBTFix() {
+	    return settings.getBooleanProperty(USE_BLUETOOTH_FIX, false);
+    }
+
+    /** Set bluetooth reading fix */
+    public void setUseBTFix(boolean value) {
+	    settings.setBooleanProperty(USE_BLUETOOTH_FIX, value);
+	    saveSettings();
     }
     
     public boolean getWriteLog() {

@@ -52,8 +52,6 @@ public class TileDownloader implements Runnable {
 
     private int nullImageCounter = 0;
 
-    HttpConnection conn;
-
     public Vector tileQueue;
 
     int status = 0;
@@ -62,7 +60,7 @@ public class TileDownloader implements Runnable {
     private volatile Thread downloaderThread;
 
     public TileDownloader(/* int MapSource */) {
-        Logger.debug("TileDownloader Constructer");
+        Logger.debug("TileDownloader Constructor");
         // mpm=MapProviderManager.getInstance();
         // setMapSource(MapSource); // No need to do this any more, as we have a
         // Manager in place
@@ -124,8 +122,11 @@ public class TileDownloader implements Runnable {
             // invalidate the work queues if the zoomlevel has changed
             if(lastZoomLevel!=z){
                 tc.clearWorkQueues();
-            }
+                tileQueue.removeAllElements();
+                requestLog.clear();
             lastZoomLevel=z;
+            }
+            
             try{
                  cacheResult = tc.checkCache(x, y, z);
             }catch(Exception e){
@@ -151,13 +152,14 @@ public class TileDownloader implements Runnable {
                 if (!requestLog.containsKey(getCacheKey(x, y, z))) {
                     System.out.println("TD: Queueing request");
                     downloadTile(x, y, z, pushToTop);
-                }else
+                }/*else
                 {       if(tileQueue.size()==0){
                             Logger.debug(x+"-"+y+"-"+z+" Downloaded, but not yet saved");                            
                         }else{
                     //Logger.debug(x+"-"+y+"-"+z+" already queued");
                         }
                 }
+                }*/
             }
         } catch(Exception ex) {
             Logger.error("Error in fetchTile(..): " + ex.getMessage());
@@ -202,13 +204,13 @@ public class TileDownloader implements Runnable {
             synchronized (tileQueue) {
                 // Check if we have just changed zoom levels. If so,
                 // delete all the tiles in the queue before adding the new one
-                if (lastZoomLevel != zoom) {
+                /*if (lastZoomLevel != zoom) {
                     Logger
                             .debug("ZoomLevel changed, deleting all queued tiles.");
                     tileQueue.removeAllElements();
                     requestLog.clear();
                 }
-                lastZoomLevel = zoom;
+                lastZoomLevel = zoom;*/
 
                 if (putAtTop)
                     tileQueue.insertElementAt(t, 0);
@@ -236,6 +238,7 @@ public class TileDownloader implements Runnable {
      */
     public void run() {
         Thread thisThread = Thread.currentThread();
+        HttpConnection conn = null;
         InputStream in = null;
         Tile tile = null;
         while (downloaderThread == thisThread && running) {
@@ -296,6 +299,21 @@ public class TileDownloader implements Runnable {
                 } catch (Exception e) {
                     e.printStackTrace();
                     Logger.error("TD run(): " + e.getMessage());
+                } finally {
+                	if (in != null) {
+                		try {
+                			in.close();
+                		} catch (IOException ioe) {
+                		}
+                		in = null;
+                	}
+                	if (conn != null) {
+                		try {
+                			conn.close();
+                		} catch (IOException ioe) {
+                		}
+                		conn = null;
+                	}
                 }
                 // Force garbage collecting
                 System.gc();

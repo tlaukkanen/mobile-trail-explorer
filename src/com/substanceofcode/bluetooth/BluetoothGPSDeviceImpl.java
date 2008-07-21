@@ -104,6 +104,9 @@ public class BluetoothGPSDeviceImpl
     public void run() {
         try {
             Logger.info("Starting BluetoothGpsDevice.run()");
+            
+            boolean useBTFix = Controller.getController().getUseBTFix();
+            
             while (Thread.currentThread() == thread) {
                 try {
                     StringBuffer output = new StringBuffer();
@@ -113,23 +116,34 @@ public class BluetoothGPSDeviceImpl
                     
                     while ((input = reader.read()) != LINE_DELIMITER) {
                         output.append((char) input);
+                        // The purpose of the sleep is to prevent bogus (like
+                        // Nokia 6630) phones from crashing.
+                        if (useBTFix) {
+                        	try {
+                        		Thread.sleep(1);
+                        	} catch (InterruptedException ie) {}
+                        }
                     }
 
                     try {
+                	    int i = 0;
                         // Trim start and end of any NON-Displayable characters.
-                        while (output.charAt(0) < '!' || output.charAt(0) > '~') {
-                            output.deleteCharAt(0);
+                        while (output.charAt(i) < '!' || output.charAt(i) > '~') {
+                        	i++;
                         }
-                        while (output.charAt(output.length() - 1) < '!'
-                                || output.charAt(output.length() - 1) > '~') {
-                            output.deleteCharAt(output.length() - 1);
+                        output.delete(0, i);
+                        i = output.length() - 1;
+                        while (output.charAt(i) < '!'
+                                || output.charAt(i) > '~') {
+                        	i--;
                         }
+                        output.delete(i+1, output.length());
                     } catch (IndexOutOfBoundsException e) {
                         // Ignore but don't bother trying to parse, just loop
                         // around to the next iteration;
                         continue;
                     }               
-                    // only parse items begining with '$', such as "$GPRMC,..."
+                    // only parse items beginning with '$', such as "$GPRMC,..."
                     // and "$GPGSA,..." etc...
                     String nmeaString = output.toString();
                     if (parser.isValidNMEASentence(nmeaString)) {

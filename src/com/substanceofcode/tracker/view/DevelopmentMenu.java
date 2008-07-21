@@ -51,7 +51,8 @@ public class DevelopmentMenu extends List implements CommandListener {
     private static final int METRICS = 0;
     private static final int LOGGER = 1;
     private static final int JSR179 = 2;
-  //  private static final int FILECACHE = 3;
+    private static final int FILECACHE = 3;
+    private static final int BLUETOOTH_FIX = 4;
     
     //Jsr179 related stuff
     private static boolean useJsr179b = false;
@@ -65,6 +66,12 @@ public class DevelopmentMenu extends List implements CommandListener {
     private static final String dontUseFileCache = "Don't use File Cache";
     private String fileCache = useFileCache;
     
+    // Bluetooth reading fix related stuff
+    //private static boolean BTFixEnabled = false;
+    private static final String useBTFix = "Use bluetooth fix";
+    private static final String dontUseBTFix = "Don't use bluetooth fix";
+    private String BTFix = useBTFix;
+    
     private RecorderSettings settings;
 
     public DevelopmentMenu() {
@@ -74,8 +81,10 @@ public class DevelopmentMenu extends List implements CommandListener {
         useJsr179b=settings.getJsr179();
         setJsrString();
         
-        //useFileCacheb=settings.getFileCache();
-        //setFileCacheString();
+        useFileCacheb=settings.getFileCache();
+        setFileCacheString();
+        
+        BTFix = CONTROLLER.getUseBTFix() ? dontUseBTFix : useBTFix;
         
         this.append("Parsing Metrics", null);
         this.append("Log", null);
@@ -84,7 +93,8 @@ public class DevelopmentMenu extends List implements CommandListener {
         //Uncomment these if you want to play with them (they don't quite work yet...)
         // be sure to uncomment the 'refresh' method below as well
         this.append(jsr179, null);
-       // this.append(fileCache, null);
+        this.append(fileCache, null);
+        append(BTFix, null);
 
         this.addCommand(backCommand = new Command("Back", Command.BACK, 2));
         this.addCommand(okCommand = new Command("Ok", Command.OK, 1));
@@ -93,10 +103,12 @@ public class DevelopmentMenu extends List implements CommandListener {
     }
     
     private void refresh(){
-      //  this.delete(3);
+    	delete(4);
+        this.delete(3);
         this.delete(2);        
         this.append(jsr179,null);
-        //this.append(fileCache,null);
+        this.append(fileCache,null);
+        append(BTFix, null);
     }
 
     private void showGPSParsingMetrics() {
@@ -147,6 +159,16 @@ public class DevelopmentMenu extends List implements CommandListener {
         }
     }
 
+    private void toggleBTFix() {
+	    if (CONTROLLER.getUseBTFix()) {
+		    BTFix = useBTFix;
+		    CONTROLLER.setUseBTFix(false);
+	    } else {
+		    BTFix = dontUseBTFix;
+		    CONTROLLER.setUseBTFix(true);
+	    }
+    }
+
     public void commandAction(Command command, Displayable disp) {
         if (disp == this) {
             if (command == okCommand) {
@@ -163,11 +185,16 @@ public class DevelopmentMenu extends List implements CommandListener {
                         refresh();
                         CONTROLLER.showSettings();
                         break;
-    ///                case(FILECACHE):
-      //                  toggleFileCacheSupport();
-        //                refresh();
-          //              CONTROLLER.showSettings();
-            //            break;
+                    case(FILECACHE):
+                        toggleFileCacheSupport();
+                        refresh();
+                        CONTROLLER.showSettings();
+                        break;
+                    case(BLUETOOTH_FIX):
+                	toggleBTFix();
+                        refresh();
+                        CONTROLLER.showSettings();
+                        break;
                 }
             } else if (command == backCommand) {
                 CONTROLLER.showSettings();

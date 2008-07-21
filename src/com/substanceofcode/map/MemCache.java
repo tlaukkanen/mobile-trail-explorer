@@ -61,10 +61,18 @@ public class MemCache implements TileCache {
      */
     private int findElement(String cacheKey) {
         int output = -1;
+        try {
+        synchronized (vec) {
         for (int i = 0; i < vec.size(); i++) {
             if (((Tile) vec.elementAt(i)).cacheKey.equals(cacheKey)) {
                 output = i;
+	                break;
+	            }
+	        }		
             }
+        } catch (Exception e) {   // A valid cache shouldn't throw any exceptions - an invalid might
+        	e.printStackTrace();
+        	output = -1;
         }
         return output;
     }
@@ -106,6 +114,11 @@ public class MemCache implements TileCache {
      */
 
     public void put(Tile tile) {
+	    if (findElement(tile.cacheKey) > -1) {
+		    // The tile is already cached
+		    return;
+	    }
+		    
         synchronized (vec) {
             if (vec.size() >= MAXSIZE) {
                 deleteOldestTile();
