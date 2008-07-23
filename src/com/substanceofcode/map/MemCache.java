@@ -1,10 +1,9 @@
 package com.substanceofcode.map;
 
-import java.util.Vector;
-
 import javax.microedition.lcdui.Image;
-
 import com.substanceofcode.tracker.view.Logger;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * A simple cache to hold a small number of Images, ready to display. This can
@@ -17,68 +16,35 @@ import com.substanceofcode.tracker.view.Logger;
  */
 public class MemCache implements TileCache {
 
-    private static int MAXSIZE = 18;// Arbitrary value, I can fit Max 120 tiles
-                                    // on my device (N81)
-    private Vector vec = null;
+    private static int MAXSIZE = 18;// Twice the grid size
+    private Hashtable ht = null;
+    private Vector list = new Vector(); //only used to note the order the tiles
+                                        //get added
     protected String threadName;
-
-
-    public MemCache(String name) {
+    
+    private MemCache(String name) {
         this();
         threadName = threadName + " " + name;
-
     }
 
     public MemCache() {
         threadName = "MEM: " + Thread.currentThread().getName();
         Logger.debug(threadName + " Initializing MemCache");
-        // hm = new Hashtable();
-        vec = new Vector();
+         ht = new Hashtable();      
     }
 
     public boolean checkCache(int x, int y, int z) {
-        return checkCache(MapProviderManager.getStoreName() + "-" + z + "-" + x
-                + "-" + y);
-
-
+        return checkCache(MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y);
     }
 
-    public boolean checkCache(String cacheKey) {
-
-        if (findElement(cacheKey) > -1) {
+    public boolean checkCache(String cacheKey) {      
+        if(ht.containsKey(cacheKey))
             return true;
-        }
-
         return false;
     }
 
     /**
-     * Search for an element in the cache
-     * 
-     * @param cacheKey
-     * @return int representing the index of the found element, or -1 if it
-     *         wasn't found.
-     */
-    private int findElement(String cacheKey) {
-        int output = -1;
-        try {
-        synchronized (vec) {
-        for (int i = 0; i < vec.size(); i++) {
-            if (((Tile) vec.elementAt(i)).cacheKey.equals(cacheKey)) {
-                output = i;
-	                break;
-	            }
-	        }		
-            }
-        } catch (Exception e) {   // A valid cache shouldn't throw any exceptions - an invalid might
-        	e.printStackTrace();
-        	output = -1;
-        }
-        return output;
-    }
-
-    /**
-     * Retrieve a tile image from the cache
+     * Retrieve a tile from the cache
      * 
      * @param x
      *                X Coordinate of the tile
@@ -88,22 +54,23 @@ public class MemCache implements TileCache {
      *                Zoom level of the tile
      * @return a tile
      */
-    public Tile getTile(int x, int y, int z) {
-        String cacheKey = MapProviderManager.getStoreName() + "-" + z + "-" + x
-                + "-" + y;
-        return getTile(cacheKey);
+    public Tile getTile(int x, int y, int z) {       
+        Tile t=null;        
+        String cacheKey = MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y;       
+        t=(Tile)ht.get(cacheKey);       
+        return t;
     }
-
+    
     /**
      * Retrieve a tile from the cache
-     * 
-     * @param name
-     *                the cache key to retrieve
-     * @return a tile
+     * @param cacheKey the name of the tile to return
+     * @return a Tile
      */
-    public Tile getTile(String cacheKey) {
-        return (Tile) vec.elementAt(findElement(cacheKey));
-    }
+     public Tile getTile(String cacheKey) {        
+        Tile t;        
+        t=(Tile)ht.get(cacheKey);        
+        return t;         
+     }
 
     /**
      * Place a tile into the MemoryCache, keeping the size within the MAXSIZE
@@ -112,39 +79,40 @@ public class MemCache implements TileCache {
      * @param tile
      * @throws MalformedTileException
      */
-
     public void put(Tile tile) {
-	    if (findElement(tile.cacheKey) > -1) {
-		    // The tile is already cached
-		    return;
-	    }
-		    
-        synchronized (vec) {
-            if (vec.size() >= MAXSIZE) {
-                deleteOldestTile();
+        synchronized (ht) {
+            Logger.debug("MemCache size is "+ht.size());
+            if (ht.size() >= MAXSIZE) {
+                clearMemCache();
             }
 
-
-            vec.addElement(tile);
-            Logger.debug(threadName + " Storing tile to memcache, size="
-                    + vec.size());
+            if(tile!=null){                
+                ht.put(tile.cacheKey,tile);
+                list.addElement(tile.cacheKey);
+            }            
         }
+        Logger.debug(threadName + " Storing tile to memcache, size=" + ht.size());
+
+
     }
 
-    public Image getImage(String name) {
-        return getTile(name).getImage();
+    public Image getImage(String name) {        
+        return ((Tile)ht.get(name)).getImage();
     }
 
     /**
-     * Removes the oldest 9 tiles, ie the ones that were added first
+     * 
+     * Removes 9 tiles, oldest first
      */
-    public void deleteOldestTile() {
-        for(int i =0;i<9;i++){
-            vec.removeElementAt(0);
+    private void clearMemCache() {
+        Logger.debug("MEM: Clearing MemCache");
+
+        synchronized (ht) {
+            for (int i = 0; i < Math.min(9, MAXSIZE); i++) {                
+                String tilename= (String)list.firstElement();
+                list.removeElementAt(0);
+                ht.remove(tilename);          
+            }
         }
-       
-        
     }
-
-
 }
