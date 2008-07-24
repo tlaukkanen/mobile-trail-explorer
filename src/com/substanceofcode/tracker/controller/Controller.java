@@ -807,8 +807,6 @@ public class Controller {
             exportFolder = "/";
         }
 
-        System.out.println("dbg(): setup filechooser");
-
         filechooser = new FileChooser(this, exportFolder, false, displayable);
 
         return filechooser;
