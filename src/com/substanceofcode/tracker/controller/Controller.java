@@ -802,7 +802,14 @@ public class Controller {
 
     /** Show export the file chooser */
     private FileChooser getFileChooser(Displayable displayable) {
-        filechooser = new FileChooser(this, settings.getExportFolder(), false, displayable);
+        String exportFolder = settings.getExportFolder();
+        if (exportFolder == null) {
+            exportFolder = "/";
+        }
+
+        System.out.println("dbg(): setup filechooser");
+
+        filechooser = new FileChooser(this, exportFolder, false, displayable);
 
         return filechooser;
     }
