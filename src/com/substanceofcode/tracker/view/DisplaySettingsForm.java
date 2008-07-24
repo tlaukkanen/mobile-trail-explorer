@@ -68,10 +68,10 @@ public class DisplaySettingsForm extends Form implements CommandListener {
 
         addControls();
 
-        okCommand = new Command("Save", Command.OK, 1);
+        okCommand = new Command("Ok", Command.OK, 1);
         this.addCommand(okCommand);
 
-        cancelCommand = new Command("Cancel", Command.BACK, 2);
+        cancelCommand = new Command("Cancel", Command.CANCEL, 2);
         this.addCommand(cancelCommand);
 
         this.setCommandListener(this);

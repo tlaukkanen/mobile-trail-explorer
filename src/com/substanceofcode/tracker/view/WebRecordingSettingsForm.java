@@ -75,10 +75,10 @@ public class WebRecordingSettingsForm extends Form implements CommandListener {
             settings.setUploadURL(url);
             boolean useUpload = useUploadGroup.isSelected(0);
             settings.setWebRecordingUsage( useUpload );
-            controller.showTrail();
+            controller.showSettings();
         }
         if(cmd==cancelCommand) {
-            controller.showTrail();
+            controller.showSettings();
         }
     }
 

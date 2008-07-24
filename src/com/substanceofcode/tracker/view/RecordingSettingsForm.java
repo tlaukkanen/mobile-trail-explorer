@@ -87,8 +87,8 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 newInterval = 10;
                 newStep = 5;
             }
-            controller.saveRecordingInterval( newInterval );
-            controller.saveRecordingMarkerStep( newStep );
+            controller.saveRecordingInterval(newInterval);
+            controller.saveRecordingMarkerStep(newStep);
             
             RecorderSettings settings = controller.getSettings();
             settings.setMaxRecordedSpeed(maxSpeed);
@@ -107,10 +107,10 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     
     /** Initialize commands */
     private void initializeCommands() {
-        okCommand = new Command("OK", Command.SCREEN, 1);
-        this.addCommand( okCommand );
-        cancelCommand = new Command("Cancel", Command.SCREEN, 2);
-        this.addCommand( cancelCommand );
+        okCommand = new Command("OK", Command.OK, 1);
+        this.addCommand(okCommand);
+        cancelCommand = new Command("Cancel", Command.CANCEL, 2);
+        this.addCommand(cancelCommand);
     }
     
     /** Initialize form controls */
