@@ -72,7 +72,7 @@ public class ImportTrailScreen extends Form implements CommandListener {
         deleteAll();
         String importFile = controller.getSettings().getImportFile();
         if (importFile == null) {
-            importFile = "E:/";
+            importFile = "C:/";
         }
         importFileField = new TextField("File Location", importFile, 50,
                 TextField.ANY);
@@ -179,7 +179,7 @@ public class ImportTrailScreen extends Form implements CommandListener {
         if (command == browseCommand) {
             String importFile = importFileField.getString();
             if (importFile == null) {
-                importFile = "E:/";
+                importFile = "C:/";
             }
             
             // remove the filename from the path

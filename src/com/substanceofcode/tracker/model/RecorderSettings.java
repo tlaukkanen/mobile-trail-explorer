@@ -34,7 +34,7 @@ import com.substanceofcode.util.Version;
 /**
  * RecorderSettings contains all settings for the Trail Explorer application.
  * Current settings are: - GPS unit connection string - Export folder (default
- * E:/)
+ * C:/)
  * 
  * @author Tommi Laukkanen
  */
@@ -233,9 +233,9 @@ public class RecorderSettings {
         saveSettings();
     }
     
-    /** Get export folder. Default is E:/ */
+    /** Get export folder. Default is C:/ */
     public String getExportFolder() {
-        return settings.getStringProperty(EXPORT_FOLDER, "E:/");
+        return settings.getStringProperty(EXPORT_FOLDER, "C:/");
     }
 
     /** Set export folder. */
@@ -244,9 +244,9 @@ public class RecorderSettings {
         saveSettings();
     }
 
-    /** Get import file. Default is E:/import.gpx */
+    /** Get import file. Default is C:/import.gpx */
     public String getImportFile() {
-        return settings.getStringProperty(IMPORT_FILE, "E:/import.gpx");
+        return settings.getStringProperty(IMPORT_FILE, "C:/import.gpx");
     }
 
     public void setImportFile(String value) {

@@ -181,7 +181,7 @@ public class ExportSettingsForm extends Form implements CommandListener {
         // Initialize export folder field
         String exportFolder = settings.getExportFolder();
         if (exportFolder == null) {
-            exportFolder = "E:/";
+            exportFolder = "C:/";
         }
         exportFolderField = new TextField("Export Folder", exportFolder, 50,
                 TextField.ANY);

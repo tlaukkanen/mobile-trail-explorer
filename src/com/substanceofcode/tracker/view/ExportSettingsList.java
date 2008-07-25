@@ -269,7 +269,7 @@ public class ExportSettingsList extends List implements CommandListener {
         // Initialize export folder field
         String exportFolder = settings.getExportFolder();
         if (exportFolder == null) {
-            exportFolder = "E:/";
+            exportFolder = "C:/";
         }
          if (!alreadyAskedPermission){
              alreadyAskedPermission = true;
