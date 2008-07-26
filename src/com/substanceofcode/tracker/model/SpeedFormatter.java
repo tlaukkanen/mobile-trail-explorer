@@ -49,6 +49,17 @@ public class SpeedFormatter {
      * @return string e.g. 123.3 km/h or 34.2 mph
      */
     public String getSpeedString(double speed) {
+        return getSpeedString(speed, 1);
+    }
+    
+    /** 
+     * Get speed string.
+     *
+     * @param speed in km/h
+     * @param decimalCount
+     * @return string e.g. 123.3 km/h or 34.2 mph
+     */
+    public String getSpeedString(double speed, int decimalCount) {
         String units;
         String speedString;
         if (settings.getUnitsAsKilometers() == true) {
@@ -58,9 +69,22 @@ public class SpeedFormatter {
             double mileSpeed = UnitConverter.convertSpeed(speed,
                                               UnitConverter.UNITS_KPH,
                                               UnitConverter.UNITS_MPH);
-            speedString = StringUtil.valueOf(mileSpeed, 1);
+            speedString = StringUtil.valueOf(mileSpeed, decimalCount);
             units = " mph";
         }
         return speedString + units;
+    }
+    
+    public String getSpeedStringWithoutUnits(double speed) {
+        String speedString;
+        if (settings.getUnitsAsKilometers() == true) {
+            speedString = String.valueOf( (int)speed );
+        } else {
+            double mileSpeed = UnitConverter.convertSpeed(speed,
+                                              UnitConverter.UNITS_KPH,
+                                              UnitConverter.UNITS_MPH);
+            speedString = String.valueOf( (int)mileSpeed );
+        }
+        return speedString;        
     }
 }

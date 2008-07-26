@@ -28,7 +28,7 @@ public class MemCache implements TileCache {
     }
 
     public MemCache() {
-        threadName = "MEM: " + Thread.currentThread().getName();
+        threadName = "MEM: " + Thread.currentThread().toString();
         Logger.debug(threadName + " Initializing MemCache");
          ht = new Hashtable();      
     }

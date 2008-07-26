@@ -48,6 +48,13 @@ public class LengthFormatter {
      * @return length       string e.g. 123.4 m or 80.4 ft
      */
     public String getLengthString(double length, boolean useKilometers) {
+        return getLengthString(length, useKilometers, true);
+    }
+
+    public String getLengthString(
+            double length, 
+            boolean useKilometers, 
+            boolean includeUnits) {
         String lengthString;
         String units;
         double lengthInMeters = length;
@@ -78,6 +85,10 @@ public class LengthFormatter {
                 units = " m";
             }
         }        
-        return lengthString + units;
+        if(includeUnits) {
+            return lengthString + units;
+        } else {
+            return lengthString;
+        }
     }
 }

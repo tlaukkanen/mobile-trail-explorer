@@ -142,9 +142,8 @@ public final class AboutScreen extends Canvas {
                 || TITLES.length != MESSAGES.length) {
             try {
                 throw new java.lang.IllegalStateException(
-                        "There was a problem with the coding of the "
-                                + AboutScreen.class.getName()
-                                + " class. neither titles, nor messages may be null, and they both must have the same number of elements");
+                        "There was a problem with the coding of the AboutScreen"
+                      + " class. neither titles, nor messages may be null, and they both must have the same number of elements");
             } catch (IllegalStateException e) {
                 e.printStackTrace();
                 throw e;

@@ -79,6 +79,7 @@ import com.substanceofcode.tracker.view.PlaceActionsForm;
 import com.substanceofcode.tracker.view.PlacesCanvas;
 import com.substanceofcode.tracker.view.PlaceForm;
 import com.substanceofcode.tracker.view.PlaceList;
+import com.substanceofcode.tracker.view.SpeedometerCanvas;
 import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
 
 /**
@@ -225,9 +226,14 @@ public class Controller {
         // XXX : mchr : Dependency from Logger to getTrailCanvas prevents this
         // array definition from being any higher - we have to tell the Logger
         // class about the RecorderSettings which in turn depend on midlet
-        screens = new BaseCanvas[]{getTrailCanvas(), getElevationCanvas(),
-                    new InformationCanvas(), new PlacesCanvas(),
-                    new SatelliteCanvas(), new SkyCanvas()
+        screens = new BaseCanvas[]{
+                    getTrailCanvas(),
+                    getElevationCanvas(),
+                    new InformationCanvas(),
+                    new PlacesCanvas(),
+                    new SatelliteCanvas(), 
+                    new SkyCanvas(),
+                    new SpeedometerCanvas()
                 };
         String gpsAddress = settings.getGpsDeviceConnectionString();
 

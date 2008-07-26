@@ -74,7 +74,7 @@ public class TileDownloader implements Runnable {
         downloaderThread = new Thread(this);
 
         Logger.debug("Starting TileDownloader Thread:"
-                + downloaderThread.getName());
+                + downloaderThread.toString());
         running = true;
         downloaderThread.start();
 

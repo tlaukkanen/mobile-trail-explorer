@@ -208,6 +208,15 @@ public class StringUtil {
         return (value < 0 ? "-" : "") + String.valueOf(Math.abs(integerValue))
                 + "." + valueString;
     }
+    
+    /** Reverse given String */
+    public static String reverse(String text) {
+        StringBuffer buf = new StringBuffer();
+        for(int i=0; i<text.length(); i++) {
+            buf.insert(0, text.charAt(i));
+        }
+        return buf.toString();
+    }    
 
     /** Parse string to short, return defaultValue is parse fails */
     public static short parseShort(String value, short defaultValue) {
