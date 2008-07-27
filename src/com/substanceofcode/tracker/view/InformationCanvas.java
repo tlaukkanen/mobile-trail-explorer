@@ -23,12 +23,12 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.tracker.model.GridFormatterManager;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.SpeedFormatter;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.util.DateTimeUtil;
-import com.substanceofcode.util.StringUtil;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
@@ -99,8 +99,6 @@ public class InformationCanvas extends BaseCanvas{
         Track currentTrack = controller.getTrack();
         LengthFormatter lengthFormatter = new LengthFormatter( controller.getSettings() );
         if(position!=null) {
-            lat = StringUtil.valueOf(position.latitude, 4);
-            lon = StringUtil.valueOf(position.longitude, 4);
             
             SpeedFormatter formatter = new SpeedFormatter( controller.getSettings() );
             spd = formatter.getSpeedString(position.speed);
@@ -131,13 +129,20 @@ public class InformationCanvas extends BaseCanvas{
                 }
             }
         }
+        
+        GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.INFORMATION_CANVAS);
+        String[] gridLabels = gridFormatter.getLabels();
+        String[] gridData = gridFormatter.getStrings(position);
+        
         int infoPos = BIG_FONT.stringWidth("LAT:_:");
         lineRow = titleHeight - firstRow;
         totalTextHeight = titleHeight;
         
         drawNextHeader(g, "Position");        
-        drawNextString(g, "LAT", lat);
-        drawNextString(g, "LON", lon);
+        for(int i=0; i< gridLabels.length ; i++)
+        {
+            drawNextString(g, gridLabels[i], gridData[i]);
+        }
         drawNextString(g, "ALT", alt);
         drawNextString(g, "HEA", hea);
         

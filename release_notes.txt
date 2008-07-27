@@ -10,6 +10,7 @@ Dave Walsh
 Anthony McCormack
 Gareth Jones
 Patrick Steiner
+Kaspar Mösinger
 
 Release Notes:
 
@@ -18,6 +19,7 @@ v1.11 (June xth 2008)
 + Filename uses datestamp with seconds
 + User can add audio-markers
 + New speedometer screen (Issue 112)
++ Support different grid formats (Contributed by Kaspar Mösinger)
 
 v1.10 (May 6th 2008)
 + Support varying screen sizes like rotating screen on N95 (Issue 90)
