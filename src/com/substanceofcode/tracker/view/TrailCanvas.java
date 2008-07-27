@@ -1,7 +1,7 @@
 /*
  * TrailCanvas.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Created on August 14th 2006
@@ -39,6 +39,7 @@ import com.substanceofcode.map.MapLocator;
 import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.map.TileDownloader;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.GridFormatterManager;
 import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
@@ -641,24 +642,24 @@ public class TrailCanvas extends BaseCanvas {
 
             /** Draw coordinates information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES) == true) {
-                g.drawString("LAT:", 1, fontHeight, Graphics.TOP
-                        | Graphics.LEFT);
-                g.drawString("LON:", 1, fontHeight * 2, Graphics.TOP
+                
+                GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.TRAIL_CANVAS);
+                String[] gridLabels = gridFormatter.getLabels();
+                String[] gridData = gridFormatter.getStrings(lastPosition);
+                
+                for(int i=0; i< gridLabels.length ; i++)
+                {
+                    // draw label
+                    g.drawString(gridLabels[i], 1, fontHeight*displayRow, Graphics.TOP
                         | Graphics.LEFT);
 
-                double latitude = lastPosition.latitude;
-                g.drawString(
-                /* Get degrees in string format (with five decimals) */
-                StringUtil.valueOf(latitude, 5), positionAdd, fontHeight,
+                    //draw value
+                    g.drawString(gridData[i], positionAdd, fontHeight * displayRow,
                         Graphics.TOP | Graphics.LEFT);
 
-                double longitude = lastPosition.longitude;
-                g.drawString(
-                /* Get degrees in string format (with five decimals) */
-                StringUtil.valueOf(longitude, 5), positionAdd, fontHeight * 2,
-                        Graphics.TOP | Graphics.LEFT);
-
-                displayRow += 2;
+                    //increase row-counter
+                    displayRow++;
+            }
             }
 
             /** Draw current time */

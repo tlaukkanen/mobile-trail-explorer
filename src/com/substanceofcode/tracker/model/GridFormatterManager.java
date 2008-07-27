@@ -1,7 +1,7 @@
 /*
  * GridFormatterManager.java
  * 
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
