@@ -2,14 +2,13 @@ package com.substanceofcode.gpsdevice;
 
 import com.substanceofcode.tracker.view.Logger;
 
-
-
 /**
  * Container for various GPS related utility methods
  * @author gareth
  *
  */
 public class GpsUtilities {
+
     /**
      * Check for the presence of the jsr179 Location api
      * 
@@ -23,5 +22,4 @@ public class GpsUtilities {
         }
         return apiIsPresent;
     }
-
 }
