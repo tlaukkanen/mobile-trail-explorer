@@ -111,7 +111,6 @@ public class TrailCanvas extends BaseCanvas {
         
         verticalMovement = 0;
         horizontalMovement = 0;
-
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
         counter = 0;
 
