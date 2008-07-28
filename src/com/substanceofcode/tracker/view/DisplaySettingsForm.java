@@ -24,6 +24,7 @@ package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.GridFormatterManager;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
@@ -58,6 +59,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     private ChoiceGroup drawingStyleGroup;
     
     private ChoiceGroup drawingMapsGroup;
+
+    private ChoiceGroup gridGroup;
 
     private ChoiceGroup backlightGroup;
 
@@ -123,7 +126,11 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             /** Save the maps properties */
             settings.setDrawMap(drawingMapsGroup.getSelectedIndex());
 
-            /** 4. Save the Backlight property */;
+            /** Save the grid */
+            settings.setGrid(GridFormatterManager.getGridFormattersName()[gridGroup.getSelectedIndex()]);
+            
+
+            /** 4. Save the Backlight property */
             boolean backlightOn = backlightGroup.isSelected(1);
             if (settings.getBacklightOn() != backlightOn) {
                 settings.setBacklightOn(backlightOn);
@@ -196,6 +203,20 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             drawingStyleGroup.setSelectedIndex(0, true);
         }
         this.append(drawingStyleGroup);
+        
+        String[] gridNames = GridFormatterManager.getGridFormattersName();
+        gridGroup = new ChoiceGroup("Grid Display",
+                ChoiceGroup.EXCLUSIVE, gridNames, null);
+        gridGroup.setSelectedIndex(0, true); // if there was no selection
+        for(int i=0; i< gridNames.length ; i++)
+        {
+            if(settings.getGrid().equals(gridNames[i]))
+            {
+                gridGroup.setSelectedIndex(i, true);
+                break;
+            }
+        }
+        this.append(gridGroup);
         
         /** Map display options */
     //    String[] drawingMaps = {"Don't draw maps","Draw OSM maps","Draw T@H maps"};

@@ -1,7 +1,7 @@
 /*
  * RecorderSettings.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This library is free software; you can redistribute it and/or
@@ -51,6 +51,7 @@ public class RecorderSettings {
     private static final String GPS_DEVICE_STRING = "gps-device";
     private static final String PLACES = "waypoints";
     private static final String UNITS = "units";
+    private static final String GRID = "grid";
     private static final String BACKLIGHT = "backlight";
     private static final String POSITIONS_TO_DRAW = "number-of-position-to-draw";
     private static final String DRAW_STYLE = "draw-style";
@@ -120,6 +121,24 @@ public class RecorderSettings {
             System.err.println("Error occured while creating an instance "
                     + "of Settings class: " + ex.toString());
         }
+    }
+
+    /**
+     * 
+     * @return the name of the selected grid
+     */
+    public String getGrid()
+    {
+        return settings.getStringProperty(GRID, "");  
+    }
+    /**
+     * set the selected grid
+     * @param gridname
+     */
+    public void setGrid(String gridname)
+    {
+        settings.setStringProperty(GRID, gridname);
+        saveSettings();
     }
 
     /**
