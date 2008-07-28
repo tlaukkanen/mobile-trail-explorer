@@ -17,7 +17,9 @@ public class GpsUtilities {
     public static boolean checkJsr179IsPresent() {
         boolean apiIsPresent = false;
         if (System.getProperty("microedition.location.version") != null) {
-            Logger.debug("microedition.location.version=["+System.getProperty("microedition.location.version")+"]");
+            Logger.debug("microedition.location.version=[" +
+                    System.getProperty("microedition.location.version") +
+                    "]");
             apiIsPresent = true;
         }
         return apiIsPresent;
