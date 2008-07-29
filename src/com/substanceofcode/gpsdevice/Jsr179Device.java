@@ -65,9 +65,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 double lon=  qc.getLatitude();
                 double lat=  qc.getLongitude();
                 float vdop= qc.getVerticalAccuracy();
-                
-                
-        
+                        
                 //These might be useful later...
                // boolean isValid=location.isValid();               
                // AddressInfo addressInfo=location.getAddressInfo();
@@ -115,7 +113,6 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
             if (locationProvider == null) {
                 
                 locationProvider = LocationProvider.getInstance(new Criteria());
-
             }
             Logger.debug(logPrefix + "LocationProvider state: "
                     + locationProvider.getState());
@@ -132,12 +129,10 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
         }
     }
 
-
     public void run() {
 
         Vector nmeaStrings = new Vector();
-        Logger.info(logPrefix + "Starting Jsr179Device.run()");
-        
+        Logger.info(logPrefix + "Starting Jsr179Device.run()");   
 
         while (Thread.currentThread() == thread) {
 
@@ -165,7 +160,6 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                             // 'remove' in j2me)
                             output.append((String) nmeaStrings.firstElement());
                             nmeaStrings.removeElementAt(0);
-
 
                             try {
                                 // Trim start and end of any NON-Displayable
@@ -198,15 +192,12 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                         }
                     }
                 }
-
             } catch (Exception e) {
                 Logger.error(logPrefix + "Exception: " + e.getMessage());
                 e.printStackTrace();
             }
         }
     }
-
-    
 
     public String getAddress() {
         return "internal";
@@ -216,8 +207,6 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
         return "JSR179 Location API";
     }
 
-   
-
     public String[] getParserMetrics() {
         return parser.getMetrics();
     }
@@ -226,7 +215,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
        // Logger.debug("getPosition called");
         if(usingExternalGPS){
             return getParserPosition();
-        }else{
+        } else {
             return getJsr179Position();
         }
     }
@@ -235,16 +224,16 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     //    Logger.debug("getParserPosition called");
         return parser.getGpsPosition();
     }
+
     public GpsPosition getJsr179Position() {
         return gp;
     }
-  
+
     public Vector getSatellites() {
         // these methods do not work until a sentence has been parsed.
         return parser.getSatellites();
     }
 
-    
     public static Device getDevice(String address, String alias) {
         Logger.debug("getDevice called");
        if(_jsr179Device==null) {
@@ -252,5 +241,4 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
        }
         return _jsr179Device;
     }
-
 }

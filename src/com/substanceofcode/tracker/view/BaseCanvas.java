@@ -1,7 +1,7 @@
 /*
  * BaseCanvas.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.localization.LocaleManager;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
@@ -78,29 +79,28 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     /* Initialize commands */
     private void initializeCommands() {
 
-
         // Start/Stop command for toggling recording
-        startStopCommand = new Command("Start/Stop recording", Command.ITEM, 1);
+        startStopCommand = new Command(LocaleManager.getMessage("menu_start_stop_recording"), Command.ITEM, 1);
         addCommand(startStopCommand);
 
         // Waypoints command
-        managePlacesCommand = new Command("Manage Places", Command.ITEM, 2);
+        managePlacesCommand = new Command(LocaleManager.getMessage("menu_manage_places"), Command.ITEM, 2);
         addCommand(managePlacesCommand);
 
         // Trails command
-        manageTrailsCommand = new Command("Manage Trails", Command.ITEM, 3);
+        manageTrailsCommand = new Command(LocaleManager.getMessage("menu_manage_trails"), Command.ITEM, 3);
         addCommand(manageTrailsCommand);
 
         // Settings command for showing settings list
-        settingsCommand = new Command("Settings", Command.SCREEN, 5);
+        settingsCommand = new Command(LocaleManager.getMessage("menu_settings"), Command.SCREEN, 5);
         addCommand(settingsCommand);
         
         // Switch between day or night theme
-        switchThemeCommand = new Command("Switch Theme", Command.ITEM, 6);
+        switchThemeCommand = new Command(LocaleManager.getMessage("menu_switch_theme"), Command.ITEM, 6);
         addCommand(switchThemeCommand);
 
         // Exit command
-        exitCommand = new Command("Exit", Command.EXIT, 10);
+        exitCommand = new Command(LocaleManager.getMessage("menu_exit"), Command.EXIT, 10);
         addCommand(exitCommand);
 
     }
