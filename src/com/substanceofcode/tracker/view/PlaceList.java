@@ -26,6 +26,7 @@ import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -56,7 +57,7 @@ public class PlaceList extends List implements CommandListener {
     private final Command importPlacesCommand;
     private final Command navigatePlaceCommand;
     
-    private static final String TITLE = "Places";
+    private static final String TITLE = LocaleManager.getMessage("places_list_title");
     
     private Vector places;
     
@@ -68,15 +69,24 @@ public class PlaceList extends List implements CommandListener {
         super(TITLE, List.IMPLICIT);        
         this.controller = controller;
         
-        this.addCommand(editCommand = new Command("Edit place", Command.OK, 1));
-        this.addCommand(deleteCommand = new Command("Remove place", Command.SCREEN, 2));
-        this.addCommand(deleteAllCommand = new Command("Remove all places", Command.SCREEN, 3));
-        this.addCommand(newPlaceCommand = new Command("Add new place", Command.ITEM, 4));
-        this.addCommand(exportPlaceCommand = new Command("Export selected place", Command.ITEM, 5));
-        this.addCommand(exportAllPlacesCommand = new Command("Export all places", Command.ITEM, 6));
-        this.addCommand(importPlacesCommand = new Command("Import places", Command.ITEM, 7));
-        this.addCommand(navigatePlaceCommand = new Command("Navigate to place", Command.ITEM, 8));
-        this.addCommand(backCommand = new Command("Back", Command.BACK, 10));
+        this.addCommand(editCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_edit"),Command.OK, 1));
+        this.addCommand(deleteCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_remove"), Command.SCREEN, 2));
+        this.addCommand(deleteAllCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_removeall"), Command.SCREEN, 3));
+        this.addCommand(newPlaceCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_add"), Command.ITEM, 4));
+        this.addCommand(exportPlaceCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_export"), Command.ITEM, 5));
+        this.addCommand(exportAllPlacesCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_exportall"), Command.ITEM, 6));
+        this.addCommand(importPlacesCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_import"), Command.ITEM, 7));
+        this.addCommand(navigatePlaceCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_navigate"), Command.ITEM, 8));
+        this.addCommand(backCommand =
+                new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 10));
 
         setSelectCommand(editCommand);
         
@@ -145,8 +155,7 @@ public class PlaceList extends List implements CommandListener {
             Place selectedPlace = getSelectedPlace();
             if(selectedPlace != null) {
                 controller.showPlaceActionsForm(selectedPlace, selectedPlaceName, 1);
-            }
-            
+            }   
         }
         
         if(command == exportAllPlacesCommand) {

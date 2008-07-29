@@ -97,7 +97,7 @@ public class LocaleManager  {
                 // '-' instead of '_'. For example Nokia or Motorola
                 locale = locale.replace('-','_');
 
-                //System.out.println("dbg():" + prefix+"_"+locale+suffix);
+                //Logger.debug("Locale:" + prefix+"_"+locale+suffix);
 
                 in = clazz.getResourceAsStream(prefix+"_"+locale+suffix);
                 if (in == null) {

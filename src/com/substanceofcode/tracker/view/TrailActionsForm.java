@@ -30,6 +30,7 @@ import javax.microedition.lcdui.*;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.*;
 import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * TrailActionsForm will be shown when recording was stopped by user.
@@ -44,10 +45,12 @@ import com.substanceofcode.util.DateTimeUtil;
 public class TrailActionsForm extends Form implements CommandListener,
         AlertListener {
 
-    private static final String[] ALL_ACTIONS = { "Export to KML",
-                                                  "Export to GPX", 
-                                                  "Save Trail", 
-                                                  "Save GPX Stream" };
+    private static final String[] ALL_ACTIONS = {
+                        LocaleManager.getMessage("trails_actions_export_kml"),
+                        LocaleManager.getMessage("trails_actions_export_gpx"),
+                        LocaleManager.getMessage("trails_actions_save_trail"),
+                        LocaleManager.getMessage("trails_actions_save_gpx_stream")
+                        };
 
     private Controller controller;
 
@@ -79,14 +82,16 @@ public class TrailActionsForm extends Form implements CommandListener,
      * @param controller 
      */
     public TrailActionsForm(Controller controller) {
-        super("Trail Actions");
+        super(LocaleManager.getMessage("trails_actions_title"));
         this.saveIsAnOption = true;
         this.track = controller.getTrack();
         String name = track.getName();
         if(name==null||name.length()==0) {
             name = DateTimeUtil.getCurrentDateStamp();
         }
-        this.trailNameField = new TextField("Name", name, 64, TextField.ANY);
+        this.trailNameField =
+                new TextField(LocaleManager.getMessage("trails_actions_name"),
+                              name, 64, TextField.ANY);
         this.initialize(controller);
     }
 
@@ -98,14 +103,16 @@ public class TrailActionsForm extends Form implements CommandListener,
      * @param trackName 
      */
     public TrailActionsForm(Controller controller, Track track, String trackName) {
-        super("Trail Actions");
+        super(LocaleManager.getMessage("trails_actions_title"));
         this.saveIsAnOption = false;
         this.track = track;
         String name = trackName;
         if(name==null||name.length()==0) {
             name = DateTimeUtil.getCurrentDateStamp();
         }        
-        this.trailNameField = new TextField("Name", name, 64, TextField.ANY);
+        this.trailNameField =
+                new TextField(LocaleManager.getMessage("trails_actions_name"),
+                              name, 64, TextField.ANY);
         this.initialize(controller);
     }
 
@@ -122,8 +129,10 @@ public class TrailActionsForm extends Form implements CommandListener,
 
     /** Initialize commands */
     private void initializeCommands() {
-        this.addCommand(saveCommand = new Command("Save", Command.SCREEN, 1));
-        this.addCommand(cancelCommand = new Command("Cancel", Command.BACK,
+        this.addCommand(saveCommand =
+                new Command(LocaleManager.getMessage("menu_save"), Command.SCREEN, 1));
+        this.addCommand(cancelCommand =
+                new Command(LocaleManager.getMessage("menu_cancel"), Command.BACK,
                         100));
     }
 
@@ -172,8 +181,8 @@ public class TrailActionsForm extends Form implements CommandListener,
         // Construct choice group
         //-----------------------------------------------------------------------
         actionsGroup = new ChoiceGroup(
-                "Please select the next actions for the current trail. Multiple "
-                        + "actions are possible:", ChoiceGroup.MULTIPLE,
+                LocaleManager.getMessage("trails_actions_export_info"),
+                ChoiceGroup.MULTIPLE,
                 actions, null);
 
         actionsGroup.setSelectedFlags(selectedFlags);
@@ -207,18 +216,21 @@ public class TrailActionsForm extends Form implements CommandListener,
                     }
                     if (track.isStreaming() && actionsGroup.isSelected(3)) {
                         try {
-                            lListen.notifyProgressStart("Closing GPX Stream");
+                            lListen.notifyProgressStart(
+                                    LocaleManager.getMessage("trails_actions_prgs_gpx_strm_start"));
                             lListen.notifyProgress(10);
                             track.closeStream();
-                            lListen.notifySuccess("GPX Stream Closed");
+                            lListen.notifySuccess(
+                                    LocaleManager.getMessage("trails_actions_prgs_gpx_strm_stop"));
                         } catch (IOException e) {
-                            lListen.notifyError("Error Closing GPX Stream", e);
+                            lListen.notifyError(
+                                    LocaleManager.getMessage("trails_actions_prgs_gpx_strm_error"), e);
                             noStreamCloseErrors = false;
                         }
                     }
 
-                    System.out.println("Finished save process");
-                    System.out.println("No Errors : " + noSaveErrors);
+                    Logger.info("Finished save process");
+                    Logger.info("No Errors : " + noSaveErrors);
 
                     //----------------------------------------------------------
                     // If we were dealing with a streaming trail and it was
@@ -234,7 +246,7 @@ public class TrailActionsForm extends Form implements CommandListener,
                     // previous Screen
                     //----------------------------------------------------------
                     if (noSaveErrors) {
-                        System.out.println("goBack()");
+                        Logger.info("goBack()");
                         lListen.join();
                         TrailActionsForm.this.goBack();
                     }
@@ -275,14 +287,16 @@ public class TrailActionsForm extends Form implements CommandListener,
                 controller.getSettings().setStreamingStopped();
             }
             if (xiListen != null) {
-                xiListen.notifySuccess(lType + " : Save Complete");
+                xiListen.notifySuccess(lType + " : " +
+                        LocaleManager.getMessage("trails_actions_prgs_success"));
             }
         } catch (Exception ex) {
             Logger.error(
                     "Exception caught when trying to export trail: "
                             + ex.toString());
             if (xiListen != null) {
-                xiListen.notifyError(lType + " : Save Failed", ex);
+                xiListen.notifyError(lType + " : " +
+                        LocaleManager.getMessage("trails_actions_prgs_error"), ex);
             }
         }
     }
@@ -299,8 +313,7 @@ public class TrailActionsForm extends Form implements CommandListener,
      * @see com.substanceofcode.tracker.model.AlertListener#notifyError()
      */
     public void notifyError() {
-        System.out.println("Error During Save");
+        Logger.error("Error During Save");
         noSaveErrors = false;
     }
-
 }

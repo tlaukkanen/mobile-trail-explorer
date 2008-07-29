@@ -36,6 +36,7 @@ import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.Version;
+import com.substanceofcode.localization.LocaleManager;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Graphics;
@@ -145,13 +146,13 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
         String info = versionText;
         if(!isAppInitialized) {
-            info += " Starting up...";
+            info += " " + LocaleManager.getMessage("splash_starting_up");
         }
         g.drawString(info, 1, 1, Graphics.TOP|Graphics.LEFT);
         
         if(updateRequired){
             g.setColor(0xFF0000);
-            g.drawString("Updating MTE", getWidth()/2, getHeight()-5, Graphics.BOTTOM | Graphics.HCENTER);
+            g.drawString(LocaleManager.getMessage("splash_updating_mte"), getWidth()/2, getHeight()-5, Graphics.BOTTOM | Graphics.HCENTER);
         }
     }
 
@@ -309,6 +310,4 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         
         return new GpsPosition(rawData, course, longitude, latitude, speed, altitude, date);
     }
-    
-    
 }
