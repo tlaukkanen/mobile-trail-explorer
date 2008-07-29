@@ -47,6 +47,7 @@ class ShortcutsList extends List implements CommandListener {
             } else {
                 settings.setPoundShortcut(selectedIndex);
             }
+            Controller.getController().showKeySettings();
         }
     }
 
