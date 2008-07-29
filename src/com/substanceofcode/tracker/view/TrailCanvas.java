@@ -49,7 +49,7 @@ import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.ProjectionUtil;
 import com.substanceofcode.util.StringUtil;
-
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * TrailCanvas is a main view for the application. It contains a current
@@ -134,7 +134,6 @@ public class TrailCanvas extends BaseCanvas {
                 calculateDisplaySize(width,height) ;
             }
             
-
             /** Get last position from recorder */
             final GpsPosition temp = controller.getPosition();
             if (temp != null) {
@@ -198,7 +197,6 @@ public class TrailCanvas extends BaseCanvas {
             Logger.debug("Caught exception:"+e.getMessage());
         }
     }
-
 
     public void setLastPosition(GpsPosition position) {
         if (position != null) {
@@ -289,7 +287,6 @@ public class TrailCanvas extends BaseCanvas {
                 	    }
                     }
                 }
-
             }
         } else {
             // Thread is started so we need to stop it
@@ -602,10 +599,10 @@ public class TrailCanvas extends BaseCanvas {
         Font currentFont = g.getFont();
         int fontHeight = currentFont.getHeight();
 
-        g.drawString("Distance:" + distanceString,
+        g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": " + distanceString,
                 midWidth + horizontalMovement,
                 midHeight + verticalMovement + fontHeight, Graphics.TOP | Graphics.HCENTER);
-        g.drawString("Course:" + courseString,
+        g.drawString(LocaleManager.getMessage("trail_canvas_course") + ": " + courseString,
                 midWidth + horizontalMovement,
                 midHeight + verticalMovement + (fontHeight * 2), Graphics.TOP | Graphics.HCENTER);
     }
@@ -625,7 +622,7 @@ public class TrailCanvas extends BaseCanvas {
         g.setColor( Theme.getColor(Theme.TYPE_TEXTVALUE));
 
         String satelliteCount = String.valueOf(controller.getSatelliteCount());
-        g.drawString("Status: " + controller.getStatusText() + " ("
+        g.drawString(LocaleManager.getMessage("trail_canvas_status") + ": " + controller.getStatusText() + " ("
                 + satelliteCount + ")", 1, 0, Graphics.TOP | Graphics.LEFT);
 
         /** Draw status */
@@ -658,13 +655,13 @@ public class TrailCanvas extends BaseCanvas {
 
                     //increase row-counter
                     displayRow++;
-            }
+                }
             }
 
             /** Draw current time */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_TIME) == true) {
                 String timeStamp = DateTimeUtil.convertToTimeStamp(now);
-                g.drawString("TME:", 1, fontHeight * displayRow, Graphics.TOP
+                g.drawString(LocaleManager.getMessage("trail_canvas_time") + ": ", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
                 g.drawString(timeStamp, positionAdd, fontHeight * displayRow,
                         Graphics.TOP | Graphics.LEFT);
@@ -686,7 +683,7 @@ public class TrailCanvas extends BaseCanvas {
                     speed = (int) lastPosition.speed;
                     units = " km/h";
                 }
-                g.drawString("SPD:", 1, fontHeight * displayRow, Graphics.TOP
+                g.drawString(LocaleManager.getMessage("trail_canvas_speed") + ": ", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
                 g.drawString(speed + units, positionAdd, fontHeight
                         * displayRow, Graphics.TOP | Graphics.LEFT);
@@ -696,7 +693,7 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw heading information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_HEADING) == true) {
                 String heading = lastPosition.getHeadingString();
-                g.drawString("HEA:", 1, fontHeight * displayRow, Graphics.TOP
+                g.drawString(LocaleManager.getMessage("trail_canvas_heading") + ": ", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
                 g.drawString(heading, positionAdd, fontHeight * displayRow,
                         Graphics.TOP | Graphics.LEFT);
@@ -729,9 +726,8 @@ public class TrailCanvas extends BaseCanvas {
                                 distanceInKilometers * 1000, 0);
                         units = " m";
                     }
-
                 }
-                g.drawString("DST:", 1, fontHeight * displayRow, Graphics.TOP
+                g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": ", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
                 g.drawString(distance + units, positionAdd, fontHeight
                         * displayRow, Graphics.TOP | Graphics.LEFT);
@@ -758,23 +754,22 @@ public class TrailCanvas extends BaseCanvas {
                     altitude = StringUtil.valueOf(altitudeInMeters, 2);
                     units = " m";
                 }
-                g.drawString("ALT:", 1, fontHeight * displayRow, Graphics.TOP
+                g.drawString(LocaleManager.getMessage("trail_canvas_altitude") + ": ", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
                 g.drawString(altitude + units, positionAdd, fontHeight
                         * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }
 
-
             /** Draw any other gps info */
             if (gpgsa != null) {
-                g.drawString("FIX:", 1, fontHeight * displayRow, Graphics.TOP
+                g.drawString(LocaleManager.getMessage("trail_canvas_fix") + ": ", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
                 g.drawString("" + gpgsa.getFixtype(), positionAdd, fontHeight
                         * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
 
-                g.drawString("PDOP:", 1, fontHeight * displayRow, Graphics.TOP
+                g.drawString(LocaleManager.getMessage("trail_canvas_pdop") + ": ", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
                 g.drawString("" + gpgsa.getPdop(), positionAdd, fontHeight
                         * displayRow, Graphics.TOP | Graphics.LEFT);
@@ -821,7 +816,7 @@ public class TrailCanvas extends BaseCanvas {
             long ageOfLastMessage = System.currentTimeMillis()
                     - Logger.getLogger().getTimeOfLastMessage();
             if (ageOfLastMessage < 10000) {
-                String lastLoggedMessage = "LOG:"
+                String lastLoggedMessage = LocaleManager.getMessage("trail_canvas_log") + ": "
                         + Logger.getLogger().getLastMessage();
                 String[] loglines = StringUtil.chopStrings(lastLoggedMessage,
                         " ", currentFont, getWidth());
@@ -857,32 +852,40 @@ public class TrailCanvas extends BaseCanvas {
                     secondsSinceLastPosition -= minutes * 60;
 
                     if (days > 0) {
-                        timeSinceLastPosition = days + " days " + hours
-                                + " hours ";
+                        timeSinceLastPosition = days + " " +
+                                LocaleManager.getMessage("trail_canvas_days") +
+                                " " + hours + " " +
+                                LocaleManager.getMessage("trail_canvas_hours");
                     } else if (hours > 0) {
-                        timeSinceLastPosition = hours + " hours " + minutes
-                                + " mins";
+                        timeSinceLastPosition = hours + " " + 
+                                LocaleManager.getMessage("trail_canvas_hours") +
+                                " " + minutes + " " +
+                                LocaleManager.getMessage("trail_canvas_minutes");
                     } else {
-                        timeSinceLastPosition = minutes + " mins "
-                                + secondsSinceLastPosition + " seconds";
+                        timeSinceLastPosition = minutes + " " +
+                                LocaleManager.getMessage("trail_canvas_minutes") +
+                                " " + secondsSinceLastPosition + " " +
+                                LocaleManager.getMessage("trail_canvas_seconds");
                     }
 
                 } else if (secondsSinceLastPosition == -1) {
                     timeSinceLastPosition = "No Time Info Available";
                 } else {
                     timeSinceLastPosition = secondsSinceLastPosition
-                            + " seconds";
+                            + " " +
+                            LocaleManager.getMessage("trail_canvas_seconds");;
                 }
 
-                g.drawString("Time from last fix:", 1, height
-                        - (fontHeight * 4 + 6), Graphics.TOP | Graphics.LEFT);
-                g.drawString(timeSinceLastPosition + " ago.", 1, height
-                        - (fontHeight * 3 + 6), Graphics.TOP | Graphics.LEFT);
+                g.drawString(LocaleManager.getMessage("trail_canvas_no_time_info"),
+                        1, height - (fontHeight * 4 + 6), Graphics.TOP | Graphics.LEFT);
+                g.drawString(timeSinceLastPosition +
+                        " " + LocaleManager.getMessage("trail_canvas_time_ago"),
+                        1, height - (fontHeight * 3 + 6), Graphics.TOP | Graphics.LEFT);
 
             }
 
         } else if (controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
-            g.drawString("No GPS fix. " + counter, 1, fontHeight, Graphics.TOP
+            g.drawString(LocaleManager.getMessage("trail_canvas_no_gps_fix") + " " + counter, 1, fontHeight, Graphics.TOP
                     | Graphics.LEFT);
         }
 
@@ -953,7 +956,6 @@ public class TrailCanvas extends BaseCanvas {
                 break;       
 
             default:
-
         }
 
         /** Handle panning keys */
@@ -985,5 +987,4 @@ public class TrailCanvas extends BaseCanvas {
         }
         this.repaint();
     }
-
 }
