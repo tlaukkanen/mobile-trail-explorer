@@ -32,6 +32,7 @@ import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p> Elevation canvas shows the change in elevation over the course of the Trail
@@ -137,7 +138,7 @@ public class ElevationCanvas extends BaseCanvas {
     private int drawTitle(Graphics g, int yPos) {
         g.setFont(titleFont);
         g.setColor( Theme.getColor(Theme.TYPE_TITLE) );
-        final String title = "Elevation";
+        final String title = LocaleManager.getMessage("elevation_canvas_title");
         g.drawString(title, this.getWidth() / 2, yPos, Graphics.TOP
                 | Graphics.HCENTER);
         return yPos + g.getFont().getHeight();
@@ -344,8 +345,8 @@ public class ElevationCanvas extends BaseCanvas {
 
         } catch (Exception ex) {
             g.setColor( Theme.getColor(Theme.TYPE_ERROR) );
-            g.drawString("ERR: " + ex.toString(), 1, 120, Graphics.TOP
-                    | Graphics.LEFT);
+            g.drawString(LocaleManager.getMessage("elevation_canvas_error") +
+                    " " + ex.toString(), 1, 120, Graphics.TOP | Graphics.LEFT);
 
             Logger.error(
                     "Exception occured while drawing elevation: "
@@ -402,7 +403,6 @@ public class ElevationCanvas extends BaseCanvas {
                         setMinMaxValues();
                         altitudeZoomIncrement = 10;
                     }                    
-                    
                 }
                 break;
 
@@ -453,7 +453,6 @@ public class ElevationCanvas extends BaseCanvas {
             default:
         }
 
-
         /** Handle panning keys */
         int gameKey = -1;
         try {
@@ -492,5 +491,4 @@ public class ElevationCanvas extends BaseCanvas {
         this.lastPosition = position;
         this.setMinMaxValues();
     }
-
 }
