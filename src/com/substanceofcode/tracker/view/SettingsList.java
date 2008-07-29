@@ -46,7 +46,8 @@ public class SettingsList extends List implements CommandListener {
     private final static int DISPLAY = 4;
     private final static int DEVELOPMENT_MENU = 5;
     private final static int ABOUT = 6;
-    private final static int SMS = 7;
+    private final static int SMS = 8;
+    private final static int KEYS = 7;
     private final static boolean SMS_AVAILABLE;
 
     static {
@@ -85,6 +86,7 @@ public class SettingsList extends List implements CommandListener {
         this.append("Display", null);
         this.append("Development Menu", null);
         this.append("About/Help", null);
+        this.append("Keys", null);
         if (SMS_AVAILABLE) {
             this.append("SMS", null);
         }
@@ -133,6 +135,11 @@ public class SettingsList extends List implements CommandListener {
                 case (ABOUT):
                     controller.showAboutScreen();
                     break;
+
+                case (KEYS):
+                    controller.showKeySettings();
+                    break;
+
                 case (SMS):
                     controller.showSMSScreen();
                     break;

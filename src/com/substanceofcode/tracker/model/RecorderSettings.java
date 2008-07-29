@@ -106,7 +106,11 @@ public class RecorderSettings {
     /** Map drawing options */
     public static final int DRAW_MAP_NONE = 0;
     public static final int DRAW_MAP_OSM = 1;
-    
+
+    /** Shortcut key options */
+    private static final String SHORTCUT_STAR = "shortcut-asterisk";
+    private static final String SHORTCUT_POUND = "shortcut-crosshatch";
+
     /** Logging */
     public static final String WRITE_LOG = "write-log";
 
@@ -585,4 +589,23 @@ public class RecorderSettings {
         saveSettings();
     }
 
+    /** Get star shortcut */
+    public short getStarShortcut() {
+        return (short)settings.getIntProperty(SHORTCUT_STAR, 0);
+    }
+
+    /** Set star shortcut */
+    public void setStarShortcut(int shortcut) {
+        settings.setIntProperty(SHORTCUT_STAR, shortcut);
+    }
+
+    /** Get cross hatch shortcut */
+    public short getPoundShortcut() {
+        return (short)settings.getIntProperty(SHORTCUT_POUND, 1);
+    }
+
+    /** Set cross hatch shortcut */
+    public void setPoundShortcut(int shortcut) {
+        settings.setIntProperty(SHORTCUT_POUND, shortcut);
+    }
 }

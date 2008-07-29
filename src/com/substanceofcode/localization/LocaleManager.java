@@ -22,6 +22,7 @@
 
 package com.substanceofcode.localization;
 
+import com.substanceofcode.tracker.view.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -143,7 +144,12 @@ public class LocaleManager  {
      * is returned
      */    
     public static final String getMessage(String key) {
-        return getMessage(key,null);
+        String msg = getMessage(key,null);
+        if(msg==null) {
+            Logger.fatal("Missing translation for key " + key);
+            return key;
+        }
+        return msg;
     }
     
     /**

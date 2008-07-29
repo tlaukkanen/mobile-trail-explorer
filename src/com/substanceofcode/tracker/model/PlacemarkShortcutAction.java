@@ -1,5 +1,5 @@
 /*
- * Point2D 
+ * PlacemarkShortcutAction.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -21,26 +21,26 @@
 
 package com.substanceofcode.tracker.model;
 
+import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.view.Logger;
+
 /**
  *
- * @author Tommi Laukkanen (tlaukkanen at gmail dot com)
+ * @author Tommi Laukkanen
  */
-public class Point2D {
+public class PlacemarkShortcutAction implements ShortcutAction {
 
-    private double x;
-    private double y;
-
-    public double getX() {
-        return x;
+    public void execute() {
+        Logger.debug("WaypointList getPosition called");
+        Controller controller = Controller.getController();
+        GpsPosition lp = controller.getPosition();
+        if (lp != null) {
+            int waypointCount = controller.getPlaces().size();
+            String name = "WP" + String.valueOf(waypointCount + 1);
+            Place waypoint = new Place(name, lp.latitude, lp.longitude);
+            controller.savePlace(waypoint);
+        }
     }
 
-    public double getY() {
-        return y;
-    }
-    
-    public Point2D(double x, double y) {
-        this.x = x;
-        this.y = y;
-    }
-    
 }

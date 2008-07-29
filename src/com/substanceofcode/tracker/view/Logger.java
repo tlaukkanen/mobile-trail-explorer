@@ -151,6 +151,7 @@ public class Logger extends Form implements CommandListener {
 
     public static void fatal(String message) {
         logger.log(message, FATAL);
+        System.err.println("Fatal error: " + message);
     }
 
     private Logger(RecorderSettings settings) {

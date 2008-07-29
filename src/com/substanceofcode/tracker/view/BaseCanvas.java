@@ -144,6 +144,10 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         if(keyCode==Canvas.KEY_STAR) {
             controller.executeStarShortcut();
         }
+        /** Handle # key press (shortcutkey) */
+        if(keyCode==Canvas.KEY_POUND) {
+            controller.executePoundShortcut();
+        }
 
     }
 }

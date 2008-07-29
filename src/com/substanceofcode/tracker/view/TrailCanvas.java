@@ -951,19 +951,6 @@ public class TrailCanvas extends BaseCanvas {
                 // Change theme
                 Theme.switchTheme();
                 break;       
-                
-            //case (KEY_STAR):
-            case (KEY_POUND):
-                Logger.debug("WaypointList getPosition called");
-                GpsPosition lp = controller.getPosition();
-                if (lp != null) {
-                    int waypointCount = controller.getPlaces().size();
-                    String name = "WP" + String.valueOf(waypointCount + 1);
-                    Place waypoint = new Place(name, lp.latitude,
-                            lp.longitude);
-                    controller.savePlace(waypoint);
-                }
-                break;
 
             default:
 

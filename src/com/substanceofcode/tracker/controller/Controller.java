@@ -62,6 +62,7 @@ import com.substanceofcode.tracker.view.ExportSettingsForm;
 import com.substanceofcode.tracker.view.FileChooser;
 import com.substanceofcode.tracker.view.ImportTrailScreen;
 import com.substanceofcode.tracker.view.InformationCanvas;
+import com.substanceofcode.tracker.view.KeySettingsList;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.tracker.view.PlaceList;
 import com.substanceofcode.tracker.view.RecordingSettingsForm;
@@ -186,6 +187,9 @@ public class Controller {
      * Navigation Place
      */
     private Place navpnt;
+    /** Shortcuts */
+    private static final short SHORTCUTACTION_AUDIOMARK = 0;
+    private static final short SHORTCUTACTION_PLACEMARK = 1;
 
     /**
      * Creates a new instance of Controller which performs the following:
@@ -214,10 +218,30 @@ public class Controller {
 
     }
 
+    public void executePoundShortcut() {
+        short shortcut = settings.getPoundShortcut();
+        executeShortcut( shortcut );
+    }
+    
     public void executeStarShortcut() {
-        // TODO: Get shortcut from settings
-        ShortcutAction action = new AudioShortcutAction();
-        action.execute();        
+        short shortcut = settings.getStarShortcut();
+        executeShortcut( shortcut );
+    }
+    
+    private void executeShortcut(short shortcut) {
+        ShortcutAction action = null;
+        switch(shortcut) {
+            case SHORTCUTACTION_AUDIOMARK:
+                action = new AudioShortcutAction();
+                break;
+            case SHORTCUTACTION_PLACEMARK:
+
+                break;
+            default:
+        }
+        if(action!=null) {
+            action.execute();
+        }
     }
 
     public void initialize() {
@@ -374,6 +398,10 @@ public class Controller {
             System.err.println("Error in Controller.searchDevices: " + ex.toString());
             ex.printStackTrace();
         }
+    }
+
+    public void showKeySettings() {
+        display.setCurrent(new KeySettingsList());
     }
 
     public void showWebRecordingSettings() {
