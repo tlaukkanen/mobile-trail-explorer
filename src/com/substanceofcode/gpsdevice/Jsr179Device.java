@@ -57,8 +57,10 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 float course=location.getCourse();
                 float speed=location.getSpeed();
 
+                float speedkmh= speed * 3.6f;
+                
                 Logger.debug("dbg(): current speed: m/s" + speed);
-                Logger.debug("dbg(): current speed: km/h" + (speed + 3.6));
+                Logger.debug("dbg(): current speed: km/h" + speedkmh);
                 
                 QualifiedCoordinates qc=location.getQualifiedCoordinates();
                 float altitude=qc.getAltitude();
