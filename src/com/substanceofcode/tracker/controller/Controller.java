@@ -51,6 +51,7 @@ import com.substanceofcode.tracker.model.GpsRecorder;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.tracker.model.PlacemarkShortcutAction;
 import com.substanceofcode.tracker.model.ShortcutAction;
 import com.substanceofcode.tracker.view.AboutScreen;
 import com.substanceofcode.tracker.view.BaseCanvas;
@@ -235,7 +236,7 @@ public class Controller {
                 action = new AudioShortcutAction();
                 break;
             case SHORTCUTACTION_PLACEMARK:
-
+                action = new PlacemarkShortcutAction();
                 break;
             default:
         }
