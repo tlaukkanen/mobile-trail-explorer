@@ -40,5 +40,4 @@ public class CanvasPoint {
         X = x;
         Y = y;
     }
-    
 }

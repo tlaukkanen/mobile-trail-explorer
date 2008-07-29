@@ -1188,12 +1188,12 @@ public class Controller {
      */
     public boolean checkIfPaused() {
         FileSystem fs = FileSystem.getFileSystem();
-        boolean status = false;
+        boolean rstatus = false;
         if (fs.containsFile(Track.PAUSEFILENAME)) {
-            status = true;
+            rstatus = true;
         }
 
-        return status;
+        return rstatus;
 
     }
 

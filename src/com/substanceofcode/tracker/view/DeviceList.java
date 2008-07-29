@@ -20,7 +20,6 @@
  *
  */
 
-
 package com.substanceofcode.tracker.view;
 
 import java.util.Vector;
@@ -32,6 +31,7 @@ import javax.microedition.lcdui.List;
 
 import com.substanceofcode.bluetooth.Device;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * 
@@ -45,7 +45,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
     private final static int STATUS_SEARCHING = 2;
     private final static int STATUS_COMPLETE = 3;
     private Thread searchThread;
-    private final static String TITLE = "Devices";
+    private final static String TITLE = LocaleManager.getMessage("device_list_title");
 
     /** Commands */
     private Command refreshCommand;
@@ -73,14 +73,22 @@ public class DeviceList extends List implements Runnable, CommandListener {
 
     /** Initialize commands */
     private void initializeCommands() {
-        refreshCommand = new Command("Refresh", Command.ITEM, 2);
+        refreshCommand = new Command(
+                LocaleManager.getMessage("device_list_menu_refresh"),
+                Command.ITEM, 2);
         addCommand(refreshCommand);
-        selectCommand = new Command("Select", Command.ITEM, 1);
+        selectCommand = new Command(
+                LocaleManager.getMessage("menu_select"),
+                Command.ITEM, 1);
         addCommand(selectCommand);
         setSelectCommand(selectCommand);
-        cancelCommand = new Command("Cancel", Command.CANCEL, 3);
+        cancelCommand = new Command(
+                LocaleManager.getMessage("menu_cancel"),
+                Command.CANCEL, 3);
         addCommand(cancelCommand);
-        mockGpsCommand = new Command("MockGPS", Command.ITEM, 4);
+        mockGpsCommand = new Command(
+                LocaleManager.getMessage("device_list_menu_mockgps"),
+                Command.ITEM, 4);
         addCommand(mockGpsCommand);
 
         setCommandListener(this);
@@ -125,11 +133,10 @@ public class DeviceList extends List implements Runnable, CommandListener {
         
         while (status != STATUS_COMPLETE) {
             try {
-
                 /** If we are ready then we'll search for the devices */
                 if (status == STATUS_READY) {
-                    this.append("Searching...", null);
-                    System.out.println("Searching GPS devices");                    
+                    this.append(LocaleManager.getMessage("device_list_searching"), null);
+                    Logger.info("Searching GPS devices");
                     controller.searchDevices();
                     status = STATUS_SEARCHING;
                 }
@@ -139,19 +146,27 @@ public class DeviceList extends List implements Runnable, CommandListener {
                 
                 if (devices != null && devices.size() > 0) {
                     Logger.debug("Search Complete. devices="+ devices.size());
-                    this.set(0, "Found " + devices.size() + " device(s)", null);
+                    //this.set(0, "Found " + devices.size() + " device(s)", null);new Object[] {e.getMessage()}
+                    this.set(0,
+                            LocaleManager.getMessage(
+                            "device_list_search_result",
+                            new Object[] {Integer.toString(devices.size())}),
+                            null);
                     for (int deviceIndex = 0; deviceIndex < devices.size(); deviceIndex++) {
                         Device device = (Device) devices.elementAt(deviceIndex);
                         this.append(device.getAlias(), null);
                     }
                     status = STATUS_COMPLETE;
                 } else {
-                    this.set(0, "No devices found", null);
+                    this.set(0,
+                            LocaleManager.getMessage(
+                            "device_list_serach_result_no_device"),
+                            null);
                     status = STATUS_COMPLETE;
                 }
 
             } catch (Exception ex) {
-                System.err.println("Error in DeviceList.run: " + ex.toString());
+                Logger.error("Error in DeviceList.run: " + ex.toString());
                 status = STATUS_COMPLETE;
             }
         }
@@ -174,10 +189,9 @@ public class DeviceList extends List implements Runnable, CommandListener {
             controller.showSettings();
         }
         if (command == mockGpsCommand) {
-            controller.setMockGpsDevice("Mock", "MockGpsDevice");
+            controller.setMockGpsDevice("Mock",
+                    LocaleManager.getMessage("device_list_mockgps_alias"));
             controller.showSettings();
         }
     }
-
-
 }
