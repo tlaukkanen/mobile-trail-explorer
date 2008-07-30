@@ -1,7 +1,7 @@
 /*
  * StringUtil.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,6 @@ package com.substanceofcode.util;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
-
 
 /**
  * StringUtil contains utility functions for manipulating strings.
@@ -105,34 +104,31 @@ public class StringUtil {
     }
     
     /**
-         * Split a Set of NMEA Strings and put the results into a vector
-         * @param original
-         * @return
-         */
-    
-        synchronized static public Vector splitToNMEAVector(String original){
-           
-            Vector nodes = new Vector();
-            String separator = "$";
-           
-            // Parse nodes into vector
-            int index = original.indexOf(separator);
-            original =  original.substring(index + separator.length());
-            index = original.indexOf(separator);
-            while (index >= 0) {
-                
-                nodes.addElement(separator + original.substring(0, index));
-                
-                original = original.substring(index + separator.length());
-                index = original.indexOf(separator);
-            }
-            // Get the last node
-            nodes.addElement(separator + original);
-            
-            return nodes;
-        }   
-    
+     * Split a Set of NMEA Strings and put the results into a vector
+     * @param original
+     * @return
+     */
+    synchronized static public Vector splitToNMEAVector(String original){
 
+        Vector nodes = new Vector();
+        String separator = "$";
+
+        // Parse nodes into vector
+        int index = original.indexOf(separator);
+        original =  original.substring(index + separator.length());
+        index = original.indexOf(separator);
+        while (index >= 0) {
+            nodes.addElement(separator + original.substring(0, index));
+
+            original = original.substring(index + separator.length());
+            index = original.indexOf(separator);
+        }
+        // Get the last node
+        nodes.addElement(separator + original);
+        
+        return nodes;
+    }
+    
     /**
      * Chops up the 'original' string into 1 or more strings which have a width <=
      * 'width' when rasterized with the specified Font.
@@ -279,6 +275,5 @@ public class StringUtil {
             index01 = s.indexOf(f, index01);
         }
         return s;
-    }    
-
+    }
 }
