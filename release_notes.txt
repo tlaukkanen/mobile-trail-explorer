@@ -11,15 +11,17 @@ Anthony McCormack
 Gareth Jones
 Patrick Steiner
 Kaspar Mösinger
+Bastian Kämpfe
 
 Release Notes:
 
-v1.11 (June xth 2008)
+v1.11 (August xth 2008)
 + Renamed "Waypoints" to "Places" (Issue 92)
 + Filename uses datestamp with seconds
 + User can add audio-markers
 + New speedometer screen (Issue 112)
 + Support different grid formats (Contributed by Kaspar Mösinger)
++ Encoding problems with KML import (Issue 120, Contribution from Bastian)
 
 v1.10 (May 6th 2008)
 + Support varying screen sizes like rotating screen on N95 (Issue 90)

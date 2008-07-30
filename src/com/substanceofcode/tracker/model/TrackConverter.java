@@ -23,7 +23,6 @@ package com.substanceofcode.tracker.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Vector;
 
 import javax.microedition.io.file.FileConnection;
@@ -91,17 +90,12 @@ public abstract class TrackConverter {
             }
 
             InputStream is = connection.openInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
 
             KXmlParser parser = new KXmlParser();
-            parser.setInput(isr);
+            parser.setInput(is, null);
 
             result = importTrack(parser);
 
-            try {
-                isr.close();
-            } catch (IOException e) {
-            }
             try {
                 is.close();
             } catch (IOException e) {
@@ -136,17 +130,11 @@ public abstract class TrackConverter {
             }
 
             InputStream is = connection.openInputStream();
-            InputStreamReader isr = new InputStreamReader(is);
-
             KXmlParser parser = new KXmlParser();
-            parser.setInput(isr);
+            parser.setInput(is, null);
 
             result = importPlace(parser);
 
-            try {
-                isr.close();
-            } catch (IOException e) {
-            }
             try {
                 is.close();
             } catch (IOException e) {
