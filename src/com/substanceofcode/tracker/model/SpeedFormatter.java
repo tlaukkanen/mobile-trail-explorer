@@ -64,7 +64,7 @@ public class SpeedFormatter {
         String speedString;
         if (settings.getUnitsAsKilometers() == true) {
             units = " km/h";
-            speedString = String.valueOf(speed);
+            speedString = StringUtil.valueOf(speed, decimalCount);
         } else {
             double mileSpeed = UnitConverter.convertSpeed(speed,
                                               UnitConverter.UNITS_KPH,
