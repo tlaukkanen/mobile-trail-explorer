@@ -218,9 +218,8 @@ public class Place {
         // Save the data to a file
         // ------------------------------------------------------------------
         
-        //faster, apparently
-        output.write(exportData.getBytes());
-        //output.println(exportData);
+        // keeps UTF-8 as encoding (as specified in KML-XML-header...
+        output.writeUTF( exportData );
         output.close();
         out.close();
         connection.close();
