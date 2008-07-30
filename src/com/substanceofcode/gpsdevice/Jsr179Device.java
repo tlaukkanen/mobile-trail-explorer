@@ -57,18 +57,15 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 float course=location.getCourse();
                 float speed=location.getSpeed();
 
+                // convert from m/s to km/h
                 float speedkmh= speed * 3.6f;
-                
-                Logger.debug("dbg(): current speed: m/s" + speed);
-                Logger.debug("dbg(): current speed: km/h" + speedkmh);
                 
                 QualifiedCoordinates qc=location.getQualifiedCoordinates();
                 float altitude=qc.getAltitude();
                 float hdop=qc.getHorizontalAccuracy();
                 
-                //Lat and lon appear to be the wrong way round
-                double lon=  qc.getLatitude();
-                double lat=  qc.getLongitude();
+                double lat=  qc.getLatitude();
+                double lon=  qc.getLongitude();
                 float vdop= qc.getVerticalAccuracy();
                         
                 //These might be useful later...
@@ -77,7 +74,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 //int locationMethod=location.getLocationMethod();
                 
                 long timestamp=location.getTimestamp();                
-                gp=new GpsPosition("",(short)course,lon,lat,speed,(double)altitude,new Date(timestamp));
+                gp=new GpsPosition("",(short)course,lon,lat,(double)speedkmh,(double)altitude,new Date(timestamp));
                 //gpgsa=new GpsGPGSA(0.0f,hdop,vdop,0);
             }
         }
@@ -116,10 +113,10 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
 
         try {
             if (locationProvider == null) {
-
                 Criteria criteria = new Criteria();
                 criteria.setSpeedAndCourseRequired(true);
-                
+                //criteria.setVerticalAccuracy(2);
+
                 locationProvider = LocationProvider.getInstance(criteria);
             }
             Logger.debug(logPrefix + "LocationProvider state: "
