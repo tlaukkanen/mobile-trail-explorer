@@ -29,6 +29,7 @@ import javax.microedition.lcdui.*;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.*;
 import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Global Actions Form for Place
@@ -38,8 +39,9 @@ import com.substanceofcode.util.DateTimeUtil;
 
 public class PlaceActionsForm extends Form implements CommandListener {
     
-    private static final String[] ALL_ACTIONS = { "Export to KML",
-                                                  "Export to GPX" };
+    private static final String[] ALL_ACTIONS = {
+                        LocaleManager.getMessage("places_actions_export_kml"),
+                        LocaleManager.getMessage("places_actions_export_gpx") };
     
     private Controller controller;
     
@@ -84,7 +86,7 @@ public class PlaceActionsForm extends Form implements CommandListener {
      * @param exportAllWaypoints 
      */
     public PlaceActionsForm(Controller controller, Place place, String placeName, int actionType) {
-        super("Place Actions");
+        super(LocaleManager.getMessage("places_actions_title"));
         this.place = place;
         String name = placeName;
         if(name == null || name.length() == 0) {
@@ -96,7 +98,10 @@ public class PlaceActionsForm extends Form implements CommandListener {
             name = name + "_" + dateStr;
         }
 
-        this.placeNameField = new TextField("Name", name, 64, TextField.ANY);
+        this.placeNameField =
+                new TextField(
+                LocaleManager.getMessage("places_actions_name"),
+                name, 64, TextField.ANY);
         this.actionType = actionType;
         this.initialize(controller);
     }
@@ -115,13 +120,14 @@ public class PlaceActionsForm extends Form implements CommandListener {
     /** Initialize commands */
     private void initializeCommands() {
         
-        String btnLabelOk = "Save";
+        String btnLabelOk = LocaleManager.getMessage("menu_save");
         
         if(actionType == REMOVE_ALL) {
-            btnLabelOk = "Remove";
+            btnLabelOk = LocaleManager.getMessage("menu_remove");
         }
         this.addCommand(okCommand = new Command(btnLabelOk, Command.SCREEN, 1));
-        this.addCommand(cancelCommand = new Command("Cancel", Command.BACK, 100));
+        this.addCommand(cancelCommand =
+                new Command(LocaleManager.getMessage("menu_cancel"), Command.BACK, 100));
     }
     
     /** Initialize form controls */
@@ -130,8 +136,10 @@ public class PlaceActionsForm extends Form implements CommandListener {
         // Construct string info item
         //----------------------------------------------------------------------
         if(actionType == REMOVE_ALL) {
-            infoStringItem = new StringItem("Info","Are you sure that you want "
-                    + "to permanently delete all places? ");
+            infoStringItem =
+                    new StringItem(
+                    LocaleManager.getMessage("places_actions_info"),
+                    LocaleManager.getMessage("places_actions_remove_all"));
         
             this.append(infoStringItem);
         } else {
@@ -161,8 +169,8 @@ public class PlaceActionsForm extends Form implements CommandListener {
             // Construct choice group
             //------------------------------------------------------------------
             actionsGroup = new ChoiceGroup(
-                "Please select the next actions for the current place. Multiple "
-                        + "actions are possible:", ChoiceGroup.MULTIPLE,
+                LocaleManager.getMessage("places_actions_choice_selection")
+                + ":", ChoiceGroup.MULTIPLE,
                 actions, null);
 
             actionsGroup.setSelectedFlags(selectedFlags);
@@ -184,11 +192,11 @@ public class PlaceActionsForm extends Form implements CommandListener {
                         AlertHandler lListen = new AlertHandler(controller, lThis);
                         controller.removeAllPlaces();
                         
-                        System.out.println("Finished remove process");
-                        System.out.println("No Errors : " + noRemoveErrors);
+                        Logger.info("Finished remove process");
+                        Logger.info("No Errors : " + noRemoveErrors);
                         
                         if (noRemoveErrors) {
-                            System.out.println("goBack()");
+                            Logger.info("goBack()");
                             lListen.join();
                             PlaceActionsForm.this.goBack();
                         }
@@ -209,15 +217,15 @@ public class PlaceActionsForm extends Form implements CommandListener {
                             exportWaypoint(RecorderSettings.EXPORT_FORMAT_GPX, lListen);
                         }
 
-                        System.out.println("Finished save process");
-                        System.out.println("No Errors : " + noSaveErrors);
+                        Logger.info("Finished save process");
+                        Logger.info("No Errors : " + noSaveErrors);
 
                         //------------------------------------------------------
                         // After doing all actions, we return to the normal 
                         // previous Screen
                         //------------------------------------------------------
                         if (noSaveErrors) {
-                            System.out.println("goBack()");
+                            Logger.info("goBack()");
                             lListen.join();
                             PlaceActionsForm.this.goBack();
                         }
@@ -257,9 +265,9 @@ public class PlaceActionsForm extends Form implements CommandListener {
                 double latValue = place.getLatitude();
                 double lonValue = place.getLongitude();
             
-                System.out.println("Waypointname: " + name +
-                                   " Latitude: " + latValue +
-                                   " Longitude: " + lonValue);
+                Logger.info("Waypointname: " + name +
+                            " Latitude: " + latValue +
+                            " Longitude: " + lonValue);
                 
                 Place selectedWaypoint = new Place(name, lonValue, latValue);
 
@@ -270,14 +278,18 @@ public class PlaceActionsForm extends Form implements CommandListener {
                     exportFormat, waypointName, xiListen);
             
             if (xiListen != null) {
-                xiListen.notifySuccess(lType + " : Save Complete");
+                xiListen.notifySuccess(lType +
+                        " : " +
+                        LocaleManager.getMessage("places_actions_prgs_success"));
             }
         } catch (Exception ex) {
             Logger.error(
                     "Exception caught when trying to export trail: "
                             + ex.toString());
             if (xiListen != null) {
-                xiListen.notifyError(lType + " : Save Failed", ex);
+                xiListen.notifyError(lType +
+                        " : " +
+                        LocaleManager.getMessage("places_actions_prgs_error"), ex);
             }
         }
     }
@@ -291,7 +303,7 @@ public class PlaceActionsForm extends Form implements CommandListener {
      * @see com.substanceofcode.tracker.model.AlertListener#notifyError()
      */
     public void notifyError() {
-        System.out.println("Error During Save");
+        Logger.error("Error During Save");
         noSaveErrors = false;
     }
 }
