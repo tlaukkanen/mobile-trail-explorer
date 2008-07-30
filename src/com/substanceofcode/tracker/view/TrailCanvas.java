@@ -50,6 +50,7 @@ import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.ProjectionUtil;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
+import com.substanceofcode.tracker.model.SpeedFormatter;
 
 /**
  * TrailCanvas is a main view for the application. It contains a current
@@ -670,22 +671,13 @@ public class TrailCanvas extends BaseCanvas {
 
             /** Draw speed information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_SPEED) == true) {
-                int speed;
-                String units;
-                if (settings.getUnitsAsKilometers() == false) {
+                String spd;
+                SpeedFormatter formatter = new SpeedFormatter( controller.getSettings() );
+                spd = formatter.getSpeedString(lastPosition.speed);
 
-                    speed = (int) UnitConverter.convertSpeed(
-                            lastPosition.speed, UnitConverter.UNITS_KPH,
-                            UnitConverter.UNITS_MPH);
-
-                    units = " mph";
-                } else {
-                    speed = (int) lastPosition.speed;
-                    units = " km/h";
-                }
                 g.drawString(LocaleManager.getMessage("trail_canvas_speed") + ": ", 1, fontHeight * displayRow, Graphics.TOP
                         | Graphics.LEFT);
-                g.drawString(speed + units, positionAdd, fontHeight
+                g.drawString(spd, positionAdd, fontHeight
                         * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }

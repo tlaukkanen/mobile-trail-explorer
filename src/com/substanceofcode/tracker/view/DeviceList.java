@@ -146,7 +146,6 @@ public class DeviceList extends List implements Runnable, CommandListener {
                 
                 if (devices != null && devices.size() > 0) {
                     Logger.debug("Search Complete. devices="+ devices.size());
-                    //this.set(0, "Found " + devices.size() + " device(s)", null);new Object[] {e.getMessage()}
                     this.set(0,
                             LocaleManager.getMessage(
                             "device_list_search_result",

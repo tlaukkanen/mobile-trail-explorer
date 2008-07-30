@@ -1,7 +1,7 @@
 /*
  * GpsPosition.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This library is free software; you can redistribute it and/or
@@ -131,8 +131,6 @@ public final class GpsPosition implements Serializable {
         } else {
             this.gpgsa = gpgsa;
         }
-
-
     }
 
     /**
@@ -173,7 +171,6 @@ public final class GpsPosition implements Serializable {
         this.altitude = altitude;
         this.date = date;
         this.gpgsa = gpgsa;
-    
     }
     /**
      * <p>
@@ -462,5 +459,4 @@ public final class GpsPosition implements Serializable {
             throw new EOFException("EOF while unserializing position: " + ex.getMessage());
         }
     }
-
 }
