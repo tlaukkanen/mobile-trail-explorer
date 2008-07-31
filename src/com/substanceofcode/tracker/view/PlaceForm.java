@@ -23,12 +23,18 @@
 package com.substanceofcode.tracker.view;
 
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.grid.GridFormatter;
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.model.GridFormatterManager;
 import com.substanceofcode.tracker.model.Place;
 
+import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
 
 /**
@@ -38,21 +44,28 @@ import javax.microedition.lcdui.TextField;
  * @author Tommi Laukkanen
  * @author Mario Sansone
  */
-public class PlaceForm extends Form implements CommandListener {
+public class PlaceForm extends Form implements CommandListener, ItemStateListener {
     
     private Controller controller;
     
     // Fields
-    private TextField latitudeField;
-    private TextField longitudeField;
     private TextField nameField;
+    
+    private ChoiceGroup gridGroup;
+    private int currentGroupIndex;
+    
+    private TextField[] dataFields = null;
+    private GridFormatter currentGridFormatter = null;
     
     // Command
     private Command okCommand;
     private Command cancelCommand;
     
+    
+    private Place place;
+    private Place oldPlace;
+    
     private boolean editing;
-    private String oldPlaceName;
     
     /** 
      * Creates a new instance of PlaceForm
@@ -68,7 +81,6 @@ public class PlaceForm extends Form implements CommandListener {
         this.setCommandListener(this);
         
         editing = false;
-        oldPlaceName = "";
     }
     
     /** 
@@ -83,14 +95,58 @@ public class PlaceForm extends Form implements CommandListener {
     /** Initialize place fields (name, lon and lat) */
     private void initializeControls() {
         
+        setItemStateListener(this);
+        
         nameField = new TextField("Name", "", 16, TextField.ANY);
         this.append(nameField);
         
-        latitudeField = new TextField("Latitude", "", 16, TextField.ANY);
-        this.append(latitudeField);
+        String[] gridNames = GridFormatterManager.getGridFormattersName();
+        gridGroup = new ChoiceGroup("Grid",
+                ChoiceGroup.EXCLUSIVE, gridNames, null);
+        this.append(gridGroup);     
+    }
         
-        longitudeField = new TextField("Longitude", "", 16, TextField.ANY);
-        this.append(longitudeField);
+    private void setGrid(String name)
+    {
+        if(currentGridFormatter != null && currentGridFormatter.getName().equals(name))
+        {
+            return;
+    }
+    
+        
+        currentGridFormatter = GridFormatterManager.getGridFormatterForName(name, true);
+        String[] labels = currentGridFormatter.getLabels(currentGridFormatter.PLACE_FORM);
+        
+        //this could be better...
+        if(dataFields!=null && dataFields.length == labels.length)
+        {
+            for (int i = 0; i < labels.length; i++)
+            {
+                dataFields[i].setLabel(labels[i]);
+            }
+        } else {
+            deleteAll();
+            this.append(nameField);
+            this.append(gridGroup);
+
+
+            dataFields = new TextField[labels.length];
+            for (int i = 0; i < labels.length; i++) {
+                dataFields[i] = new TextField(labels[i], "", 16, TextField.ANY);
+                insert(i + 1, dataFields[i]);
+            }
+        }
+        
+        String[] gridNames = GridFormatterManager.getGridFormattersName();
+        for(int i=0; i< gridNames.length; i++)
+        {
+            if(gridNames[i].equals(currentGridFormatter.getName()))
+            {
+                gridGroup.setSelectedIndex(i, true);
+                currentGroupIndex = i;
+                break;
+            }
+        }
     }
     
     /** Initialize commands */
@@ -100,75 +156,96 @@ public class PlaceForm extends Form implements CommandListener {
         
         cancelCommand = new Command("Cancel", Command.SCREEN, 2);
         this.addCommand( cancelCommand );
-    }
     
-    /** Set values according to a place object */
-    public void setValues(String name, String lat, String lon) {
-        nameField.setString( name );
-        latitudeField.setString( lat );
-        longitudeField.setString( lon );
-        oldPlaceName = name;
     }
     
     /** Initialize controls with place values. */
-    public void setValues(Place wp) {
-        Logger.debug("Setting values");
-        Logger.debug("Setting name: " + wp.getName());
+    public void setPlace(Place wp) 
+    {
+        //we don't lose the editing-place, when we changed the grid
+        if(wp != place)
+        {
+            oldPlace = wp;
+            place = wp.clone();
+        }
+        
+        setGrid(place.getPosition().getName());
+
+        String[] data = currentGridFormatter.getStrings(place.getPosition(), currentGridFormatter.PLACE_FORM);
+        for (int i = 0; i < data.length; i++) {
+            dataFields[i].setString(data[i]);
+        }
+
         nameField.setString(wp.getName());
-        Logger.debug("Setting latitude: " + wp.getLatitude());
-        String latitude = String.valueOf( wp.getLatitude() );
-        if(latitude.length()>16) {
-            latitude = latitude.substring(0, 16);
-        }
-        Logger.debug("Setting longitude: " + wp.getLongitude());
-        String longitude = String.valueOf( wp.getLongitude() );
-        if(longitude.length()>16) {
-            longitude = longitude.substring(0, 16);
-        }
-        Logger.debug("Setting strings");
-        latitudeField.setString( latitude );
-        longitudeField.setString( longitude );
-        oldPlaceName = wp.getName();
-        Logger.debug("WP values set. Name: " + oldPlaceName);
+
+        return;
     }
 
     /** Handle commands */
-    public void commandAction(Command command, Displayable displayable) {
-        if( command == okCommand ) {
+    public void commandAction(Command command, Displayable displayable) 
+    {
+        if (command == okCommand) {
             // Save waypoint
             String name = nameField.getString();
-            double latitude;
-            double longitude;
+            GridPosition position = null;
             try {
-                latitude = Double.parseDouble(latitudeField.getString());
-                longitude = Double.parseDouble(longitudeField.getString());
-            } catch (NumberFormatException nfe) {
-                controller.showError("Error while parsing latitude or longitude. " +
-                                     "Valid format for latitude and longitude is:\n" +
-                                     "[-]xxx.xxxxx");
+                String[] data = new String[dataFields.length];
+                for(int i=0 ; i<dataFields.length; i++)
+                {
+                    data[i] = dataFields[i].getString();
+                }
+                
+                position = currentGridFormatter.getGridPositionWithData(data);
+            } catch (Exception nfe) {
+                controller.showError(nfe.getMessage());
                 return;
             }
-            Place place = new Place( name, latitude, longitude );
+            place.setName(name);
+            place.setPosition(position);
             
-            if(editing==false) {
+            if (editing == false) {
                 /** Create new waypoint */
-                controller.savePlace( place );
-                controller.showTrail();                
+                controller.savePlace(place);
+                controller.showPlacesList();
             } else {
                 /** Update existing waypoint */
-                controller.updateWaypoint( oldPlaceName, place );
+                controller.updateWaypoint(oldPlace, place);
                 controller.showPlacesList();
             }
 
         }
-        if( command == cancelCommand ) {
-            // Do nothing -> show trail
-            controller.showTrail();
+        if (command == cancelCommand) {
+            controller.showPlacesList();
+            
         }
     }
 
+    public void itemStateChanged(Item item) 
+    {
+        if(item ==  this.gridGroup)
+        {
+            GridPosition position = null;
+            try {
+                String[] data = new String[dataFields.length];
+                for(int i=0 ; i<dataFields.length; i++)
+                {
+                    data[i] = dataFields[i].getString();
+                }
 
+                position = currentGridFormatter.getGridPositionWithData(data);
+            } catch (Exception nfe) {
+                gridGroup.setSelectedIndex(currentGroupIndex, true);
+                controller.showError(nfe.getMessage());
+                return;
+            }
     
     
-    
+            GridFormatter gridFormatter = GridFormatterManager.getGridFormatters()[gridGroup.getSelectedIndex()];
+            //convert the position of the place
+            place.setName(nameField.getString());
+            place.setPosition(gridFormatter.convertPosition(position));  
+            setPlace(place);
 }
+    }
+}
+

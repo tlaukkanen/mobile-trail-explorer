@@ -642,7 +642,7 @@ public class TrailCanvas extends BaseCanvas {
                 
                 GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.TRAIL_CANVAS);
                 String[] gridLabels = gridFormatter.getLabels();
-                String[] gridData = gridFormatter.getStrings(lastPosition);
+                String[] gridData = gridFormatter.getStrings(lastPosition.getWSG84Position());
                 
                 for(int i=0; i< gridLabels.length ; i++)
                 {
@@ -865,7 +865,7 @@ public class TrailCanvas extends BaseCanvas {
                 } else {
                     timeSinceLastPosition = secondsSinceLastPosition
                             + " " +
-                            LocaleManager.getMessage("trail_canvas_seconds");;
+                            LocaleManager.getMessage("trail_canvas_seconds");
                 }
 
                 g.drawString(LocaleManager.getMessage("trail_canvas_no_time_info"),

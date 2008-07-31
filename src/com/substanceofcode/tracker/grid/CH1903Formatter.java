@@ -5,7 +5,6 @@
 
 package com.substanceofcode.tracker.grid;
 
-import com.substanceofcode.gps.GpsPosition;
 
 /**
  *
@@ -21,22 +20,33 @@ public class CH1903Formatter implements GridFormatter
             case(INFORMATION_CANVAS):
                 return new String[]{"X", "Y"};
                 
+            case(PLACE_FORM):
+                return new String[]{"X", "Y"};
+                
             default: //TRAIL_CANVAS
                 return new String[]{"X:", "Y:"};
                 
         }
     }
 
-    public String[] getStrings(GpsPosition position, int display_context) 
+    public String[] getStrings(GridPosition position, int display_context) 
     {
         if(position == null)
         {
             return new String[]{"",""};
         }
-        CH1903Position chp = (CH1903Position) CH1903Grid.factory().convertFromGpsPosition(position);
+        CH1903Position chp = new CH1903Position(position);
               
-        return new String[]{ formatAsCH1903String(chp.getX()), 
+        switch(display_context)
+        {
+            case(PLACE_FORM):
+                return new String[]{ String.valueOf(chp.getX()), String.valueOf(chp.getY()) };
+                
+            default:
+                return new String[]{    formatAsCH1903String(chp.getX()), 
                              formatAsCH1903String(chp.getY()) };
+    }
+    
     }
     
     private String formatAsCH1903String(int val)
@@ -56,7 +66,33 @@ public class CH1903Formatter implements GridFormatter
 
     public String getName() 
     {
-        return "Swiss Grid";
+        return GRID_CH1903;
+    }
+
+    public GridPosition getGridPositionWithData(String[] data) throws BadFormattedException 
+    {
+        int x;
+        int y;
+        
+        try
+        {
+            x = Integer.parseInt(data[0]);
+            y = Integer.parseInt(data[1]); 
+            return new CH1903Position(x, y);
+        } catch (Exception e) {
+            throw new BadFormattedException("Error while parsing X or Y. " +
+                                     "Valid format for X and Y is:\n" +
+                                     "XXXXXX");
+}
+    }
+
+    public GridPosition convertPosition(GridPosition position) {
+        return new CH1903Position(position);
+    }
+
+    public GridPosition getEmptyPosition() 
+    {
+        return new CH1903Position(0,0);
     }
 
 }

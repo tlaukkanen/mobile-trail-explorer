@@ -22,20 +22,17 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.grid.GridFormatter;
-import com.substanceofcode.tracker.grid.CH1903Formatter;
 import com.substanceofcode.tracker.grid.GridFormatterContext;
-import com.substanceofcode.tracker.grid.WSG84Formatter;
+import com.substanceofcode.tracker.grid.GridNames;
+import com.substanceofcode.tracker.grid.GridPosition;
 
 /**
  *
  * @author kaspar
  */
-public class GridFormatterManager implements GridFormatterContext
+public class GridFormatterManager implements GridFormatterContext, GridNames
 {
-    //all available gridformatters have to be registered here (default formatter (wsg84) has to be on first place)
-    private final static GridFormatter[] formatters = {new WSG84Formatter(), new CH1903Formatter()};
     
     
     private RecorderSettings settings;
@@ -79,7 +76,7 @@ public class GridFormatterManager implements GridFormatterContext
      * @param position
      * @return
      */
-    public String [] getStrings(GpsPosition position)
+    public String [] getStrings(GridPosition position)
     {
         return currentFormatter().getStrings(position, display_context);
     }
@@ -109,4 +106,25 @@ public class GridFormatterManager implements GridFormatterContext
         return names;
     }
 
+    public static GridFormatter getGridFormatterForName(String name, boolean returnDefaultWhenNotFound)
+    {
+        for(int i=0; i < formatters.length ; i++)
+        {
+            if(name.equals(formatters[i].getName() ))
+            {
+                return formatters[i];
+}
+        }      
+        if(returnDefaultWhenNotFound)
+        {
+            return formatters[0];
+        }else {
+            return null;
+        }
+    }
+
+    public static GridFormatter defaultFormatter() 
+    {
+        return formatters[0];
+    }
 }

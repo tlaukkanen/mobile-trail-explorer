@@ -27,6 +27,8 @@ import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 
 import com.substanceofcode.map.MapProviderManager;
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.grid.WSG84Position;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.util.Version;
@@ -306,15 +308,31 @@ public class RecorderSettings {
 
             String[] values = StringUtil.split(placeLines[placeIndex],
                     "|");
-            if (values.length == 3) {
+            if (values.length >= 3) {
                 String lat = values[0];
                 String lon = values[1];
                 String name = values[2];
 
                 double latValue = Double.parseDouble(lat);
                 double lonValue = Double.parseDouble(lon);
+                GridPosition position = null;
 
-                Place newPlace = new Place(name, latValue, lonValue);
+                //check, if we can get a GridPosition, if not, just create it with the available data (lat,lon)
+                if(values.length > 3)
+                {
+                    String [] arr = new String[values.length-3];
+                    for(int i=0; i<values.length-3;i++)
+                    {
+                        arr[i] = values[i+3];
+                    }
+                    position = GridPosition.unserializeGridPosition(arr);
+                }
+                if(position == null)
+                {
+                    position = new WSG84Position(latValue, lonValue);
+                }
+
+                Place newPlace = new Place(name, position);
                 places.addElement( newPlace );
             }
         }
@@ -325,17 +343,30 @@ public class RecorderSettings {
      * Set places
      * @param places 
      */
-    public void setPlaces(Vector places) {
+    public void setPlaces(Vector places) 
+    {
         String placeString = "";
         Enumeration wpEnum = places.elements();
         while (wpEnum.hasMoreElements() == true) {
             Place wp = (Place) wpEnum.nextElement();
+            GridPosition pos = wp.getPosition();
+            WSG84Position pos84 = pos.getAsWSG84Position();
 
-            String latString = String.valueOf(wp.getLatitude());
-            String lonString = String.valueOf(wp.getLongitude());
+            //store the wsg84 anyway, so that if a grid would be removed, the place is not lost
+            String latString = String.valueOf(pos84.getLatitude());
+            String lonString = String.valueOf(pos84.getLongitude());
 
-            placeString += latString + "|" + lonString + "|" + wp.getName()
-                    + "\n";
+            placeString += latString + "|" + lonString + "|" + wp.getName();
+
+            //append all the serialized data from the position
+            String[] posData = pos.serialize();
+            for(int i=0; i<posData.length; i++)
+            {
+                placeString += "|" + posData[i];
+        }
+            
+            //append end of record
+            placeString += "\n";
 
         }
         settings.setStringProperty(PLACES, placeString);

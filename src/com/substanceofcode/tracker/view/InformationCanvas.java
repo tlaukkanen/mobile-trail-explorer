@@ -132,7 +132,7 @@ public class InformationCanvas extends BaseCanvas{
         
         GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.INFORMATION_CANVAS);
         String[] gridLabels = gridFormatter.getLabels();
-        String[] gridData = gridFormatter.getStrings(position);
+        String[] gridData = gridFormatter.getStrings(position.getWSG84Position());
         
         int infoPos = BIG_FONT.stringWidth("LAT:_:");
         lineRow = titleHeight - firstRow;

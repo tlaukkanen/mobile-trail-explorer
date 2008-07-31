@@ -22,6 +22,8 @@
 
 package com.substanceofcode.tracker.model;
 
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.grid.WSG84Position;
 import java.util.Vector;
 import java.io.DataOutputStream;
 import java.io.OutputStream;
@@ -43,22 +45,35 @@ public class Place {
     /** Name of this place */
     private String name;
     
-    /** Latitude of place */
-    private double latitude;
     
-    /** Longitude of place */
-    private double longitude;
+    private GridPosition position;
+    
+    
     
     /** 
-     * Constructor.
+     * Default constructor
+     * @param name
+     * @param position
+     */
+    public Place(String name, GridPosition position)
+    {
+        this.name = name;
+        this.position = position;
+    }
+    
+    /** 
+     * for backward-compatibility.
      * @param name      Name of this place.
      * @param latitude  Latitude position value of this place.
      * @param longitude Longitude position value of this place. 
      */
     public Place(String name, double latitude, double longitude) {
-        this.name = name;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this(name, new WSG84Position(latitude, longitude));
+    }
+    
+    public Place clone()
+    {
+        return new Place(new String(name), position.clone());
     }
     
     /** Get place name
@@ -79,28 +94,24 @@ public class Place {
      * @return Latitude value.
      */
     public double getLatitude() {
-        return latitude;
-    }
-    
-    /** Set latitude
-     * @param lat Latitude value.
-     */
-    public void setLatitude(double lat) {
-        latitude = lat;
+        return position.getAsWSG84Position().getLatitude();
     }
     
     /** Get longitude
      * @return Longitude value.
      */
     public double getLongitude() {
-        return longitude;
+        return position.getAsWSG84Position().getLongitude();
     }
     
-    /** Set longitude
-     * @param lon Longitude value.
-     */
-    public void setLongitude(double lon) {
-        longitude = lon;
+    public GridPosition getPosition()
+    {
+        return position;
+    }
+    
+    public void setPosition(GridPosition position)
+    {
+        this.position = position;
     }
     
     /** 

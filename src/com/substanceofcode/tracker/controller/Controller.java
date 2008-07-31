@@ -44,6 +44,7 @@ import com.substanceofcode.gpsdevice.GpsDeviceFactory;
 import com.substanceofcode.gpsdevice.GpsUtilities;
 import com.substanceofcode.gpsdevice.Jsr179Device;
 import com.substanceofcode.gpsdevice.MockGpsDevice;
+import com.substanceofcode.tracker.grid.GridPosition;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.AudioShortcutAction;
 import com.substanceofcode.tracker.model.Backlight;
@@ -65,7 +66,6 @@ import com.substanceofcode.tracker.view.ImportTrailScreen;
 import com.substanceofcode.tracker.view.InformationCanvas;
 import com.substanceofcode.tracker.view.KeySettingsList;
 import com.substanceofcode.tracker.view.Logger;
-import com.substanceofcode.tracker.view.PlaceList;
 import com.substanceofcode.tracker.view.RecordingSettingsForm;
 import com.substanceofcode.tracker.view.SatelliteCanvas;
 import com.substanceofcode.tracker.view.SettingsList;
@@ -635,7 +635,8 @@ public class Controller {
      * @param lat
      * @param lon 
      */
-    public void markPlace(String lat, String lon) {
+    public void markPlace(GridPosition position) 
+    {
         if (placeForm == null) {
             placeForm = new PlaceForm(this);
         }
@@ -644,8 +645,8 @@ public class Controller {
          * autonumber (1,2,3...).
          */
         int waypointCount = places.size();
-        placeForm.setValues("WP" + String.valueOf(waypointCount + 1), lat,
-                lon);
+        placeForm.setPlace(new Place("WP" + String.valueOf(waypointCount + 1), position));
+
         placeForm.setEditingFlag(false);
         display.setCurrent(placeForm);
     }
@@ -663,7 +664,7 @@ public class Controller {
         if (placeForm == null) {
             placeForm = new PlaceForm(this);
         }
-        placeForm.setValues(wp);
+        placeForm.setPlace(wp);
         placeForm.setEditingFlag(true);
         Logger.debug("Setting current display to display waypoint details");
         display.setCurrent(placeForm);
@@ -1045,15 +1046,16 @@ public class Controller {
     }
 
     /** Update selected waypoint */
-    public void updateWaypoint(String m_oldWaypointName, Place newWaypoint) {
+    public void updateWaypoint(Place oldWaypoint, Place newWaypoint) 
+    {
+        
         Enumeration waypointEnum = places.elements();
         while (waypointEnum.hasMoreElements()) {
             Place wp = (Place) waypointEnum.nextElement();
-            String currentName = wp.getName();
-            if (currentName.equals(m_oldWaypointName)) {
+            if (wp == oldWaypoint) {
                 int updateIndex = places.indexOf(wp);
                 places.setElementAt(newWaypoint, updateIndex);
-                return;
+                break;
             }
         }
         savePlaces(); // Save waypoints immediately to RMS

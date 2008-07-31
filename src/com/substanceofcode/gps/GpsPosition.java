@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import com.substanceofcode.data.Serializable;
+import com.substanceofcode.tracker.grid.WSG84Position;
 import com.substanceofcode.util.MathUtil;
 import java.io.EOFException;
 
@@ -459,4 +460,9 @@ public final class GpsPosition implements Serializable {
             throw new EOFException("EOF while unserializing position: " + ex.getMessage());
         }
     }
+    
+    public WSG84Position getWSG84Position()
+    {
+        return new WSG84Position(this);
+}
 }

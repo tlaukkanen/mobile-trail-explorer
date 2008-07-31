@@ -25,9 +25,10 @@ package com.substanceofcode.tracker.view;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Place;
-import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
 
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.model.GridFormatterManager;
 import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.lcdui.Command;
@@ -136,18 +137,19 @@ public class PlaceList extends List implements CommandListener {
         }
         
         if(command == newPlaceCommand) {
-            String latString = "";
-            String lonString = "";
             GpsPosition lastPosition = controller.getPosition();
-            if(lastPosition!=null) {
-                double lat = lastPosition.latitude;
-                latString = StringUtil.valueOf(lat,5);
+            GridPosition gridPos = null;
+            GridFormatterManager gfm = new GridFormatterManager(controller.getSettings(), GridFormatterManager.PLACE_FORM);
                 
-                double lon = lastPosition.longitude;
-                lonString = StringUtil.valueOf(lon,5);
+            if(lastPosition == null)
+            {
+                gridPos = gfm.currentFormatter().getEmptyPosition();
+            }else{
+                gridPos = lastPosition.getWSG84Position();
+                gridPos = gfm.currentFormatter().convertPosition(gridPos);
             }
             
-            controller.markPlace(latString, lonString);
+            controller.markPlace(gridPos);
         }
         
         if(command == exportPlaceCommand) {

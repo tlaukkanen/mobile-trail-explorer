@@ -21,4 +21,9 @@ public interface GridFormatterContext {
      * called from TrailCanvas
      */
     public static int TRAIL_CANVAS = 2;
+    
+    /**
+     * called from PlaceForm: this data will put into an editable TextField
+     */
+    public static int PLACE_FORM = 3;
 }
