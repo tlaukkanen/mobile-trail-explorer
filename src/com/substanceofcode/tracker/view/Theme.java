@@ -71,5 +71,4 @@ public class Theme {
             currentTheme = 0;
         }
     }
-    
 }

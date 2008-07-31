@@ -30,12 +30,14 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
+
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>This screen will show information about a Trail/Track, such as number of Positions recorded, length etc...</p>
@@ -59,17 +61,26 @@ public class TrailDetailsScreen extends Form implements CommandListener {
         super(trailName);
 
         // Add commands etc.
-        this.addCommand(saveCommand = new Command("Save", Command.OK, 1));
-        this.addCommand(deleteCommand = new Command("Delete", Command.ITEM, 2));
-        this.addCommand(loadCommand = new Command("Load", Command.ITEM, 3));
-        this.addCommand(exportCommand = new Command("Export Track", Command.ITEM, 4));
-        this.addCommand(backCommand = new Command("Back", Command.BACK, 10));
+        this.addCommand(saveCommand =
+                new Command(LocaleManager.getMessage("menu_save"), Command.OK, 1));
+        this.addCommand(deleteCommand =
+                new Command(LocaleManager.getMessage("trail_details_screen_menu_delete"),
+                Command.ITEM, 2));
+        this.addCommand(loadCommand =
+                new Command(LocaleManager.getMessage("trail_details_screen_menu_load"),
+                Command.ITEM, 3));
+        this.addCommand(exportCommand =
+                new Command(LocaleManager.getMessage("trail_details_screen_menu_export"),
+                Command.ITEM, 4));
+        this.addCommand(backCommand =
+                new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 10));
         this.setCommandListener(this);
 
         trail = new Track(FileSystem.getFileSystem().getFile(trailName));
         this.controller = controller;
 
-        titleBox = new TextField("Trail Name", trailName, 100, TextField.ANY);
+        titleBox = new TextField(LocaleManager.getMessage("trail_details_screen_name"),
+                trailName, 100, TextField.ANY);
         this.append(titleBox);
 
         final boolean kilometers = controller.getSettings().getUnitsAsKilometers();
@@ -79,13 +90,18 @@ public class TrailDetailsScreen extends Form implements CommandListener {
         } else {
             dist = UnitConverter.convertLength(trail.getDistance(), UnitConverter.UNITS_KILOMETERS, UnitConverter.UNITS_MILES);
         }
-        StringItem distanceItem = new StringItem("Distance", StringUtil.valueOf(dist, 3) + (kilometers ? "Km" : "Mi"));
+        StringItem distanceItem = new StringItem(LocaleManager.getMessage("trail_details_screen_distance"),
+                StringUtil.valueOf(dist, 3) + (kilometers ? "Km" : "Mi"));
         this.append(distanceItem);
 
-        StringItem pointsItem = new StringItem("Number of Positions recorded: ", "" + trail.getPositionCount());
+        StringItem pointsItem =
+                new StringItem(LocaleManager.getMessage("trail_details_screen_positions")
+                + ": ", "" + trail.getPositionCount());
         this.append(pointsItem);
 
-        StringItem markersItem = new StringItem("Number of Markers recorded: ", "" + trail.getMarkerCount());
+        StringItem markersItem =
+                new StringItem(LocaleManager.getMessage("trail_details_screen_markers")
+                + ": ", "" + trail.getMarkerCount());
         this.append(markersItem);
     }
 
@@ -98,7 +114,8 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                 try {
                     FileSystem.getFileSystem().renameFile(this.getTitle(), newTitle);
                 } catch (FileIOException e) {
-                    controller.showError("An exception was caught when trying to rename the file: " + e.toString());
+                    controller.showError(LocaleManager.getMessage("trail_details_screen_error_rename")
+                            + ": " + e.toString());
                 }
                 this.setTitle(newTitle);
                 controller.showTrailsList();
@@ -108,7 +125,8 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                     FileSystem.getFileSystem().deleteFile(selectedTrailName);
                     controller.showTrailsList();
                 } catch (IOException e) {
-                    controller.showAlert("ERROR!   An Exception was thrown when attempting to load " + "the Trail from the RMS!  " + e.toString(), 5, AlertType.ERROR);
+                    controller.showAlert(LocaleManager.getMessage("trail_details_screen_error_load")
+                            + " " + e.toString(), 5, AlertType.ERROR);
                     e.printStackTrace();
                 }
             } else if (command == loadCommand) {
@@ -118,7 +136,8 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                     controller.loadTrack(loadedTrail);
                     controller.showTrail();
                 } catch (IOException e) {
-                    controller.showAlert("ERROR! An Exception was thrown when attempting to load " + "the Trail from the RMS!  " + e.toString(), 5, AlertType.ERROR);
+                    controller.showAlert(LocaleManager.getMessage("trail_details_screen_error_load")
+                            + " " + e.toString(), 5, AlertType.ERROR);
                     e.printStackTrace();
                 }
             } else if (command == exportCommand) {
@@ -128,7 +147,8 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                     final TrailActionsForm taf = new TrailActionsForm(controller, exportedTrail, this.getTitle());
                     controller.setCurrentScreen(taf);
                 } catch (IOException e) {
-                    controller.showAlert("ERROR! An Exception was thrown when attempting to export " + "the Trail from the RMS!  " + e.toString(), 5, AlertType.ERROR);
+                    controller.showAlert(LocaleManager.getMessage("trail_details_screen_error_load")
+                            + " " + e.toString(), 5, AlertType.ERROR);
                     e.printStackTrace();
                 }
             }
