@@ -60,7 +60,6 @@ import com.substanceofcode.tracker.view.DevelopmentMenu;
 import com.substanceofcode.tracker.view.DeviceList;
 import com.substanceofcode.tracker.view.DisplaySettingsForm;
 import com.substanceofcode.tracker.view.ElevationCanvas;
-import com.substanceofcode.tracker.view.ExportSettingsForm;
 import com.substanceofcode.tracker.view.FileChooser;
 import com.substanceofcode.tracker.view.ImportTrailScreen;
 import com.substanceofcode.tracker.view.InformationCanvas;
@@ -145,7 +144,6 @@ public class Controller {
     private AboutScreen aboutScreen;
     private SettingsList settingsList;
     private RecordingSettingsForm recordingSettingsForm;
-    private ExportSettingsForm exportSettingsForm;
     private FileChooser filechooser;
     private DisplaySettingsForm displaySettingsForm;
     private PlaceForm placeForm;
@@ -826,14 +824,6 @@ public class Controller {
             }
         };
         t.start();
-    }
-
-    /** Show export settings form */
-    private ExportSettingsForm getExportSettingsForm() {
-        if (exportSettingsForm == null) {
-            exportSettingsForm = new ExportSettingsForm(this);
-        }
-        return exportSettingsForm;
     }
 
     /** Show export the file chooser */
