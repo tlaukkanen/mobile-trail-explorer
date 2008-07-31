@@ -35,6 +35,7 @@ import javax.microedition.lcdui.List;
 
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Filechooser (thanks to bbtrack.org) :-)
@@ -59,7 +60,7 @@ public class FileChooser
     private Command cancelCommand;
     
     private String path;
-    private String selectDir = "<select this directory>";
+    private String selectDir = LocaleManager.getMessage("file_chooser_select_dir");
     private boolean showFiles;
     
     private Thread updateThread;
@@ -69,14 +70,14 @@ public class FileChooser
             String path, 
             boolean showFiles, 
             Displayable previousScreen) {
-        super("Exporting", List.IMPLICIT);
+        super(LocaleManager.getMessage("file_chooser_title"), List.IMPLICIT);
         this.controller = controller;
         this.path = path;
         this.showFiles = showFiles;
         this.previousScreen = previousScreen;
         
-        selectCommand = new Command("Select", Command.ITEM, 1);
-        cancelCommand = new Command("Cancel", Command.CANCEL, 2);
+        selectCommand = new Command(LocaleManager.getMessage("menu_select"), Command.ITEM, 1);
+        cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.CANCEL, 2);
         setSelectCommand(selectCommand);
         addCommand(cancelCommand);
 
@@ -97,7 +98,7 @@ public class FileChooser
     private void updateContent() {
         this.deleteAll();
         //TODO: show current path
-        this.setTitle(path == null ? "Device" : path);
+        this.setTitle(path == null ? LocaleManager.getMessage("file_chooser_title_device") : path);
         if(path == null) {
             final Enumeration roots = FileSystemRegistry.listRoots();
             while (roots.hasMoreElements()) {
