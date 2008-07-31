@@ -50,9 +50,19 @@ public class CH1903Position extends GridPosition
         double latH = (lat - 169028.66)/10000;
         double lonH = (lon - 26782.5)/10000;
         
-        x =(int) (600072.37 + (211455.93 * lonH) - (10938.51 * lonH * latH) - (0.36 * lonH * latH * latH) - (44.54 * latH * latH *latH));
-        y =(int) (200147.07 + (308807.95 * latH) + (3745.25 * lonH * lonH) + (76.63 * latH * latH) - (194.56 * lonH * lonH * latH) + (119.79 * latH * latH * latH));
-        //double z = alt - 49.55 + (2.73 * lonH) + (6.94 * latH); 
+        x =(int) (600072.37
+                + 211455.93 * lonH 
+                - 10938.51 * lonH * latH
+                - 0.36 * lonH * latH * latH
+                - 44.54 * lonH * lonH *lonH
+                );
+        
+        y =(int) (200147.07
+                + (308807.95 * latH)
+                + (3745.25 * lonH * lonH)
+                + (76.63 * latH * latH)
+                - (194.56 * lonH * lonH * latH)
+                + (119.79 * latH * latH * latH)); 
     }
 
     public int getX()
