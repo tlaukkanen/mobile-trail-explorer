@@ -25,6 +25,7 @@ import javax.microedition.lcdui.*;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * This form is shown when we start MTE and our settings file shows that we
@@ -52,7 +53,7 @@ public class StreamRecovery extends Form implements CommandListener {
      */
     public StreamRecovery()
     {
-        super("Stream Recovery");
+        super(LocaleManager.getMessage("stream_recovery_title"));
         initializeCommands();
         initializeControls();
         this.setCommandListener(this);
@@ -60,21 +61,29 @@ public class StreamRecovery extends Form implements CommandListener {
     
     /** Initialize commands */
     private void initializeCommands() {
-        resumeCommand = new Command("Resume", Command.SCREEN, 1);
+        resumeCommand =
+                new Command(LocaleManager.getMessage("stream_recovery_menu_resume"),
+                Command.SCREEN, 1);
         this.addCommand(resumeCommand);
-        saveCommand = new Command("Save", Command.SCREEN, 2);
+        saveCommand =
+                new Command(LocaleManager.getMessage("menu_save"),
+                Command.SCREEN, 2);
         this.addCommand(saveCommand);
-        nexttimeCommand = new Command("Next Time", Command.SCREEN, 3);
+        nexttimeCommand =
+                new Command(LocaleManager.getMessage("stream_recovery_menu_nexttime"),
+                Command.SCREEN, 3);
         this.addCommand(nexttimeCommand);
-        forgetaboutCommand = new Command("Forget About", Command.SCREEN, 4);
+        forgetaboutCommand =
+                new Command(LocaleManager.getMessage("stream_recovery_menu_forgetabout"),
+                Command.SCREEN, 4);
         this.addCommand(forgetaboutCommand);
     }
     
     /** Initialize form controls */
     private void initializeControls() {
-        helpText = new StringItem("Stream Recovery","This application closed " +
-          "without properly saving the active GPX stream. Please choose from " +
-          "the menu options to decide how to procede.");
+        helpText =
+                new StringItem(LocaleManager.getMessage("stream_recovery_helptext_info"),
+                LocaleManager.getMessage("stream_recovery_helptext"));
         this.append(helpText);
     }
     
@@ -96,7 +105,8 @@ public class StreamRecovery extends Form implements CommandListener {
             }
             catch (Exception e)
             {
-                controller.showError("Exception : " + e.toString());
+                controller.showError(LocaleManager.getMessage("stream_recovery_exception")
+                        + ": " + e.toString());
             }
         }
         //----------------------------------------------------------------------
@@ -114,7 +124,8 @@ public class StreamRecovery extends Form implements CommandListener {
             }
             catch (Exception e)
             {
-                controller.showError("Exception : " + e.toString());
+                controller.showError(LocaleManager.getMessage("stream_recovery_exception")
+                        + ": " + e.toString());
             }
         }
         //----------------------------------------------------------------------
