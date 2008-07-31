@@ -21,10 +21,16 @@
  */
 
 package com.substanceofcode.tracker.view;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
+
+import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Image;
+import javax.microedition.lcdui.Font;
 
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.gps.GpsPosition;
@@ -37,11 +43,6 @@ import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.Version;
 import com.substanceofcode.localization.LocaleManager;
-
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
-import javax.microedition.lcdui.Font;
 
 /**
  * Splash canvas for Trail Explorer application. This class also deals with any updates

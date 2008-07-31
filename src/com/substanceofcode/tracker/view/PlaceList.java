@@ -22,19 +22,20 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.Place;
-import com.substanceofcode.localization.LocaleManager;
-
-import com.substanceofcode.tracker.grid.GridPosition;
-import com.substanceofcode.tracker.model.GridFormatterManager;
 import java.util.Enumeration;
 import java.util.Vector;
+
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
+
+import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.localization.LocaleManager;
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.model.GridFormatterManager;
 
 /**
  * Displays a list of all places
