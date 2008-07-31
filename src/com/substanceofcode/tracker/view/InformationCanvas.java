@@ -1,7 +1,7 @@
 /*
  * InformationCanvas.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@ import com.substanceofcode.tracker.model.SpeedFormatter;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
@@ -76,7 +77,8 @@ public class InformationCanvas extends BaseCanvas{
         g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
         if(firstRow==0) {
-            g.drawString("Information", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
+            g.drawString(LocaleManager.getMessage("information_canvas_title"),
+                    getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
         }
         
         final int titleHeight = 2 + titleFont.getHeight();
@@ -138,22 +140,22 @@ public class InformationCanvas extends BaseCanvas{
         lineRow = titleHeight - firstRow;
         totalTextHeight = titleHeight;
         
-        drawNextHeader(g, "Position");        
+        drawNextHeader(g, LocaleManager.getMessage("information_canvas_position"));
         for(int i=0; i< gridLabels.length ; i++)
         {
             drawNextString(g, gridLabels[i], gridData[i]);
         }
-        drawNextString(g, "ALT", alt);
-        drawNextString(g, "HEA", hea);
+        drawNextString(g, LocaleManager.getMessage("information_canvas_altitude"), alt);
+        drawNextString(g, LocaleManager.getMessage("information_canvas_heading"), hea);
         
-        drawNextHeader(g, "Speed");        
-        drawNextString(g, "SPD", spd);
-        drawNextString(g, "AVG", averageSpeed);
-        drawNextString(g, "MAX", maximumSpeed);
+        drawNextHeader(g, LocaleManager.getMessage("information_canvas_speed_info"));
+        drawNextString(g, LocaleManager.getMessage("information_canvas_speed"), spd);
+        drawNextString(g, LocaleManager.getMessage("information_canvas_speed_average"), averageSpeed);
+        drawNextString(g, LocaleManager.getMessage("information_canvas_speed_maximal"), maximumSpeed);
 
-        drawNextHeader(g, "Trail");
-        drawNextString(g, "DST", dst);
-        drawNextString(g, "DUR", durationTime);
+        drawNextHeader(g, LocaleManager.getMessage("information_canvas_trail"));
+        drawNextString(g, LocaleManager.getMessage("information_canvas_distance"), dst);
+        drawNextString(g, LocaleManager.getMessage("information_canvas_duration"), durationTime);
         if(currentTrack!=null) {
             if(currentTrack.getMinAltitudePosition()!=null) {
                 double minAltitude = currentTrack.getMinAltitudePosition().altitude;
@@ -161,10 +163,9 @@ public class InformationCanvas extends BaseCanvas{
                 double maxAltitude = currentTrack.getMaxAltitudePosition().altitude;
                 String maxAltString = lengthFormatter.getLengthString(maxAltitude, false);
                 String trailAltitude = minAltString + " - " + maxAltString;
-                drawNextString(g, "ALT", trailAltitude);
+                drawNextString(g, LocaleManager.getMessage("information_canvas_altitude"), trailAltitude);
             }
         }
-      
     }
     
     private void drawNextString(Graphics g, String name, String value) {
@@ -223,6 +224,5 @@ public class InformationCanvas extends BaseCanvas{
                 firstRow += BIG_FONT.getHeight();
             }
         }        
-    }
-    
+    }    
 }

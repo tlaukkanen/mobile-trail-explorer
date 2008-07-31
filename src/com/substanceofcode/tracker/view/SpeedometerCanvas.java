@@ -22,13 +22,15 @@
 
 package com.substanceofcode.tracker.view;
 
+import javax.microedition.lcdui.Graphics;
+
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.SpeedFormatter;
 import com.substanceofcode.tracker.model.Track;
-import javax.microedition.lcdui.Graphics;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  *
@@ -64,7 +66,8 @@ public class SpeedometerCanvas extends BaseCanvas {
         /** Draw title */
         g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
-        g.drawString("Speedometer", getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);        
+        g.drawString(LocaleManager.getMessage("speedometer_canvas_title"),
+                getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
 
         /** Draw speed */
         GpsPosition loc = Controller.getController().getPosition();
@@ -73,7 +76,8 @@ public class SpeedometerCanvas extends BaseCanvas {
             speed = formatter.getSpeedStringWithoutUnits( loc.speed );
         }
         g.setColor(Theme.getColor(Theme.TYPE_SUBTITLE));
-        g.drawString("Speed", 2, titleFont.getHeight(), Graphics.TOP|Graphics.LEFT);
+        g.drawString(LocaleManager.getMessage("speedometer_canvas_speed"),
+                2, titleFont.getHeight(), Graphics.TOP|Graphics.LEFT);
         speedArea.draw(speed, g);
 
         /** Draw distance */
@@ -83,14 +87,12 @@ public class SpeedometerCanvas extends BaseCanvas {
             distance = distanceFormatter.getLengthString( track.getDistance(), true, false );        
         }
         g.setColor(Theme.getColor(Theme.TYPE_SUBTITLE));
-        g.drawString("Distance", 2, titleFont.getHeight()+((getHeight()/4)*3), Graphics.TOP|Graphics.LEFT);
+        g.drawString(LocaleManager.getMessage("speedometer_canvas_distance"),
+                2, titleFont.getHeight()+((getHeight()/4)*3), Graphics.TOP|Graphics.LEFT);
         distanceArea.draw(distance, g);
     }
 
     protected void keyPressed(int keyCode) {
         super.keyPressed(keyCode);
     }
-    
-    
-
 }

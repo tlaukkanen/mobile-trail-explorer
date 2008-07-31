@@ -1,7 +1,7 @@
 /*
  * SatelliteCanvas.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,14 +22,15 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.gps.GpsSatellite;
-
 import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+
+import com.substanceofcode.gps.GpsSatellite;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * 
@@ -45,8 +46,7 @@ public class SatelliteCanvas extends BaseCanvas {
         super();
         
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
-        smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
-       
+        smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);  
     }
     
     protected void paint(Graphics g) {
@@ -55,14 +55,16 @@ public class SatelliteCanvas extends BaseCanvas {
         
         g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
-        g.drawString("Satellites", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
+        g.drawString(LocaleManager.getMessage("satellite_canvas_title"),
+                getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
         
         g.setColor(Theme.getColor(Theme.TYPE_TEXT));
         g.setFont(rowFont);
         g.drawString(
-            "Satellite count ",
+            LocaleManager.getMessage("satellite_canvas_count") +
+            " ",
             1,
-            1+titleFont.getHeight(),
+            1 + titleFont.getHeight(),
             Graphics.TOP|Graphics.LEFT);
         try {
             int satelliteCount = controller.getSatelliteCount();
@@ -74,8 +76,9 @@ public class SatelliteCanvas extends BaseCanvas {
             
             // drawSatelliteData(g);
         } catch(Exception ex) {
-            controller.showError("Exception while painting satellite count: " + 
-                                 ex.toString());
+            controller.showError(LocaleManager.getMessage("satellite_canvas_count_exception")
+                    + " " +
+                    ex.toString());
         }
         this.drawSatelliteData(g, 1+titleFont.getHeight()+rowFont.getHeight());
     }
@@ -90,7 +93,8 @@ public class SatelliteCanvas extends BaseCanvas {
             
             while(satelliteEnum.hasMoreElements()) {
                 final GpsSatellite satellite = (GpsSatellite)satelliteEnum.nextElement();
-                final String id = "sat " + satellite.getNumber();
+                final String id = LocaleManager.getMessage("satellite_canvas_satellite_id")
+                        + " " + satellite.getNumber();
                 // Change the line color based on the Signal Strength from the satellite
                 final int snr = satellite.getSnr();
                 int lineColor = 0x0; // Default Color is Black
@@ -119,8 +123,10 @@ public class SatelliteCanvas extends BaseCanvas {
                 satelliteIndex++;
             }
         } else {
-            g.drawString("No Additional Satellite", 5, yPos, 0);
-            g.drawString("Information Available", 5, yPos + g.getFont().getHeight(), 0);
+            g.drawString(LocaleManager.getMessage("satellite_canvas_no_satellite"),
+                    5, yPos, 0);
+            g.drawString(LocaleManager.getMessage("satellite_canvas_information_available"),
+                    5, yPos + g.getFont().getHeight(), 0);
         }
     }
     
@@ -131,5 +137,4 @@ public class SatelliteCanvas extends BaseCanvas {
             controller.switchDisplay();
         }
     }
-    
 }

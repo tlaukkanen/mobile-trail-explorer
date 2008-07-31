@@ -22,12 +22,6 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.grid.GridFormatter;
-import com.substanceofcode.tracker.grid.GridPosition;
-import com.substanceofcode.tracker.model.GridFormatterManager;
-import com.substanceofcode.tracker.model.Place;
-
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -36,6 +30,13 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.ItemStateListener;
 import javax.microedition.lcdui.TextField;
+
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.grid.GridFormatter;
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.model.GridFormatterManager;
+import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * PlaceForm contains user interface for adding and editing waypoint 
@@ -61,7 +62,6 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
     private Command okCommand;
     private Command cancelCommand;
     
-    
     private Place place;
     private Place oldPlace;
     
@@ -72,7 +72,7 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
      * @param controller 
      */
     public PlaceForm(Controller controller) {
-        super("Place");
+        super(LocaleManager.getMessage("place_form_title"));
         this.controller = controller;
         
         initializeControls();
@@ -97,11 +97,12 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
         
         setItemStateListener(this);
         
-        nameField = new TextField("Name", "", 16, TextField.ANY);
+        nameField = new TextField(LocaleManager.getMessage("place_form_name"),
+                "", 16, TextField.ANY);
         this.append(nameField);
         
         String[] gridNames = GridFormatterManager.getGridFormattersName();
-        gridGroup = new ChoiceGroup("Grid",
+        gridGroup = new ChoiceGroup(LocaleManager.getMessage("place_form_grid"),
                 ChoiceGroup.EXCLUSIVE, gridNames, null);
         this.append(gridGroup);     
     }
@@ -151,12 +152,11 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
     
     /** Initialize commands */
     private void initializeCommands() {
-        okCommand = new Command("OK", Command.SCREEN, 1);
+        okCommand = new Command(LocaleManager.getMessage("menu_save"), Command.SCREEN, 1);
         this.addCommand( okCommand );
         
-        cancelCommand = new Command("Cancel", Command.SCREEN, 2);
+        cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.SCREEN, 2);
         this.addCommand( cancelCommand );
-    
     }
     
     /** Initialize controls with place values. */
@@ -212,7 +212,6 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
                 controller.updateWaypoint(oldPlace, place);
                 controller.showPlacesList();
             }
-
         }
         if (command == cancelCommand) {
             controller.showPlacesList();
@@ -239,13 +238,11 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
                 return;
             }
     
-    
             GridFormatter gridFormatter = GridFormatterManager.getGridFormatters()[gridGroup.getSelectedIndex()];
             //convert the position of the place
             place.setName(nameField.getString());
             place.setPosition(gridFormatter.convertPosition(position));  
             setPlace(place);
-}
+        }
     }
 }
-

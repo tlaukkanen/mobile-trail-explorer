@@ -82,6 +82,7 @@ import com.substanceofcode.tracker.view.PlaceForm;
 import com.substanceofcode.tracker.view.PlaceList;
 import com.substanceofcode.tracker.view.SpeedometerCanvas;
 import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Controller contains methods for the application flow.
@@ -480,19 +481,19 @@ public class Controller {
         String statusText = "";
         switch (status) {
             case STATUS_STOPPED:
-                statusText = "STOPPED";
+                statusText = LocaleManager.getMessage("status_stopped");
                 break;
             case STATUS_RECORDING:
-                statusText = "RECORDING";
+                statusText = LocaleManager.getMessage("status_recording");
                 break;
             case STATUS_NOTCONNECTED:
-                statusText = "NOT CONNECTED";
+                statusText = LocaleManager.getMessage("status_not_connected");
                 break;
             case STATUS_CONNECTING:
-                statusText = "CONNECTING";
+                statusText = LocaleManager.getMessage("status_connecting");
                 break;
             default:
-                statusText = "UNKNOWN";
+                statusText = LocaleManager.getMessage("status_unknown");
         }
         return statusText;
     }

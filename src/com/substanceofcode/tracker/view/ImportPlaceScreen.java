@@ -1,7 +1,7 @@
 /*
  * ImportTrailScreen.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@ import java.util.Enumeration;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.*;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  *
@@ -50,15 +51,19 @@ public class ImportPlaceScreen extends Form implements CommandListener {
     private FileChooser filechooser;
     
     public ImportPlaceScreen(Displayable previousScreen) {
-        super("Import Place(s)");
+        super(LocaleManager.getMessage("import_place_screen_title"));
         this.controller = Controller.getController();
         this.previousScreen = previousScreen;
         
         // Initialize commands
-        this.addCommand(okCommand = new Command("OK", Command.SCREEN, 1));
-        this.addCommand(cancelCommand = new Command("Cancel",
+        this.addCommand(okCommand =
+                new Command(LocaleManager.getMessage("menu_import"),
+                Command.SCREEN, 1));
+        this.addCommand(cancelCommand =
+                new Command(LocaleManager.getMessage("menu_cancel"),
                 Command.SCREEN, 2));
-        this.addCommand(browseCommand = new Command("Browse",
+        this.addCommand(browseCommand =
+                new Command(LocaleManager.getMessage("menu_browse"),
                 Command.SCREEN, 3));
         this.setCommandListener(this);
 
@@ -72,8 +77,9 @@ public class ImportPlaceScreen extends Form implements CommandListener {
         if (importFile == null) {
             importFile = "C:/";
         }
-        importFileField = new TextField("File Location (GPX)", importFile, 50,
-                TextField.ANY);
+        importFileField =
+                new TextField(LocaleManager.getMessage("import_place_screen_file_location"),
+                importFile, 50, TextField.ANY);
         this.append(importFileField);
     }
     
@@ -102,8 +108,8 @@ public class ImportPlaceScreen extends Form implements CommandListener {
                                     "Could not determine file type for import: "
                                             + importFile);
                             controller
-                                    .showError("Could not determine file type for import: "
-                                            + importFile);
+                                    .showError(LocaleManager.getMessage("import_place_screen_error_filetype")
+                                    + ": " + importFile);
                             return;
                         }
                         
@@ -117,7 +123,7 @@ public class ImportPlaceScreen extends Form implements CommandListener {
                         }
                         if (places.isEmpty()) {
                             controller
-                                    .showError("Unable to retrieve specified place. See log for details");
+                                    .showError(LocaleManager.getMessage("import_place_screen_error_place"));
                             Logger.debug(
                                             "Unable to retrieve specified place, previous statements should explain.");
                         } else {
@@ -132,8 +138,8 @@ public class ImportPlaceScreen extends Form implements CommandListener {
                                 Logger.warn(
                                         "Unable to save 'Empty Place' "
                                                 + e.toString());
-                                controller.showError("Can not save \"Empty\" Place. " +
-                                            "must record at least 1 point");
+                                controller.
+                                        showError(LocaleManager.getMessage("import_place_screen_error_empty_place"));
                             }
                         }
                         
@@ -142,8 +148,8 @@ public class ImportPlaceScreen extends Form implements CommandListener {
                                 "Error occured when trying to import waypoins: "
                                         + e.toString());
                         controller
-                                .showError("Error occured when trying to import waypoint:  "
-                                        + e.toString());
+                                .showError(LocaleManager.getMessage("import_place_screen_error_import") +
+                                ":  " + e.toString());
                         e.printStackTrace();
                     } finally {
                         ImportPlaceScreen.this.goBack();
@@ -151,8 +157,8 @@ public class ImportPlaceScreen extends Form implements CommandListener {
                 }
             }).start();
             this.deleteAll();
-            this.append(new StringItem("Importing file",
-                            "Please wait as this could take up to a minute"));
+            this.append(new StringItem(LocaleManager.getMessage("import_place_screen_import_header"),
+                            LocaleManager.getMessage("import_place_screen_import_info")));
         }
         
         if(command == browseCommand) {

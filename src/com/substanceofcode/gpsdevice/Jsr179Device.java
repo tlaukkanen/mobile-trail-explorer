@@ -1,3 +1,25 @@
+/*
+ * Jsr179Device.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.gpsdevice;
 
 import java.util.Date;
@@ -20,6 +42,7 @@ import com.substanceofcode.util.StringUtil;
  * Class to provide jsr179 functionality
  * 
  * @author gareth
+ * @author steinerp
  * 
  */
 public class Jsr179Device extends GpsDeviceImpl implements Runnable {
@@ -46,7 +69,9 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 
                 //Guessing that if there is no nmea data present, the Location API is giving us an internal
                 //GPS or a network
-                //if(extraInfo!=null){
+                if(extraInfo != null){
+                    Logger.debug("dbg(): 1: extra info not available!!!");
+                }
                 //   usingExternalGPS=true;
                 //   Logger.debug("using ExternalGps is "+usingExternalGPS);
                 //}
@@ -58,7 +83,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 float speed=location.getSpeed();
 
                 // convert from m/s to km/h
-                float speedkmh= speed * 3.6f;
+                float speedkmh = speed * 3.6f;
                 
                 QualifiedCoordinates qc=location.getQualifiedCoordinates();
                 float altitude=qc.getAltitude();
@@ -196,6 +221,8 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                             }
                         }
                     }
+                } else {
+                    Logger.debug("dbg(): 2: extra info not available!!!");
                 }
             } catch (Exception e) {
                 Logger.error(logPrefix + "Exception: " + e.getMessage());
@@ -219,6 +246,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     public GpsPosition getPosition() {
        // Logger.debug("getPosition called");
         if(usingExternalGPS){
+            Logger.debug("dbg(): USING EXTERNAL GPS!!!");
             return getParserPosition();
         } else {
             return getJsr179Position();

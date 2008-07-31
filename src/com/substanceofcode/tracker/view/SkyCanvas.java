@@ -22,14 +22,15 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.gps.GpsSatellite;
-
 import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+
+import com.substanceofcode.gps.GpsSatellite;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * 
@@ -49,7 +50,6 @@ public class SkyCanvas extends BaseCanvas{
         
         rowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_MEDIUM);
         smallRowFont = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
-        
     }
     
     protected void paint(Graphics g) {
@@ -58,18 +58,22 @@ public class SkyCanvas extends BaseCanvas{
         
         g.setColor(Theme.getColor(Theme.TYPE_TITLE) );
         g.setFont(titleFont);
-        g.drawString("Sky View", getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
+        g.drawString(LocaleManager.getMessage("sky_canvas_title"),
+                getWidth()/2,1,Graphics.TOP|Graphics.HCENTER);
 
         try {
             int satelliteCount = controller.getSatelliteCount();
             g.drawString(
-                "Trk " + String.valueOf(satelliteCount),
+                LocaleManager.getMessage("sky_canvas_satellite_count") +
+                " " + String.valueOf(satelliteCount),
                 getWidth()-1,
                 1+titleFont.getHeight(),
                 Graphics.TOP|Graphics.RIGHT);
             
         } catch(Exception ex) {
-            controller.showError("Exception while painting satellite count: " + 
+            controller.showError(
+                                 LocaleManager.getMessage("sky_canvas_count_exception")
+                                 + " " +
                                  ex.toString());
         }
         
@@ -98,12 +102,12 @@ public class SkyCanvas extends BaseCanvas{
         
         g.setColor(0,128,0);
         g.setFont(titleFont);
-        g.drawString("N",horizonX+horizonDiameter/2,horizonY+1,Graphics.TOP|Graphics.HCENTER);
-        g.drawString("S",horizonX+horizonDiameter/2,horizonY+horizonDiameter,Graphics.BOTTOM|Graphics.HCENTER);
+        g.drawString(LocaleManager.getMessage("sky_canvas_north"),horizonX+horizonDiameter/2,horizonY+1,Graphics.TOP|Graphics.HCENTER);
+        g.drawString(LocaleManager.getMessage("sky_canvas_south"),horizonX+horizonDiameter/2,horizonY+horizonDiameter,Graphics.BOTTOM|Graphics.HCENTER);
        //Note: East and West appear back the front to normal Map view
        //This is because the view is looking into the sky not to the ground
-        g.drawString("E",horizonX+1,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.LEFT);
-        g.drawString("W",horizonX+horizonDiameter,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.RIGHT);
+        g.drawString(LocaleManager.getMessage("sky_canvas_east"),horizonX+1,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.LEFT);
+        g.drawString(LocaleManager.getMessage("sky_canvas_west"),horizonX+horizonDiameter,horizonY+horizonDiameter/2+g.getFont().getHeight()/2,Graphics.BOTTOM|Graphics.RIGHT);
         
         this.drawSNRkey(g,(int)(getHeight()*SNRKeyHeight),20,getHeight(),getWidth()-20);
         this.drawSatelliteData(g,horizonX,horizonY,horizonDiameter);
@@ -133,9 +137,8 @@ public class SkyCanvas extends BaseCanvas{
         g.setColor(getSNRColor(0));
         g.drawString("0", left, top, Graphics.LEFT|Graphics.BOTTOM);
         g.setColor(0);
-        g.drawString("Signal (SNR)", (left+right)/2, top, Graphics.HCENTER|Graphics.BOTTOM);
-        
-       
+        g.drawString(LocaleManager.getMessage("sky_canvas_signal"),
+                (left+right)/2, top, Graphics.HCENTER|Graphics.BOTTOM);
     }
     private void drawSatelliteData(Graphics g, int xPos, int yPos, int diameter) {
         
@@ -161,7 +164,6 @@ public class SkyCanvas extends BaseCanvas{
                 double x = Math.sin(Az*Math.PI/180)*((90.0- (double)Elev)/90.0)*diameter/2 + (double)diameter/2;
                 double y = -Math.cos(Az*Math.PI/180)*((90.0-(double)Elev)/90.0)*diameter/2 + (double)diameter/2;               
 
-                
                 int satelliteRadius = diameter/40;
                 
                 g.fillArc(xPos+(int)x-satelliteRadius,yPos+(int)y-satelliteRadius,2*satelliteRadius,2*satelliteRadius,0,360);
@@ -200,6 +202,5 @@ public class SkyCanvas extends BaseCanvas{
             maxSNR=maxSNRRecieved;
             if(maxSNR<10) maxSNR=10;
         }
-    }
-    
+    }    
 }

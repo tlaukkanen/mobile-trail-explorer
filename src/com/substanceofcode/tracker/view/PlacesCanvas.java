@@ -22,14 +22,17 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.tracker.model.LengthFormatter;
-import com.substanceofcode.tracker.model.Place;
 import java.util.Enumeration;
 import java.util.Vector;
+
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+
+import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.tracker.model.LengthFormatter;
+import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  *
@@ -59,7 +62,8 @@ public class PlacesCanvas extends BaseCanvas {
         /** Draw title */
         g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
-        g.drawString("Places", getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
+        g.drawString(LocaleManager.getMessage("places_canvas_title"),
+                getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
                 
         /** Draw places */
         g.setFont(rowFont);

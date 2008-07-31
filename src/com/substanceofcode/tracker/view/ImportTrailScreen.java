@@ -1,7 +1,7 @@
 /*
  * ImportTrailScreen.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@ import javax.microedition.lcdui.*;
 import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.*;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Import SettingsForm includes information about exporting trail.
@@ -52,15 +53,15 @@ public class ImportTrailScreen extends Form implements CommandListener {
 
     /** Creates a new instance of ExportSettingsForm */
     public ImportTrailScreen(Displayable previousScreen) {
-        super("Import Trail");
+        super(LocaleManager.getMessage("import_trail_screen_title"));
         controller = Controller.getController();
         this.previousScreen = previousScreen;
 
         // Initialize commands
-        addCommand(okCommand = new Command("OK", Command.SCREEN, 1));
-        addCommand(cancelCommand = new Command("Cancel",
+        addCommand(okCommand = new Command(LocaleManager.getMessage("menu_import"), Command.SCREEN, 1));
+        addCommand(cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"),
                 Command.SCREEN, 2));
-        addCommand(browseCommand = new Command("Browse",
+        addCommand(browseCommand = new Command(LocaleManager.getMessage("menu_browse"),
                 Command.SCREEN, 3));
         setCommandListener(this);
 
@@ -74,8 +75,8 @@ public class ImportTrailScreen extends Form implements CommandListener {
         if (importFile == null) {
             importFile = "C:/";
         }
-        importFileField = new TextField("File Location", importFile, 50,
-                TextField.ANY);
+        importFileField = new TextField(LocaleManager.getMessage("import_trail_screen_file_location"),
+                importFile, 50, TextField.ANY);
         append(importFileField);
     }
 
@@ -111,8 +112,8 @@ public class ImportTrailScreen extends Form implements CommandListener {
                             converter = new GpxConverter();
                         } else {
                             Logger.warn(
-                                    "Could not determine file type for import: "
-                                            + importFile);
+                                    LocaleManager.getMessage("import_trail_screen_error_filetype")
+                                    + " " + importFile);
                             controller
                                     .showError("Could not determine file type for import: "
                                             + importFile);
@@ -129,7 +130,7 @@ public class ImportTrailScreen extends Form implements CommandListener {
                         }
                         if (track == null) {
                             controller
-                                    .showError("Unable to retrieve specified track. See log for details");
+                                    .showError(LocaleManager.getMessage("import_trail_screen_error_track"));
                             Logger.debug(
                                             "Unable to retrieve specified track, previous statements should explain.");
                         } else {
@@ -137,8 +138,8 @@ public class ImportTrailScreen extends Form implements CommandListener {
                                 track.saveToRMS();
                             } catch (IllegalStateException e) {
                                 Logger.warn(
-                                        "Unable to save 'Empty Trail' "
-                                                + e.toString());
+                                        LocaleManager.getMessage("import_trail_screen_error_empty_trail")
+                                        + " " + e.toString());
                                 controller.showError("Can not save \"Empty\" Trail. " +
                                             "must record at least 1 point");
                             } catch (FileIOException e) {
@@ -146,9 +147,8 @@ public class ImportTrailScreen extends Form implements CommandListener {
                                         "Unable to save Trail " + e.toString());
                                 ;
                                 controller.showAlert(
-                                        "An Exception was thrown when attempting to save "
-                                                + "the Trail to the RMS!  "
-                                                + e.toString(), 5,
+                                        LocaleManager.getMessage("import_trail_screen_error_save_rms")
+                                        + " " + e.toString(), 5,
                                         AlertType.ERROR);
                                 e.printStackTrace();
                             }
@@ -158,8 +158,8 @@ public class ImportTrailScreen extends Form implements CommandListener {
                                 "Error occured when trying to import Trail: "
                                         + e.toString());
                         controller
-                                .showError("Error occured when trying to import Trail:  "
-                                        + e.toString());
+                                .showError(LocaleManager.getMessage("import_trail_screen_error_import")
+                                + "  " + e.toString());
                         e.printStackTrace();
                     } finally {
                         ImportTrailScreen.this.goBack();
@@ -168,8 +168,8 @@ public class ImportTrailScreen extends Form implements CommandListener {
             }).start();
             this.deleteAll();
             this
-                    .append(new StringItem("Importing file",
-                            "Please wait as this could take up to a minute"));
+                    .append(new StringItem(LocaleManager.getMessage("import_trail_screen_import_header"),
+                            LocaleManager.getMessage("import_trail_screen_import_info")));
         }
 
         if (command == cancelCommand) {
