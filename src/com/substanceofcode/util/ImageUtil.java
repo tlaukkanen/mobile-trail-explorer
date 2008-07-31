@@ -1,7 +1,7 @@
 /*
  * ImageUtil.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,6 +24,7 @@ package com.substanceofcode.util;
 
 import javax.microedition.lcdui.Image;
 
+import com.substanceofcode.tracker.view.Logger;
 /**
  * Image utility for loading images from resources.
  *
@@ -41,8 +42,8 @@ public class ImageUtil {
         try {
             image = Image.createImage(filename);
         } catch(Exception e) {
-            System.err.println("Error while loading image: " + filename);
-            System.out.println("Description: " + e.toString());
+            Logger.error("Error while loading image: " + filename);
+            Logger.info("Description: " + e.toString());
             // Use null
         }
         return image;
@@ -67,5 +68,4 @@ public class ImageUtil {
         Image img = Image.createRGBImage(buf2, width, height, true);
         return img;
     }
-    
 }
