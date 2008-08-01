@@ -21,15 +21,18 @@
  */
 package com.substanceofcode.tracker.model;
 
+import java.io.IOException;
+
+import javax.microedition.media.Manager;
+import javax.microedition.media.MediaException;
 import javax.microedition.media.Player;
 import javax.microedition.media.control.RecordControl;
+
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.util.FileUtil;
-import java.io.IOException;
-import javax.microedition.media.Manager;
-import javax.microedition.media.MediaException;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  *
@@ -50,8 +53,12 @@ public class AudioShortcutAction implements ShortcutAction {
             GpsPosition pos = controller.getPosition();
 
             Track track = controller.getTrack();
-            String audioFile = "track_audio_marker_" + dateStamp + ".wav";
-            Marker audioMarker = new Marker(pos, "Audio", audioFile);
+            String audioFile = LocaleManager.getMessage("audio_shortcut_action_file_prefix")
+                    + dateStamp + ".wav";
+            Marker audioMarker =
+                    new Marker(pos,
+                               LocaleManager.getMessage("audio_shortcut_action_marker_name"),
+                               audioFile);
             track.addMarker( audioMarker );
             
             try {
@@ -69,10 +76,12 @@ public class AudioShortcutAction implements ShortcutAction {
                 p.start();
                 bRecStarted = true;
             } catch (IOException ex) {
-                controller.setError("IOException: " + ex.getMessage());
+                controller.setError(LocaleManager.getMessage("audio_shortcut_ioexception")
+                        + ": " + ex.getMessage());
                 ex.printStackTrace();
             } catch (MediaException ex) {
-                controller.setError("MediaException: " + ex.getMessage());
+                controller.setError(LocaleManager.getMessage("audio_shortcut_mediaexception")
+                        + ": " + ex.getMessage());
                 ex.printStackTrace();
             }
         } else {
@@ -83,12 +92,11 @@ public class AudioShortcutAction implements ShortcutAction {
                 bRecStarted = false;
             } catch (IOException ex) {
                 Controller controller = Controller.getController();
-                controller.setError("IOException: " + ex.getMessage());
+                controller.setError(LocaleManager.getMessage("audio_shortcut_ioexception")
+                        + ": " + ex.getMessage());
                 ex.printStackTrace();
             }
 
         }
     }
-    
 }
-

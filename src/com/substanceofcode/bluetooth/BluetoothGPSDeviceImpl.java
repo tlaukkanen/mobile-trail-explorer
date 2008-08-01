@@ -30,6 +30,7 @@ import javax.microedition.io.StreamConnection;
 import com.substanceofcode.gpsdevice.GpsDeviceImpl;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * This class represents bluetooth devices that provide gps information
@@ -76,12 +77,11 @@ public class BluetoothGPSDeviceImpl
             reader = new InputStreamReader(connection.openInputStream());
             thread = new Thread(this);
             thread.start();
-         
     }
     
     /** Disconnect from bluetooth device */
     public synchronized void disconnect() {
-        Logger.debug("Disconnecting from "+this.getAlias());
+        Logger.debug("Disconnecting from " + this.getAlias());
         try {
             if (reader != null) {
                 reader.close();
@@ -119,23 +119,22 @@ public class BluetoothGPSDeviceImpl
                         // The purpose of the sleep is to prevent bogus (like
                         // Nokia 6630) phones from crashing.
                         if (useBTFix) {
-                        	try {
-                        		Thread.sleep(1);
-                        	} catch (InterruptedException ie) {}
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException ie) {}
                         }
                     }
 
                     try {
-                	    int i = 0;
+                        int i = 0;
                         // Trim start and end of any NON-Displayable characters.
                         while (output.charAt(i) < '!' || output.charAt(i) > '~') {
-                        	i++;
+                            i++;
                         }
                         output.delete(0, i);
                         i = output.length() - 1;
-                        while (output.charAt(i) < '!'
-                                || output.charAt(i) > '~') {
-                        	i--;
+                        while (output.charAt(i) < '!' || output.charAt(i) > '~') {
+                            i--;
                         }
                         output.delete(i+1, output.length());
                     } catch (IndexOutOfBoundsException e) {
@@ -149,7 +148,6 @@ public class BluetoothGPSDeviceImpl
                     if (parser.isValidNMEASentence(nmeaString)) {
                         parser.parse(nmeaString);
                     }
-                 
                 }
                 // Most severe type of exception. Either thrown while connecting
                 // or
@@ -166,7 +164,7 @@ public class BluetoothGPSDeviceImpl
                     }
                     controller.pause();
                     controller
-                            .showError("IOException occured in BluetoothGPSDevice.run()");
+                            .showError(LocaleManager.getMessage("bluetooth_gps_device_impl_ioexception"));
                     Logger.error("IOException occured in BluetoothGPSDevice.run()");
                     try {
                         Thread.sleep(BREAK);
@@ -174,23 +172,25 @@ public class BluetoothGPSDeviceImpl
                         // Ignore
                     }
                     ie.printStackTrace();
-                //    this.disconnect();
+                    //this.disconnect();
                     boolean connected = false;
-                    controller.showInfo("Attempting To Reconnect:");
+                    controller.showInfo(LocaleManager.getMessage("bluetooth_gps_device_impl_info_reconnect"));
                     int count = 0;
                     // Try to reconnect if we are still recording
-                    //Reconnecting only applies to BT devices
+                    // Reconnecting only applies to BT devices
                     
                     while (isRecording && !connected) {
                         try {
                             this.connect();
                             connected = true;
-                            controller.showInfo("Reconnected!");
+                            controller.showInfo(
+                                    LocaleManager.getMessage("bluetooth_gps_device_impl_info_reconnected"));
                         } catch (IOException e) {
                             count++;
                             controller
-                                    .showError("Failed To Reconnect on attempt "
-                                            + count);
+                                    .showError(
+                                    LocaleManager.getMessage("bluetooth_gps_device_impl_error_reconnect")
+                                    + " " + count);
                             this.disconnect();
                             try {
                                 Thread.sleep(BREAK);
@@ -225,5 +225,4 @@ public class BluetoothGPSDeviceImpl
         }
         Logger.info("Thread BluetoothGPSDevice.run() finished.");
     }
-
 }

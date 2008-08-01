@@ -21,9 +21,9 @@
 
 package com.substanceofcode.bluetooth;
 
-import com.substanceofcode.tracker.view.Logger;
 import java.io.IOException;
 import java.util.Vector;
+
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryAgent;
@@ -31,6 +31,8 @@ import javax.bluetooth.DiscoveryListener;
 import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
+
+import com.substanceofcode.tracker.view.Logger;
 
 /**
  *
@@ -50,12 +52,9 @@ public class BluetoothUtility implements DiscoveryListener {
     /** Collects the services found during a search. */
     private Vector /* ServiceRecord */ records = new Vector();
     
-    
-   
     /** Creates a new instance of BluetoothUtility */
     public BluetoothUtility() {
         searchComplete = false;
-        
     }
     
     public boolean searchTimeOutExceeded(){
@@ -151,5 +150,4 @@ public class BluetoothUtility implements DiscoveryListener {
     public void inquiryCompleted(int i) {
         searchComplete = true;
     }
-    
 }

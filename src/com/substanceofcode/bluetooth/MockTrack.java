@@ -1387,7 +1387,6 @@ private final String trackData = ""
     public int getPositionCount() {
         // TODO Auto-generated method stub
         return pos.length;
-
     }
 
     public GpsPosition getPosition(int positionNumber) throws ArrayIndexOutOfBoundsException
@@ -1416,7 +1415,4 @@ private final String trackData = ""
      }
         return gp;
     }
-    
-
-    
 }

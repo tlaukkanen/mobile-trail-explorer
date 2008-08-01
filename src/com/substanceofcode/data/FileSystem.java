@@ -36,6 +36,7 @@ import javax.microedition.rms.RecordStoreException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>A file-system overlay for the RMS</p>
@@ -144,7 +145,9 @@ public class FileSystem {
                 throws FileIOException {
         if (this.fileTable.containsKey(filename)) {
             if (!overwrite) {
-                throw new FileIOException("File " + filename + " already exists. Specify a different name, or assert 'overwrite'");
+                throw new FileIOException(
+                        LocaleManager.getMessage(
+                        "file_system_fileioexception_already_exists", new Object[] {filename}));
             } else {
                 this.deleteFile(filename);
             }
@@ -160,7 +163,8 @@ public class FileSystem {
             baos.close();
         } catch (IOException e1) {
             e1.printStackTrace();
-            throw new FileIOException("Error serializing file:- " + e1.getMessage());
+            throw new FileIOException(LocaleManager.getMessage("file_system_fileioexception_serializing")
+                    + ":- " + e1.getMessage());
         }
         int bytesWritten = 0;
         int numRecords = data.length / RMS_RECORD_SIZE + (data.length % RMS_RECORD_SIZE == 0 ? 0 : 1);
@@ -193,7 +197,6 @@ public class FileSystem {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -206,15 +209,17 @@ public class FileSystem {
     public DataInputStream getFile(String filename) throws FileIOException {
         // Make sure the file exists in our table of files.
         if (!fileTable.containsKey(filename)) {
-            throw new FileIOException("File '" + filename + "' does not exist");
+            throw new FileIOException(
+                    LocaleManager.getMessage("file_system_fileioexception_not_exist",
+                    new Object[] {filename}));
         }
         byte[] resultArray;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String state = "";
         try {
-            state = "Getting filetable";
+            state = LocaleManager.getMessage("file_system_get_filetable");
             FileLocator fl = (FileLocator) (fileTable.get(filename));
-            state = "Getting record store name";
+            state = LocaleManager.getMessage("file_system_record_store_name");
             String recordStoreName = fl.recordStores[0];
             RecordStore recordStore = RecordStore.openRecordStore(recordStoreName, false);
             for (int i = 0; i < fl.recordStores.length; i++) {
@@ -230,9 +235,11 @@ public class FileSystem {
             resultArray = baos.toByteArray();
             baos.close();
         } catch (RecordStoreException e) {
-            throw new FileIOException("RecordStoreException: " + e.getMessage());
+            throw new FileIOException(LocaleManager.getMessage("file_system_recordstoreexception")
+                    + ": " + e.getMessage());
         } catch (IOException e) {
-            throw new FileIOException("GetFileIOEx" + e.getMessage());
+            throw new FileIOException(LocaleManager.getMessage("file_system_fileioexception")
+                    + e.getMessage());
         }
         return new DataInputStream(new ByteArrayInputStream(resultArray));
     }
@@ -312,7 +319,8 @@ public class FileSystem {
     public void deleteFile(String filename) throws FileIOException {
         // Make sure the file exists in our table of files.
         if (!fileTable.containsKey(filename)) {
-            throw new FileIOException("File '" + filename + "' does not exist");
+            throw new FileIOException(LocaleManager.getMessage("file_system_fileioexception_not_exist",
+                    new Object[] {filename}));
         }
         try {
             FileLocator fl = (FileLocator) (fileTable.get(filename));
@@ -411,10 +419,10 @@ public class FileSystem {
             baos.close();
         } catch (RecordStoreException e) {
             e.printStackTrace();
-            throw new FileIOException("Unable to write File-Table to RMS.");
+            throw new FileIOException(LocaleManager.getMessage("file_system_error_rms"));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new FileIOException("Unable to write File-Table to RMS.");
+            throw new FileIOException(LocaleManager.getMessage("file_system_error_rms"));
         }
     }
 }
