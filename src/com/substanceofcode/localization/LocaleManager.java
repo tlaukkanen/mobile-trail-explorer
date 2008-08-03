@@ -117,6 +117,9 @@ public class LocaleManager  {
                 // load messages to _messageTable hashtable
                 _messageTable = new Hashtable();                
                 _loadMessages(in);
+                // load missing messages from default locale
+                in = clazz.getResourceAsStream(_MESSAGES_BUNDLE);
+                _loadMessages(in);
                 // we are ok - return true as success ...
                 return true;
             }
@@ -309,7 +312,9 @@ public class LocaleManager  {
                     // Convert then store key and value
                     key = _convertString(key);
                     value = _convertString(value);
-                    _messageTable.put(key, value);
+                    if(_messageTable.containsKey(key)==false) {
+                        _messageTable.put(key, value);
+                    }
                 }
             }
         }
