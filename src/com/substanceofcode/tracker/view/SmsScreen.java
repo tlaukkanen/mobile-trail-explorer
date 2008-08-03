@@ -77,7 +77,7 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         currentPlaceIndex = 0;
         
         latField = new TextField("Lat", "0.0", 15, TextField.DECIMAL);
-        lonField = new TextField("Long", "0.0", 15, TextField.DECIMAL);
+        lonField = new TextField("Lon", "0.0", 15, TextField.DECIMAL);
         altField = new TextField("Altitude", "0.0", 15, TextField.DECIMAL);
 
         privateMessageField = new TextField("Your Message", DEFAULT_MESSAGE,
