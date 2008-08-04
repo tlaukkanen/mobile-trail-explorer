@@ -1,7 +1,7 @@
 /*
  * GpsPositionParser.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This library is free software; you can redistribute it and/or
@@ -21,12 +21,13 @@
 
 package com.substanceofcode.gps;
 
-import com.substanceofcode.tracker.view.Logger;
-import com.substanceofcode.util.StringUtil;
-
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Parser class for parsing NMEA sentences. Small tutorial about the NMEA can
@@ -95,7 +96,8 @@ public class GpsPositionParser {
     }
 
     private final Hashtable metricstable = new Hashtable();
-    private String lastParsedString = "No Strings Parsed Yet.";
+    private String lastParsedString =
+            LocaleManager.getMessage("gps_position_parser_no_last_parsed_string");
 
     private void recordMetrics(String record){
         try{
@@ -126,7 +128,8 @@ public class GpsPositionParser {
             result[i + 1] = value;
             i += 2;
         }
-        result[i] = "Last Parsed String:";
+        result[i] = LocaleManager.getMessage("gps_position_parser_last_parsed_string")
+                + ":";
         result[i + 1] = this.lastParsedString;
         // i+=2;
         return result;
@@ -565,41 +568,41 @@ public class GpsPositionParser {
 
     
     /**
-	 * Track Made Good and Ground Speed.
-	 * 
-	 * eg1. $GPVTG,360.0,T,348.7,M,000.0,N,000.0,K*43 * eg2.
-	 * $GPVTG,054.7,T,034.4,M,005.5,N,010.2,K
-	 * 
-	 * 
-	 * 054.7,T True track made good 034.4,M Magnetic track made good 005.5,N
-	 * Ground speed, knots 010.2,K Ground speed, Kilometers per hour
-	 * 
-	 * 
-	 * eg3. $GPVTG,t,T,,,s.ss,N,s.ss,K*hh 1 = Track made good 2 = Fixed text 'T'
-	 * indicates that track made good is relative to true north 3 = not used 4 =
-	 * not used 5 = Speed over ground in knots 6 = Fixed text 'N' indicates that
-	 * speed over ground in in knots 7 = Speed over ground in kilometers/hour 8 =
-	 * Fixed text 'K' indicates that speed over ground is in kilometers/hour 9 =
-	 * Checksum
-	 * 
-	 * The actual track made good and speed relative to the ground.
-	 * 
-	 * $--VTG,x.x,T,x.x,M,x.x,N,x.x,K x.x,T = Track, degrees True x.x,M = Track,
-	 * degrees Magnetic x.x,N = Speed, knots x.x,K = Speed, Km/hr
-	 * 
-	 * http://aprs.gids.nl/nmea/
-	 */
-	private synchronized void parseGPVTG(String record) {
-		String[] values = StringUtil.split(record, DELIMITER);
-		String trackMadeGood= values[1];
-		boolean relTrueNorth = values[2]=="t"?true:false;
-		String notUsed1=values[3];
-		String notUsed2=values[4];
-		String groundSpeedKnots=values[5];
-		boolean speedinKnots=values[6]=="N"?true:false;
-		String groundSpeedKmph=values[7];
-		boolean speedinKmph=values[8]=="K"?true:false;
-	}
+     * Track Made Good and Ground Speed.
+     *
+     * eg1. $GPVTG,360.0,T,348.7,M,000.0,N,000.0,K*43 * eg2.
+     * $GPVTG,054.7,T,034.4,M,005.5,N,010.2,K
+     *
+     *
+     * 054.7,T True track made good 034.4,M Magnetic track made good 005.5,N
+     * Ground speed, knots 010.2,K Ground speed, Kilometers per hour
+     *
+     *
+     * eg3. $GPVTG,t,T,,,s.ss,N,s.ss,K*hh 1 = Track made good 2 = Fixed text 'T'
+     * indicates that track made good is relative to true north 3 = not used 4 =
+     * not used 5 = Speed over ground in knots 6 = Fixed text 'N' indicates that
+     * speed over ground in in knots 7 = Speed over ground in kilometers/hour 8 =
+     * Fixed text 'K' indicates that speed over ground is in kilometers/hour 9 =
+     * Checksum
+     *
+     * The actual track made good and speed relative to the ground.
+     *
+     * $--VTG,x.x,T,x.x,M,x.x,N,x.x,K x.x,T = Track, degrees True x.x,M = Track,
+     * degrees Magnetic x.x,N = Speed, knots x.x,K = Speed, Km/hr
+     *
+     * http://aprs.gids.nl/nmea/
+     */
+    private synchronized void parseGPVTG(String record) {
+        String[] values = StringUtil.split(record, DELIMITER);
+        String trackMadeGood= values[1];
+        boolean relTrueNorth = values[2]=="t"?true:false;
+        String notUsed1=values[3];
+        String notUsed2=values[4];
+        String groundSpeedKnots=values[5];
+        boolean speedinKnots=values[6]=="N"?true:false;
+        String groundSpeedKmph=values[7];
+        boolean speedinKmph=values[8]=="K"?true:false;
+    }
 	
     private void copyLastCycleSatellitesAndClear() {
         if(this.tempSatellites == null){
@@ -632,29 +635,28 @@ public class GpsPositionParser {
         return degrees;
     }
     /**
-	 * Calculates the checksum for an NMEA sentence
-	 * 
-	 * @param n
-	 *            the sentence to calculate the checksum for
-	 * @return true if sentence checksum is good
-	 */
-	public boolean isValidNMEASentence(String n) {
-		boolean result = false;
-		byte[] bs = n.getBytes();
-	
-		if (n != null && n.length() > 0 && n.charAt(0) == '$'
-				&& n.charAt(n.length() - 3) == '*') {
-			String checksum = n.substring(n.indexOf('*') + 1, n.length());
-			byte cb = Byte.parseByte(checksum, 16);
-			byte c = 0;
-			for (int i = 1; i < bs.length - 3; i++) {
-				c ^= bs[i];
-			}
-			if (c == cb) {
-				result = true;
-			}
-		}
-		return result;
-	}
-
+     * Calculates the checksum for an NMEA sentence
+     *
+     * @param n
+     *            the sentence to calculate the checksum for
+     * @return true if sentence checksum is good
+     */
+    public boolean isValidNMEASentence(String n) {
+        boolean result = false;
+        byte[] bs = n.getBytes();
+        
+        if (n != null && n.length() > 0 && n.charAt(0) == '$'
+                && n.charAt(n.length() - 3) == '*') {
+            String checksum = n.substring(n.indexOf('*') + 1, n.length());
+            byte cb = Byte.parseByte(checksum, 16);
+            byte c = 0;
+            for (int i = 1; i < bs.length - 3; i++) {
+                c ^= bs[i];
+            }
+            if (c == cb) {
+                result = true;
+            }
+        }
+        return result;
+    }
 }

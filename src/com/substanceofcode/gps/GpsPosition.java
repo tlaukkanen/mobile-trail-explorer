@@ -24,12 +24,13 @@ package com.substanceofcode.gps;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.EOFException;
 import java.util.Date;
 
 import com.substanceofcode.data.Serializable;
 import com.substanceofcode.tracker.grid.WSG84Position;
 import com.substanceofcode.util.MathUtil;
-import java.io.EOFException;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>
@@ -252,8 +253,22 @@ public final class GpsPosition implements Serializable {
     public String getHeadingString() {
 
         double sector = 22.5; // = 360 degrees / 16 sectors
-        String[] compass = { "N", "NE", "NE", "E", "E", "SE", "SE", "S", "S",
-                "SW", "SW", "W", "W", "NW", "NW", "N" };
+        String[] compass = { LocaleManager.getMessage("gps_position_n"),
+                             LocaleManager.getMessage("gps_position_ne"),
+                             LocaleManager.getMessage("gps_position_ne"),
+                             LocaleManager.getMessage("gps_position_e"),
+                             LocaleManager.getMessage("gps_position_e"),
+                             LocaleManager.getMessage("gps_position_se"),
+                             LocaleManager.getMessage("gps_position_se"),
+                             LocaleManager.getMessage("gps_position_s"),
+                             LocaleManager.getMessage("gps_position_s"),
+                             LocaleManager.getMessage("gps_position_sw"),
+                             LocaleManager.getMessage("gps_position_sw"),
+                             LocaleManager.getMessage("gps_position_w"),
+                             LocaleManager.getMessage("gps_position_w"),
+                             LocaleManager.getMessage("gps_position_nw"),
+                             LocaleManager.getMessage("gps_position_nw"),
+                             LocaleManager.getMessage("gps_position_n") };
         String heading = "";
 
         int directionIndex = (int) Math.floor(course / sector);
@@ -457,12 +472,13 @@ public final class GpsPosition implements Serializable {
                 gpgsa.unserialize(dis);
             }
         } catch(EOFException ex) {
-            throw new EOFException("EOF while unserializing position: " + ex.getMessage());
+            throw new EOFException(LocaleManager.getMessage("gps_postition_unserialize_eofexception")
+                    + ": " + ex.getMessage());
         }
     }
     
     public WSG84Position getWSG84Position()
     {
         return new WSG84Position(this);
-}
+    }
 }
