@@ -1,3 +1,25 @@
+/*
+ * Tile.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.map;
 
 import java.io.DataInputStream;
@@ -9,7 +31,7 @@ import javax.microedition.lcdui.Image;
 
 import com.substanceofcode.data.Serializable;
 import com.substanceofcode.tracker.view.Logger;
-
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Stores the Meta-data relating to a single map tile, and it's retrieval status
@@ -180,8 +202,6 @@ public class Tile implements Serializable {
         dos.write(imageByteArray);
         // We won't save the image, we can regenerate it from the byte array
         // if needed
-
-
     }
 
     public void unserialize(DataInputStream dis) throws IOException {
@@ -224,38 +244,37 @@ public class Tile implements Serializable {
          Logger.error("url="+url);
          Logger.error("cacheKey="+cacheKey);
         
-         throw new IOException("Tile is borked");
+         throw new IOException(LocaleManager.getMessage("tile_error_unserialize"));
          }catch(Exception e){
              //ignore
          }finally{
              
          }
         }
-
     }
-
-public static Tile getTile(DataInputStream in) throws Exception{
-    Tile tempTile = new Tile();
     
+    public static Tile getTile(DataInputStream in) throws Exception{
+        Tile tempTile = new Tile();
         
         tempTile.unserialize(in);
-   
-    return tempTile;
-}
-
-public static Tile getTileOffset(DataInputStream in) throws Exception{
-    Tile tempTile = new Tile();
-    boolean notdoneyet=true;
-    int x;
+        
+        return tempTile;
+    }
+    
+    public static Tile getTileOffset(DataInputStream in) throws Exception{
+        Tile tempTile = new Tile();
+        boolean notdoneyet=true;
+        int x;
+        
         while(notdoneyet){
-        x = in.readInt();
-        if(x>0 && x<65000){
-            Logger.debug("Valid x read "+ x);
-            notdoneyet=false;
+            x = in.readInt();
+            if(x>0 && x<65000){
+                Logger.debug("Valid x read "+ x);
+                notdoneyet=false;
+            }
+            //tempTile.unserialize(in);
         }
-        //tempTile.unserialize(in);
-        }
-    return tempTile;
-}
-
+        
+        return tempTile;
+    }
 }

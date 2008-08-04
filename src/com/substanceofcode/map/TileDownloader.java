@@ -1,3 +1,25 @@
+/*
+ * TileDownloader.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.map;
 
 import java.io.IOException;
@@ -13,6 +35,7 @@ import javax.microedition.lcdui.Image;
 
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.MathUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Code to download tiles from various map servers See:
@@ -23,9 +46,8 @@ import com.substanceofcode.util.MathUtil;
  */
 public class TileDownloader implements Runnable {
 
-
-    public static final String RootCacheDir = "file:///Memory Card/"
-            + "MTE/cache/";
+    //FIXME: should we change it to c (rootdir), some devices dont have a memcard
+    public static final String RootCacheDir = "file:///Memory Card/MTE/cache/";
 
     // public static final int OSM = 1;
 
@@ -56,7 +78,6 @@ public class TileDownloader implements Runnable {
 
     int status = 0;
 
-
     private volatile Thread downloaderThread;
 
     public TileDownloader(/* int MapSource */) {
@@ -67,7 +88,6 @@ public class TileDownloader implements Runnable {
         tileQueue = new Vector();
         tc = new TileCacheManager();
         tc.initialize();
-
     }
 
     public void start() {
@@ -77,7 +97,6 @@ public class TileDownloader implements Runnable {
                 + downloaderThread.toString());
         running = true;
         downloaderThread.start();
-
     }
 
     public void stop() {
@@ -323,8 +342,6 @@ public class TileDownloader implements Runnable {
                 Thread.yield();
             }
         }
-
-
     }
 
     public static String getCacheKey(int x, int y, int z) {
@@ -355,14 +372,13 @@ public class TileDownloader implements Runnable {
         g.setColor(128, 128, 128);
         // Draw a boundary around the image
         g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
-        g.drawString("Loading..." + nullImageCounter, 10, 10, Graphics.TOP
-                | Graphics.LEFT);
+        g.drawString(LocaleManager.getMessage("tile_downloader_loading") 
+                + "..." + nullImageCounter, 10, 10, Graphics.TOP | Graphics.LEFT);
         Image p = loadingImage[nullImageCounter];
        // Logger.debug("Returning new nullImage " + nullImageCounter);
         nullImageCounter++;
         if (nullImageCounter > 8)
             nullImageCounter = 0;
-
 
         return p;
     }
@@ -413,6 +429,4 @@ public class TileDownloader implements Runnable {
         g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
         return loadingFileCachedImage;
     }
-
-
 }

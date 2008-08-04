@@ -1,3 +1,25 @@
+/*
+ * AbstractMapProvider.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.map;
 
 import com.substanceofcode.tracker.view.Logger;
@@ -17,7 +39,6 @@ public abstract class AbstractMapProvider implements MapProvider {
              
     }
     
-    
     public String getCacheDir() {
         return cacheDir;
      }
@@ -33,9 +54,6 @@ public abstract class AbstractMapProvider implements MapProvider {
      public String getDisplayString() {
          return displayString;
      }
-
-    
- 
     
     /**
      * Constructs the url request for the given tile. 
@@ -54,14 +72,12 @@ public abstract class AbstractMapProvider implements MapProvider {
      * @throws Exception
      */
 
-
     public String makeurl(int x, int y, int z) {
         int coords[] =  configureCoords(x,y,z);        
         StringBuffer output=null;
         String[] bits = StringUtil.split(UrlFormat, "X");
         try{
          output= new StringBuffer(bits[0]);
-        
         
             output.append(coords[2]);
             output.append(bits[1]);
@@ -71,7 +87,6 @@ public abstract class AbstractMapProvider implements MapProvider {
             output.append(bits[3]);
         }catch(ArrayIndexOutOfBoundsException aioobe){
             Logger.error("makeurl: x="+x+",y="+y+",z="+z+"\nUrl="+UrlFormat);
-            
         }
         return output.toString();
     }
@@ -79,7 +94,6 @@ public abstract class AbstractMapProvider implements MapProvider {
     private final int[] configureCoords(int x , int y, int z){              
         int[] a = { setX(x),setY(y),setZ(z)};
         return a;
-        
     }
     
     /**
@@ -117,6 +131,4 @@ public abstract class AbstractMapProvider implements MapProvider {
     public int validateZoomLevel(int z){
         return z;
     }
-    
 }
-

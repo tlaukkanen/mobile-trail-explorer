@@ -1,3 +1,25 @@
+/*
+ * FileCache.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.map;
 
 import java.io.DataInputStream;
@@ -45,7 +67,6 @@ public class FileCache implements TileCache, Runnable {
         exportFolder = Controller.getController().getSettings()
                 .getExportFolder();
 
-
         fullPath = "file:///" + exportFolder + cacheName;
         Thread initThread = new Thread() {
             public void run() {
@@ -73,7 +94,6 @@ public class FileCache implements TileCache, Runnable {
     public void initializeCache() {
         Logger.debug("Initializing FileCache");
         
-
         try {
             Conn = (FileConnection) Connector.open(fullPath);
             if (Conn != null && !Conn.exists()) {
@@ -92,7 +112,6 @@ public class FileCache implements TileCache, Runnable {
                     // There's no way of detecting the end of the stream
                     // short of getting an IOexception
                     try {
-
                         Tile t = Tile.getTile(streamIn);
 
                         Logger.debug("t is " + t.cacheKey + ", offset is "
@@ -108,7 +127,6 @@ public class FileCache implements TileCache, Runnable {
                 }
                 Logger.debug("FILE: read " + availableTileList.size()
                         + " tiles");
-
 
                 streamIn.close();
 
@@ -180,8 +198,6 @@ public class FileCache implements TileCache, Runnable {
                 OutputStream x = Conn.openOutputStream(Conn.fileSize());
 
                 streamOut = new DataOutputStream(x);
-
-
             } else {
                 // Logger.debug("streamOut is not null");
             }
@@ -228,7 +244,6 @@ public class FileCache implements TileCache, Runnable {
                 Logger.debug("File: output stream is null");
             }
             
-            
             streamOut = null;
 
         } catch (IOException e) {
@@ -250,7 +265,6 @@ public class FileCache implements TileCache, Runnable {
         }
 
         return out;
-
     }
 
     public Tile getTile(String name) {
@@ -306,7 +320,6 @@ public class FileCache implements TileCache, Runnable {
                 } catch (NullPointerException npe) {
                     Logger.debug("Caught NPE: name is " + name);
                 }
-
             }
         }
         return t;
@@ -322,7 +335,6 @@ public class FileCache implements TileCache, Runnable {
         }
     }
 
-
     private void addToQueue(Tile tile) {
         Logger.debug("FILE:Adding Tile to File queue");
         synchronized (fileProcessQueue) {
@@ -333,14 +345,12 @@ public class FileCache implements TileCache, Runnable {
         Logger.debug("FILE: FILE queue size now " + fileProcessQueue.size());
     }
 
-
     /**
      * This version will write the whole list out as one file in order to reduce
      * the amount of times permission needs to be sought.
      */
     public void run() {
         Thread thisThread = Thread.currentThread();
-
 
         try {
             // Logger.debug("FILE:Initialized ok, now sleeping for 1sec");
@@ -369,13 +379,10 @@ public class FileCache implements TileCache, Runnable {
 
                         Logger.debug("FILE: FILE queue size is:"
                                 + fileProcessQueue.size());
-
-
                         try {
                             // Logger.debug("FILE: " + cacheName);
 
                             writeToFileCache(fileProcessQueue);
-
 
                         } catch (Exception e) {
                             Logger
@@ -392,16 +399,12 @@ public class FileCache implements TileCache, Runnable {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }
-
-
     }
 
     public void put(Tile tile) {
         addToQueue(tile);
-
     }
 
     /**
@@ -418,5 +421,4 @@ public class FileCache implements TileCache, Runnable {
     private boolean verifyCacheIntegrity() {
         return true;
     }
-
 }

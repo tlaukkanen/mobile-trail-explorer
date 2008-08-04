@@ -1,3 +1,25 @@
+/*
+ * RMSCache.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.map;
 
 import java.io.IOException;
@@ -41,7 +63,6 @@ public class RMSCache implements  TileCache ,Runnable {
         }
 
         return result;
-
     }
 
 
@@ -56,8 +77,8 @@ public class RMSCache implements  TileCache ,Runnable {
      * @throws FileIOException 
      */
     public Tile get(int index) throws  FileIOException, IOException {
-     // return ImageRmsUtils.loadPngFromRMS(storename, (String) tiles
-       //       .elementAt(index));
+        // return ImageRmsUtils.loadPngFromRMS(storename, (String) tiles
+        // .elementAt(index));
             Tile t=null;
             try {
                 t=new Tile(FileSystem.getFileSystem().getFile((String)tiles.elementAt(index)));
@@ -89,18 +110,16 @@ public class RMSCache implements  TileCache ,Runnable {
         } catch (Exception e) {
             Logger.error("RMS: "+e.getMessage());
             e.printStackTrace();
-        
         }
         
         return result;
     }
-
     
     private void getTileList(){
         Logger.debug("RMS: getTileList called");
-     if(tiles==null){
-         tiles=FileSystem.getFileSystem().listFiles(Tile.MIMETYPE);
-     }
+        if(tiles==null){
+            tiles=FileSystem.getFileSystem().listFiles(Tile.MIMETYPE);
+        }
     }
 
     /**
@@ -176,7 +195,6 @@ public class RMSCache implements  TileCache ,Runnable {
                                 "RMS: RMS queue size is:"
                                         + rmsProcessQueue.size());
 
-
                         Tile tile = (Tile) rmsProcessQueue.firstElement();
                         rmsProcessQueue.removeElementAt(0);
                         try {
@@ -198,10 +216,8 @@ public class RMSCache implements  TileCache ,Runnable {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }
-
     }
     
     public void put(Tile tile){
@@ -259,7 +275,6 @@ public class RMSCache implements  TileCache ,Runnable {
             FileSystem.getFileSystem().deleteFiles(Tile.MIMETYPE);
         }
         
-        
         //New version will save the entire tile to the rms (hopefully)
         //This means all the caches are storing the same objects which will make it easier (possible?) to 
         //Move stuff between them.
@@ -269,5 +284,4 @@ public class RMSCache implements  TileCache ,Runnable {
             FileSystem.getFileSystem().saveFile(tile.cacheKey, tile.getMimeType(), tile,
                     true);
         }
-
 }
