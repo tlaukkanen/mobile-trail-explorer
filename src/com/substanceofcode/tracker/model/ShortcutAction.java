@@ -29,5 +29,4 @@ public interface ShortcutAction {
     
     /** Execute shortcut action. */
     void execute();
-
 }

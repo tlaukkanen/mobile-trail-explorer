@@ -42,5 +42,4 @@ public class PlacemarkShortcutAction implements ShortcutAction {
             controller.savePlace(waypoint);
         }
     }
-
 }

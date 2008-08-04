@@ -19,7 +19,6 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 package com.substanceofcode.tracker.model;
 
 import java.util.Enumeration;
@@ -32,6 +31,7 @@ import com.substanceofcode.tracker.grid.WSG84Position;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.util.Version;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * RecorderSettings contains all settings for the Trail Explorer application.
@@ -124,7 +124,7 @@ public class RecorderSettings {
         try {
             settings = Settings.getInstance(midlet);
         } catch (Exception ex) {
-            System.err.println("Error occured while creating an instance "
+            Logger.error("Error occured while creating an instance "
                     + "of Settings class: " + ex.toString());
         }
     }
@@ -164,6 +164,7 @@ public class RecorderSettings {
     public boolean getWebRecordingUsage() {
         return settings.getBooleanProperty(UPLOAD_USE, false);
     }
+
     /**
      * Set web recording usage.
      * @param useWebRecording   true if we are uploading position to web.
@@ -193,7 +194,6 @@ public class RecorderSettings {
         saveSettings();
     }
     
-    
     /** @return Min distance for recorded position since last position */
     public int getMinRecordedDistance() {
         int minDistance = settings.getIntProperty(
@@ -207,17 +207,14 @@ public class RecorderSettings {
         saveSettings();
     }
     
-
     public String getUploadURL(){
         return settings.getStringProperty(UPLOAD_URL,"");
     }
-    
     
     public void setUploadURL(String url){
         settings.setStringProperty(UPLOAD_URL, url);
         saveSettings();
     }
-    
     
     /**
      * @return True if streaming trail was unfinished.
@@ -364,10 +361,8 @@ public class RecorderSettings {
             {
                 placeString += "|" + posData[i];
         }
-            
             //append end of record
             placeString += "\n";
-
         }
         settings.setStringProperty(PLACES, placeString);
         saveSettings();
@@ -456,8 +451,8 @@ public class RecorderSettings {
     public void setNumberOfPositionToDraw(int value) {
         if (value < 1) {
             throw new IllegalArgumentException(
-                    "Settings.setDrawingIncrement may not be 0, or negitive ("
-                            + value + ")");
+                    LocaleManager.getMessage("recorder_settings_setnumberofpositiontodraw")
+                    + ": " + value);
         }
         settings.setIntProperty(POSITIONS_TO_DRAW, value);
         saveSettings();
@@ -485,7 +480,6 @@ public class RecorderSettings {
         MapProviderManager.setSelectedMapProvider(value);
         saveSettings();
     }
-    
     
     /**
      * Should the backlight always be on? Default is false;

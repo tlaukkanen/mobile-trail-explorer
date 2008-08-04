@@ -22,8 +22,6 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.tracker.grid.GridPosition;
-import com.substanceofcode.tracker.grid.WSG84Position;
 import java.util.Vector;
 import java.io.DataOutputStream;
 import java.io.OutputStream;
@@ -33,6 +31,9 @@ import javax.microedition.io.file.FileConnection;
 
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.grid.WSG84Position;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Place contains information of a single location. Place has a name and 
@@ -45,10 +46,7 @@ public class Place {
     /** Name of this place */
     private String name;
     
-    
     private GridPosition position;
-    
-    
     
     /** 
      * Default constructor
@@ -149,7 +147,8 @@ public class Place {
                     lType = "KML";
                     break;
             }
-            listener.notifyProgressStart("Writing to " + lType + " file");
+            listener.notifyProgressStart(LocaleManager.getMessage("place_writeToFile_prgs_start",
+                    new Object[] {lType}));
             listener.notifyProgress(1);
         }
         // ------------------------------------------------------------------
@@ -180,17 +179,18 @@ public class Place {
             connection = (FileConnection) Connector.open(fullPath,
                     Connector.WRITE);
         } catch (Exception ex) {
-            System.out.println("Open threw : " + ex.toString());
+            Logger.info("Open threw : " + ex.toString());
             ex.printStackTrace();
-            throw new Exception("writeToFile: Open Connector: " + ex.toString());
+            throw new Exception(LocaleManager.getMessage("place_exception_write")
+                    + ": " + ex.toString());
         }
         try {
             // Create file
             connection.create();
         } catch (Exception ex) {
             connection.close();
-            throw new Exception("writeToFile: Unable to open file : "
-                    + "Full details : " + ex.toString());
+            throw new Exception(LocaleManager.getMessage("place_exception_open")
+                    + ": " + ex.toString());
         }
 
         // ------------------------------------------------------------------
@@ -201,8 +201,8 @@ public class Place {
             out = connection.openOutputStream();
         } catch (Exception ex) {
             connection.close();
-            throw new Exception("writeToFile: Open output stream: "
-                    + ex.toString());
+            throw new Exception(LocaleManager.getMessage("place_exception_stream")
+                    + ": " + ex.toString());
         }
         DataOutputStream output= new DataOutputStream(out);
 
@@ -242,5 +242,4 @@ public class Place {
         }
         return fullPath;
     }
-    
  }

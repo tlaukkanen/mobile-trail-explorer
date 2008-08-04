@@ -1,7 +1,7 @@
 /*
  * Track.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,8 @@ import java.io.PrintStream;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.Vector;
+import java.io.EOFException;
+import java.util.Date;
 
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
@@ -42,8 +44,7 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
-import java.io.EOFException;
-import java.util.Date;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>
@@ -104,7 +105,6 @@ public class Track implements Serializable {
     private FileConnection streamConnection = null;
     private OutputStream streamOut = null;
     private PrintStream streamPrint = null;
-
 
     /**
      * State variable : True - This track should be streamed to disk, False -
@@ -344,7 +344,6 @@ public class Track implements Serializable {
         return name;
     }
 
-
     /*
      * Setter methods
      */
@@ -355,11 +354,9 @@ public class Track implements Serializable {
         this.name = name;
     }
 
-
     /*
      * Other Methods
      */
-
 
     /** Add new Track Point to the end of this Track */
     public void addPosition(GpsPosition pos) {
@@ -420,8 +417,8 @@ public class Track implements Serializable {
                     trackPoints.removeElementAt(0);
                 }
             } catch (IOException e) {
-                lController.showError("Exception adding point : "
-                        + e.toString());
+                lController.showError(LocaleManager.getMessage("track_addposition_exception")
+                        + " : " + e.toString());
             }
         }
     }
@@ -518,7 +515,8 @@ public class Track implements Serializable {
                     lType = "KML";
                     break;
             }
-            listener.notifyProgressStart("Writing to " + lType + " file");
+            listener.notifyProgressStart(LocaleManager.getMessage("track_writetofile_prgs_start",
+                    new Object[] {lType}));
             listener.notifyProgress(1);
         }
         // ------------------------------------------------------------------
@@ -548,17 +546,18 @@ public class Track implements Serializable {
             connection = (FileConnection) Connector.open(fullPath,
                     Connector.WRITE);
         } catch (Exception ex) {
-            System.out.println("Open threw : " + ex.toString());
+            Logger.info("Open threw : " + ex.toString());
             ex.printStackTrace();
-            throw new Exception("writeToFile: Open Connector: " + ex.toString());
+            throw new Exception(LocaleManager.getMessage("track_writetofile_exception_write")
+                    + ": " + ex.toString());
         }
         try {
             // Create file
             connection.create();
         } catch (Exception ex) {
             connection.close();
-            throw new Exception("writeToFile: Unable to open file : "
-                    + "Full details : " + ex.toString());
+            throw new Exception(LocaleManager.getMessage("track_writetofile_exception_open")
+                    + ": " + ex.toString());
         }
 
         // ------------------------------------------------------------------
@@ -569,8 +568,8 @@ public class Track implements Serializable {
             out = connection.openOutputStream();
         } catch (Exception ex) {
             connection.close();
-            throw new Exception("writeToFile: Open output stream: "
-                    + ex.toString());
+            throw new Exception(LocaleManager.getMessage("track_writetofile_exception_stream")
+                    + ": " + ex.toString());
         }
         // PrintStream output = new PrintStream(out);
         DataOutputStream output = new DataOutputStream(out);
@@ -616,7 +615,6 @@ public class Track implements Serializable {
         return fullPath;
     }
 
-
     /**
      * 
      * @throws FileIOException
@@ -628,7 +626,7 @@ public class Track implements Serializable {
         if (this.trackMarkers.size() == 0 && this.trackPoints.size() == 0) {
             // May not save an empty trail.
             throw new IllegalStateException(
-                    "Can not save \"Empty\" Trail. must record at least 1 point");
+                    LocaleManager.getMessage("track_savetorms_error"));
         } else {
             final String filename;
             if (this.name == null || this.name.length() == 0) {
@@ -640,7 +638,6 @@ public class Track implements Serializable {
                     false);
         }
     }
-
 
     /**
      * Utility method to 'pause' the current track to the rms Not throwing any
@@ -660,12 +657,10 @@ public class Track implements Serializable {
                     fs.deleteFile(Track.PAUSEFILENAME);
                 }
 
-
                 fs.saveFile(PAUSEFILENAME, getMimeType(), this, false);
             } catch (FileIOException e) {
                 Logger.error("Error creating pause file " + e.getMessage());
             }
-
         }
     }
 
@@ -728,5 +723,4 @@ public class Track implements Serializable {
     public String getMimeType() {
         return MIME_TYPE;
     }
-
 }

@@ -22,11 +22,6 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.tracker.view.Logger;
-import com.substanceofcode.util.DateTimeUtil;
-import com.substanceofcode.util.StringUtil;
-
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,6 +31,12 @@ import java.util.Vector;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Class to convert a Track/Place to KML (google-earth) format.
@@ -269,7 +270,6 @@ public class KmlConverter extends TrackConverter {
             markerString.append("</coordinates></Point>\r\n");
             markerString.append("</Placemark>\r\n");
         }
-
 
         // End position
 
@@ -511,7 +511,8 @@ public class KmlConverter extends TrackConverter {
                             coords = StringUtil.split(coordinateString, "\n");
                         }
                         if(coords==null || coords.length==0) {
-                            throw new Exception("Couldn't find any coords");
+                            throw new Exception(
+                                    LocaleManager.getMessage("kml_converter_parsekmlplacemark"));
                         }
                         parseCoordinages(coords, result);                        
                     } catch (Exception e) {
@@ -585,11 +586,9 @@ public class KmlConverter extends TrackConverter {
                     Logger.debug("Creating new waypoint");
                     return new Place(name, latitude, longitude);
                 }
-                
             }        
             eventType = parser.next();
         }
         return null;
     }
-
 }

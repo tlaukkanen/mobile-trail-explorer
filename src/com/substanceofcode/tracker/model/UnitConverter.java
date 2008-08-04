@@ -1,7 +1,7 @@
 /*
  * UnitConverter.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -148,5 +148,4 @@ public class UnitConverter {
                 "supported : ( unit index " + originalUnits + 
                 " to unit index" + convertedUnits + ")");
     }
-
 }

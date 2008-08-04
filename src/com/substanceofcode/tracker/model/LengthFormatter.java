@@ -1,7 +1,7 @@
 /*
  * LengthFormatter.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -30,10 +30,9 @@ import com.substanceofcode.util.StringUtil;
  * @author Tommi Laukkanen
  */
 public class LengthFormatter {
-    
-		/**
-	   * Reference to Settings object
-	   */
+    /**
+     * Reference to Settings object
+     */
     RecorderSettings settings;
     
     /** Creates a new instance of LengthFormatter */

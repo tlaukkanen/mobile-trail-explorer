@@ -34,7 +34,6 @@ import com.substanceofcode.tracker.grid.GridPosition;
 public class GridFormatterManager implements GridFormatterContext, GridNames
 {
     
-    
     private RecorderSettings settings;
     private int display_context;
     
@@ -113,7 +112,7 @@ public class GridFormatterManager implements GridFormatterContext, GridNames
             if(name.equals(formatters[i].getName() ))
             {
                 return formatters[i];
-}
+            }
         }      
         if(returnDefaultWhenNotFound)
         {
