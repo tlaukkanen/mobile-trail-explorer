@@ -388,14 +388,12 @@ public class Controller {
             while (!bt.searchComplete() && !bt.searchTimeOutExceeded()) {
                 // Logger.debug("Finding devices.");
                 Thread.sleep(100);
-
-
             }
-            System.out.println("Getting devices.");
+            Logger.debug("Getting devices.");
             //addDevices(devices, bt.getDevices());
             devices = bt.getDevices();
         } catch (Exception ex) {
-            System.err.println("Error in Controller.searchDevices: " + ex.toString());
+            Logger.error("Error in Controller.searchDevices: " + ex.toString());
             ex.printStackTrace();
         }
     }
@@ -443,7 +441,6 @@ public class Controller {
 
     /** Set GPS device */
     public void setGpsDevice(String address, String alias) {
-
         gpsDevice = GpsDeviceFactory.createDevice(address, alias);
         settings.setGpsDeviceConnectionString(gpsDevice.getAddress());
     }
@@ -512,7 +509,8 @@ public class Controller {
                     }
                 } catch (Exception ex) {
                     Logger.error("Error while connection to GPS: " + ex.toString());
-                    showError("Error while connection to GPS: " + ex.toString());
+                    showError(LocaleManager.getMessage("controller_connecttogpsdevice_error")
+                            + ": " + ex.toString());
                 }
             }
         }.start();
@@ -528,7 +526,7 @@ public class Controller {
             // XXX : HACK(disabled)
             Logger.debug("gpsDevice is " + gpsDevice);
             if (gpsDevice == null) {
-                showError("Please select a GPS device first");
+                showError(LocaleManager.getMessage("controller_startstop_error"));
             } else {
                 if( status==STATUS_NOTCONNECTED ) {
                     connectToGpsDevice();
@@ -573,7 +571,8 @@ public class Controller {
                 ((BluetoothDevice) gpsDevice).disconnect();
             }
         } catch (Exception e) {
-            showError("Error while disconnecting from GPS device: " + e.toString());
+            showError(LocaleManager.getMessage("controller_disconnect_error")
+                    + ": " + e.toString());
         }
     }
 
@@ -595,7 +594,6 @@ public class Controller {
         places.addElement(waypoint);
 
         savePlaces(); // Save waypoints immediately to RMS
-
     }
 
     /**
@@ -607,24 +605,24 @@ public class Controller {
      */
     public void saveTrail(AlertHandler xiListener, String name) {
         // XXX : mchr : Vulnerable to NPE...
-        xiListener.notifyProgressStart("Saving Trail to RMS");
+        xiListener.notifyProgressStart(LocaleManager.getMessage("controller_prgs_start"));
         xiListener.notifyProgress(2);
         try {
             Track track = recorder.getTrack();
             track.setName(name);
             track.saveToRMS();
             if (xiListener != null) {
-                xiListener.notifySuccess("RMS : Save succeeded");
+                xiListener.notifySuccess(LocaleManager.getMessage("controller_prgs_success"));
             }
         } catch (IllegalStateException e) {
             if (xiListener != null) {
                 xiListener.notifyError(
-                        "RMS : Can not save \"Empty\" Trail. must record at " + "least 1 point", null);
+                        LocaleManager.getMessage("controller_prgs_error_empty_trail"), null);
             }
         } catch (FileIOException e) {
             if (xiListener != null) {
                 xiListener.notifyError(
-                        "RMS : An Exception was thrown when attempting to save " + "the Trail to the RMS!", e);
+                        LocaleManager.getMessage("controller_prgs_error_fileioexception"), e);
             }
         }
     }
@@ -657,7 +655,7 @@ public class Controller {
     public void editPlace(Place wp) {
         Logger.debug("Editing waypoint");
         if (wp == null) {
-            showError("Selected waypoint is null");
+            showError(LocaleManager.getMessage("controller_editplace_error"));
             return;
         }
         if (placeForm == null) {
@@ -954,7 +952,7 @@ public class Controller {
         try {
             display.setCurrent(new TrailDetailsScreen(this, trailName));
         } catch (IOException e) {
-            showError("An error occured when trying to retrieve the trail from the RMS!" + e.toString());
+            showError(LocaleManager.getMessage("controller_showtraildetails_error") + e.toString());
         }
     }
 
@@ -980,7 +978,8 @@ public class Controller {
      */
     public Alert showAlert(final String message, final int seconds,
             AlertType type) {
-        final Alert alert = new Alert("Error", message, null, AlertType.ERROR);
+        final Alert alert = new Alert(LocaleManager.getMessage("controller_showalert_title"),
+                message, null, AlertType.ERROR);
         alert.setTimeout(seconds == 0 || seconds == Alert.FOREVER ? Alert.FOREVER
                 : seconds * 1000);
         // Put it into a thread as 2 calls to this method in quick succession
@@ -1020,7 +1019,8 @@ public class Controller {
      * TODO
      */
     public Alert createProgressAlert(final String message) {
-        final Alert alert = new Alert("Progress", message, null, AlertType.INFO);
+        final Alert alert = new Alert(LocaleManager.getMessage("controller_createprogressalert_title"),
+                message, null, AlertType.INFO);
         final Gauge gauge = new Gauge(null, false, 10, 0);
         alert.setTimeout(Alert.FOREVER);
         alert.setIndicator(gauge);
@@ -1039,7 +1039,6 @@ public class Controller {
     /** Update selected waypoint */
     public void updateWaypoint(Place oldWaypoint, Place newWaypoint) 
     {
-        
         Enumeration waypointEnum = places.elements();
         while (waypointEnum.hasMoreElements()) {
             Place wp = (Place) waypointEnum.nextElement();
@@ -1050,7 +1049,6 @@ public class Controller {
             }
         }
         savePlaces(); // Save waypoints immediately to RMS
-
     }
 
     /** Save waypoints to persistent storage */
@@ -1174,7 +1172,6 @@ public class Controller {
         } catch (IOException e) {
             Logger.error("Resume from pause failed: " + e.getMessage());
         }
-
     }
 
     /**
@@ -1188,7 +1185,6 @@ public class Controller {
         }
 
         return rstatus;
-
     }
 
     /** Rotate around main displays */

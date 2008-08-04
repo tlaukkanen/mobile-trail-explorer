@@ -1,11 +1,29 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * WSG84Formatter.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
 
 package com.substanceofcode.tracker.grid;
 
 import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  *
@@ -13,18 +31,20 @@ import com.substanceofcode.util.StringUtil;
  */
 public class WSG84Formatter implements GridFormatter
 {
-
     public String[] getLabels(int display_context) 
     {
         switch(display_context)
         {
             case(INFORMATION_CANVAS):
-                return new String[]{"LAT", "LON"};
+                return new String[]{LocaleManager.getMessage("wsg84_formatter_lat"),
+                                    LocaleManager.getMessage("wsg84_formatter_lon")};
             case(PLACE_FORM):
-                return new String[]{"Latitude", "Longitude"};
+                return new String[]{LocaleManager.getMessage("wsg84_formatter_latitude"),
+                                    LocaleManager.getMessage("wsg84_formatter_longitude")};
                 
             default: //trail-canvas
-                return new String[]{"LAT:", "LON:"};
+                return new String[]{LocaleManager.getMessage("wsg84_formatter_lat"),
+                                    LocaleManager.getMessage("wsg84_formatter_lon")};
         }
     }
 
@@ -36,7 +56,6 @@ public class WSG84Formatter implements GridFormatter
         }
         
         WSG84Position pos = new WSG84Position(position);
-        
         
         String lat;
         String lon;
@@ -62,16 +81,14 @@ public class WSG84Formatter implements GridFormatter
 
     public GridPosition getGridPositionWithData(String[] data) throws BadFormattedException 
     {
-        
             double latitude;
             double longitude;
             try {
                 latitude = Double.parseDouble(data[0]);
                 longitude = Double.parseDouble(data[1]);
             } catch (Exception e) {
-                throw new BadFormattedException("Error while parsing latitude or longitude. " +
-                                     "Valid format for latitude and longitude is:\n" +
-                                     "[-]xxx.xxxxx");
+                throw new BadFormattedException(
+                        LocaleManager.getMessage("wsg84_formatter_getgridpositionwithdata_error"));
 }
             return new WSG84Position(latitude, longitude);
     }
@@ -85,5 +102,4 @@ public class WSG84Formatter implements GridFormatter
     {
         return new WSG84Position(0.0,0.0);
     }
-
 }

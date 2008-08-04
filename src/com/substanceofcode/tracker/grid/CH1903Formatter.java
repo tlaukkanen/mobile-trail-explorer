@@ -1,10 +1,28 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * CH1903Formatter.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
  */
 
 package com.substanceofcode.tracker.grid;
 
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  *
@@ -24,8 +42,7 @@ public class CH1903Formatter implements GridFormatter
                 return new String[]{"X", "Y"};
                 
             default: //TRAIL_CANVAS
-                return new String[]{"X:", "Y:"};
-                
+                return new String[]{"X:", "Y:"};       
         }
     }
 
@@ -45,7 +62,7 @@ public class CH1903Formatter implements GridFormatter
             default:
                 return new String[]{    formatAsCH1903String(chp.getX()), 
                              formatAsCH1903String(chp.getY()) };
-    }
+        }
     
     }
     
@@ -80,10 +97,9 @@ public class CH1903Formatter implements GridFormatter
             y = Integer.parseInt(data[1]); 
             return new CH1903Position(x, y);
         } catch (Exception e) {
-            throw new BadFormattedException("Error while parsing X or Y. " +
-                                     "Valid format for X and Y is:\n" +
-                                     "XXXXXX");
-}
+            throw new BadFormattedException(
+                    LocaleManager.getMessage("ch1903_formatter_getgridpositionwithdata_error"));
+        }
     }
 
     public GridPosition convertPosition(GridPosition position) {
@@ -94,5 +110,4 @@ public class CH1903Formatter implements GridFormatter
     {
         return new CH1903Position(0,0);
     }
-
 }

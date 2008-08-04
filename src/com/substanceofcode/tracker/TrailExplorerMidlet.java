@@ -98,5 +98,4 @@ public class TrailExplorerMidlet extends MIDlet {
     public void destroyApp(boolean unconditional) {
         Logger.debug("TrailExplorerMidlet.destroyApp() called @ " + DateTimeUtil.convertToTimeStamp(System.currentTimeMillis(), true));
     }
-    
 }
