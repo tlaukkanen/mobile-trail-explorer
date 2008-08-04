@@ -22,11 +22,6 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.gps.GpsGPGSA;
-import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.tracker.view.Logger;
-import com.substanceofcode.util.DateTimeUtil;
-
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,6 +31,12 @@ import java.util.Vector;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import com.substanceofcode.gps.GpsGPGSA;
+import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * GpxConverter writes track/place data in GPX format.
@@ -133,7 +134,6 @@ public class GpxConverter extends TrackConverter {
         gpx.append("</gpx>\r\n");
     }
 
-    
     /**
      * TODO
      * 
@@ -166,7 +166,6 @@ public class GpxConverter extends TrackConverter {
             gpx.append("<fixtype>").append(String.valueOf(gpgsa.getFixtype()))
             .append("</fixtype>\r\n");
         }
-
 
         gpx.append("</trkpt>\r\n");
     }
@@ -275,7 +274,7 @@ public class GpxConverter extends TrackConverter {
 
     private void parseGPX(KXmlParser parser, Track track)
             throws XmlPullParserException, IOException {
-        System.out.println("Starting parseGPX");
+        Logger.info("Starting parseGPX");
         int eventType = parser.getEventType();
         // --------------------------------------------------------------------------
         // Keep stepping through tags until we find a END_TAG with the
@@ -302,7 +301,7 @@ public class GpxConverter extends TrackConverter {
      */
     private void parseTRK(KXmlParser parser, Track track)
             throws XmlPullParserException, IOException {
-        System.out.println("Starting parseTRK");
+        Logger.info("Starting parseTRK");
         int eventType = parser.getEventType();
         // --------------------------------------------------------------------------
         // Keep stepping through tags until we find a END_TAG with the
@@ -340,7 +339,7 @@ public class GpxConverter extends TrackConverter {
      */
     private void parseName(KXmlParser parser, Track track)
             throws XmlPullParserException, IOException {
-        System.out.println("Starting parseName");
+        Logger.info("Starting parseName");
         int eventType = parser.getEventType();
         // --------------------------------------------------------------------------
         // Check for a START_TAG with the name "name". We need the middle check
@@ -355,14 +354,15 @@ public class GpxConverter extends TrackConverter {
                 parser.next();
                 return;
             } else {
-                throw new XmlPullParserException("Expecting TEXT, but found "
-                        + eventType + " instead");
+                throw new XmlPullParserException(
+                        LocaleManager.getMessage("gpx_converter_parsename_error",
+                        new Object[] {Integer.toString(eventType)}));
             }
         } else {
-            throw new XmlPullParserException("Expecting START_TAG, but found "
-                    + eventType + " instead");
+            throw new XmlPullParserException(
+                    LocaleManager.getMessage("gpx_converter_parsename_error_start_tag",
+                    new Object[] {Integer.toString(eventType)}));
         }
-
     }
 
     /**
@@ -371,7 +371,7 @@ public class GpxConverter extends TrackConverter {
     private void parseTRKSEG(KXmlParser parser, Track track)
             throws XmlPullParserException, IOException {
         int count = 0;
-        System.out.println("Starting parseTRKSEG");
+        Logger.info("Starting parseTRKSEG");
         int eventType = parser.getEventType();
         // --------------------------------------------------------------------------
         // Check for a START_TAG with the name "trkseg". We need the middle
@@ -413,12 +413,12 @@ public class GpxConverter extends TrackConverter {
                 eventType = parser.next();
             }
         } else {
-            throw new XmlPullParserException("Expecting START_TAG, but found "
-                    + eventType + " instead");
+            throw new XmlPullParserException(
+                    LocaleManager.getMessage("gpx_converter_parsetrkseg_error",
+                    new Object[] {Integer.toString(eventType)}));
         }
 
-        Logger.debug
-                ("Added " + count + " GpsPositions");
+        Logger.debug("Added " + count + " GpsPositions");
     }
 
     /**
@@ -426,7 +426,7 @@ public class GpxConverter extends TrackConverter {
      */
     private GpsPosition parseTRKPT(KXmlParser parser)
             throws XmlPullParserException, IOException {
-        System.out.println("Starting parseTRKPT");
+        Logger.info("Starting parseTRKPT");
         short course = 0;
         double longitudeDouble = 0;
         double latitudeDouble = 0;
@@ -480,11 +480,12 @@ public class GpxConverter extends TrackConverter {
 
 
         } else {
-            throw new XmlPullParserException("Expecting START_TAG, but found "
-                    + eventType + " instead");
+            throw new XmlPullParserException(
+                    LocaleManager.getMessage("gpx_converter_parsetrkpt_error",
+                    new Object[] {Integer.toString(eventType)}));
         }
 
-        System.out.println("Parsed GpsPosition: lat:" + latitudeDouble
+        Logger.info("Parsed GpsPosition: lat:" + latitudeDouble
                 + " |lon:" + longitudeDouble + " |altitude:" + altitude
                 + " |speed:" + speed);
         return new GpsPosition(course, longitudeDouble, latitudeDouble, speed,
@@ -519,9 +520,9 @@ public class GpxConverter extends TrackConverter {
 
             // XXX : mchr : What purpose does this output have?
             if (dateString.toLowerCase().equals(reconstruct.toLowerCase())) {
-                System.out.println("Same");
+                Logger.info("Same");
             } else {
-                System.out.println(dateString + " not same as " + reconstruct);
+                Logger.info(dateString + " not same as " + reconstruct);
             }
 
             Calendar calendar = Calendar.getInstance();
@@ -587,7 +588,7 @@ public class GpxConverter extends TrackConverter {
     
     private void parseGPXWaypoint(KXmlParser parser, Vector waypoints)
             throws XmlPullParserException, IOException {
-        System.out.println("Starting parseGPXWaypoint");
+        Logger.info("Starting parseGPXWaypoint");
         int eventType = parser.getEventType();
         // --------------------------------------------------------------------------
         // Keep stepping through tags until we find a END_TAG with the
@@ -612,7 +613,7 @@ public class GpxConverter extends TrackConverter {
     
     private void parseWPT(KXmlParser parser, Vector waypoints)
             throws XmlPullParserException, IOException {
-        System.out.println("Starting parseWPT");
+        Logger.info("Starting parseWPT");
         double longitudeDouble = 0;
         double latitudeDouble = 0;
         String wptName = "WP_UNTITLED";
@@ -651,11 +652,12 @@ public class GpxConverter extends TrackConverter {
                 }
             }
         } else {
-            throw new XmlPullParserException("Expecting START_TAG, but found "
-                    + eventType + " instead");
+            throw new XmlPullParserException(
+                    LocaleManager.getMessage("px_converter_parsewpt_error",
+                    new Object[] {Integer.toString(eventType)}));
         }
 
-        System.out.println("Parsed GpsPosition: name:"+ wptName + " |lat:" + latitudeDouble
+        Logger.info("Parsed GpsPosition: name:"+ wptName + " |lat:" + latitudeDouble
                 + " |lon:" + longitudeDouble);
         
         Place waypoint = new Place(wptName, latitudeDouble, longitudeDouble);

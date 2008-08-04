@@ -20,7 +20,6 @@
  *
  */
 
-
 package com.substanceofcode.tracker.model;
 
 import java.io.ByteArrayInputStream;
@@ -43,6 +42,7 @@ import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Timer based class that encapsulates recording data from a GPS device.
@@ -163,8 +163,6 @@ public class GpsRecorder {
         recording = active;
     }
 
-
-  
     private boolean checkValidPosition(GpsPosition currentPosition,
             GpsPosition lastPosition, GpsPosition lastRecordedPosition) {
         /** Check for valid position */
@@ -258,7 +256,6 @@ public class GpsRecorder {
             // ------------------------------------------------------------------
             this.notifyAll();
         }
-
 
         /**
          * Main worker thread method
@@ -481,10 +478,7 @@ public class GpsRecorder {
                                 if(conn!=null)conn.close();
                                 
                             }
-                            
                         }
-                        
-                        
                     }
                     lastPosition = currentPosition;
                 } else {
@@ -494,14 +488,9 @@ public class GpsRecorder {
                 }
                 controller.repaintDisplay();
             } catch (Exception ex) {
-                controller.showError("Error in recorder task: "
-                        + ex.toString()+"\n controller is " +controller+
-                       "\n currentPosition is" +controller.getPosition());
-            }
-                    
+                controller.showError(LocaleManager.getMessage("gps_recorder_error",
+                        new Object[] {ex.toString(), controller, controller.getPosition()}));
+            }     
         }
-        
     }
 }
-
-

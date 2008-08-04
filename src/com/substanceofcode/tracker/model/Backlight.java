@@ -30,6 +30,7 @@ import javax.microedition.midlet.MIDlet;
 
 import com.nokia.mid.ui.DeviceControl;
 
+import com.substanceofcode.tracker.view.Logger;
 
 /**
  * This class is used to keep the backlight always on.
@@ -118,7 +119,6 @@ public final class Backlight extends TimerTask {
             case VENDOR_SONY_ERICSSON:
                 switchBacklightSonyEricsson(BACKLIGHT_ON);
                 return;
-
         }
     }
 
@@ -148,7 +148,7 @@ public final class Backlight extends TimerTask {
             } else {
                 DeviceControl.setLights(0, 100);
             }
-            System.out.println("Backlight "
+            Logger.info("Backlight "
                     + (backlightOnOff != 0 ? "on" : "off"));
         } catch (Throwable ex) {
             // XXX : mchr : log/notify lights failure?
@@ -178,7 +178,7 @@ public final class Backlight extends TimerTask {
                             BACKLIGHT_TIMER_INTERVAL);
                 }
             }
-            System.out.println("Backlight "
+            Logger.info("Backlight "
                     + (backlightOnOff != 0 ? "on" : "off"));
         } catch (Throwable ex) {
             // XXX : mchr : log/notify lights failure?
@@ -208,5 +208,4 @@ public final class Backlight extends TimerTask {
             Display.getDisplay(midlet).flashBacklight(1);
         }
     }
-
 }

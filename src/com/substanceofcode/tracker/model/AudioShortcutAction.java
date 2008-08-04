@@ -96,7 +96,6 @@ public class AudioShortcutAction implements ShortcutAction {
                         + ": " + ex.getMessage());
                 ex.printStackTrace();
             }
-
         }
     }
 }

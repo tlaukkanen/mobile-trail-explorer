@@ -1,3 +1,25 @@
+/*
+ * AlertHandler.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.tracker.model;
 
 import javax.microedition.lcdui.Alert;
@@ -7,6 +29,8 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>Alert handling class. Ensures only one alert is displayed at a time.
@@ -87,7 +111,7 @@ public class AlertHandler implements CommandListener {
         String lErrorMsg = (th != null? th.toString() : "");
         if (mActiveAlert != null) {
             if (mProgressActive) {
-                mActiveAlert.setTitle("Error");
+                mActiveAlert.setTitle(LocaleManager.getMessage("alert_handler_notifyerror_title"));
                 mActiveAlert.setString(message + "\n" + lErrorMsg);
                 mActiveAlert.setIndicator(null);
                 mProgressActive = false;
@@ -115,8 +139,8 @@ public class AlertHandler implements CommandListener {
     public void notifySuccess(String message) {
         if (mActiveAlert != null) {
             if (mProgressActive) {
-                System.out.println("Final progress message");
-                mActiveAlert.setTitle("Info");
+                Logger.info("Final progress message");
+                mActiveAlert.setTitle(LocaleManager.getMessage("alert_handler_notifysuccess_title"));
                 mActiveAlert.setString(message);
                 mActiveAlert.setIndicator(null);
                 mProgressActive = false;
@@ -155,7 +179,7 @@ public class AlertHandler implements CommandListener {
      */
     public void notifyProgress(int percent) {
         if (mActiveAlert != null) {
-            System.out.println("Setting value : " + percent);
+            Logger.info("Setting value : " + percent);
             mActiveAlert.getIndicator().setValue(percent);
         }
     }
