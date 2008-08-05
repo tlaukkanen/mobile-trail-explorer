@@ -15,6 +15,9 @@ Bastian Kämpfe
 
 Release Notes:
 
+v1.12 (xxx xth 2008)
++ ...
+
 v1.11 (August xth 2008)
 + Renamed "Waypoints" to "Places" (Issue 92)
 + Filename uses datestamp with seconds
