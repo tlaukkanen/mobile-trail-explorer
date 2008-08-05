@@ -19,13 +19,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.tracker.controller.Controller;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
+
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * SettingsList contains links to all settings categories like GPS unit
@@ -75,28 +78,30 @@ public class SettingsList extends List implements CommandListener {
      * @param controller 
      */
     public SettingsList(Controller controller) {
-        super("Settings", List.IMPLICIT);
+        super(LocaleManager.getMessage("settings_list_title"), List.IMPLICIT);
         this.controller = controller;
 
         // List initialization
-        this.append("GPS", null);
-        this.append("Export Folder", null);
-        this.append("Recording", null);
-        this.append("Web Recording", null);
-        this.append("Display", null);
-        this.append("Development Menu", null);
-        this.append("About/Help", null);
-        this.append("Keys", null);
+        this.append(LocaleManager.getMessage("settings_list_gps"), null);
+        this.append(LocaleManager.getMessage("settings_list_export_folder"), null);
+        this.append(LocaleManager.getMessage("settings_list_recording"), null);
+        this.append(LocaleManager.getMessage("settings_list_web_recording"), null);
+        this.append(LocaleManager.getMessage("settings_list_display"), null);
+        this.append(LocaleManager.getMessage("settings_list_development_menu"), null);
+        this.append(LocaleManager.getMessage("settings_list_about"), null);
+        this.append(LocaleManager.getMessage("settings_list_keys"), null);
         if (SMS_AVAILABLE) {
-            this.append("SMS", null);
+            this.append(LocaleManager.getMessage("settings_list_sms"), null);
         }
 
         // Commands
-        selectCommand = new Command("Select", Command.OK, 1);
+        selectCommand = new Command(LocaleManager.getMessage("menu_select"),
+                Command.OK, 1);
         addCommand(selectCommand);
         setSelectCommand(selectCommand);
 
-        backCommand = new Command("Back", Command.BACK, 4);
+        backCommand = new Command(LocaleManager.getMessage("menu_back"),
+                Command.BACK, 4);
         addCommand(backCommand);
 
         setCommandListener(this);

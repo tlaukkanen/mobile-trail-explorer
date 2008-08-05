@@ -68,7 +68,6 @@ public class PlacesCanvas extends BaseCanvas {
         /** Draw places */
         g.setFont(rowFont);
         paintPlaces(g, titleFont.getHeight()+2);
-        
     }
     
     /** Handle key presses */

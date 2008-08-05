@@ -114,7 +114,6 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
             return;
     }
     
-        
         currentGridFormatter = GridFormatterManager.getGridFormatterForName(name, true);
         String[] labels = currentGridFormatter.getLabels(currentGridFormatter.PLACE_FORM);
         

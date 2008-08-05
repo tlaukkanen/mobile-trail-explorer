@@ -22,8 +22,10 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.util.StringUtil;
 import javax.microedition.lcdui.Graphics;
+
+import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.tracker.view.Logger;
 
 /**
  *
@@ -57,7 +59,7 @@ public class NumberArea {
             if(numChar.compareTo(".")==0 || 
                numChar.compareTo(",")==0) {
                 setBlack(g);
-                System.out.println("char: " + numChar);
+                Logger.info("char: " + numChar);
                 //g.fillRect(xinc+numSize.getWidth(), y, numSize.getLineWidth(), numSize.getLineWidth());
                 g.fillRoundRect(
                         xinc+numSize.getWidth()-numSize.getLineWidth(), y + numSize.getHeight() - numSize.getLineWidth(), 
@@ -195,7 +197,6 @@ public class NumberArea {
 
     private void setBlack(Graphics g) {
         g.setColor( Theme.getColor(Theme.TYPE_TEXT) );
-        
     }
 
     private void setWhite(Graphics g) {
@@ -236,6 +237,5 @@ public class NumberArea {
         public int getLineWidth() {
             return getQuarterWidth();
         }
-        
     }
 }

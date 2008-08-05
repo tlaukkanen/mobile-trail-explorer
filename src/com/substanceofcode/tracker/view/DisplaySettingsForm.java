@@ -22,16 +22,18 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.map.MapProviderManager;
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.GridFormatterManager;
-import com.substanceofcode.tracker.model.RecorderSettings;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
+
+import com.substanceofcode.map.MapProviderManager;
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.GridFormatterManager;
+import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Settings form for displayable items.
@@ -66,15 +68,15 @@ public class DisplaySettingsForm extends Form implements CommandListener {
 
     /** Creates a new instance of DisplaySettingsForm */
     public DisplaySettingsForm(Controller controller) {
-        super("Display");
+        super(LocaleManager.getMessage("display_settings_form_title"));
         this.controller = controller;
 
         addControls();
 
-        okCommand = new Command("Ok", Command.OK, 1);
+        okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.OK, 1);
         this.addCommand(okCommand);
 
-        cancelCommand = new Command("Cancel", Command.CANCEL, 2);
+        cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.CANCEL, 2);
         this.addCommand(cancelCommand);
 
         this.setCommandListener(this);
@@ -88,14 +90,13 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             /** Check all fields have valid values before storing ANYTHING */
             try{
                 if(Integer.parseInt(drawingLimitField.getString()) < 1){
-                    controller.showError("The Value in \"Max Positions To Draw\" field must be >= 1, your settings have NOT been saved. Please fix this and try again");
+                    controller.showError(LocaleManager.getMessage("display_settings_form_max_position_error"));
                     return;
                 }
             }catch(NumberFormatException e){
-                controller.showError("There was a problem evaluating the value in \"Max Positions To Draw\" field must be numeric, your settings have NOT been saved. This is probably a bug, please reprot if you think it is or fix this and try again");
+                controller.showError(LocaleManager.getMessage("display_settings_form_max_position_not_numeric_error"));
                 return;
             }
-            
             
             RecorderSettings settings = controller.getSettings();
             
@@ -129,7 +130,6 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             /** Save the grid */
             settings.setGrid(GridFormatterManager.getGridFormattersName()[gridGroup.getSelectedIndex()]);
             
-
             /** 4. Save the Backlight property */
             boolean backlightOn = backlightGroup.isSelected(1);
             if (settings.getBacklightOn() != backlightOn) {
@@ -153,8 +153,10 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     private void addControls() {
         RecorderSettings settings = controller.getSettings();
 
-        String[] units = { "Kilometers", "Miles" };
-        unitGroup = new ChoiceGroup("Units", ChoiceGroup.EXCLUSIVE, units, null);
+        String[] units = { LocaleManager.getMessage("display_settings_form_kilometers"),
+                           LocaleManager.getMessage("display_settings_form_miles") };
+        unitGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_form_units"),
+                ChoiceGroup.EXCLUSIVE, units, null);
         if (settings.getUnitsAsKilometers()) {
             unitGroup.setSelectedIndex(0, true);
         } else {
@@ -163,9 +165,14 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         this.append(unitGroup);
 
         String[] displayItems = { 
-            "Coordinates", "Speed", "Heading",
-            "Altitude", "Distance", "Time" };
-        displayGroup = new ChoiceGroup("Display the following",
+            LocaleManager.getMessage("display_settings_form_coordinates"),
+            LocaleManager.getMessage("display_settings_form_speed"),
+            LocaleManager.getMessage("display_settings_form_heading"),
+            LocaleManager.getMessage("display_settings_form_altitude"),
+            LocaleManager.getMessage("display_settings_form_distance"),
+            LocaleManager.getMessage("display_settings_form_time") };
+
+        displayGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_form_display"),
                 ChoiceGroup.MULTIPLE, displayItems, null);
 
         boolean showCoordinates = settings
@@ -190,13 +197,16 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         this.append(displayGroup);
         
         /** How many positions to draw */
-        drawingLimitField = new TextField("Max Position To Draw", "" + settings.getNumberOfPositionToDraw(), 10, TextField.NUMERIC);
+        drawingLimitField = new TextField(LocaleManager.getMessage("display_settings_form_max_position"),
+                "" + settings.getNumberOfPositionToDraw(), 10, TextField.NUMERIC);
         this.append(drawingLimitField);
 
         /** How trail is drawn */
-        String[] drawingStyles = {"Draw end of the trail", "Draw the whole trail"};
+        String[] drawingStyles = { LocaleManager.getMessage("display_settings_form_draw_end"),
+                                   LocaleManager.getMessage("display_settings_form_draw_whole") };
         drawingStyleGroup = new ChoiceGroup(
-                "Drawing style", ChoiceGroup.EXCLUSIVE, drawingStyles, null);
+                LocaleManager.getMessage("display_settings_form_drawing_style"),
+                ChoiceGroup.EXCLUSIVE, drawingStyles, null);
         if(settings.getDrawWholeTrail()) {
             drawingStyleGroup.setSelectedIndex(1, true);
         } else {
@@ -205,7 +215,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         this.append(drawingStyleGroup);
         
         String[] gridNames = GridFormatterManager.getGridFormattersName();
-        gridGroup = new ChoiceGroup("Grid Display",
+        gridGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_form_grid_display"),
                 ChoiceGroup.EXCLUSIVE, gridNames, null);
         gridGroup.setSelectedIndex(0, true); // if there was no selection
         for(int i=0; i< gridNames.length ; i++)
@@ -219,19 +229,20 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         this.append(gridGroup);
         
         /** Map display options */
-    //    String[] drawingMaps = {"Don't draw maps","Draw OSM maps","Draw T@H maps"};
+        // String[] drawingMaps = {"Don't draw maps","Draw OSM maps","Draw T@H maps"};
         String[] drawingMaps= MapProviderManager.getDisplayStrings();
         drawingMapsGroup = new ChoiceGroup(
-                "Map Display", ChoiceGroup.EXCLUSIVE, drawingMaps, null);
+                LocaleManager.getMessage("display_settings_form_map_display"),
+                ChoiceGroup.EXCLUSIVE, drawingMaps, null);
         
         drawingMapsGroup.setSelectedIndex(settings.getDrawMap(), true);
          
         this.append(drawingMapsGroup);
         
 
-        String[] backlight = { "Phones Default" /* Allow Off */,
-                "Attempt to Force On" };
-        backlightGroup = new ChoiceGroup("Phone Backlight (see About/Help)",
+        String[] backlight = { LocaleManager.getMessage("display_settings_form_backlight_phone") /* Allow Off */,
+                LocaleManager.getMessage("display_settings_form_backlight_force") };
+        backlightGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_form_backlight"),
                 ChoiceGroup.EXCLUSIVE, backlight, null);
         if (settings.getBacklightOn()) {
             backlightGroup.setSelectedIndex(1, true);
@@ -240,5 +251,4 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         }
         this.append(backlightGroup);
     }
-
 }

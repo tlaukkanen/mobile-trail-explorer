@@ -63,7 +63,6 @@ public class PlaceList extends List implements CommandListener {
     
     private Vector places;
     
-    
     /** Creates a new instance of PlaceList
      * @param controller 
      */

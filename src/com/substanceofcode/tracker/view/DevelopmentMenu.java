@@ -28,6 +28,7 @@ import javax.microedition.lcdui.List;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>
@@ -56,26 +57,26 @@ public class DevelopmentMenu extends List implements CommandListener {
     
     //Jsr179 related stuff
     private static boolean useJsr179b = false;
-    private static final String useJsr179= "Use Jsr179 (if available)";
-    private static final String dontUsejsr179 = "Don't use Jsr179";
+    private static final String useJsr179= LocaleManager.getMessage("development_menu_usejsr179");
+    private static final String dontUsejsr179 = LocaleManager.getMessage("development_menu_dontusejsr179");
     private String jsr179 = useJsr179;
     
     //Filecache related stuff
     private static boolean useFileCacheb = false;
-    private static final String useFileCache= "Use File Cache";
-    private static final String dontUseFileCache = "Don't use File Cache";
+    private static final String useFileCache= LocaleManager.getMessage("development_menu_usefilecache");
+    private static final String dontUseFileCache = LocaleManager.getMessage("development_menu_dontusefilecache");
     private String fileCache = useFileCache;
     
     // Bluetooth reading fix related stuff
     //private static boolean BTFixEnabled = false;
-    private static final String useBTFix = "Use bluetooth fix";
-    private static final String dontUseBTFix = "Don't use bluetooth fix";
+    private static final String useBTFix = LocaleManager.getMessage("development_menu_usebtfix");
+    private static final String dontUseBTFix = LocaleManager.getMessage("development_menu_dontusebtfix");
     private String BTFix = useBTFix;
     
     private RecorderSettings settings;
 
     public DevelopmentMenu() {
-        super("Developers Menu", List.IMPLICIT);
+        super(LocaleManager.getMessage("development_menu_title"), List.IMPLICIT);
         
         settings=CONTROLLER.getSettings();
         useJsr179b=settings.getJsr179();
@@ -86,8 +87,8 @@ public class DevelopmentMenu extends List implements CommandListener {
         
         BTFix = CONTROLLER.getUseBTFix() ? dontUseBTFix : useBTFix;
         
-        this.append("Parsing Metrics", null);
-        this.append("Log", null);
+        this.append(LocaleManager.getMessage("development_menu_parsing_metrics"), null);
+        this.append(LocaleManager.getMessage("development_menu_log"), null);
         
         //these next two toggle certain features on or off
         //Uncomment these if you want to play with them (they don't quite work yet...)
@@ -96,8 +97,8 @@ public class DevelopmentMenu extends List implements CommandListener {
         this.append(fileCache, null);
         append(BTFix, null);
 
-        this.addCommand(backCommand = new Command("Back", Command.BACK, 2));
-        this.addCommand(okCommand = new Command("Ok", Command.OK, 1));
+        this.addCommand(backCommand = new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 2));
+        this.addCommand(okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.OK, 1));
         this.setSelectCommand(okCommand);
         this.setCommandListener(this);
     }
@@ -160,13 +161,13 @@ public class DevelopmentMenu extends List implements CommandListener {
     }
 
     private void toggleBTFix() {
-	    if (CONTROLLER.getUseBTFix()) {
-		    BTFix = useBTFix;
-		    CONTROLLER.setUseBTFix(false);
-	    } else {
-		    BTFix = dontUseBTFix;
-		    CONTROLLER.setUseBTFix(true);
-	    }
+        if (CONTROLLER.getUseBTFix()) {
+            BTFix = useBTFix;
+            CONTROLLER.setUseBTFix(false);
+        } else {
+            BTFix = dontUseBTFix;
+            CONTROLLER.setUseBTFix(true);
+        }
     }
 
     public void commandAction(Command command, Displayable disp) {
@@ -201,5 +202,4 @@ public class DevelopmentMenu extends List implements CommandListener {
             }
         }
     }
-
 }

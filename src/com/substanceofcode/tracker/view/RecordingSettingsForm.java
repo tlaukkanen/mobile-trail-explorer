@@ -1,7 +1,7 @@
 /*
  * RecordingSettingsForm.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,13 +22,15 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.RecorderSettings;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
+
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Recording settings form. Includes settings for recording intervals.
@@ -53,7 +55,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
      * @param controller Main controller
      */
     public RecordingSettingsForm(Controller controller) {
-        super("Recording");
+        super(LocaleManager.getMessage("recording_settings_form_title"));
         this.controller = controller;
         
         initializeControls();
@@ -107,9 +109,9 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     
     /** Initialize commands */
     private void initializeCommands() {
-        okCommand = new Command("OK", Command.OK, 1);
+        okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.OK, 1);
         this.addCommand(okCommand);
-        cancelCommand = new Command("Cancel", Command.CANCEL, 2);
+        cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.CANCEL, 2);
         this.addCommand(cancelCommand);
     }
     
@@ -120,14 +122,14 @@ public class RecordingSettingsForm extends Form implements CommandListener {
         String intervalText = String.valueOf(interval);
         
         intervalField = new TextField(
-                "Recording interval in seconds", 
+                LocaleManager.getMessage("recording_settings_form_recording_interval"),
                 intervalText,
                 6,
                 TextField.NUMERIC);
         this.append(intervalField);
         
         int markerStep = settings.getRecordingMarkerInterval();
-        markerStepField = new TextField("Create marker every Nth position",
+        markerStepField = new TextField(LocaleManager.getMessage("recording_settings_form_create_marker"),
                 String.valueOf(markerStep),
                 6,
                 TextField.NUMERIC);
@@ -135,7 +137,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
         
         int maxSpeed = settings.getMaxRecordedSpeed();
         maxSpeedField = new TextField(
-                "Maximum speed for recorded position (km/h)",
+                LocaleManager.getMessage("recording_settings_form_max_speed"),
                 String.valueOf(maxSpeed),
                 6,
                 TextField.NUMERIC);
@@ -143,7 +145,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
         
         int maxAcceleration = settings.getMaxAcceleration();
         maxAccelerationField = new TextField(
-                "Maximum acceleration for recorded position ((km/h)/s)",
+                LocaleManager.getMessage("recording_settings_form_max_accel"),
                 String.valueOf(maxAcceleration),
                 6,
                 TextField.NUMERIC);
@@ -151,12 +153,10 @@ public class RecordingSettingsForm extends Form implements CommandListener {
         
         int minDistance = settings.getMinRecordedDistance();
         minDistanceField = new TextField(
-                "Minimum distance between recorded positions (m)",
+                LocaleManager.getMessage("recording_settings_min_distance"),
                 String.valueOf(minDistance),
                 6,
                 TextField.NUMERIC);
-        this.append(minDistanceField);
-        
-    }
-    
+        this.append(minDistanceField);   
+    }   
 }

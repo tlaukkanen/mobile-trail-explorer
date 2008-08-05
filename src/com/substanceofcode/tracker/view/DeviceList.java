@@ -74,7 +74,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
     /** Initialize commands */
     private void initializeCommands() {
         refreshCommand = new Command(
-                LocaleManager.getMessage("device_list_menu_refresh"),
+                LocaleManager.getMessage("menu_refresh"),
                 Command.ITEM, 2);
         addCommand(refreshCommand);
         selectCommand = new Command(

@@ -1,7 +1,7 @@
 /*
  * GpsParsingMetricsScreen.java
  *
- * Copyright (C) 2005-2007 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@ import javax.microedition.lcdui.StringItem;
 
 import com.substanceofcode.gps.GpsPositionParser;
 import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.localization.LocaleManager;
 
 public class GpsParsingMetricsScreen extends Form implements CommandListener{
 
@@ -40,9 +41,11 @@ public class GpsParsingMetricsScreen extends Form implements CommandListener{
     private Screen previousScreen;
     
     public GpsParsingMetricsScreen() {
-        super("GPS Parsing Metrics");
-        this.addCommand(refreshCommand = new Command("Refresh", Command.OK, 0));
-        this.addCommand(backCommand = new Command("BACK", Command.BACK, 1));
+        super(LocaleManager.getMessage("gps_parsing_metrics_screen_title"));
+        this.addCommand(refreshCommand = new Command(LocaleManager.getMessage("menu_refresh"),
+                Command.OK, 0));
+        this.addCommand(backCommand = new Command(LocaleManager.getMessage("menu_back"),
+                Command.BACK, 1));
         this.setCommandListener(this);
         
         this.refresh();
@@ -51,20 +54,19 @@ public class GpsParsingMetricsScreen extends Form implements CommandListener{
     public void refresh()throws NullPointerException, IllegalArgumentException{
         String[] details = GpsPositionParser.getPositionParser().getMetrics();
         if(details.length % 2 != 0){
-            throw new IllegalArgumentException("The string array passed to .refresh() must have a length which is a multiple of 2.");
+            throw new IllegalArgumentException(
+                    LocaleManager.getMessage("gps_parsing_metrics_screen_refresh_exception"));
         }
         
         this.deleteAll();
         for (int i = 0; i < details.length; i+=2 ){
             this.append(new StringItem(details[i], details[i+1]));
         }
-        
     }
     
     public void setPreviousScreen(Screen screen){
         this.previousScreen = screen;
-    }
-    
+    }  
     
     public void commandAction(Command command, Displayable disp) {
         if(disp == this){
@@ -77,8 +79,6 @@ public class GpsParsingMetricsScreen extends Form implements CommandListener{
                     Controller.getController().showDisplayable(previousScreen);
                 }
             }
-        }
-        
+        } 
     }
-
 }

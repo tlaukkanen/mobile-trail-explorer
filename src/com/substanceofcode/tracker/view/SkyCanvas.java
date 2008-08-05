@@ -112,6 +112,7 @@ public class SkyCanvas extends BaseCanvas{
         this.drawSNRkey(g,(int)(getHeight()*SNRKeyHeight),20,getHeight(),getWidth()-20);
         this.drawSatelliteData(g,horizonX,horizonY,horizonDiameter);
     }
+
     private int getSNRColor(int SNR){
         int red, green, blue;
        
@@ -122,6 +123,7 @@ public class SkyCanvas extends BaseCanvas{
         blue = (int)(255.0*(((double)maxSNR-(double)SNR)/(double)maxSNR));
         return(red*0x10000 + green*0x100 + blue);
     }
+
     private void drawSNRkey(Graphics g, int top, int left, int bottom, int right){
         int width;
         int i;
@@ -140,6 +142,7 @@ public class SkyCanvas extends BaseCanvas{
         g.drawString(LocaleManager.getMessage("sky_canvas_signal"),
                 (left+right)/2, top, Graphics.HCENTER|Graphics.BOTTOM);
     }
+
     private void drawSatelliteData(Graphics g, int xPos, int yPos, int diameter) {
         
         Vector satellites = controller.getSatellites();

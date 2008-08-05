@@ -1,3 +1,25 @@
+/*
+ * SmsScreen.java
+ *
+ * Copyright (C) 2005-2008 Tommi Laukkanen
+ * http://www.substanceofcode.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
 package com.substanceofcode.tracker.view;
 
 import java.util.NoSuchElementException;
@@ -19,6 +41,7 @@ import javax.wireless.messaging.TextMessage;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>The SmsScreen is the form used to send an SMS with GPS information in it.</p>
@@ -29,7 +52,8 @@ import com.substanceofcode.tracker.model.Place;
  */
 public class SmsScreen extends Form implements CommandListener, ItemStateListener, ItemCommandListener {
 
-    private static final String DEFAULT_MESSAGE = "This is where I am now!";
+    private static final String DEFAULT_MESSAGE =
+            LocaleManager.getMessage("sms_screen_default_message");
     
     private static final int NO_PORT = -1;
 
@@ -59,47 +83,56 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
     private int currentPlaceIndex;
 
     public SmsScreen() {
-        super("SMS");
+        super(LocaleManager.getMessage("sms_screen_title"));
         
-        positionType = new ChoiceGroup("Position", ChoiceGroup.EXCLUSIVE);
-        positionType.append("Current Position", null);
-        positionType.append("End Of Current Trail", null);
-        positionType.append("Existing Place", null);
-        positionType.append("New Place", null);
+        positionType = new ChoiceGroup(LocaleManager.getMessage("sms_screen_position"),
+                ChoiceGroup.EXCLUSIVE);
+        positionType.append(LocaleManager.getMessage("sms_screen_current_position"), null);
+        positionType.append(LocaleManager.getMessage("sms_screen_end_of_trail"), null);
+        positionType.append(LocaleManager.getMessage("sms_screen_existing_place"), null);
+        positionType.append(LocaleManager.getMessage("sms_screen_new_place"), null);
         positionType.setSelectedIndex(0, true);
         
-        placeNameText = new StringItem("Place", "");
-        placeNameText.addCommand(nextPlaceCommand = new Command("Next Place", Command.OK, 2));
-        placeNameText.addCommand(previousPlaceCommand = new Command("Previous Place", Command.ITEM, 3));
+        placeNameText = new StringItem(LocaleManager.getMessage("sms_screen_place"), "");
+        placeNameText.addCommand(nextPlaceCommand =
+                new Command(LocaleManager.getMessage("sms_screen_menu_next_place"), Command.OK, 2));
+        placeNameText.addCommand(previousPlaceCommand =
+                new Command(LocaleManager.getMessage("sms_screen_menu_previous_place"), Command.ITEM, 3));
         placeNameText.setDefaultCommand(nextPlaceCommand);
         placeNameText.setItemCommandListener(this);
         
         currentPlaceIndex = 0;
         
-        latField = new TextField("Lat", "0.0", 15, TextField.DECIMAL);
-        lonField = new TextField("Lon", "0.0", 15, TextField.DECIMAL);
-        altField = new TextField("Altitude", "0.0", 15, TextField.DECIMAL);
+        latField = new TextField(LocaleManager.getMessage("sms_screen_lat"),
+                "0.0", 15, TextField.DECIMAL);
+        lonField = new TextField(LocaleManager.getMessage("sms_screen_lon"),
+                "0.0", 15, TextField.DECIMAL);
+        altField = new TextField(LocaleManager.getMessage("sms_screen_altitude"),
+                "0.0", 15, TextField.DECIMAL);
 
-        privateMessageField = new TextField("Your Message", DEFAULT_MESSAGE,
-                90, TextField.ANY);
+        privateMessageField = new TextField(LocaleManager.getMessage("sms_screen_your_message"),
+                DEFAULT_MESSAGE, 90, TextField.ANY);
 
-        typeChoice = new ChoiceGroup("SMS Type", ChoiceGroup.EXCLUSIVE);
-        typeChoice.append("Text Message", null);
+        typeChoice = new ChoiceGroup(LocaleManager.getMessage("sms_screen_sms_type"),
+                ChoiceGroup.EXCLUSIVE);
+        typeChoice.append(LocaleManager.getMessage("sms_screen_text_message"), null);
         // FIXME: implement&reinstate: typeChoice.append("MTE Program Message",
         // null);
         typeChoice.setSelectedIndex(TEXT_MESSAGE, true);
 
-        recipientField = new TextField("Recipient", "", 20,
-                TextField.PHONENUMBER);
+        recipientField = new TextField(LocaleManager.getMessage("sms_screen_recipient"),
+                "", 20, TextField.PHONENUMBER);
 
-        finalMessageText = new StringItem("Message To Be Sent", "");
+        finalMessageText = new StringItem(LocaleManager.getMessage("sms_screen_message_sent"), "");
 
         this.setItemStateListener(this);
 
         this.refresh();
         
-        this.addCommand(sendCommand = new Command("Send", Command.OK, 0));
-        this.addCommand(cancelCommand = new Command("Cancel", Command.BACK, 1));
+        this.addCommand(sendCommand = new Command(LocaleManager.getMessage("sms_screen_menu_send"),
+                Command.OK, 0));
+        this.addCommand(cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"),
+                Command.BACK, 1));
         this.setCommandListener(this);
 
     }
@@ -125,11 +158,11 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         }
         switch(typeChoice.getSelectedIndex()){
             case(TEXT_MESSAGE):
-                this.privateMessageField.setLabel("Private Message");
+                this.privateMessageField.setLabel(LocaleManager.getMessage("sms_screen_private_message"));
                 this.privateMessageField.setMaxSize(90);
                 break;
             case(MTE_MESSAGE):
-                this.privateMessageField.setLabel("Waypoint Name");
+                this.privateMessageField.setLabel(LocaleManager.getMessage("sms_screen_waypoint_name"));
                 this.privateMessageField.setMaxSize(50);
                 break;
         }
@@ -145,7 +178,7 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
         try{
             waypointName = ((Place)Controller.getController().getPlaces().elementAt(this.currentPlaceIndex)).getName();
         }catch(IndexOutOfBoundsException e){
-            waypointName = "No Waypoints Found";
+            waypointName = LocaleManager.getMessage("sms_screen_no_waypoint");
         }
         this.placeNameText.setText(waypointName);
     }
@@ -167,7 +200,7 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
                                     "Neither of the only 2 choices are selected. Crazy! class="
                                             + this.getClass().getName());
                             Controller.getController().showError(
-                                            "Message not sent because of some ERROR!, See log for details");
+                                            LocaleManager.getMessage("sms_screen_message_not_send"));
                         }
                     }catch(Throwable t){
                         Logger.error("Error trying to do SmsScreen.commandAction(..., sendCommand)");
@@ -287,8 +320,11 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
             alt = alt / 10;
         }
         final String messageText = privateMessageField.getString() + "\n\n"
-                + "GPS-Details:\n" + "Lat:" + lat + "\n" + "Long:" + lon + "\n"
-                + "Alt:" + alt + "m";
+                + LocaleManager.getMessage("sms_screen_msgtxt_gpsdetails")
+                + ":\n" + LocaleManager.getMessage("sms_screen_msgtxt_lat") + ":"
+                + lat + "\n" + LocaleManager.getMessage("sms_screen_msgtxt_lon") +":"
+                + lon + "\n" + LocaleManager.getMessage("sms_screen_msgtxt_alt") + ":"
+                + alt + "m";
         this.finalMessageText.setText(messageText);
     }
 
@@ -312,5 +348,4 @@ public class SmsScreen extends Form implements CommandListener, ItemStateListene
             this.refreshMessage();
         }
     }
-
 }

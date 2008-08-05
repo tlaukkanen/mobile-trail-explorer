@@ -89,7 +89,6 @@ public class FileChooser
                 super.run();
                 updateContent();
             }
-            
         };
 
         updateThread.start();

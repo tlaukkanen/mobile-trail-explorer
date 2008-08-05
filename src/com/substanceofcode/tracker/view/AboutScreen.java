@@ -1,5 +1,5 @@
 /*
- * AboutForm.java
+ * AboutScreen.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -26,15 +26,16 @@ package com.substanceofcode.tracker.view;
 
 import java.util.Vector;
 
-import com.substanceofcode.tracker.TrailExplorerMidlet;
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.util.ImageUtil;
-import com.substanceofcode.util.StringUtil;
-
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
+
+import com.substanceofcode.tracker.TrailExplorerMidlet;
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.util.ImageUtil;
+import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>
@@ -64,9 +65,12 @@ public final class AboutScreen extends Canvas {
     private static final Font DEFAULT_SIMPLE_FONT = Font.getDefaultFont();
 
     private static final String[] aboutText = { "Mobile Trail Explorer,",
-            "Version: " + TrailExplorerMidlet.VERSION.toString(),
-            "Copyright (C) 2005-2008", "Tommi Laukkanen", "",
-            "Licensed under the GPL", "", "For more information visit:",
+            LocaleManager.getMessage("about_screen_version") +
+            ": " + TrailExplorerMidlet.VERSION.toString(),
+            LocaleManager.getMessage("about_screen_copyright") +
+            " 2005-2008", "Tommi Laukkanen", "",
+            LocaleManager.getMessage("about_screen_licence"),
+            "", LocaleManager.getMessage("about_screen_more_info"),
             "www.substanceofcode.com" };
 
     private static final String[] trailScreenHelpText = {
@@ -122,9 +126,11 @@ public final class AboutScreen extends Canvas {
      * Both {@link AboutScreen#TITLES} and {@link AboutScreen#MESSAGES} must NOT
      * be null, and must have the same number of elements.
      */
-    private static final String[] TITLES = { "About", "Trail Screen",
-            "Elevation Screen", "Sky View Screen", "Help" };
-
+    private static final String[] TITLES = { LocaleManager.getMessage("about_screen_trail_title"),
+                                             LocaleManager.getMessage("about_screen_trail_screen"),
+                                             LocaleManager.getMessage("about_screen_elevation_screen"),
+                                             LocaleManager.getMessage("about_screen_sky_view_screen"),
+                                             LocaleManager.getMessage("about_screen_help") };
     /**
      * <p>
      * The text for the different sections
@@ -142,8 +148,7 @@ public final class AboutScreen extends Canvas {
                 || TITLES.length != MESSAGES.length) {
             try {
                 throw new java.lang.IllegalStateException(
-                        "There was a problem with the coding of the AboutScreen"
-                      + " class. neither titles, nor messages may be null, and they both must have the same number of elements");
+                        LocaleManager.getMessage("about_screen_title_exception"));
             } catch (IllegalStateException e) {
                 e.printStackTrace();
                 throw e;
@@ -217,7 +222,6 @@ public final class AboutScreen extends Canvas {
             finalResult[i] = (String) result.elementAt(i);
         }
         return finalResult;
-
     }
 
     protected void paint(Graphics g) {

@@ -22,14 +22,16 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.RecorderSettings;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
+
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Settings form for the web recording options.
@@ -39,8 +41,10 @@ public class WebRecordingSettingsForm extends Form implements CommandListener {
 
     private Controller controller;
     private RecorderSettings settings;
-    private Command backCommand = new Command("OK", Command.OK, 1);
-    private Command cancelCommand = new Command("Cancel", Command.CANCEL, 2);
+    private Command backCommand = new Command(LocaleManager.getMessage("menu_ok"),
+            Command.OK, 1);
+    private Command cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"),
+            Command.CANCEL, 2);
     private TextField uploadUrlField;
     private ChoiceGroup useUploadGroup;
     
@@ -49,7 +53,7 @@ public class WebRecordingSettingsForm extends Form implements CommandListener {
      * @param controller Main controller instance.
      */
     public WebRecordingSettingsForm(Controller controller) {
-        super("Web Recording");
+        super(LocaleManager.getMessage("web_recording_settings_form_title"));
         
         this.controller = controller;
         
@@ -84,14 +88,16 @@ public class WebRecordingSettingsForm extends Form implements CommandListener {
 
     private void createControls() {
         boolean useUpload = settings.getWebRecordingUsage();
-        useUploadGroup = new ChoiceGroup("Web recording", ChoiceGroup.MULTIPLE);
-        useUploadGroup.append("Upload position to web", null);
+        useUploadGroup = new ChoiceGroup(LocaleManager.getMessage("web_recording_settings_form_recording"),
+                ChoiceGroup.MULTIPLE);
+        useUploadGroup.append(LocaleManager.getMessage("web_recording_settings_form_upload_position"),
+                null);
         useUploadGroup.setSelectedIndex(0, useUpload);
         this.append(useUploadGroup);
 
         String url = settings.getUploadURL();
-        uploadUrlField = new TextField("Upload URL", url, 128, TextField.URL);
+        uploadUrlField = new TextField(LocaleManager.getMessage("web_recording_settings_form_upload_url"),
+                url, 128, TextField.URL);
         this.append(uploadUrlField);
     }
-    
 }

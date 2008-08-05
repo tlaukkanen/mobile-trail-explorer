@@ -1,7 +1,7 @@
 /*
  * Logger.java
  *
- * Copyright (C) 2005-2006 Tommi Laukkanen
+ * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,7 @@ import javax.microedition.lcdui.Form;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * A Very rough Logger class.
@@ -75,10 +76,13 @@ public class Logger extends Form implements CommandListener {
      */
     public static final byte DEBUG = 1;
 
-    private static final String[] LEVEL_NAMES = { "ALL", "DEBUG", "INFO",
-            "WARN", "ERROR", "FATAL", "OFF" };
-
-
+    private static final String[] LEVEL_NAMES = { LocaleManager.getMessage("logger_level_all"),
+                                                  LocaleManager.getMessage("logger_level_debug"),
+                                                  LocaleManager.getMessage("logger_level_info"),
+                                                  LocaleManager.getMessage("logger_level_warn"),
+                                                  LocaleManager.getMessage("logger_level_error"),
+                                                  LocaleManager.getMessage("logger_level_fatal"),
+                                                  LocaleManager.getMessage("logger_level_off") };
     public static final byte OFF = 6;
     public static final byte ALL = 0;
 
@@ -117,13 +121,12 @@ public class Logger extends Form implements CommandListener {
         if (logger == null) {
             logger = new Logger(settings);
         }
-
     }
 
     public static Logger getLogger() throws NullPointerException {
         if (logger == null) {
             throw new NullPointerException(
-                    "Logger.logger is null. The first time you access the Logger, you must use getLogger(RecorderSettings)");
+                    LocaleManager.getMessage("logger_get_logger_error"));
         }
         return logger;
     }
@@ -151,27 +154,34 @@ public class Logger extends Form implements CommandListener {
 
     public static void fatal(String message) {
         logger.log(message, FATAL);
-        System.err.println("Fatal error: " + message);
+        System.err.println(LocaleManager.getMessage("logger_fatal_error")
+                + ": " + message);
     }
 
     private Logger(RecorderSettings settings) {
-        super("Log");
+        super(LocaleManager.getMessage("logger_title"));
         this.buffer = new StringBuffer();
         this.maxSize = DEFAULT_MAX_SIZE;
         this.settings = settings;
         this.setLoggingLevel(settings.getLoggingLevel());
 
         // Form related setup;
-        this.addCommand(refreshCommand = new Command("Refresh", Command.OK, 1));
-        this.addCommand(backCommand = new Command("Back", Command.BACK, 2));
-        this
-                .addCommand(offCommand = new Command("Logging Off",
-                        Command.ITEM, 3));
-        this.addCommand(fatalCommand = new Command("Fatal", Command.ITEM, 4));
-        this.addCommand(errorCommand = new Command("Error++", Command.ITEM, 5));
-        this.addCommand(warnCommand = new Command("Warn++", Command.ITEM, 6));
-        this.addCommand(infoCommand = new Command("Info++", Command.ITEM, 7));
-        this.addCommand(debugCommand = new Command("Debug++", Command.ITEM, 8));
+        this.addCommand(refreshCommand = new Command(LocaleManager.getMessage("menu_refresh"),
+                Command.OK, 1));
+        this.addCommand(backCommand = new Command(LocaleManager.getMessage("menu_back"),
+                Command.BACK, 2));
+        this.addCommand(offCommand = new Command(LocaleManager.getMessage("logger_menu_logging_off"),
+                Command.ITEM, 3));
+        this.addCommand(fatalCommand = new Command(LocaleManager.getMessage("logger_menu_fatal"),
+                Command.ITEM, 4));
+        this.addCommand(errorCommand = new Command(LocaleManager.getMessage("logger_menu_error"),
+                Command.ITEM, 5));
+        this.addCommand(warnCommand = new Command(LocaleManager.getMessage("logger_menu_warn"),
+                Command.ITEM, 6));
+        this.addCommand(infoCommand = new Command(LocaleManager.getMessage("logger_menu_info"),
+                Command.ITEM, 7));
+        this.addCommand(debugCommand = new Command(LocaleManager.getMessage("logger_menu_debug"),
+                Command.ITEM, 8));
 
         refreshWriteLogCommand();
 
@@ -191,14 +201,13 @@ public class Logger extends Form implements CommandListener {
         System.out.println(level + ") " + message);
         if (level < DEBUG || level > FATAL) {
             throw new IllegalArgumentException(
-                    "Logging level must be between DEBUG(" + DEBUG
-                            + ") and FATAL(" + FATAL + ")");
+                    LocaleManager.getMessage("logger_log_error",
+                    new Object [] {Integer.toString(DEBUG), Integer.toString(FATAL)}));
         }
         if (level < loggingLevel) {
             return;
         }
         synchronized (buffer) {
-
 
             if (level == lastMessageLevel && message.equals(this.lastMessage)) {
                 numOfLastMessage++;
@@ -245,11 +254,10 @@ public class Logger extends Form implements CommandListener {
     public void refresh() {
         this.deleteAll();
         if (buffer.length() == 0) {
-            this.append("Nothing Logged Yet");
+            this.append(LocaleManager.getMessage("logger_nothing_logged"));
         } else {
             this.append(buffer.toString());
         }
-
     }
 
     public void commandAction(Command command, Displayable disp) {
@@ -280,32 +288,35 @@ public class Logger extends Form implements CommandListener {
                 refreshWriteLogCommand();
             }
         }
-
     }
     
     private void refreshWriteLogCommand(){
         this.removeCommand(writeLogToFileSystemCommand);
         if (settings.getWriteLog()) {
             this.addCommand(writeLogToFileSystemCommand = new Command(
-                    "Don't Write log to file system", Command.ITEM, 9));
+                    LocaleManager.getMessage("logger_menu_dont_write_log"),
+                    Command.ITEM, 9));
         } else {
             this.addCommand(writeLogToFileSystemCommand = new Command(
-                    "Write log to file system", Command.ITEM, 9));
+                    LocaleManager.getMessage("logger_menu_write_log"),
+                    Command.ITEM, 9));
         }
     }
 
     public void setLoggingLevel(byte level) {
         if (level < ALL || level > OFF) {
             throw new IllegalArgumentException(
-                    "Logging level must be between ALL(" + ALL + ") and OFF("
-                            + OFF + ")");
+                    LocaleManager.getMessage("logger_log_level_error",
+                    new Object[] {Integer.toString(ALL), Integer.toString(OFF)}));
         }
         settings.setLoggingLevel(level);
         this.loggingLevel = level;
         if (loggingLevel == OFF || loggingLevel == ALL) {
-            this.setTitle("Logging " + LEVEL_NAMES[loggingLevel]);
+            this.setTitle(LocaleManager.getMessage("logger_lot_title_logging")
+                    + " " + LEVEL_NAMES[loggingLevel]);
         } else {
-            this.setTitle("Logging @ " + LEVEL_NAMES[loggingLevel]);
+            this.setTitle(LocaleManager.getMessage("logger_lot_title_logging_at")
+                    + " " + LEVEL_NAMES[loggingLevel]);
         }
     }
 
@@ -390,14 +401,10 @@ public class Logger extends Form implements CommandListener {
         	    fileWritingPossible = false;
                 Logger.debug("Logger: output stream is null");
             }
-    
-
         } catch (IOException e) {
         	fileWritingPossible = false;
             Logger.debug("Logger: error:" + e.getMessage());
             e.printStackTrace();
         }
-        
     }
-
 }

@@ -102,7 +102,6 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         // Exit command
         exitCommand = new Command(LocaleManager.getMessage("menu_exit"), Command.EXIT, 10);
         addCommand(exitCommand);
-
     }
 
     /** 
@@ -148,6 +147,5 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         if(keyCode==Canvas.KEY_POUND) {
             controller.executePoundShortcut();
         }
-
     }
 }

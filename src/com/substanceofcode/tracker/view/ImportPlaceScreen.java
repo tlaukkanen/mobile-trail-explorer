@@ -22,11 +22,12 @@
 
 package com.substanceofcode.tracker.view;
 
+import java.util.Vector;
+import java.util.Enumeration;
+
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 import javax.microedition.lcdui.*;
-import java.util.Vector;
-import java.util.Enumeration;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.*;
