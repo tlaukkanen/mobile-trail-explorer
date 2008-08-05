@@ -22,6 +22,8 @@
 
 package com.substanceofcode.util;
 
+import com.substanceofcode.localization.LocaleManager;
+
 /**
  * <p>Represents a Software Version.</p>
  * 
@@ -75,7 +77,7 @@ public class Version {
         
         int firstDecimalIndex = versionAsString.indexOf('.');
         if(firstDecimalIndex == -1){
-            throw new NumberFormatException("A Version must contain at least a MAJOR and a MINOR part, seperated by a '.'");
+            throw new NumberFormatException(LocaleManager.getMessage("version_exception"));
         }
         localMajor = Integer.parseInt(versionAsString.substring(0,firstDecimalIndex));
         

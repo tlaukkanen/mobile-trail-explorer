@@ -21,6 +21,7 @@
 package com.substanceofcode.util;
 
 import java.io.IOException;
+
 import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;

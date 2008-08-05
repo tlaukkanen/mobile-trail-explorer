@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+
 package com.substanceofcode.util;
 
 import com.substanceofcode.tracker.model.Point2D;
@@ -70,5 +71,3 @@ public class ProjectionUtil {
         return 40075160 * Math.cos (Math.PI * lat / 180) / scale;
     }
 }
-
-   
