@@ -206,12 +206,8 @@ public class StringUtil {
     }
     
     /** Reverse given String */
-    public static String reverse(String text) {
-        StringBuffer buf = new StringBuffer();
-        for(int i=0; i<text.length(); i++) {
-            buf.insert(0, text.charAt(i));
-        }
-        return buf.toString();
+    public static String reverse(String text) {        
+        return new StringBuffer(text).reverse().toString();
     }    
 
     /** Parse string to short, return defaultValue is parse fails */
