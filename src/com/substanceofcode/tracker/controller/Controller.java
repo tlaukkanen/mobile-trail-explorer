@@ -212,6 +212,9 @@ public class Controller {
 
         // Do mandatory initializations
 
+        // Initialize ocalization
+        LocaleManager.initLocalizationSupport();
+
         // Initialize Logger, as it must have an instance of RecorderSettings on
         // it's first call.
         Logger.init(settings);

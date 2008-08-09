@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 package com.substanceofcode.tracker.view;
 
 import javax.microedition.lcdui.ChoiceGroup;
@@ -46,27 +45,21 @@ import com.substanceofcode.localization.LocaleManager;
  * @author Mario Sansone
  */
 public class PlaceForm extends Form implements CommandListener, ItemStateListener {
-    
+
     private Controller controller;
-    
     // Fields
     private TextField nameField;
-    
     private ChoiceGroup gridGroup;
     private int currentGroupIndex;
-    
     private TextField[] dataFields = null;
     private GridFormatter currentGridFormatter = null;
-    
     // Command
     private Command okCommand;
     private Command cancelCommand;
-    
     private Place place;
     private Place oldPlace;
-    
     private boolean editing;
-    
+
     /** 
      * Creates a new instance of PlaceForm
      * @param controller 
@@ -74,15 +67,15 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
     public PlaceForm(Controller controller) {
         super(LocaleManager.getMessage("place_form_title"));
         this.controller = controller;
-        
+
         initializeControls();
         initializeCommands();
-        
+
         this.setCommandListener(this);
-        
+
         editing = false;
     }
-    
+
     /** 
      * Set editing flag value.
      *
@@ -94,106 +87,103 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
 
     /** Initialize place fields (name, lon and lat) */
     private void initializeControls() {
-        
+
         setItemStateListener(this);
-        
+
         nameField = new TextField(LocaleManager.getMessage("place_form_name"),
-                "", 16, TextField.ANY);
+                "", 32, TextField.ANY);
         this.append(nameField);
-        
+
         String[] gridNames = GridFormatterManager.getGridFormattersName();
         gridGroup = new ChoiceGroup(LocaleManager.getMessage("place_form_grid"),
                 ChoiceGroup.EXCLUSIVE, gridNames, null);
-        this.append(gridGroup);     
+        this.append(gridGroup);
     }
-        
-    private void setGrid(String name)
-    {
-        if(currentGridFormatter != null && currentGridFormatter.getName().equals(name))
-        {
-            return;
-    }
-    
-        currentGridFormatter = GridFormatterManager.getGridFormatterForName(name, true);
-        String[] labels = currentGridFormatter.getLabels(currentGridFormatter.PLACE_FORM);
-        
-        //this could be better...
-        if(dataFields!=null && dataFields.length == labels.length)
-        {
-            for (int i = 0; i < labels.length; i++)
-            {
-                dataFields[i].setLabel(labels[i]);
+
+    private void setGrid(String name) {
+        try {
+            if (currentGridFormatter != null && currentGridFormatter.getName().equals(name)) {
+                return;
             }
-        } else {
-            deleteAll();
-            this.append(nameField);
-            this.append(gridGroup);
+
+            currentGridFormatter = GridFormatterManager.getGridFormatterForName(name, true);
+            String[] labels = currentGridFormatter.getLabels(currentGridFormatter.PLACE_FORM);
+
+            //this could be better...
+            if (dataFields != null && dataFields.length == labels.length) {
+                for (int i = 0; i < labels.length; i++) {
+                    dataFields[i].setLabel(labels[i]);
+                }
+            } else {
+                deleteAll();
+                this.append(nameField);
+                this.append(gridGroup);
 
 
-            dataFields = new TextField[labels.length];
-            for (int i = 0; i < labels.length; i++) {
-                dataFields[i] = new TextField(labels[i], "", 16, TextField.DECIMAL);
-                insert(i + 1, dataFields[i]);
+                dataFields = new TextField[labels.length];
+                for (int i = 0; i < labels.length; i++) {
+                    dataFields[i] = new TextField(labels[i], "", 16, TextField.DECIMAL);
+                    insert(i + 1, dataFields[i]);
+                }
             }
-        }
-        
-        String[] gridNames = GridFormatterManager.getGridFormattersName();
-        for(int i=0; i< gridNames.length; i++)
-        {
-            if(gridNames[i].equals(currentGridFormatter.getName()))
-            {
-                gridGroup.setSelectedIndex(i, true);
-                currentGroupIndex = i;
-                break;
+
+            String[] gridNames = GridFormatterManager.getGridFormattersName();
+            for (int i = 0; i < gridNames.length; i++) {
+                if (gridNames[i].equals(currentGridFormatter.getName())) {
+                    gridGroup.setSelectedIndex(i, true);
+                    currentGroupIndex = i;
+                    break;
+                }
             }
+        } catch (Exception ex) {
+            Logger.fatal("Exception when setting grid: " + ex.getMessage());
         }
     }
-    
+
     /** Initialize commands */
     private void initializeCommands() {
         okCommand = new Command(LocaleManager.getMessage("menu_save"), Command.SCREEN, 1);
-        this.addCommand( okCommand );
-        
+        this.addCommand(okCommand);
+
         cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.SCREEN, 2);
-        this.addCommand( cancelCommand );
+        this.addCommand(cancelCommand);
     }
-    
+
     /** Initialize controls with place values. */
-    public void setPlace(Place wp) 
-    {
-        //we don't lose the editing-place, when we changed the grid
-        if(wp != place)
-        {
-            oldPlace = wp;
-            place = wp.clone();
+    public void setPlace(Place wp) {
+        try {
+            //we don't lose the editing-place, when we changed the grid
+            if (wp != place) {
+                oldPlace = wp;
+                place = wp.clone();
+            }
+
+            setGrid(place.getPosition().getName());
+
+            String[] data = currentGridFormatter.getStrings(place.getPosition(), currentGridFormatter.PLACE_FORM);
+            for (int i = 0; i < data.length; i++) {
+                dataFields[i].setString(data[i]);
+            }
+
+            nameField.setString(wp.getName());
+        } catch (Exception ex) {
+            Logger.fatal("Exception when setting place: " + ex.getMessage());
         }
-        
-        setGrid(place.getPosition().getName());
-
-        String[] data = currentGridFormatter.getStrings(place.getPosition(), currentGridFormatter.PLACE_FORM);
-        for (int i = 0; i < data.length; i++) {
-            dataFields[i].setString(data[i]);
-        }
-
-        nameField.setString(wp.getName());
-
         return;
     }
 
     /** Handle commands */
-    public void commandAction(Command command, Displayable displayable) 
-    {
+    public void commandAction(Command command, Displayable displayable) {
         if (command == okCommand) {
             // Save waypoint
             String name = nameField.getString();
             GridPosition position = null;
             try {
                 String[] data = new String[dataFields.length];
-                for(int i=0 ; i<dataFields.length; i++)
-                {
+                for (int i = 0; i < dataFields.length; i++) {
                     data[i] = dataFields[i].getString();
                 }
-                
+
                 position = currentGridFormatter.getGridPositionWithData(data);
             } catch (Exception nfe) {
                 controller.showError(nfe.getMessage());
@@ -201,7 +191,7 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
             }
             place.setName(name);
             place.setPosition(position);
-            
+
             if (editing == false) {
                 /** Create new waypoint */
                 controller.savePlace(place);
@@ -214,19 +204,16 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
         }
         if (command == cancelCommand) {
             controller.showPlacesList();
-            
+
         }
     }
 
-    public void itemStateChanged(Item item) 
-    {
-        if(item ==  this.gridGroup)
-        {
+    public void itemStateChanged(Item item) {
+        if (item == this.gridGroup) {
             GridPosition position = null;
             try {
                 String[] data = new String[dataFields.length];
-                for(int i=0 ; i<dataFields.length; i++)
-                {
+                for (int i = 0; i < dataFields.length; i++) {
                     data[i] = dataFields[i].getString();
                 }
 
@@ -236,11 +223,11 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
                 controller.showError(nfe.getMessage());
                 return;
             }
-    
+
             GridFormatter gridFormatter = GridFormatterManager.getGridFormatters()[gridGroup.getSelectedIndex()];
             //convert the position of the place
             place.setName(nameField.getString());
-            place.setPosition(gridFormatter.convertPosition(position));  
+            place.setPosition(gridFormatter.convertPosition(position));
             setPlace(place);
         }
     }
