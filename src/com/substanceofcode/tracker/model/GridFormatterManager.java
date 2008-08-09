@@ -24,15 +24,16 @@ package com.substanceofcode.tracker.model;
 
 import com.substanceofcode.tracker.grid.GridFormatter;
 import com.substanceofcode.tracker.grid.GridFormatterContext;
-import com.substanceofcode.tracker.grid.GridNames;
+import com.substanceofcode.tracker.grid.GridIdentifiers;
 import com.substanceofcode.tracker.grid.GridPosition;
 
 /**
  *
  * @author kaspar
  */
-public class GridFormatterManager implements GridFormatterContext, GridNames
+public class GridFormatterManager implements GridFormatterContext, GridIdentifiers
 {
+    
     
     private RecorderSettings settings;
     private int display_context;
@@ -52,7 +53,7 @@ public class GridFormatterManager implements GridFormatterContext, GridNames
     {
         for(int i=0; i < formatters.length ; i++)
         {
-            if( settings.getGrid().equals(formatters[i].getName()) )
+            if( settings.getGrid().equals(formatters[i].getIdentifier()) )
             {
                 return formatters[i];
             }
@@ -91,13 +92,30 @@ public class GridFormatterManager implements GridFormatterContext, GridNames
     
     /**
      * 
-     * @return returns the names of all abailable GridFormatters
+     * @return returns the identifiers of all available GridFormatters
      */
-    public static String[] getGridFormattersName()
+    public static String[] getGridFormattersIdentifier()
+    {
+        String identifiers[] = new String[formatters.length];
+        
+        for(int i=0; i<formatters.length; i++)
+        {
+            identifiers[i] = formatters[i].getIdentifier();
+        }
+        
+        return identifiers;
+    }
+    
+    
+    /**
+     * returns the human-readable localized names of all available GridFormatters
+     * @return
+     */
+    public static String[] getGridFormattersNames() 
     {
         String names[] = new String[formatters.length];
         
-        for(int i=0; i < formatters.length ; i++)
+        for(int i=0; i<formatters.length; i++)
         {
             names[i] = formatters[i].getName();
         }
@@ -105,11 +123,11 @@ public class GridFormatterManager implements GridFormatterContext, GridNames
         return names;
     }
 
-    public static GridFormatter getGridFormatterForName(String name, boolean returnDefaultWhenNotFound)
+    public static GridFormatter getGridFormatterForIdentifier(String identifier, boolean returnDefaultWhenNotFound)
     {
         for(int i=0; i < formatters.length ; i++)
         {
-            if(name.equals(formatters[i].getName() ))
+            if(identifier.equals(formatters[i].getIdentifier()) )
             {
                 return formatters[i];
             }

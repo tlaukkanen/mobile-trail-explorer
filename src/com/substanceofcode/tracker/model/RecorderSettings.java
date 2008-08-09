@@ -131,7 +131,7 @@ public class RecorderSettings {
 
     /**
      * 
-     * @return the name of the selected grid
+     * @return the identifier of the selected grid
      */
     public String getGrid()
     {
@@ -139,11 +139,11 @@ public class RecorderSettings {
     }
     /**
      * set the selected grid
-     * @param gridname
+     * @param identifier
      */
-    public void setGrid(String gridname)
+    public void setGrid(String identifier)
     {
-        settings.setStringProperty(GRID, gridname);
+        settings.setStringProperty(GRID, identifier);
         saveSettings();
     }
 

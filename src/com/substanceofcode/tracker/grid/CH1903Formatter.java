@@ -81,11 +81,16 @@ public class CH1903Formatter implements GridFormatter
         return (sk + " / " + sm);
     }
 
-    public String getName() 
+    public String getIdentifier() 
     {
         return GRID_CH1903;
     }
 
+    public String getName() 
+    {
+        return LocaleManager.getMessage("ch1903_name");
+    }
+    
     public GridPosition getGridPositionWithData(String[] data) throws BadFormattedException 
     {
         int x;
@@ -110,4 +115,5 @@ public class CH1903Formatter implements GridFormatter
     {
         return new CH1903Position(0,0);
     }
+
 }

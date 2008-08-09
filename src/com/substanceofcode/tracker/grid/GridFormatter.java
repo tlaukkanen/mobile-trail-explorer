@@ -28,11 +28,11 @@ package com.substanceofcode.tracker.grid;
  * - make a new class which implements the GridFormatter interface (look at 
  *   WSG84Formatter as an example)
  * - subclass GridPosition and implement the abstract methods
- * - register your XXXGridPosition and XXXGridFormatter at GridNames
+ * - register your XXXGridPosition and XXXGridFormatter at GridIdentifiers
  * 
  * @author kaspar
  */
-public interface GridFormatter extends GridFormatterContext, GridNames
+public interface GridFormatter extends GridFormatterContext, GridIdentifiers
 {
     
     /**
@@ -61,13 +61,19 @@ public interface GridFormatter extends GridFormatterContext, GridNames
     public GridPosition getGridPositionWithData(String[] data) throws BadFormattedException;
     
     /**
-     * the class should return the name of the Grid. 
-     * This name will be displayed in the Dialog Display Settings 
-     * and is used as an internal identifier.
+     * the class should return the identifier of the Grid. 
      * use the same in your XXXPosition-implementation.
      * @return the name
      */
+    public String getIdentifier();
+    
+    
+    /**
+     * returns the human-readable localized name of the grid
+     * @return
+     */
     public String getName();
+    
     
     /**
      * returns an instance of the Position

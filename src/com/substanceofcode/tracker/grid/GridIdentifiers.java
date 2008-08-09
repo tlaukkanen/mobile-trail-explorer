@@ -1,5 +1,5 @@
 /*
- * GridNames.java
+ * GridIdentifiers.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -22,28 +22,23 @@
 
 package com.substanceofcode.tracker.grid;
 
-import com.substanceofcode.localization.LocaleManager;
-
 /**
  * list of all grids
- * 
+ *
  * @author kaspar
  * @author Tommi Laukkanen
  */
-public interface GridNames 
+public interface GridIdentifiers
 {
-    /**
-     * It seems that you can't initialize messages with LocaleManager 
-     * (atleast when using Nokia phones).
-     */
-    public final static String GRID_WSG84 = "WSG84"; // LocaleManager.getMessage("grid_names_wsg84");
-    public final static String GRID_CH1903 = "Swiss Grid"; //LocaleManager.getMessage("grid_names_swiss_grid");
-    
+    public final static String GRID_WSG84 = "WSG84";
+    public final static String GRID_CH1903 = "Swiss Grid";
+
+
     /**
      * there should be an instance of each XXXPosition of each GridImplementation
      */
     public static final GridPosition[] gridPositions = new GridPosition[]{new WSG84Position(), new CH1903Position() };
-    
+
     /**
      * there should be an instance of each GridFormatter. The default-formatter has to be on first place (wsg84)
      */

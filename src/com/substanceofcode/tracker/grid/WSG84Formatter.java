@@ -74,9 +74,14 @@ public class WSG84Formatter implements GridFormatter
         return new String[]{lat, lon};
     }
 
-    public String getName() 
+    public String getIdentifier() 
     {
         return GRID_WSG84;
+    }
+
+    public String getName() 
+    {
+        return LocaleManager.getMessage("wsg84_name");
     }
 
     public GridPosition getGridPositionWithData(String[] data) throws BadFormattedException 

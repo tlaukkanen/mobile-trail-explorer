@@ -90,7 +90,7 @@ public class CH1903Position extends GridPosition
         return y;
     }
 
-    public String getName() 
+    public String getIdentifier() 
     {
         return GRID_CH1903;
     }
@@ -120,7 +120,7 @@ public class CH1903Position extends GridPosition
     
     public String[] serialize() 
     {
-        return new String[]{getName(), "0.1", String.valueOf(getX()), String.valueOf(getY())};
+        return new String[]{getIdentifier(), "0.1", String.valueOf(getX()), String.valueOf(getY())};
     }
 
     public GridPosition clone() 
@@ -130,7 +130,7 @@ public class CH1903Position extends GridPosition
 
     public GridPosition unserialize(String[] data) throws Exception 
     {
-        if(!data[0].equals(getName()))
+        if(!data[0].equals(getIdentifier()))
         {
             throw new Exception("");
         }

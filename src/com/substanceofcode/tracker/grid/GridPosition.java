@@ -28,7 +28,7 @@ package com.substanceofcode.tracker.grid;
  *
  * @author kaspar
  */
-public abstract class GridPosition implements GridNames
+public abstract class GridPosition implements GridIdentifiers
 {
 
     /**
@@ -41,7 +41,7 @@ public abstract class GridPosition implements GridNames
      * returns the same name as in GridFormatter
      * @return
      */
-    public abstract String getName();
+    public abstract String getIdentifier();
     
     /**
      * clones the receiver

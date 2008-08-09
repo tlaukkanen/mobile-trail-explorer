@@ -130,21 +130,24 @@ public class InformationCanvas extends BaseCanvas{
                     true);
                 }
             }
+
+            /** Draw position using grid formatter. Usually lat/lon */
+            GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.INFORMATION_CANVAS);
+            String[] gridLabels = gridFormatter.getLabels();
+            String[] gridData = gridFormatter.getStrings(position.getWSG84Position());
+
+            int infoPos = BIG_FONT.stringWidth("LAT:_:");
+            lineRow = titleHeight - firstRow;
+            totalTextHeight = titleHeight;
+
+            drawNextHeader(g, LocaleManager.getMessage("information_canvas_position"));
+            for(int i=0; i< gridLabels.length ; i++)
+            {
+                drawNextString(g, gridLabels[i], gridData[i]);
+            }
         }
         
-        GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.INFORMATION_CANVAS);
-        String[] gridLabels = gridFormatter.getLabels();
-        String[] gridData = gridFormatter.getStrings(position.getWSG84Position());
-        
-        int infoPos = BIG_FONT.stringWidth("LAT:_:");
-        lineRow = titleHeight - firstRow;
-        totalTextHeight = titleHeight;
-        
-        drawNextHeader(g, LocaleManager.getMessage("information_canvas_position"));
-        for(int i=0; i< gridLabels.length ; i++)
-        {
-            drawNextString(g, gridLabels[i], gridData[i]);
-        }
+
         drawNextString(g, LocaleManager.getMessage("information_canvas_altitude"), alt);
         drawNextString(g, LocaleManager.getMessage("information_canvas_heading"), hea);
         

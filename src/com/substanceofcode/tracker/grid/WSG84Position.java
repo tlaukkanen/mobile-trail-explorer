@@ -58,7 +58,7 @@ public class WSG84Position extends GridPosition
     {
     }
     
-    public String getName() 
+    public String getIdentifier() 
     {
         return GRID_WSG84;
     }
@@ -80,7 +80,7 @@ public class WSG84Position extends GridPosition
 
     public String[] serialize() 
     {
-        return new String[]{getName(), "0.1", String.valueOf(getLatitude()), String.valueOf(getLongitude())};
+        return new String[]{getIdentifier(), "0.1", String.valueOf(getLatitude()), String.valueOf(getLongitude())};
     }
 
     public GridPosition clone() 
@@ -90,7 +90,7 @@ public class WSG84Position extends GridPosition
 
     public GridPosition unserialize(String[] data) throws Exception 
     {
-        if(!data[0].equals(getName()))
+        if(!data[0].equals(getIdentifier()))
         {
             throw new Exception("");
         }
