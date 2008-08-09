@@ -638,16 +638,19 @@ public class Controller {
     public void markPlace(GridPosition position) 
     {
         if (placeForm == null) {
+            Logger.debug("Creating new place form");
             placeForm = new PlaceForm(this);
         }
         /**
          * Autofill the waypoint form fields with current location and
          * autonumber (1,2,3...).
          */
+        Logger.debug("Setting place to form");
         int waypointCount = places.size();
         placeForm.setPlace(new Place("WP" + String.valueOf(waypointCount + 1), position));
 
         placeForm.setEditingFlag(false);
+        Logger.debug("Set placeForm as current");
         display.setCurrent(placeForm);
     }
 

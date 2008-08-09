@@ -137,19 +137,30 @@ public class PlaceList extends List implements CommandListener {
         }
         
         if(command == newPlaceCommand) {
-            GpsPosition lastPosition = controller.getPosition();
-            GridPosition gridPos = null;
-            GridFormatterManager gfm = new GridFormatterManager(controller.getSettings(), GridFormatterManager.PLACE_FORM);
+            try {
+                GpsPosition lastPosition = controller.getPosition();
+                GridPosition gridPos = null;
+                Logger.debug("Creating grid formatter manager");
+                GridFormatterManager gfm = new GridFormatterManager(
+                        controller.getSettings(),
+                        GridFormatterManager.PLACE_FORM);
                 
-            if(lastPosition == null)
-            {
-                gridPos = gfm.currentFormatter().getEmptyPosition();
-            }else{
-                gridPos = lastPosition.getWSG84Position();
-                gridPos = gfm.currentFormatter().convertPosition(gridPos);
+                if(lastPosition == null)
+                {
+                    Logger.debug("Getting empty position");
+                    gridPos = gfm.currentFormatter().getEmptyPosition();
+                } else {
+                    Logger.debug("Getting WSG84 position");
+                    gridPos = lastPosition.getWSG84Position();
+                    Logger.debug("Converting position");
+                    gridPos = gfm.currentFormatter().convertPosition(gridPos);
+                }
+                Logger.debug("Marking place");
+                controller.markPlace(gridPos);
+            } catch(Exception ex ) {
+                Logger.error("Can't display new place form: " + ex.getMessage());
             }
-            
-            controller.markPlace(gridPos);
+
         }
         
         if(command == exportPlaceCommand) {

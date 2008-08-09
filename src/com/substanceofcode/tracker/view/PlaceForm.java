@@ -122,7 +122,7 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
 
                 dataFields = new TextField[labels.length];
                 for (int i = 0; i < labels.length; i++) {
-                    dataFields[i] = new TextField(labels[i], "", 16, TextField.DECIMAL);
+                    dataFields[i] = new TextField(labels[i], "", 32, TextField.DECIMAL);
                     insert(i + 1, dataFields[i]);
                 }
             }

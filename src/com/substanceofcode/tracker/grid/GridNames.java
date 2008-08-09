@@ -28,12 +28,16 @@ import com.substanceofcode.localization.LocaleManager;
  * list of all grids
  * 
  * @author kaspar
+ * @author Tommi Laukkanen
  */
 public interface GridNames 
 {
-
-    public final static String GRID_WSG84 = LocaleManager.getMessage("grid_names_wsg84");
-    public final static String GRID_CH1903 = LocaleManager.getMessage("grid_names_swiss_grid");
+    /**
+     * It seems that you can't initialize messages with LocaleManager 
+     * (atleast when using Nokia phones).
+     */
+    public final static String GRID_WSG84 = "WSG84"; // LocaleManager.getMessage("grid_names_wsg84");
+    public final static String GRID_CH1903 = "Swiss Grid"; //LocaleManager.getMessage("grid_names_swiss_grid");
     
     /**
      * there should be an instance of each XXXPosition of each GridImplementation
