@@ -12,11 +12,12 @@ Gareth Jones
 Patrick Steiner
 Kaspar Mösinger
 Bastian Kämpfe
+Nicolas Marchildon
 
 Release Notes:
 
 v1.12 (xxx xth 2008)
-+ ...
++ French support (Contribution from Nicolas)
 
 v1.11 (August xth 2008)
 + Renamed "Waypoints" to "Places" (Issue 92)
