@@ -88,8 +88,6 @@ public class InformationCanvas extends BaseCanvas{
         g.setFont(BIG_FONT);
         
         int charHeight = BIG_FONT.getHeight();
-        String lat = "";
-        String lon = "";
         String spd = "";
         String hea = "";
         String alt = "";
