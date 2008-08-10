@@ -127,8 +127,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             /** Save the maps properties */
             settings.setDrawMap(drawingMapsGroup.getSelectedIndex());
 
-            /** Save the grid */
-            settings.setGrid(GridFormatterManager.getGridFormattersName()[gridGroup.getSelectedIndex()]);
+            /** Save the grids identifier */
+            settings.setGrid(GridFormatterManager.getGridFormattersIdentifier()[gridGroup.getSelectedIndex()]);
             
             /** 4. Save the Backlight property */
             boolean backlightOn = backlightGroup.isSelected(1);
@@ -214,13 +214,14 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         }
         this.append(drawingStyleGroup);
         
-        String[] gridNames = GridFormatterManager.getGridFormattersName();
+        String[] gridNames = GridFormatterManager.getGridFormattersNames();
+        String[] gridIdentifiers = GridFormatterManager.getGridFormattersIdentifier();
         gridGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_form_grid_display"),
                 ChoiceGroup.EXCLUSIVE, gridNames, null);
         gridGroup.setSelectedIndex(0, true); // if there was no selection
         for(int i=0; i< gridNames.length ; i++)
         {
-            if(settings.getGrid().equals(gridNames[i]))
+            if(settings.getGrid().equals(gridIdentifiers[i]))
             {
                 gridGroup.setSelectedIndex(i, true);
                 break;

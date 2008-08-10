@@ -97,6 +97,7 @@ public class InformationCanvas extends BaseCanvas{
         String durationTime = "";
         String maximumSpeed = "";
         String averageSpeed = "";
+        lineRow = titleHeight - firstRow;
         
         Track currentTrack = controller.getTrack();
         LengthFormatter lengthFormatter = new LengthFormatter( controller.getSettings() );
@@ -137,7 +138,7 @@ public class InformationCanvas extends BaseCanvas{
             String[] gridData = gridFormatter.getStrings(position.getWSG84Position());
 
             int infoPos = BIG_FONT.stringWidth("LAT:_:");
-            lineRow = titleHeight - firstRow;
+            
             totalTextHeight = titleHeight;
 
             drawNextHeader(g, LocaleManager.getMessage("information_canvas_position"));

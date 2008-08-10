@@ -94,19 +94,19 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
                 "", 32, TextField.ANY);
         this.append(nameField);
 
-        String[] gridNames = GridFormatterManager.getGridFormattersName();
+        String[] gridNames = GridFormatterManager.getGridFormattersNames();
         gridGroup = new ChoiceGroup(LocaleManager.getMessage("place_form_grid"),
                 ChoiceGroup.EXCLUSIVE, gridNames, null);
         this.append(gridGroup);
     }
 
-    private void setGrid(String name) {
+    private void setGrid(String identifier) {
         try {
-            if (currentGridFormatter != null && currentGridFormatter.getName().equals(name)) {
+            if (currentGridFormatter != null && currentGridFormatter.getIdentifier().equals(identifier)) {
                 return;
             }
 
-            currentGridFormatter = GridFormatterManager.getGridFormatterForName(name, true);
+            currentGridFormatter = GridFormatterManager.getGridFormatterForIdentifier(identifier, true);
             String[] labels = currentGridFormatter.getLabels(currentGridFormatter.PLACE_FORM);
 
             //this could be better...
@@ -127,9 +127,9 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
                 }
             }
 
-            String[] gridNames = GridFormatterManager.getGridFormattersName();
-            for (int i = 0; i < gridNames.length; i++) {
-                if (gridNames[i].equals(currentGridFormatter.getName())) {
+            String[] gridIdentifiers = GridFormatterManager.getGridFormattersIdentifier();
+            for (int i = 0; i < gridIdentifiers.length; i++) {
+                if (gridIdentifiers[i].equals(currentGridFormatter.getIdentifier())) {
                     gridGroup.setSelectedIndex(i, true);
                     currentGroupIndex = i;
                     break;
@@ -158,7 +158,7 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
                 place = wp.clone();
             }
 
-            setGrid(place.getPosition().getName());
+            setGrid(place.getPosition().getIdentifier());
 
             String[] data = currentGridFormatter.getStrings(place.getPosition(), currentGridFormatter.PLACE_FORM);
             for (int i = 0; i < data.length; i++) {
