@@ -22,11 +22,13 @@
 
 package com.substanceofcode.localization;
 
-import com.substanceofcode.tracker.view.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Hashtable;
+
+import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.tracker.controller.Controller;
 
 /**
  * @author steinerp
@@ -51,8 +53,9 @@ public class LocaleManager  {
      * with finding the appropriate localized message or any part of it.
      */    
     private static final String _DEFAULT_STRING = "NA";
-    
-    
+
+    private static Controller controller;
+
     /**
      * Initializes localization support based on currently set locale (obtained
      * from "microedition.locale" system property). The initialization method is called
@@ -66,7 +69,16 @@ public class LocaleManager  {
      * @return true if the intialization was succesfull, false if there was any problem.
      */        
     public static boolean initLocalizationSupport() {
-        return initLocalizationSupport(System.getProperty("microedition.locale"));     // NOI18N
+        String MteLocale;
+
+        MteLocale = controller.getSettings().getMteLocale();
+
+        if (MteLocale == null)
+            MteLocale = System.getProperty("microedition.locale");
+
+        System.out.println("Localization language: " + MteLocale);
+
+        return initLocalizationSupport(MteLocale);     // NOI18N
     }
     
     /**
@@ -221,7 +233,6 @@ public class LocaleManager  {
      */    
     private static final String _WHITESPACE_CHARS = " \t\r\n\f";
     
-    
     /**
      * Contains the parsed message bundle.
      */    
@@ -231,8 +242,6 @@ public class LocaleManager  {
      * If everything is OK, this field is null.
      */    
     private static String _localizationErrorMessage = null;
-    
-    
     
     /**
      * Loads messages from input stream to hash table.
@@ -318,7 +327,6 @@ public class LocaleManager  {
                 }
             }
         }
-         
     }
     
     /**

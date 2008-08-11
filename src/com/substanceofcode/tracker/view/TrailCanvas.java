@@ -195,7 +195,7 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw zoom scale bar */
             drawZoomScaleBar(g);
         } catch (Exception e) {
-            Logger.debug("Caught exception:"+e.getMessage());
+            Logger.debug("Caught exception:" + e.getMessage());
         }
     }
 

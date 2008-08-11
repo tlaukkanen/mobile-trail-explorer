@@ -19,6 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+
 package com.substanceofcode.tracker.controller;
 
 import java.io.IOException;
@@ -383,7 +384,7 @@ public class Controller {
             Logger.debug("Initializing bluetooth utility");
             bt.initialize();
             int countDown = BluetoothUtility.SearchTimeoutLimitSecs;
-            Logger.debug("Finding devices." + countDown);
+            Logger.debug("Finding devices. " + Integer.toString(countDown));
             bt.findDevices();
             // TODO : mchr : Add explicit timeout to avoid infinite loop?
             // yes

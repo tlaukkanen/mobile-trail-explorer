@@ -66,6 +66,14 @@ public class DisplaySettingsForm extends Form implements CommandListener {
 
     private ChoiceGroup backlightGroup;
 
+    private ChoiceGroup localeGroup;
+
+    private static final int LOCALE_EN = 0;
+    private static final int LOCALE_DE = 1;
+    private static final int LOCALE_FI = 2;
+    private static final int LOCALE_FR = 3;
+    private static final int LOCALE_NL = 4;
+
     /** Creates a new instance of DisplaySettingsForm */
     public DisplaySettingsForm(Controller controller) {
         super(LocaleManager.getMessage("display_settings_form_title"));
@@ -138,6 +146,29 @@ public class DisplaySettingsForm extends Form implements CommandListener {
                 controller.backlightOn(backlightOn);
             }
 
+            /** Save locale */
+            int lclId = localeGroup.getSelectedIndex();
+
+            switch (lclId) {
+                case LOCALE_EN:
+                    settings.setMteLocale("en");
+                    break;
+                case LOCALE_DE:
+                    settings.setMteLocale("de");
+                    break;
+                case LOCALE_FI:
+                    settings.setMteLocale("fi");
+                    break;
+                case LOCALE_FR:
+                    settings.setMteLocale("fr");
+                    break;
+                case LOCALE_NL:
+                    settings.setMteLocale("nl");
+                    break;
+                default:
+                    settings.setMteLocale("en");
+            }
+
             controller.showSettings();
         }
         if (command == cancelCommand) {
@@ -152,6 +183,37 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     /** Add controls to form */
     private void addControls() {
         RecorderSettings settings = controller.getSettings();
+
+        //TODO: translate
+        String[] mteLocales = {
+            LocaleManager.getMessage("display_settings_form_locale_en"),
+            LocaleManager.getMessage("display_settings_form_locale_de"),
+            LocaleManager.getMessage("display_settings_form_locale_fi"),
+            LocaleManager.getMessage("display_settings_form_locale_fr"),
+            LocaleManager.getMessage("display_settings_form_locale_nl")
+        };
+
+        localeGroup =
+                new ChoiceGroup(LocaleManager.getMessage("display_settings_form_locales"),
+                ChoiceGroup.EXCLUSIVE, mteLocales, null);
+
+        String lcl = settings.getMteLocale();
+
+        if (lcl.equals("en")) {
+            localeGroup.setSelectedIndex(LOCALE_EN, true);
+        } else if (lcl.equals("de")) {
+            localeGroup.setSelectedIndex(LOCALE_DE, true);
+        } else if (lcl.equals("fi")) {
+            localeGroup.setSelectedIndex(LOCALE_FI, true);
+        } else if (lcl.equals("fr")) {
+            localeGroup.setSelectedIndex(LOCALE_FR, true);
+        } else if (lcl.equals("nl")) {
+            localeGroup.setSelectedIndex(LOCALE_NL, true);
+        } else {
+            localeGroup.setSelectedIndex(LOCALE_EN, true);
+        }
+
+        this.append(localeGroup);
 
         String[] units = { LocaleManager.getMessage("display_settings_form_kilometers"),
                            LocaleManager.getMessage("display_settings_form_miles") };

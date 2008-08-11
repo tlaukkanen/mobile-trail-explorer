@@ -116,6 +116,9 @@ public class RecorderSettings {
     /** Logging */
     public static final String WRITE_LOG = "write-log";
 
+    /** Locale */
+    private static final String MTE_LOCALE = "locale";
+
     /** 
      * Creates a new instance of RecorderSettings
      * @param midlet 
@@ -632,5 +635,21 @@ public class RecorderSettings {
     /** Set cross hatch shortcut */
     public void setPoundShortcut(int shortcut) {
         settings.setIntProperty(SHORTCUT_POUND, shortcut);
+    }
+
+    /** Get saved locale */
+    public String getMteLocale() {
+        String phoneLocale = System.getProperty("microedition.locale");
+
+        if(phoneLocale == null) {
+            phoneLocale = "en";
+        }
+
+        return settings.getStringProperty(MTE_LOCALE, phoneLocale);
+    }
+
+    /** Set locale */
+    public void setMteLocale(String locale) {
+        settings.setStringProperty(MTE_LOCALE, locale);
     }
 }
