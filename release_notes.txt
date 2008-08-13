@@ -13,13 +13,16 @@ Patrick Steiner
 Kaspar Mösinger
 Bastian Kämpfe
 Nicolas Marchildon
+Patric Oosterveld
 
 Release Notes:
 
-v1.12 (xxx xth 2008)
+v1.12 (August 13th 2008)
 + French support (Contribution from Nicolas)
++ Dutch support (Contribution from Patric)
++ Fixed NoSuchFieldError (Issue 123)
 
-v1.11 (August xth 2008)
+v1.11 (August 5th 2008)
 + Renamed "Waypoints" to "Places" (Issue 92)
 + Filename uses datestamp with seconds
 + User can add audio-markers
