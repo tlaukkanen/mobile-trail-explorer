@@ -126,7 +126,7 @@ public final class AboutScreen extends Canvas {
      * Both {@link AboutScreen#TITLES} and {@link AboutScreen#MESSAGES} must NOT
      * be null, and must have the same number of elements.
      */
-    private static final String[] TITLES = { LocaleManager.getMessage("about_screen_trail_title"),
+    private static final String[] TITLES = { LocaleManager.getMessage("about_screen_title"),
                                              LocaleManager.getMessage("about_screen_trail_screen"),
                                              LocaleManager.getMessage("about_screen_elevation_screen"),
                                              LocaleManager.getMessage("about_screen_sky_view_screen"),
