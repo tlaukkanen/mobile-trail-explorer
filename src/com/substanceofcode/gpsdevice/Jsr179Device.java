@@ -70,7 +70,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 //GPS or a network
                 if(extraInfo != null){
                     usingExternalGPS = true;
-                    Logger.debug("dbg(): extrainfo:(" + extraInfo + ")");
+                    //Logger.debug("dbg(): extrainfo:(" + extraInfo + ")");
                 }
                 //   usingExternalGPS=true;
                 //   Logger.debug("using ExternalGps is "+usingExternalGPS);
@@ -246,7 +246,6 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     public GpsPosition getPosition() {
        // Logger.debug("getPosition called");
         if(usingExternalGPS){
-            Logger.debug("dbg(): USING EXTERNAL GPS!!!");
             return getParserPosition();
         } else {
             return getJsr179Position();
