@@ -998,7 +998,7 @@ public class Controller {
                     Display.getDisplay(midlet).setCurrent(alert);
                 } catch (IllegalArgumentException e) {
                     // do nothing just log
-                    Logger.warn("IllegalArgumetException occured " + "in showAlert");
+                    Logger.warn("IllegalArgumetException occured in showAlert");
                 }
             }
         });
@@ -1068,11 +1068,17 @@ public class Controller {
      */
     public void removePlace(Place wp) {
         places.removeElement(wp);
+
+        // save immediatly to RMS (no undo possible)!!!
+        savePlaces();
     }
 
     /** Remove all waypoints */
     public void removeAllPlaces() {
         places.removeAllElements();
+
+        // save immediatly to RMS (no undo possible)!!!
+        savePlaces();
     }
 
     /**
