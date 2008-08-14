@@ -69,9 +69,11 @@ public class LocaleManager  {
      * @return true if the intialization was succesfull, false if there was any problem.
      */        
     public static boolean initLocalizationSupport() {
-        String MteLocale;
-
-        MteLocale = controller.getSettings().getMteLocale();
+        String MteLocale = null;
+        
+        if (controller != null && controller.getSettings() != null){
+            MteLocale = controller.getSettings().getMteLocale();
+        }
 
         if (MteLocale == null)
             MteLocale = System.getProperty("microedition.locale");
