@@ -47,16 +47,15 @@ import com.substanceofcode.util.StringUtil;
  */
 public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     
-    private static final String JSR179MIMETYPE="application/X-jsr179-location-nmea";
+    private static final String JSR179MIMETYPE = "application/X-jsr179-location-nmea";
     private final String logPrefix = "Jsr179: ";
     private Thread thread;
-    //private LocationProvider locationProvider;
+
     // GPS position variables
-    private  boolean usingExternalGPS=false; 
+    private  boolean usingExternalGPS = false;
     private String extraInfo = "";
-    //private GpsGPGSA gpgsa=null;
-    GpsPosition gp=null;
-    private static Jsr179Device _jsr179Device=null;
+    GpsPosition gp = null;
+    private static Jsr179Device _jsr179Device = null;
     protected GpsPositionParser parser;
     
     private LocationProvider locationProvider;
@@ -70,7 +69,8 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 //Guessing that if there is no nmea data present, the Location API is giving us an internal
                 //GPS or a network
                 if(extraInfo != null){
-                    Logger.debug("dbg(): 1: extra info not available!!!");
+                    usingExternalGPS = true;
+                    Logger.debug("dbg(): extrainfo:(" + extraInfo + ")");
                 }
                 //   usingExternalGPS=true;
                 //   Logger.debug("using ExternalGps is "+usingExternalGPS);
@@ -79,44 +79,43 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 // also give extraInfo so it makes no sense. 
                 // Had to do this to get it working on Blackberry 8820 emulator.
                 
-                float course=location.getCourse();
-                float speed=location.getSpeed();
+                float course = location.getCourse();
+                float speed = location.getSpeed();
 
                 // convert from m/s to km/h
                 float speedkmh = speed * 3.6f;
                 
-                QualifiedCoordinates qc=location.getQualifiedCoordinates();
-                float altitude=qc.getAltitude();
-                float hdop=qc.getHorizontalAccuracy();
+                QualifiedCoordinates qc = location.getQualifiedCoordinates();
+                float altitude = qc.getAltitude();
+                float hdop = qc.getHorizontalAccuracy();
                 
-                double lat=  qc.getLatitude();
-                double lon=  qc.getLongitude();
-                float vdop= qc.getVerticalAccuracy();
+                double lat =  qc.getLatitude();
+                double lon =  qc.getLongitude();
+                float vdop = qc.getVerticalAccuracy();
                         
                 //These might be useful later...
                // boolean isValid=location.isValid();               
                // AddressInfo addressInfo=location.getAddressInfo();
                 //int locationMethod=location.getLocationMethod();
                 
-                long timestamp=location.getTimestamp();                
-                gp=new GpsPosition("",(short)course,lon,lat,(double)speedkmh,(double)altitude,new Date(timestamp));
+                long timestamp = location.getTimestamp();
+                gp = new GpsPosition(extraInfo,(short)course,lon,lat,(double)speedkmh,(double)altitude,new Date(timestamp));
                 //gpgsa=new GpsGPGSA(0.0f,hdop,vdop,0);
             }
         }
         
         public void providerStateChanged(final javax.microedition.location.LocationProvider provider, final int newState) {
-            String state="";
+            String state = "";
             switch (newState) {
                 case javax.microedition.location.LocationProvider.AVAILABLE:
-                    state="Available";
+                    state = "Available";
                     break;
                 case javax.microedition.location.LocationProvider.OUT_OF_SERVICE:
-                    state="Unavailable";
+                    state = "Unavailable";
                     break;
                 case javax.microedition.location.LocationProvider.TEMPORARILY_UNAVAILABLE:
-                    state="Temporarily Unavailable";
-                    break;
-                
+                    state = "Temporarily Unavailable";
+                    break;   
             }
             Logger.debug(logPrefix + "State Changed: [" + state + "]");
         }
@@ -140,22 +139,24 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
             if (locationProvider == null) {
                 Criteria criteria = new Criteria();
                 criteria.setSpeedAndCourseRequired(true);
-                //criteria.setVerticalAccuracy(2);
+                criteria.setAltitudeRequired(true);
 
                 locationProvider = LocationProvider.getInstance(criteria);
             }
             Logger.debug(logPrefix + "LocationProvider state: "
                     + locationProvider.getState());
-            locationProvider.setLocationListener(locationListener, 1, 1, 1);
-            //mccormackaj changed from -1,-1,-1 to 1,1,1 to get it working on Blackberry
-            //8820 emulator. It must have an issue with the default values. 1s update should be
-            //ok for all platforms.
+
+            try {
+                locationProvider.setLocationListener(locationListener, -1, -1, -1);
+            } catch (final IllegalArgumentException e) {
+                locationProvider.setLocationListener(locationListener, 1, 1, 1);
+                Logger.warn("LocationListener uses 1s update interval");
+            }
         } catch (LocationException e) {
             Logger.fatal(logPrefix + "Device failed to initialise:"
                     + e.getMessage());
         } catch (SecurityException e) {
-            Logger.fatal(logPrefix
-                    + "init failed due to permission restriction.");
+            Logger.fatal(logPrefix + "init failed due to permission restriction.");
         }
     }
 
@@ -222,7 +223,6 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                         }
                     }
                 } else {
-                    Logger.debug("dbg(): 2: extra info not available!!!");
                 }
             } catch (Exception e) {
                 Logger.error(logPrefix + "Exception: " + e.getMessage());
@@ -267,11 +267,19 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
         return parser.getSatellites();
     }
 
+    public int getSatelliteCount() {
+        if (parser != null) {
+            return parser.getSatelliteCount();
+        } else {
+            return 0;
+        }
+    }
+
     public static Device getDevice(String address, String alias) {
         Logger.debug("getDevice called");
-       if(_jsr179Device==null) {
-           _jsr179Device=new Jsr179Device(address, alias);
-       }
+        if(_jsr179Device == null) {
+            _jsr179Device = new Jsr179Device(address, alias);
+        }
         return _jsr179Device;
     }
 }

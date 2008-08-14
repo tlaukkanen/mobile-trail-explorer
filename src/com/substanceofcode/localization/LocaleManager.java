@@ -69,18 +69,18 @@ public class LocaleManager  {
      * @return true if the intialization was succesfull, false if there was any problem.
      */        
     public static boolean initLocalizationSupport() {
-        String MteLocale = null;
+        String mteLocale = null;
         
         if (controller != null && controller.getSettings() != null){
-            MteLocale = controller.getSettings().getMteLocale();
+            mteLocale = controller.getSettings().getMteLocale();
         }
 
-        if (MteLocale == null)
-            MteLocale = System.getProperty("microedition.locale");
+        if (mteLocale == null)
+            mteLocale = System.getProperty("microedition.locale");
 
-        System.out.println("Localization language: " + MteLocale);
+        //System.out.println("Localization language: " + mteLocale);
 
-        return initLocalizationSupport(MteLocale);     // NOI18N
+        return initLocalizationSupport(mteLocale);     // NOI18N
     }
     
     /**
