@@ -651,5 +651,6 @@ public class RecorderSettings {
     /** Set locale */
     public void setMteLocale(String locale) {
         settings.setStringProperty(MTE_LOCALE, locale);
+        saveSettings();
     }
 }

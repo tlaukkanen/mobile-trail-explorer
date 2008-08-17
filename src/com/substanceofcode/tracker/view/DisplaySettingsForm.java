@@ -68,11 +68,6 @@ public class DisplaySettingsForm extends Form implements CommandListener {
 
     private ChoiceGroup localeGroup;
 
-    private static final int LOCALE_EN = 0;
-    private static final int LOCALE_DE = 1;
-    private static final int LOCALE_FI = 2;
-    private static final int LOCALE_FR = 3;
-    private static final int LOCALE_NL = 4;
 
     /** Creates a new instance of DisplaySettingsForm */
     public DisplaySettingsForm(Controller controller) {
@@ -147,27 +142,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             }
 
             /** Save locale */
-            int lclId = localeGroup.getSelectedIndex();
-
-            switch (lclId) {
-                case LOCALE_EN:
-                    settings.setMteLocale("en");
-                    break;
-                case LOCALE_DE:
-                    settings.setMteLocale("de");
-                    break;
-                case LOCALE_FI:
-                    settings.setMteLocale("fi");
-                    break;
-                case LOCALE_FR:
-                    settings.setMteLocale("fr");
-                    break;
-                case LOCALE_NL:
-                    settings.setMteLocale("nl");
-                    break;
-                default:
-                    settings.setMteLocale("en");
-            }
+            settings.setMteLocale(LocaleManager.getSupportedLocales()[localeGroup.getSelectedIndex()]);
 
             controller.showSettings();
         }
@@ -185,32 +160,23 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         RecorderSettings settings = controller.getSettings();
 
         //TODO: translate
-        String[] mteLocales = {
-            LocaleManager.getMessage("display_settings_form_locale_en"),
-            LocaleManager.getMessage("display_settings_form_locale_de"),
-            LocaleManager.getMessage("display_settings_form_locale_fi"),
-            LocaleManager.getMessage("display_settings_form_locale_fr"),
-            LocaleManager.getMessage("display_settings_form_locale_nl")
-        };
+        String[] mteLocalesLabels = LocaleManager.getSupportedLocalesLabels();
 
         localeGroup =
                 new ChoiceGroup(LocaleManager.getMessage("display_settings_form_locales"),
-                ChoiceGroup.EXCLUSIVE, mteLocales, null);
+                ChoiceGroup.EXCLUSIVE, mteLocalesLabels, null);
 
-        String lcl = settings.getMteLocale();
-
-        if (lcl.equals("en")) {
-            localeGroup.setSelectedIndex(LOCALE_EN, true);
-        } else if (lcl.equals("de")) {
-            localeGroup.setSelectedIndex(LOCALE_DE, true);
-        } else if (lcl.equals("fi")) {
-            localeGroup.setSelectedIndex(LOCALE_FI, true);
-        } else if (lcl.equals("fr")) {
-            localeGroup.setSelectedIndex(LOCALE_FR, true);
-        } else if (lcl.equals("nl")) {
-            localeGroup.setSelectedIndex(LOCALE_NL, true);
-        } else {
-            localeGroup.setSelectedIndex(LOCALE_EN, true);
+        String currentLocale = settings.getMteLocale();
+        // select EN, in case locale was not found
+        localeGroup.setSelectedIndex(0, true);
+        //select current locale
+        for(int i=0; i<LocaleManager.getSupportedLocales().length; i++)
+        {
+            if(currentLocale.equals(LocaleManager.getSupportedLocales()[i]))
+            {
+                localeGroup.setSelectedIndex(i, true);
+                break;
+        }
         }
 
         this.append(localeGroup);

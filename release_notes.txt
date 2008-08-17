@@ -18,7 +18,9 @@ Patric Oosterveld
 Release Notes:
 
 v1.13 (xxx xth 2008)
-+ ...
++ Bug fix: When the locale is changed manually, it will be saved (From Kaspar)
++ Bug fix: LocaleManager does now respect the user-selected locale (From Kaspar)
++ Simplified the addition for additional locales (From Kaspar)
 
 v1.12 (August 13th 2008)
 + French support (Contribution from Nicolas)

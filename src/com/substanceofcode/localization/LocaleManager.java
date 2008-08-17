@@ -32,8 +32,14 @@ import com.substanceofcode.tracker.controller.Controller;
 
 /**
  * @author steinerp
+ * @author kaspar
  */
 public class LocaleManager  {
+    
+    /**
+     * the place to register any additional locales, so that they are available in the display-settings
+     */
+    private static final String[] _SUPPORTED_LOCALES = {"en", "de", "fi", "fr", "nl"};
     
     /**
      * Full path to the messages resource bundle. Feel free to change it if you don't
@@ -70,6 +76,8 @@ public class LocaleManager  {
      */        
     public static boolean initLocalizationSupport() {
         String mteLocale = null;
+        
+        controller = Controller.getController();
         
         if (controller != null && controller.getSettings() != null){
             mteLocale = controller.getSettings().getMteLocale();
@@ -216,6 +224,28 @@ public class LocaleManager  {
         
         return toAppendTo.toString();
     }
+    
+    /**
+     * @return all available Locals
+     */
+    public static String[] getSupportedLocales()
+    {
+        return _SUPPORTED_LOCALES;
+    }
+    
+    /**
+     * @return the Labels in current Locale for the available locales
+     */
+    public static String[] getSupportedLocalesLabels()
+    {
+        String[] arr = new String[_SUPPORTED_LOCALES.length];
+        for(int i=0; i<_SUPPORTED_LOCALES.length; i++)
+        {
+            arr[i] = getMessage("display_settings_form_locale_"+_SUPPORTED_LOCALES[i]);
+        }
+        return arr;
+    }
+    
     
     /* The rest is private to localization support. You shouldn't change anything
      * below this comment unless you really know what you are doing
