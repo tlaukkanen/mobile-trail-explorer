@@ -176,7 +176,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             {
                 localeGroup.setSelectedIndex(i, true);
                 break;
-        }
+            }
         }
 
         this.append(localeGroup);

@@ -96,11 +96,11 @@ public class GridFormatterManager implements GridFormatterContext, GridIdentifie
      */
     public static String[] getGridFormattersIdentifier()
     {
-        String identifiers[] = new String[formatters.length];
+        String identifiers[] = new String[GridIdentifiers.formatters.length];
         
-        for(int i=0; i<formatters.length; i++)
+        for(int i=0; i<GridIdentifiers.formatters.length; i++)
         {
-            identifiers[i] = formatters[i].getIdentifier();
+            identifiers[i] = GridIdentifiers.formatters[i].getIdentifier();
         }
         
         return identifiers;
@@ -113,11 +113,11 @@ public class GridFormatterManager implements GridFormatterContext, GridIdentifie
      */
     public static String[] getGridFormattersNames() 
     {
-        String names[] = new String[formatters.length];
+        String names[] = new String[GridIdentifiers.formatters.length];
         
-        for(int i=0; i<formatters.length; i++)
+        for(int i=0; i<GridIdentifiers.formatters.length; i++)
         {
-            names[i] = formatters[i].getName();
+            names[i] = GridIdentifiers.formatters[i].getName();
         }
         
         return names;
