@@ -93,6 +93,7 @@ public class RecorderSettings {
     public static final String EXPORT_TO_KML = "export-to-kml";
     public static final String EXPORT_TO_GPX = "export-to-gpx";
     public static final String EXPORT_TO_SAVE = "export-to-save";
+    public static final String EXPORT_TO_GPXSTREAM = "export-to-gpxstream";
 
     /** Default recording intervals */
     private static final int RECORDING_INTERVAL_DEFAULT = 1;
@@ -526,6 +527,21 @@ public class RecorderSettings {
      */
     public void setExportToGPX(boolean value) {
         settings.setBooleanProperty(EXPORT_TO_GPX, value);
+        saveSettings();
+    }
+    
+    /**
+     * Flag to set gpxstream as default recording setting
+     */
+    public boolean getExportToGPXStream() {
+        return settings.getBooleanProperty(EXPORT_TO_GPXSTREAM, false);
+    }
+
+    /**
+     * Set gpxstream as default export
+     */
+    public void setExportToGPXStream(boolean value) {
+        settings.setBooleanProperty(EXPORT_TO_GPXSTREAM, value);
         saveSettings();
     }
 

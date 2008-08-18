@@ -405,9 +405,9 @@ public class GpsRecorder {
                     if (lastRecordedPosition != null && currentPosition != null) {
                         stopped = currentPosition.equals(lastRecordedPosition);
                     }
-
-                //     Logger.debug("interval: "+ intervalSeconds + 
-                  //   " currentPosition is " + (currentPosition==null?"null":"not null"));
+                    
+                    //Logger.debug("interval: "+ intervalSeconds +
+                    //" currentPosition is " + (currentPosition==null?"null":"not null"));
                     /**
                      * Record current position if user have moved or this is a
                      * first recorded position.

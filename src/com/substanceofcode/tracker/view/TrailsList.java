@@ -196,6 +196,8 @@ public class TrailsList extends List implements CommandListener{
                 if (controller.getSettings().getStreamingStarted()) {
                     controller.showStreamRecovery();
                 } else {
+
+                    /*
                     try {
                         String folder = controller.getSettings()
                                 .getExportFolder();
@@ -217,6 +219,10 @@ public class TrailsList extends List implements CommandListener{
                         controller.showError(LocaleManager.getMessage("trails_list_error") +
                                 ": " + e.toString());
                     }
+                    */
+
+                    controller.newGpxStream();
+                    controller.showTrail();
                 }
             } else if (command == useAsMockTrackCommand) {
                 try {                    

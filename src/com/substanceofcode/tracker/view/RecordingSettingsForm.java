@@ -27,6 +27,7 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
+import javax.microedition.lcdui.ChoiceGroup;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.RecorderSettings;
@@ -49,7 +50,9 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     private TextField maxSpeedField;
     private TextField maxAccelerationField;
     private TextField minDistanceField;
-    
+
+    private ChoiceGroup saveGpxStream;
+
     /** 
      * Creates a new instance of RecordingSettingsForm
      * @param controller Main controller
@@ -74,6 +77,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             int maxSpeed = 310;
             int maxAcceleration = 50;
             int minDistance = 5;
+            boolean sGpxStream = false;
             try{
                 // TODO: Add max speed and acceleration
                 newInterval = Integer.valueOf( intervalText ).intValue();
@@ -84,6 +88,8 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 maxAcceleration = Integer.valueOf(maxAccelerationText).intValue();
                 String minDistanceText = minDistanceField.getString();
                 minDistance = Integer.valueOf(minDistanceText).intValue();
+                sGpxStream = saveGpxStream.isSelected(0);
+
             }catch(Exception ex) {
                 ex.printStackTrace();
                 newInterval = 10;
@@ -96,6 +102,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             settings.setMaxRecordedSpeed(maxSpeed);
             settings.setMaxAcceleration(maxAcceleration);
             settings.setMinDistance(minDistance);
+            settings.setExportToGPXStream(sGpxStream);
             
             controller.showSettings();
         } else {
@@ -157,6 +164,17 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 String.valueOf(minDistance),
                 6,
                 TextField.NUMERIC);
-        this.append(minDistanceField);   
+        this.append(minDistanceField);
+
+        boolean saveGpx = settings.getExportToGPXStream();
+
+        saveGpxStream = new ChoiceGroup(
+                LocaleManager.getMessage("recording_settings_stream"),
+                ChoiceGroup.MULTIPLE);
+        saveGpxStream.append(
+                LocaleManager.getMessage("recording_settings_save_stream"),
+                null);
+        saveGpxStream.setSelectedIndex(0, saveGpx);
+        this.append(saveGpxStream);
     }   
 }

@@ -84,6 +84,7 @@ import com.substanceofcode.tracker.view.PlaceList;
 import com.substanceofcode.tracker.view.SpeedometerCanvas;
 import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
 import com.substanceofcode.localization.LocaleManager;
+import com.substanceofcode.tracker.model.GpxStream;
 
 /**
  * Controller contains methods for the application flow.
@@ -135,6 +136,11 @@ public class Controller {
      * Ghost Track
      */
     private Track ghostTrail;
+
+    /**
+     * GPX Stream
+     */
+    private GpxStream gpxstream;
 
     // ----------------------------------------------------------------------------
     // Screens and Forms
@@ -535,6 +541,20 @@ public class Controller {
                 if( status==STATUS_NOTCONNECTED ) {
                     connectToGpsDevice();
                 }
+
+                // save gpx stream
+                if (settings.getExportToGPXStream() &&
+                        !controller.getSettings().getStreamingStarted()) {
+                    controller.newGpxStream();
+
+                    // give the device some time for creating the file
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception e) {
+                        Logger.error(e.toString());
+                    }
+                }
+
                 recorder.startRecording();
                 status = STATUS_RECORDING;
             }
@@ -1285,5 +1305,16 @@ public class Controller {
 
     public Place getNavigationPlace() {
         return navpnt;
+    }
+
+    public synchronized void newGpxStream() {
+
+        Logger.debug("starting new gpxstream");
+
+        new Thread() {
+            public synchronized void run() {
+                gpxstream = new GpxStream(controller);
+            }
+        }.start();
     }
 }
