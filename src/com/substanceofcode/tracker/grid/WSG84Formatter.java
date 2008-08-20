@@ -23,7 +23,6 @@
 package com.substanceofcode.tracker.grid;
 
 import com.substanceofcode.util.StringUtil;
-
 import com.substanceofcode.localization.LocaleManager;
 
 /**
@@ -96,7 +95,7 @@ public class WSG84Formatter implements GridFormatter
             } catch (Exception e) {
                 throw new BadFormattedException(
                         LocaleManager.getMessage("wsg84_formatter_getgridpositionwithdata_error"));
-}
+            }
             return new WSG84Position(latitude, longitude);
     }
 
