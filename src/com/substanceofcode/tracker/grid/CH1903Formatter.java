@@ -23,7 +23,6 @@
 package com.substanceofcode.tracker.grid;
 
 import com.substanceofcode.localization.LocaleManager;
-
 /**
  *
  * @author kaspar
@@ -88,7 +87,9 @@ public class CH1903Formatter implements GridFormatter
 
     public String getName() 
     {
-        return LocaleManager.getMessage("ch1903_name");
+        // it seems nokia s40 jvm can not handle this
+        //return LocaleManager.getMessage("ch1903_name");
+        return "SwissGrid";
     }
     
     public GridPosition getGridPositionWithData(String[] data) throws BadFormattedException 
@@ -115,5 +116,4 @@ public class CH1903Formatter implements GridFormatter
     {
         return new CH1903Position(0,0);
     }
-
 }

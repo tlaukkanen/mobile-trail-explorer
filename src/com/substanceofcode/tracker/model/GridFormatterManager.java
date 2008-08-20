@@ -51,15 +51,15 @@ public class GridFormatterManager implements GridFormatterContext, GridIdentifie
     
     public GridFormatter currentFormatter()
     {
-        for(int i=0; i < formatters.length ; i++)
+        for(int i=0; i < GridIdentifiers.formatters.length ; i++)
         {
-            if( settings.getGrid().equals(formatters[i].getIdentifier()) )
+            if( settings.getGrid().equals(GridIdentifiers.formatters[i].getIdentifier()) )
             {
-                return formatters[i];
+                return GridIdentifiers.formatters[i];
             }
         }
         //return default formatter
-        return formatters[0];
+        return GridIdentifiers.formatters[0];
     }
     
     /**
@@ -87,7 +87,7 @@ public class GridFormatterManager implements GridFormatterContext, GridIdentifie
      */
     public static GridFormatter[] getGridFormatters()
     {
-        return formatters; 
+        return GridIdentifiers.formatters;
     }
     
     /**
@@ -125,16 +125,16 @@ public class GridFormatterManager implements GridFormatterContext, GridIdentifie
 
     public static GridFormatter getGridFormatterForIdentifier(String identifier, boolean returnDefaultWhenNotFound)
     {
-        for(int i=0; i < formatters.length ; i++)
+        for(int i=0; i < GridIdentifiers.formatters.length ; i++)
         {
-            if(identifier.equals(formatters[i].getIdentifier()) )
+            if(identifier.equals(GridIdentifiers.formatters[i].getIdentifier()) )
             {
-                return formatters[i];
+                return GridIdentifiers.formatters[i];
             }
         }      
         if(returnDefaultWhenNotFound)
         {
-            return formatters[0];
+            return GridIdentifiers.formatters[0];
         }else {
             return null;
         }
@@ -142,6 +142,6 @@ public class GridFormatterManager implements GridFormatterContext, GridIdentifie
 
     public static GridFormatter defaultFormatter() 
     {
-        return formatters[0];
+        return GridIdentifiers.formatters[0];
     }
 }

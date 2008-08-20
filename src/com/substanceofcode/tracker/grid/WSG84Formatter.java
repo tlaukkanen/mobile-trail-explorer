@@ -23,6 +23,7 @@
 package com.substanceofcode.tracker.grid;
 
 import com.substanceofcode.util.StringUtil;
+
 import com.substanceofcode.localization.LocaleManager;
 
 /**
@@ -41,7 +42,6 @@ public class WSG84Formatter implements GridFormatter
             case(PLACE_FORM):
                 return new String[]{LocaleManager.getMessage("wsg84_formatter_latitude"),
                                     LocaleManager.getMessage("wsg84_formatter_longitude")};
-                
             default: //trail-canvas
                 return new String[]{LocaleManager.getMessage("wsg84_formatter_lat"),
                                     LocaleManager.getMessage("wsg84_formatter_lon")};
@@ -81,7 +81,9 @@ public class WSG84Formatter implements GridFormatter
 
     public String getName() 
     {
-        return LocaleManager.getMessage("wsg84_name");
+        // it seems nokia s40 jvm can not handle this
+        //return LocaleManager.getMessage("wsg84_name");
+        return "WSG84";
     }
 
     public GridPosition getGridPositionWithData(String[] data) throws BadFormattedException 
