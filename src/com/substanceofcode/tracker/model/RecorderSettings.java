@@ -71,6 +71,7 @@ public class RecorderSettings {
     private static final String EXPORT_FOLDER = "export-folder";
     public static final int EXPORT_FORMAT_KML = 0;
     public static final int EXPORT_FORMAT_GPX = 1;
+    public static final String EXPORT_PLACEMARKS = "export-placemarks";
 
     /** Recording setting keys */
     private static final String RECORDING_INTERVAL = "recording-interval";
@@ -267,6 +268,17 @@ public class RecorderSettings {
     /** Set export folder. */
     public void setExportFolder(String exportFolder) {
         settings.setStringProperty(EXPORT_FOLDER, exportFolder);
+        saveSettings();
+    }
+
+    /** Get export default value for placemarks */
+    public boolean getPlacemarkExport() {
+        return settings.getBooleanProperty(EXPORT_PLACEMARKS, false);
+    }
+
+    /** Set export default value for placemarks */
+    public void setPlacemarkExport(boolean include) {
+        settings.setBooleanProperty(EXPORT_PLACEMARKS, include);
         saveSettings();
     }
 

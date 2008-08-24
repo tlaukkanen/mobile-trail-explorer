@@ -59,6 +59,7 @@ public class TrailActionsForm extends Form implements CommandListener,
 
     private TextField trailNameField;
     private ChoiceGroup actionsGroup;
+    private ChoiceGroup exportPlaceMarks;
 
     /**
      * State indicating whether save to RMS is an option - not applicable when
@@ -158,12 +159,10 @@ public class TrailActionsForm extends Form implements CommandListener,
         //----------------------------------------------------------------------
         // Construct default checked array
         //----------------------------------------------------------------------
-        final boolean kml = Controller.getController().getSettings()
-                .getExportToKML();
-        final boolean gpx = Controller.getController().getSettings()
-                .getExportToGPX();
-        final boolean save = Controller.getController().getSettings()
-                .getExportToSave();
+        RecorderSettings settings = Controller.getController().getSettings();
+        final boolean kml = settings.getExportToKML();
+        final boolean gpx = settings.getExportToGPX();
+        final boolean save = settings.getExportToSave();
         final boolean[] allSelectedFlags = { kml, gpx, save, true };
         //----------------------------------------------------------------------
         // Copy values into correct sized arrays for this form
@@ -184,10 +183,19 @@ public class TrailActionsForm extends Form implements CommandListener,
                 LocaleManager.getMessage("trails_actions_export_info"),
                 ChoiceGroup.MULTIPLE,
                 actions, null);
-
         actionsGroup.setSelectedFlags(selectedFlags);
-
         this.append(actionsGroup);
+
+        /** Construct choice group for placemark exporting */
+        String[] placeMark = new String[]{
+            LocaleManager.getMessage("trails_actions_export_placemarks_include") };
+        exportPlaceMarks = new ChoiceGroup(
+                LocaleManager.getMessage("trails_actions_export_placemarks"),
+                ChoiceGroup.MULTIPLE,
+                placeMark, null);
+        boolean includePlacemarks = settings.getPlacemarkExport();
+        exportPlaceMarks.setSelectedIndex(0, includePlacemarks);
+        this.append(exportPlaceMarks);
     }
 
     /** Handle commands */
@@ -271,8 +279,10 @@ public class TrailActionsForm extends Form implements CommandListener,
         }
         try {
             RecorderSettings settings = controller.getSettings();
+            boolean includePlaces = exportPlaceMarks.isSelected(0);
+            settings.setPlacemarkExport(includePlaces);
             final Vector places;
-            if (saveIsAnOption) {
+            if (saveIsAnOption && includePlaces) {
                 places = controller.getPlaces();
             } else {
                 places = null;
