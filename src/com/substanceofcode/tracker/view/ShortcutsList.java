@@ -47,6 +47,7 @@ class ShortcutsList extends List implements CommandListener {
         super(LocaleManager.getMessage("shortcuts_list_title"), List.EXCLUSIVE);
         append(LocaleManager.getMessage("shortcuts_list_add_audio_mark"), null);
         append(LocaleManager.getMessage("shortcuts_list_add_placemark"), null);
+        append(LocaleManager.getMessage("shortcuts_list_none"), null);
         selectCommand = new Command(LocaleManager.getMessage("menu_select"), Command.OK, 1);
         addCommand(selectCommand);
         setSelectCommand(selectCommand);
