@@ -22,8 +22,10 @@
 
 package com.substanceofcode.util;
 
+import com.substanceofcode.tracker.grid.WSG84Position;
 import com.substanceofcode.tracker.model.Point2D;
 import com.substanceofcode.tracker.view.CanvasPoint;
+import com.substanceofcode.util.Float11;
 
 /**
  * Projection utility class can be used to convert lat/lon coordinates to screen
@@ -66,8 +68,24 @@ public class ProjectionUtil {
                 (int) (normalised.getY() * scale));
     }
     
+    public static WSG84Position toGridPosition(CanvasPoint point, int zoom)
+    {
+        double scale = (1 << zoom) * TILE_SIZE;
+        double x = point.X / scale;
+        double y = point.Y / scale;
+        
+        
+        double lng = (x - 0.5)*360;
+        double lat = 360/Math.PI * (Float11.atan(Float11.exp(-(y - 0.5)*2*Math.PI)) - Math.PI/4);
+        
+        return new WSG84Position(lat, lng);
+    }
+    
     public static double pixelSize(double lat, double lng, int zoom) {
         double scale = (1 << zoom) * TILE_SIZE;
         return 40075160 * Math.cos (Math.PI * lat / 180) / scale;
     }
+    
+    
+  
 }

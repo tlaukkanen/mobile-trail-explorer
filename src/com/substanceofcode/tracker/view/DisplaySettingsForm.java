@@ -128,7 +128,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             settings.setDrawWholeTrail(drawingStyleGroup.isSelected(1));
             
             /** Save the maps properties */
-            settings.setDrawMap(drawingMapsGroup.getSelectedIndex());
+            MapProviderManager.manager().setSelectedMapProvider(drawingMapsGroup.getSelectedIndex());
 
             /** Save the grids identifier */
             settings.setGrid(GridFormatterManager.getGridFormattersIdentifier()[gridGroup.getSelectedIndex()]);
@@ -259,12 +259,12 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         
         /** Map display options */
         // String[] drawingMaps = {"Don't draw maps","Draw OSM maps","Draw T@H maps"};
-        String[] drawingMaps= MapProviderManager.getDisplayStrings();
+        String[] drawingMaps= MapProviderManager.manager().getDisplayStrings();
         drawingMapsGroup = new ChoiceGroup(
                 LocaleManager.getMessage("display_settings_form_map_display"),
                 ChoiceGroup.EXCLUSIVE, drawingMaps, null);
         
-        drawingMapsGroup.setSelectedIndex(settings.getDrawMap(), true);
+        drawingMapsGroup.setSelectedIndex(MapProviderManager.manager().getSelectedIndex(), true);
          
         this.append(drawingMapsGroup);
         

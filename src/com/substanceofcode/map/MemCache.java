@@ -46,19 +46,18 @@ public class MemCache implements TileCache {
                                         //get added
     protected String threadName;
     
-    private MemCache(String name) {
-        this();
-        threadName = threadName + " " + name;
-    }
+    private MercatorMapProvider mapProvider;
 
-    public MemCache() {
+
+    public MemCache(MercatorMapProvider mP) {
+        mapProvider = mP;
         threadName = "MEM: " + Thread.currentThread().toString();
         Logger.debug(threadName + " Initializing MemCache");
          ht = new Hashtable();      
     }
 
     public boolean checkCache(int x, int y, int z) {
-        return checkCache(MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y);
+        return checkCache(mapProvider.getIdentifier() + "-" + z + "-" + x + "-" + y);
     }
 
     public boolean checkCache(String cacheKey) {      
@@ -80,7 +79,7 @@ public class MemCache implements TileCache {
      */
     public Tile getTile(int x, int y, int z) {       
         Tile t=null;        
-        String cacheKey = MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y;       
+        String cacheKey = mapProvider.getIdentifier() + "-" + z + "-" + x + "-" + y;       
         t=(Tile)ht.get(cacheKey);       
         return t;
     }

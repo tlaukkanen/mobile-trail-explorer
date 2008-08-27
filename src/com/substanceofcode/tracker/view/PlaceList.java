@@ -42,6 +42,7 @@ import com.substanceofcode.tracker.model.GridFormatterManager;
  * 
  * @author Tommi Laukkanen
  * @author Patrick Steiner
+ * @author kaspar
  */
 public class PlaceList extends List implements CommandListener {
     
@@ -58,6 +59,7 @@ public class PlaceList extends List implements CommandListener {
     private final Command exportAllPlacesCommand;
     private final Command importPlacesCommand;
     private final Command navigatePlaceCommand;
+    private final Command centerMapOnPlaceCommand;
     
     private static final String TITLE = LocaleManager.getMessage("places_list_title");
     
@@ -86,8 +88,10 @@ public class PlaceList extends List implements CommandListener {
                 new Command(LocaleManager.getMessage("places_list_menu_import"), Command.ITEM, 7));
         this.addCommand(navigatePlaceCommand =
                 new Command(LocaleManager.getMessage("places_list_menu_navigate"), Command.ITEM, 8));
+        this.addCommand(centerMapOnPlaceCommand =
+                new Command("Center Map On Place", Command.ITEM, 10));
         this.addCommand(backCommand =
-                new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 10));
+                new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 11));
 
         setSelectCommand(editCommand);
         
@@ -138,20 +142,18 @@ public class PlaceList extends List implements CommandListener {
         
         if(command == newPlaceCommand) {
             try {
-                GpsPosition lastPosition = controller.getPosition();
-                GridPosition gridPos = null;
+                //getting the center from the current map
+                GridPosition gridPos = controller.getTrailCanvas().getMapCenter();
                 Logger.debug("Creating grid formatter manager");
                 GridFormatterManager gfm = new GridFormatterManager(
                         controller.getSettings(),
                         GridFormatterManager.PLACE_FORM);
                 
-                if(lastPosition == null)
+                if(gridPos == null)
                 {
                     Logger.debug("Getting empty position");
                     gridPos = gfm.currentFormatter().getEmptyPosition();
                 } else {
-                    Logger.debug("Getting WSG84 position");
-                    gridPos = lastPosition.getWSG84Position();
                     Logger.debug("Converting position");
                     gridPos = gfm.currentFormatter().convertPosition(gridPos);
                 }
@@ -191,6 +193,14 @@ public class PlaceList extends List implements CommandListener {
             if(selectedPlace != null) {
                 controller.setNavigationPlace(selectedPlace);
             }
+        }
+        
+        if(command == centerMapOnPlaceCommand) {
+            Place selectedPlace = getSelectedPlace();
+            if(selectedPlace != null) {
+                controller.getTrailCanvas().setMapCenter(selectedPlace.getPosition());
+                controller.showTrail();
+    }
         }
     }
     

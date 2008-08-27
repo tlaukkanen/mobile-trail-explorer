@@ -19,10 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 package com.substanceofcode.map;
-
-import java.util.Vector;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
@@ -37,88 +34,60 @@ import com.substanceofcode.tracker.view.Logger;
  */
 public final class MapProviderManager {
     
-    private static Vector mapproviders=null;
+    private static MapProvider[] mapproviders = {new NullMapProvider(), new OsmMapProvider(), new TahMapProvider(), new LocalSwissMapProvider()};
+    private MapProvider selectedProvider = null;
+    private static MapProviderManager singleton = null;
     
-    private static MapProvider selectedProvider=null;
-    private static Controller controller;
-  
-    private MapProviderManager(){  
+    public static MapProviderManager manager() {
+        if (singleton == null) {
+            singleton = new MapProviderManager();
     }
-    /**
-     * This method populates the internal MapProviders Vector with the implemented 
-     * MapProviders. If you are adding a new MapProvider make sure it gets added 
-     * here, BELOW the NullMapProvider.
-     */
-    public static void initialize(){
-        mapproviders=new Vector();
-        
-        mapproviders.addElement(new NullMapProvider());
-        mapproviders.addElement(new OsmMapProvider());
-        mapproviders.addElement(new TahMapProvider());
-        
-        //None of these are implemented, they are some ideas for the future
-        //mapproviders.addElement(new CacheOnlyMapProvider());
-        //mapproviders.addElement(new YahooMapProvider());
-        controller=Controller.getController();
-        int selectedMap=controller.getSettings().getDrawMap();
-        Logger.debug("MapManager: selectedMap Idx ="+selectedMap);
-        setSelectedMapProvider(selectedMap);
+        return singleton;
     }
     
-    public static void addMapProvider(MapProvider map){  
-        mapproviders.addElement(map);
+    private MapProviderManager() {
+        //get the selected mapProvider from the store
+        String ident = Controller.getController().getSettings().getDrawMap();
+        selectedProvider = mapproviders[0]; //nullMapProvider as default value
+        for (int i = 0; i < mapproviders.length; i++) {
+            if (ident.equals(mapproviders[i].getIdentifier())) {
+                selectedProvider = mapproviders[i];
+                break;
+    }
+    }
+        selectedProvider.setState(MapProvider.ACTIVE);
     }
     
-    public static void removeMapProvider(MapProvider map){
-        mapproviders.removeElement(map);
+    public int getSelectedIndex() {
+        for (int i = 0; i < mapproviders.length; i++) {
+            if (mapproviders[i] == selectedProvider) {
+                return i;
+    }
+    }
+        //if not found => return default
+        return 0;
     }
     
-    public static int getIndex(MapProvider map){
-        return mapproviders.indexOf(map);
+    public MapProvider getSelectedMapProvider() {
+        return selectedProvider;
     }
     
-    public static Object getMapProvider(int index){
-        
-        return mapproviders.elementAt(index);
+    public void setSelectedMapProvider(int indx) {
+        if (selectedProvider != mapproviders[indx]) {
+            if(selectedProvider != null)
+            {
+                selectedProvider.setState(MapProvider.INACTIVE);
     }
-    /**
-     * Select the active map provider. This MUST get called before attempting to call any of the get
-     * @param index
-     */
-    public static void setSelectedMapProvider(int index){ 
-        Logger.debug("Changing MapProvider index to "+index);
-        selectedProvider=(MapProvider)mapproviders.elementAt(index);
+            selectedProvider = mapproviders[indx];
+            selectedProvider.setState(MapProvider.ACTIVE);
+            Controller.getController().getSettings().setDrawMap(selectedProvider.getIdentifier());
     }
-    
-    public static String getCacheDir(){        
-        return selectedProvider.getCacheDir();      
     }
     
-    public static String getUrlFormat(){
-      return selectedProvider.getUrlFormat();
-    }
-    
-    public static String getStoreName(){
-        return selectedProvider.getStoreName();
-    }
-
-    public static int validateZoomLevel(int z){
-        return selectedProvider.validateZoomLevel(z);
-    }
-    
-    public static String makeUrl(int x, int y ,int z){
-        return selectedProvider.makeurl( x, y, z);
-    }
-    
-    /**
-     * Retrieve the display strings from all registered MapProviders, and return 
-     * them all as a string array
-     * @return
-     */    
-    public static String [] getDisplayStrings(){
-        String [] displayStrings=new String [mapproviders.size()];
-        for (int i = 0;i<mapproviders.size();i++){
-            displayStrings[i]=((MapProvider)mapproviders.elementAt(i)).getDisplayString();
+    public String[] getDisplayStrings() {
+        String[] displayStrings = new String[mapproviders.length];
+        for (int i = 0; i < mapproviders.length; i++) {
+            displayStrings[i] = mapproviders[i].getDisplayString();
         }
         return displayStrings;
     }

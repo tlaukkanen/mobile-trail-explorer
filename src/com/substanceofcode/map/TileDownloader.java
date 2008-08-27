@@ -80,14 +80,16 @@ public class TileDownloader implements Runnable {
 
     private volatile Thread downloaderThread;
 
-    public TileDownloader(/* int MapSource */) {
+    private MercatorMapProvider mapProvider;
+
+    public TileDownloader(MercatorMapProvider mP) {
+        mapProvider = mP;
         Logger.debug("TileDownloader Constructor");
         // mpm=MapProviderManager.getInstance();
         // setMapSource(MapSource); // No need to do this any more, as we have a
         // Manager in place
         tileQueue = new Vector();
-        tc = new TileCacheManager();
-        tc.initialize();
+        tc = new TileCacheManager(mP);
     }
 
     public void start() {
@@ -206,12 +208,12 @@ public class TileDownloader implements Runnable {
     public void downloadTile(int x, int y, int zoom, boolean putAtTop) {
 
         try {
-            String targetUrl = MapProviderManager.makeUrl(x, y, zoom);
-            String destDir = MapProviderManager.getCacheDir() + "/" + zoom
+            String targetUrl = mapProvider.makeurl(x, y, zoom);
+            String destDir = mapProvider.getCacheDir() + "/" + zoom
                     + "/" + x + "/";
             String destFile = y + ".png";
             Tile t = new Tile(x, y, zoom, targetUrl, destDir, destFile,
-                    MapProviderManager.getStoreName());
+                    mapProvider.getIdentifier());
             // Invalid tile requested, return a blank tile
             if (x < 0 || y < 0) {
                 Logger.error("Invalid Tile requested x=" + x + ",y=" + y
@@ -344,8 +346,8 @@ public class TileDownloader implements Runnable {
         }
     }
 
-    public static String getCacheKey(int x, int y, int z) {
-        return MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y;
+    public String getCacheKey(int x, int y, int z) {
+        return mapProvider.getIdentifier() + "-" + z + "-" + x + "-" + y;
     }
 
     /**

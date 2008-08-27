@@ -85,6 +85,7 @@ import com.substanceofcode.tracker.view.SpeedometerCanvas;
 import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
 import com.substanceofcode.localization.LocaleManager;
 import com.substanceofcode.tracker.model.GpxStream;
+import com.substanceofcode.tracker.view.GeocodeForm;
 
 /**
  * Controller contains methods for the application flow.
@@ -161,6 +162,7 @@ public class Controller {
     private TrailActionsForm trailActionsForm;
     private SmsScreen smsScreen;
     private ImportTrailScreen importTrailScreen;
+    private GeocodeForm geocodeForm;
     /**
      * Display which we are drawing to
      */
@@ -228,6 +230,12 @@ public class Controller {
 
     }
 
+    
+    public Display getDisplay()
+    {
+        return display;
+    }
+
     public void executePoundShortcut() {
         short shortcut = settings.getPoundShortcut();
         executeShortcut( shortcut );
@@ -236,6 +244,14 @@ public class Controller {
     public void executeStarShortcut() {
         short shortcut = settings.getStarShortcut();
         executeShortcut( shortcut );
+    }
+    
+    public void showGeocode() {
+        if(geocodeForm == null)
+        {
+            geocodeForm = new GeocodeForm(this);
+        }
+        display.setCurrent(geocodeForm);
     }
     
     private void executeShortcut(short shortcut) {
@@ -611,7 +627,7 @@ public class Controller {
     /** Save new waypoint
      * @param waypoint Place to be saved.
      */
-    public void savePlace(Place waypoint) {
+    public void addPlace(Place waypoint) {
         if (places == null) {
             places = new Vector();
         }

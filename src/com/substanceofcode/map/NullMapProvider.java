@@ -28,11 +28,63 @@ import com.substanceofcode.localization.LocaleManager;
  * This map provider is used to represent the case where we don't actually want to draw any maps.
  * We still need to provide some strings though e.g "Don't draw Maps"
  * @author gareth
+ * @author kaspar
  *
  */
-public class NullMapProvider extends AbstractMapProvider {
+public class NullMapProvider extends MercatorMapProvider 
+{
+    int zoomLevel = 12;
 
-    public NullMapProvider() {
-        displayString=LocaleManager.getMessage("null_map_provider_displaystring");
+    public String getIdentifier() 
+    {
+        return "nullmaps";
     }
+
+    public String getDisplayString() 
+    {
+        return LocaleManager.getMessage("null_map_provider_displaystring");
+}
+
+    public void setState(int state) 
+    {
+    }
+
+    /**
+     * just override the implementation of NullMapProvider
+     * @param mdc
+     */
+    public void drawMap(MapDrawContext mdc) {
+    }
+
+
+    public int validateZoomLevel(int z) 
+    {
+        return z;
+    }
+
+    public String getUrlFormat() 
+    {
+        //should never get called
+        return "NotSupported";
+    }
+
+    public void zoomIn() {
+        zoomLevel++;
+        
+        if(zoomLevel > 20)
+            zoomLevel = 20;
+    }
+
+    public void zoomOut() {
+        zoomLevel--;
+        
+        if(zoomLevel < 0)
+            zoomLevel = 0;
+    }
+
+    public int getZoomLevel() {
+        return zoomLevel;
+    }
+
+
 }

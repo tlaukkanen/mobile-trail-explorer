@@ -22,16 +22,89 @@
 
 package com.substanceofcode.map;
 
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.tracker.view.CanvasPoint;
+import java.util.Vector;
+
 /**
  * Defines the methods we expect on a MapProvider implementation
+ * 
  * @author gareth
- *
+ * @author kaspar
  */
-public interface MapProvider {
+public interface MapProvider 
+{    
+    /**
+     * see getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels)
+     */
+    public final static int NORTH = 1;
+    public final static int SOUTH = 2;
+    public final static int EAST = 4;
+    public final static int WEST = 8;
+    
+    /**
+     * see setState(int state)
+     */
+    public final static int ACTIVE = 1;
+    public final static int INACTIVE = 2;
+    
+    
+    /**
+ *
+     * @return the identifier of the mapprovider. this identifier is only used internally
+ */
+    public String getIdentifier();
+    
+    /**
+     * 
+     * @return the localized string displayed to the user
+     */
     public String getDisplayString();          
-    public String getStoreName();
-    public String getCacheDir();
-    public String getUrlFormat();
-    public String makeurl(int x, int y, int z);
-    public int validateZoomLevel(int z);
+    
+    /**
+     * zoom in and out
+     */
+    public void zoomIn();
+    public void zoomOut();
+    public int getZoomLevel();
+    
+    /**
+     * the MapProvider is notified, if it has become ACTIVE or INACITVE.
+     * when it has become INACTIVE, be sure to release all caches...
+     * @param state the new state
+     */
+    public void setState(int state);
+    
+    /**
+     * 
+     * @param mdc
+     * @param position
+     * @return
+     */
+    public CanvasPoint convertPositionToScreen(MapDrawContext mdc, GridPosition position);
+    
+    public void drawMap(MapDrawContext mdc);
+    public void drawTrail(MapDrawContext mdc, Track trail, int color, boolean drawWholeTrail, int numPositionsToDraw);
+    public void drawPlaces(MapDrawContext mdc, Vector places);
+    public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels);
+    public double getPixelSize(MapDrawContext mdc);
+    
+    
+    /*
+     * - drawMap(Graphics g, GridPosition mapCenter, int zoomLevel)
+- drawTrail(g, mapCenter, zoomLevel, trailToDraw, int color)
+- drawPlaces(g, mapCenter, zoomLevel, placesToDraw)
+- drawCurrentLocation(g, mapCenter, zoomLevel, GridPosition currentLocation)
+- (GridPosition) getCenterPositionWhenMoving(mapCenter, zoomLevel, int direction /*NORTH, WEST, EAST, SOUTH )
+
+
+- gotoPlace server/lokal 
+- lookupPlace/gotoPlace
+
+lokal
+- file für jeden buchstaben*/
+    
+    
+    
 }

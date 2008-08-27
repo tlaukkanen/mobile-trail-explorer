@@ -56,10 +56,23 @@ public class TileCacheManager implements Runnable {
     private boolean rmsEnabled=false;
     private boolean fileCacheEnabled = true;//Controller.getController().getUseFileCache();
     private static int THREADDELAY=200;
-    public TileCacheManager() {
+    
+    private MercatorMapProvider mapProvider;
+    
+    public TileCacheManager(MercatorMapProvider mP) {
+        mapProvider = mP;
         //this.storename = storename;
         cacheManagerThread = new Thread(this);
         cacheManagerThread.start();
+        
+        Logger.debug("Initializing TileCacheManager, storename=" + mapProvider.getIdentifier());
+        //this.storename = storename;
+//        rmsCache = new RMSCache(storename);
+        
+        memCache = new MemCache(mP);
+        if (fileCacheEnabled) {
+            fileCache = new FileCache();
+    }
     }
     /**
      * Invalidates all work queues
@@ -74,15 +87,6 @@ public class TileCacheManager implements Runnable {
         Logger.debug("TCM:Caches cleared");
     }
 
-    public void initialize() {
-        Logger.debug("Initializing TileCacheManager, storename=" + MapProviderManager.getStoreName());
-        //this.storename = storename;
-//        rmsCache = new RMSCache(storename);
-        memCache = new MemCache();
-        if (fileCacheEnabled) {
-            fileCache = new FileCache();
-        }
-    }
 
     /**
      * Create an Image from the input stream data, then save it to the cache(s)
@@ -235,7 +239,7 @@ public class TileCacheManager implements Runnable {
      */
     public int checkCache(int x, int y, int z) {
         int result = 0;
-        String tileName = MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y;
+        String tileName = mapProvider.getIdentifier() + "-" + z + "-" + x + "-" + y;
         if (memCache.checkCache(tileName)) {
             try {
                 if (memCache.getTile(tileName) != null) {
@@ -299,7 +303,7 @@ public class TileCacheManager implements Runnable {
         Image i = null;
         try {
             t = (Tile) memCache
-                    .getTile(MapProviderManager.getStoreName() + "-" + z + "-" + x + "-" + y);
+                    .getTile(mapProvider.getIdentifier() + "-" + z + "-" + x + "-" + y);
             i = t.getImage();
         } catch (Exception e) {
             Logger.error("TCM: " + e.getMessage());

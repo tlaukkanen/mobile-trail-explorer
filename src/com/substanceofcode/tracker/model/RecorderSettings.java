@@ -63,6 +63,7 @@ public class RecorderSettings {
     private static final String USEJSR179="jsr179";
     private static final String USEFILECACHE="fileCache";
     private static final String USE_BLUETOOTH_FIX = "bluetoothFix";
+    private static final String GEOCODE = "geocode";
 
     /** Importing settings keys */
     private static final String IMPORT_FILE = "import-file";
@@ -107,9 +108,6 @@ public class RecorderSettings {
     private static final String STREAMING_FILE = "streaming-file";
     private static final String STREAMING_STARTED = "streaming-started";
 
-    /** Map drawing options */
-    public static final int DRAW_MAP_NONE = 0;
-    public static final int DRAW_MAP_OSM = 1;
 
     /** Shortcut key options */
     private static final String SHORTCUT_STAR = "shortcut-asterisk";
@@ -132,6 +130,25 @@ public class RecorderSettings {
             Logger.error("Error occured while creating an instance "
                     + "of Settings class: " + ex.toString());
         }
+    }
+
+    /**
+     * 
+     * @return the current geocodeProvider identifier
+     */
+    public String getGeocode()
+    {
+        return settings.getStringProperty(GEOCODE, "");
+    }
+    
+    /**
+     * set the geocode identifier
+     * @param identifier
+     */
+    public void setGeocode(String identifier)
+    {
+        settings.setStringProperty(GEOCODE, identifier);
+        saveSettings();
     }
 
     /**
@@ -486,14 +503,13 @@ public class RecorderSettings {
     }
 
     /** Are we going to display background maps? */
-    public int getDrawMap() {
-        return settings.getIntProperty(DRAW_MAP,0);
+    public String getDrawMap() {
+        return settings.getStringProperty(DRAW_MAP,"");
     }
 
     /** Set the drawing style */
-    public void setDrawMap(int value) {       
-        settings.setIntProperty(DRAW_MAP, value);
-        MapProviderManager.setSelectedMapProvider(value);
+    public void setDrawMap(String mapIdentifier) {       
+        settings.setStringProperty(DRAW_MAP, mapIdentifier);
         saveSettings();
     }
     

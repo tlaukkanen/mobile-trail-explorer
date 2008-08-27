@@ -18,7 +18,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package com.substanceofcode.bluetooth;
 
 import java.io.IOException;
@@ -39,10 +38,8 @@ import com.substanceofcode.localization.LocaleManager;
 public class BluetoothGPSDeviceImpl 
         extends GpsDeviceImpl 
         implements Runnable, BluetoothDevice {
-    
-    private StreamConnection connection;
-    private InputStreamReader reader;
-    
+    //private StreamConnection connection;
+    //private InputStreamReader reader;
     private Thread thread;    
    
     /** 
@@ -50,19 +47,19 @@ public class BluetoothGPSDeviceImpl
      * of subclasses
      *
      */
-    public  BluetoothGPSDeviceImpl() {
+    public BluetoothGPSDeviceImpl() {
     }
     
     /** Creates a new instance of BluetoothDevice */
     public BluetoothGPSDeviceImpl(String address, String alias) {
-        super(address,alias);
+        super(address, alias);
         this.alias = alias;
         this.address = address;
     }
     
     public String getAddress() {
         String url;
-        url =  address;
+        url = address;
         return url;
     }
     
@@ -70,17 +67,24 @@ public class BluetoothGPSDeviceImpl
         return alias;
     }
     /** Connect to GPS device */
+    private boolean isConnected = false;
+
     public synchronized void connect() throws IOException {
-        Logger.debug("Connecting to "+this.getAlias());
-            connection = (StreamConnection) Connector.open("btspp://"
-                    + this.getAddress() + ":1", Connector.READ);
+        Logger.debug("Start thread Connecting to " + this.getAlias());
+
+        connection = (StreamConnection) Connector.open("btspp://" + this.getAddress() + ":1", Connector.READ);
             reader = new InputStreamReader(connection.openInputStream());
+
+        if (thread != null) {
+            return;
+        }
             thread = new Thread(this);
             thread.start();
     }
     
     /** Disconnect from bluetooth device */
     public synchronized void disconnect() {
+
         Logger.debug("Disconnecting from " + this.getAlias());
         try {
             if (reader != null) {
@@ -100,6 +104,8 @@ public class BluetoothGPSDeviceImpl
         connection = null;
         thread = null;
     }
+    private StreamConnection connection;
+    private InputStreamReader reader;
    
     public void run() {
         try {
@@ -115,14 +121,19 @@ public class BluetoothGPSDeviceImpl
                     int input;
                     
                     while ((input = reader.read()) != LINE_DELIMITER) {
+                        if (input == -1) {
+                            Logger.debug("bt:run -1");
+                            throw new IOException("got -1");
+                        }
                         output.append((char) input);
                         // The purpose of the sleep is to prevent bogus (like
                         // Nokia 6630) phones from crashing.
                         if (useBTFix) {
                             try {
                                 Thread.sleep(1);
-                            } catch (InterruptedException ie) {}
+                            } catch (InterruptedException ie) {
                         }
+                    }
                     }
 
                     try {
@@ -136,7 +147,7 @@ public class BluetoothGPSDeviceImpl
                         while (output.charAt(i) < '!' || output.charAt(i) > '~') {
                             i--;
                         }
-                        output.delete(i+1, output.length());
+                        output.delete(i + 1, output.length());
                     } catch (IndexOutOfBoundsException e) {
                         // Ignore but don't bother trying to parse, just loop
                         // around to the next iteration;
@@ -148,8 +159,7 @@ public class BluetoothGPSDeviceImpl
                     if (parser.isValidNMEASentence(nmeaString)) {
                         parser.parse(nmeaString);
                     }
-                }
-                // Most severe type of exception. Either thrown while connecting
+                } // Most severe type of exception. Either thrown while connecting
                 // or
                 // while reading. Wait some time before continuing, then
                 // disconnect, and reconnect... to be sure to be sure.
@@ -163,8 +173,7 @@ public class BluetoothGPSDeviceImpl
                         return;
                     }
                     controller.pause();
-                    controller
-                            .showError(LocaleManager.getMessage("bluetooth_gps_device_impl_ioexception"));
+                    controller.showError(LocaleManager.getMessage("bluetooth_gps_device_impl_ioexception"));
                     Logger.error("IOException occured in BluetoothGPSDevice.run()");
                     try {
                         Thread.sleep(BREAK);
@@ -187,10 +196,8 @@ public class BluetoothGPSDeviceImpl
                                     LocaleManager.getMessage("bluetooth_gps_device_impl_info_reconnected"));
                         } catch (IOException e) {
                             count++;
-                            controller
-                                    .showError(
-                                    LocaleManager.getMessage("bluetooth_gps_device_impl_error_reconnect")
-                                    + " " + count);
+                            controller.showError(
+                                    LocaleManager.getMessage("bluetooth_gps_device_impl_error_reconnect") + " " + count);
                             this.disconnect();
                             try {
                                 Thread.sleep(BREAK);
@@ -200,27 +207,21 @@ public class BluetoothGPSDeviceImpl
                     }
                 } catch (NullPointerException npe) {
                     Logger.warn(
-                            "UNEXPECTED EXCEPTION Caught in BluetoothGPSDevice.run(), attempting to continue: "
-                                    + npe.getMessage()+"\n"+npe.getClass());
+                            "UNEXPECTED EXCEPTION Caught in BluetoothGPSDevice.run(), attempting to continue: " + npe.getMessage() + "\n" + npe.getClass());
                     npe.printStackTrace();
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     Logger.warn(
-                            "UNEXPECTED EXCEPTION Caught in BluetoothGPSDevice.run(), attempting to continue: "
-                                    + e.toString());                    
+                            "UNEXPECTED EXCEPTION Caught in BluetoothGPSDevice.run(), attempting to continue: " + e.toString());
                 }
             }
         } catch (Throwable e) {
             if (e instanceof Error) {
-                Logger.fatal("UNEXPECTED ERROR! Caught in BluetoothGPSDevice.run() : "
-                        + e.toString());
+                Logger.fatal("UNEXPECTED ERROR! Caught in BluetoothGPSDevice.run() : " + e.toString());
             } else if (e instanceof Exception) {
-                Logger.fatal("UNEXPECTED Exception! Caught in BluetoothGPSDevice.run() : "
-                        + e.toString());
+                Logger.fatal("UNEXPECTED Exception! Caught in BluetoothGPSDevice.run() : " + e.toString());
             } else {
                 // Should never reach here, but.... never say never??
-                Logger.fatal("UNEXPECTED " + e.getClass().getName()
-                        + "! Caught in BluetoothGPSDevice.run() : " + e.toString());
+                Logger.fatal("UNEXPECTED " + e.getClass().getName() + "! Caught in BluetoothGPSDevice.run() : " + e.toString());
             }
         }
         Logger.info("Thread BluetoothGPSDevice.run() finished.");

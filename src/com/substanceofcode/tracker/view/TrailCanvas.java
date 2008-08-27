@@ -21,12 +21,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 package com.substanceofcode.tracker.view;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Vector;
 
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
@@ -35,21 +33,20 @@ import javax.microedition.lcdui.game.Sprite;
 
 import com.substanceofcode.gps.GpsGPGSA;
 import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.map.MapLocator;
 import com.substanceofcode.map.MapProviderManager;
-import com.substanceofcode.map.TileDownloader;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.GridFormatterManager;
-import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.tracker.model.RecorderSettings;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
-import com.substanceofcode.util.ProjectionUtil;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
+import com.substanceofcode.map.MapDrawContext;
+import com.substanceofcode.map.MapProvider;
+import com.substanceofcode.tracker.grid.GridPosition;
 import com.substanceofcode.tracker.model.SpeedFormatter;
 
 /**
@@ -61,45 +58,23 @@ import com.substanceofcode.tracker.model.SpeedFormatter;
  */
 public class TrailCanvas extends BaseCanvas {
 
-    private GpsPosition lastPosition;
-    private CanvasPoint lastCanvasPoint;
+    //when mapCenter==null then lastPosition is used as mapCenter
+    private GridPosition mapCenter = null;
+    private GpsPosition lastPosition = null;
     private GpsGPGSA gpgsa = null;
-
     private int counter;
     private String error;
-
     /** Trail drawing helpers */
     private int midWidth;
     private int midHeight;
     private int movementSize;
-    private int verticalMovement;
-    private int horizontalMovement;
-
     private final int MAX_ZOOM = 20;
     private final int MIN_ZOOM = 1;
-
     private Image redDotImage;
     private Image compass;
     private Sprite compassArrows;
     private Sprite navigationArrows;
     private boolean largeDisplay;
-
-    private int zoom = 11; // Used by both the map and trail
-
-    // Variables needed by the map generator
-    // Order of map tile indexes:
-    // 0 1 2
-    // 3 4 5
-    // 6 7 8
-    private Image mapTiles[] = new Image[9];
-    // Offsets for the map tile indexes in the horizontal direction
-    static private final int m[] = new int[] { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
-    // Offsets for the map tile indexes in the vertical direction
-    static private final int n[] = new int[] { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
-    // The priority order of downloading the tiles. These are the indexes as depicted above
-    static private final int tilePriorities[] = new int[] { 4, 1, 3, 5, 7, 0, 2, 6, 8 };
-
-    private TileDownloader tileDownloader = null;
 
     /**
      * Creates a new instance of TrailCanvas
@@ -110,63 +85,102 @@ public class TrailCanvas extends BaseCanvas {
         super();
         this.setLastPosition(initialPosition);
         
-        verticalMovement = 0;
-        horizontalMovement = 0;
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
         counter = 0;
 
-        calculateDisplaySize(getWidth(),getHeight()) ;        
+        calculateDisplaySize(getWidth(), getHeight());
+    }
+
+    /** 
+     * 
+     * @return the current center of the map. never use variable mapCenter, since it is null when the map is fixed on currentlocation
+     */
+    public GridPosition getMapCenter() {
+        if (mapCenter != null) {
+            return mapCenter;
+        }
+        if (lastPosition != null) {
+            return lastPosition.getWSG84Position();
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param pos set the center of the map. if set to null, then map will follow currentPosition
+     */
+    public void setMapCenter(GridPosition pos) {
+        mapCenter = pos;
     }
 
     /** 
      * Paint trails and maps
      * @param g 
      */
-    public void paint(Graphics g) {
+    public void paint(Graphics gr) {
+        
+        Image buffer = Image.createImage(getWidth(), getHeight());
+        Graphics g = buffer.getGraphics();
+        
         try {
             final int height = getHeight();
             final int width = getWidth();
+
 
             /** 
              * Some phones like N95 can resize their screen 
              * (e.g rotating the Display)
              */
-            if(width/2 != midWidth || height/2 !=midHeight ) {
-                calculateDisplaySize(width,height) ;
+            if (width / 2 != midWidth || height / 2 != midHeight) {
+                calculateDisplaySize(width, height);
             }
             
             /** Get last position from recorder */
             final GpsPosition temp = controller.getPosition();
             if (temp != null) {
-                this.lastPosition = controller.getPosition();
-                this.setLastPosition(lastPosition);
+                setLastPosition(temp);
                 gpgsa = temp.getGpgsa();
-                if (gpgsa==null){
-                    gpgsa=lastPosition.getGpgsa();
                 }
-            }
             
             /** Fill background with backgroundcolor */
-            g.setColor( Theme.getColor(Theme.TYPE_BACKGROUND) );
+            g.setColor(Theme.getColor(Theme.TYPE_BACKGROUND));
             g.fillRect(0, 0, width, height);
 
             RecorderSettings settings = controller.getSettings();
 
             // Draw maps first, as they will fill the screen
             // and we don't want to occlude other items
+
+            MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
+            MapDrawContext mdc = new MapDrawContext(g, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight());
+
             try {
-                if (controller.getStatusCode() == Controller.STATUS_RECORDING) {
-                    drawMaps(g, settings.getDrawMap());
+                if (getMapCenter() != null) {
+                    mapProvider.drawMap(mdc);
                 }
             } catch (Exception ex) {
                 Logger.fatal("drawMaps Exception: " + ex.getMessage());
                 ex.printStackTrace();
             }
             /** Draw status bar */
+            try {
             drawStatusBar(g);
+            } catch (Exception ex) {
+                Logger.fatal("drawStatusBar Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
 
-            /** Draw places */
-            drawPlaceMarks(g);
+            /** Draw places
+             */
+            try {
+                if (getMapCenter() != null) {
+                    mapProvider.drawPlaces(mdc, controller.getPlaces());
+                }
+            } catch (Exception ex) {
+                Logger.fatal("drawPlaces Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
 
             /** Draw ghost trail */
             // TODO: Draw all the saved tracks to 'ghost' PNGs, then display
@@ -174,35 +188,79 @@ public class TrailCanvas extends BaseCanvas {
             // the code used for maps
             // This could be more efficient than drawing each track
             Track ghostTrail = controller.getGhostTrail();
-            drawTrail(g, ghostTrail, Theme.getColor(Theme.TYPE_GHOSTTRAIL), true);
+            //drawTrail(g, ghostTrail, Theme.getColor(Theme.TYPE_GHOSTTRAIL), true);
+            try {
+                if (getMapCenter() != null) {
+                    mapProvider.drawTrail(mdc, ghostTrail, Theme.getColor(Theme.TYPE_GHOSTTRAIL), true,
+                            controller.getSettings().getNumberOfPositionToDraw());
+                }
+            } catch (Exception ex) {
+                Logger.fatal("drawGhostTrail Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
 
             /** Draw current trail */
             Track currentTrail = controller.getTrack();
-            drawTrail(g, currentTrail, Theme.getColor(Theme.TYPE_TRAIL), settings.getDrawWholeTrail());
+            // drawTrail(g, currentTrail, Theme.getColor(Theme.TYPE_TRAIL), settings.getDrawWholeTrail());
+            try {
+                if (getMapCenter() != null) {
+                    mapProvider.drawTrail(mdc, currentTrail, Theme.getColor(Theme.TYPE_TRAIL), settings.getDrawWholeTrail(),
+                            controller.getSettings().getNumberOfPositionToDraw());
+                }
+            } catch (Exception ex) {
+                Logger.fatal("drawCurrentTrail Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
 
             /** Draw current location with red dot */
-            g.drawImage(redDotImage, midWidth + horizontalMovement, midHeight
-                    + verticalMovement, Graphics.VCENTER | Graphics.HCENTER);
+            // Logger.debug("c: "+lastPosition + " lastPos: " + lastPosition.getWSG84Position());
+            try {
+                if (getMapCenter() != null) {
+                    CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWSG84Position());
+                    g.drawImage(redDotImage, currLocPoint.X, currLocPoint.Y, Graphics.VCENTER | Graphics.HCENTER);
+                }
+            } catch (Exception ex) {
+                Logger.fatal("drawCurrentLocation Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
             
             /** Draw naviagation status */
-            if(controller.getNavigationStatus() == true) {
+            try {
+                if (controller.getNavigationStatus() == true) {
                 drawNavigationStatus(g);
+            }
+            } catch (Exception ex) {
+                Logger.fatal("drawNavigationStatus Exception: " + ex.getMessage());
+                ex.printStackTrace();
             }
 
             /** Draw compass */
+            try {
             drawCompass(g);
+            } catch (Exception ex) {
+                Logger.fatal("drawCompass Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
 
             /** Draw zoom scale bar */
+            try {
             drawZoomScaleBar(g);
+            } catch (Exception ex) {
+                Logger.fatal("drawZoomScaleBar Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+            
+            gr.drawImage(buffer, 0, 0, Graphics.TOP | Graphics.LEFT);
+            
         } catch (Exception e) {
-            Logger.debug("Caught exception:" + e.getMessage());
+            Logger.debug("Caught exception tc.paint: " + e.getMessage());
         }
+        
     }
 
     public void setLastPosition(GpsPosition position) {
         if (position != null) {
-            this.lastPosition = position;
-            setLastPosition(position.latitude, position.longitude, zoom);
+            lastPosition = position;
         }
     }
 
@@ -211,19 +269,16 @@ public class TrailCanvas extends BaseCanvas {
         midHeight = height / 2;
         movementSize = width / 8;              
 
-        Image tempCompassArrows = ImageUtil
-                .loadImage("/images/compass-arrows.png");
+        Image tempCompassArrows = ImageUtil.loadImage("/images/compass-arrows.png");
         compass = ImageUtil.loadImage("/images/compass.png");
         
          // Check for high resolution (eg. N80 352x416)
         if (width > 250) {
             // Double the compass size
             largeDisplay = true;
-            compass = ImageUtil.scale(compass, compass.getWidth() * 2, compass
-                    .getHeight() * 2);
+            compass = ImageUtil.scale(compass, compass.getWidth() * 2, compass.getHeight() * 2);
             tempCompassArrows = ImageUtil.scale(tempCompassArrows,
-                    tempCompassArrows.getWidth() * 2, tempCompassArrows
-                            .getHeight() * 2);
+                    tempCompassArrows.getWidth() * 2, tempCompassArrows.getHeight() * 2);
             compassArrows = new Sprite(tempCompassArrows, 22, 22);
             compassArrows.setPosition(width - 44, 22);
         } else {
@@ -233,219 +288,6 @@ public class TrailCanvas extends BaseCanvas {
         }
     }
     
-    /**
-     * 
-     * @param g
-     * @param drawMap
-     */
-    private void drawMaps(Graphics g, int drawMap) {
-        // conditionally draw background map tiles
-
-
-        if (drawMap != RecorderSettings.DRAW_MAP_NONE) {
-
-            if (tileDownloader == null) {
-                Logger.debug("Starting TileDownloader Instance:");
-                tileDownloader = new TileDownloader();
-                tileDownloader.start();
-            }
-            if (lastPosition != null) {
-                // System.out.println("lastPos not null");
-                if (tileDownloader != null
-                        && tileDownloader.isStarted() == true) {
-                    // System.out.println("td not null and td was started");
-                    int[] pt = MapLocator.conv(lastPosition.latitude, lastPosition.longitude, zoom);
-
-                    // System.out.println("zoom = "+zoom);
-
-                    // Get the tile images in the priority order. Unavailable images are returned as null
-                    for (int i = 0; i < tilePriorities.length; i++) {
-                    try {
-                		    int imageIndex = tilePriorities[i];
-                		    mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], zoom, false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                	    }
-                    }
-
-                    // Alpha blending
-                    /*
-                     * int [] rgbData=null; images[0].getRGB(rgbData, 0, 256, 0,
-                     * 0, 256, 256); int col = rgbData[1]&0x00FFFFFF; int alpha =
-                     * 128<<24; col+=alpha; rgbData[1]=col;
-                     * 
-                     * g.drawRGB(rgbData,0,256,0,0,256,256,true);
-                     * 
-                     */
-                    
-                    // Blit the images to the canvas
-                    int x = midWidth - pt[2] + horizontalMovement; // The top left corner
-                    int y = midHeight - pt[3] + verticalMovement;  // of the middle tile
-                    int anchor = Graphics.TOP | Graphics.LEFT;
-                    for (int i = 0; i < 9; i++) {
-                	    if (mapTiles[i] != null) {
-                		    g.drawImage(mapTiles[i], x + (m[i] * TileDownloader.TILE_SIZE), y + (n[i] * TileDownloader.TILE_SIZE), anchor);
-                	    }
-                    }
-                }
-            }
-        } else {
-            // Thread is started so we need to stop it
-            if (tileDownloader != null && tileDownloader.isStarted() == true) {
-                tileDownloader.stop();
-                tileDownloader = null;
-            }
-        }
-    }
-
-    /** Draw places */
-    private void drawPlaceMarks(Graphics g) {
-
-        // Draw information about the places
-        Vector places = controller.getPlaces();
-        if (places == null) {
-            return;
-        }
-
-        // Draw places
-        int placeCount = places.size();
-        g.setColor( Theme.getColor(Theme.TYPE_PLACEMARK));
-        for (int placeIndex = 0; placeIndex < placeCount; placeIndex++) {
-
-            Place place = (Place) places.elementAt(placeIndex);
-            double lat = place.getLatitude();
-            double lon = place.getLongitude();
-            CanvasPoint point = convertPosition(lat, lon);
-            if (point != null) {
-                g.drawString(place.getName(), point.X + 2, point.Y - 1,
-                        Graphics.BOTTOM | Graphics.LEFT);
-                g.drawRect(point.X - 1, point.Y - 1, 2, 2);
-            }
-        }
-    }
-
-    /** Set last position */
-    private void setLastPosition(double lat, double lon, int zoom) {
-        lastCanvasPoint = ProjectionUtil.toCanvasPoint(lat, lon, zoom);
-    }
-
-    /** Convert position to canvas point */
-    private CanvasPoint convertPosition(double lat, double lon) {
-
-        CanvasPoint merc = ProjectionUtil.toCanvasPoint(lat, lon, zoom);
-
-        int relativeX = (merc.X - lastCanvasPoint.X) + midWidth
-                + horizontalMovement;
-        int relativeY = (merc.Y - lastCanvasPoint.Y) + midHeight
-                + verticalMovement;
-
-        // midWidth + horizontalMovement
-        // midHeight + verticalMovement
-
-        // final int TILE_SIZE = 256;
-        // double scale = (1 << zoom);
-
-        // System.out.println("diffx: " + (int)relativeX);
-        // System.out.println("lastpoint: " + (int)(lastCanvasPoint.X));
-
-        CanvasPoint relativePoint = new CanvasPoint((int) (relativeX),
-                (int) (relativeY));
-        return relativePoint;
-
-        /*
-         * double latitude = lat; double longitude = lon;
-         * 
-         * if (lastPosition == null) { return null; }
-         * 
-         * double currentLatitude = lastPosition.latitude; double
-         * currentLongitude = lastPosition.longitude; // Current latitude will
-         * be zero, hence in the middle of the screen latitude -=
-         * currentLatitude; latitude *= verticalZoomFactor; int y = midHeight +
-         * verticalMovement - (int) latitude;
-         * 
-         * longitude -= currentLongitude; longitude *= horizontalZoomFactor; int
-         * x = (int) longitude + midWidth + horizontalMovement;
-         * 
-         * CanvasPoint point = new CanvasPoint(x, y); return point;
-         */
-    }
-
-    /** Draw trail with a given color */
-    private void drawTrail(Graphics g, Track trail, int color,
-            boolean drawWholeTrail) {
-        try {
-            if (trail == null) {
-                return;
-            }
-
-            g.setColor(color);
-
-            // TODO: implement the drawing based solely on numPositions.
-            final int numPositionsToDraw = controller.getSettings()
-                    .getNumberOfPositionToDraw();
-
-            final int numPositions;
-            synchronized (trail) {
-                /*
-                 * Synchronized so that no element can be added or removed
-                 * between getting the number of elements and getting the
-                 * elements themselfs.
-                 */
-                numPositions = trail.getPositionCount();
-
-                /** Set increment value */
-                int increment;
-                if (drawWholeTrail) {
-                    increment = numPositions / numPositionsToDraw;
-                    if (increment < 1) {
-                        increment = 1;
-                    }
-                } else {
-                    increment = 1;
-                }
-
-                int positionsDrawn = 0;
-
-                try {
-                    if (trail != null && trail.getEndPosition() != null) {
-                        double lastLatitude = trail.getEndPosition().latitude;
-                        double lastLongitude = trail.getEndPosition().longitude;
-
-                        for (int index = numPositions - 2; index >= 0; index -= increment) {
-                            GpsPosition pos = trail.getPosition(index);
-
-                            double lat = pos.latitude;
-                            double lon = pos.longitude;
-                            CanvasPoint point1 = convertPosition(lat, lon);
-                            // debugging...
-                            // if(index == numPositions - 2) {
-                            // System.out.println("coord: " + point1.X + "," +
-                            // point1.Y);
-                            // }
-                            CanvasPoint point2 = convertPosition(lastLatitude,
-                                    lastLongitude);
-
-                            g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
-
-                            lastLatitude = pos.latitude;
-                            lastLongitude = pos.longitude;
-                            positionsDrawn++;
-                            if (!drawWholeTrail
-                                    && positionsDrawn > numPositionsToDraw) {
-                                break;
-                            }
-                        }
-                    }
-                } catch (NullPointerException npe) {
-                    Logger.error("NPE while drawing trail");
-                }
-            }
-        } catch (Exception ex) {
-            Logger.warn("Exception occured while drawing trail: "
-                    + ex.toString());
-        }
-    }
-
     /** Draw compass */
     protected void drawCompass(Graphics g) {
         if (lastPosition != null) {
@@ -453,9 +295,7 @@ public class TrailCanvas extends BaseCanvas {
             if (largeDisplay) {
                 fix = 20;
             }
-            g.drawImage(compass, compassArrows.getX() - fix, compassArrows
-                    .getY()
-                    - fix, 0);
+            g.drawImage(compass, compassArrows.getX() - fix, compassArrows.getY() - fix, 0);
             compassArrows.setFrame(lastPosition.getHeadingIndex());
             compassArrows.paint(g);
         }
@@ -464,16 +304,11 @@ public class TrailCanvas extends BaseCanvas {
     /** Draw zoom scale bar */
     private void drawZoomScaleBar(Graphics g) {
         String text = "", unit = "";
-        double lat, lon;
 
-        if (lastPosition != null) {
-            lat = lastPosition.latitude;
-            lon = lastPosition.longitude;
-        } else {
-            lat = 0;
-            lon = 0;
-        }
-        double pixelSize = ProjectionUtil.pixelSize(lat, lon, zoom);
+
+        MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
+        double pixelSize = mapProvider.getPixelSize(
+                new MapDrawContext(null, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight()));
         double barDist = 1;
         int scaleLength;
         int scaleParts;
@@ -500,23 +335,24 @@ public class TrailCanvas extends BaseCanvas {
             }
         }
 
-        while (barDist < pixelSize)
+        while (barDist < pixelSize) {
             barDist *= 10;
+        }
         barDist /= 10;
         if ((barDist * 5) < pixelSize) {
             barDist *= 5;
             scaleParts = 5;
         } else {
-            if ((barDist * 2) < pixelSize)
+            if ((barDist * 2) < pixelSize) {
                 barDist *= 2;
+            }
             scaleParts = 4;
         }
 
         scaleLength = (int) (scaleLength * barDist / pixelSize);
 
-        g.setColor( Theme.getColor(Theme.TYPE_LINE) ); // black color
-        g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT
-                + scaleLength, getHeight() - MARGIN_BOTTOM);
+        g.setColor(Theme.getColor(Theme.TYPE_LINE)); // black color
+        g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT + scaleLength, getHeight() - MARGIN_BOTTOM);
         g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT,
                 getHeight() - MARGIN_BOTTOM - 3);
         g.drawLine(MARGIN_LEFT + scaleLength, getHeight() - MARGIN_BOTTOM,
@@ -525,8 +361,7 @@ public class TrailCanvas extends BaseCanvas {
         /* Divide the complete scale bar into smaller parts */
         int scalePartLength = (int) (scaleLength / scaleParts);
         for (int i = 1; i < scaleParts; i++) {
-            g.drawLine(MARGIN_LEFT + scalePartLength * i, getHeight()
-                    - MARGIN_BOTTOM, MARGIN_LEFT + scalePartLength * i,
+            g.drawLine(MARGIN_LEFT + scalePartLength * i, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT + scalePartLength * i,
                     getHeight() - MARGIN_BOTTOM - 2);
         }
 
@@ -549,8 +384,7 @@ public class TrailCanvas extends BaseCanvas {
         g.drawString("0", MARGIN_LEFT - 1, getHeight() - MARGIN_BOTTOM - 2,
                 Graphics.BOTTOM | Graphics.LEFT);
         g.drawString(text + unit, MARGIN_LEFT + scaleLength - textWidth / 2,
-                getHeight() - MARGIN_BOTTOM - 2, Graphics.BOTTOM
-                        | Graphics.LEFT);
+                getHeight() - MARGIN_BOTTOM - 2, Graphics.BOTTOM | Graphics.LEFT);
     }
     
     /** Draw navigation arrow */
@@ -560,7 +394,7 @@ public class TrailCanvas extends BaseCanvas {
         
          Image tempNaviArrows = ImageUtil.loadImage("/images/compass-arrows.png");
         
-        if(largeDisplay) {
+        if (largeDisplay) {
             spriteSize = 22;
             
             ImageUtil.scale(tempNaviArrows, tempNaviArrows.getWidth() * 2,
@@ -570,8 +404,12 @@ public class TrailCanvas extends BaseCanvas {
             spriteSize = 11;
         }
 
+        MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
+        MapDrawContext mdc = new MapDrawContext(g, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight());
+        CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWSG84Position());
+        
         navigationArrows = new Sprite(tempNaviArrows, spriteSize, spriteSize);
-        navigationArrows.setPosition(midWidth + horizontalMovement - (spriteSize / 2), midHeight + verticalMovement - (spriteSize / 2));
+        navigationArrows.setPosition(currLocPoint.X - (spriteSize / 2), currLocPoint.Y - (spriteSize / 2));
 
         navigationArrows.setFrame(lastPosition.getCourseCourseIndex(course));
         navigationArrows.paint(g);
@@ -600,12 +438,17 @@ public class TrailCanvas extends BaseCanvas {
         Font currentFont = g.getFont();
         int fontHeight = currentFont.getHeight();
 
+        MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
+        MapDrawContext mdc = new MapDrawContext(g, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight());
+        CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWSG84Position());
+        
         g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": " + distanceString,
-                midWidth + horizontalMovement,
-                midHeight + verticalMovement + fontHeight, Graphics.TOP | Graphics.HCENTER);
+                currLocPoint.X,
+                currLocPoint.Y + fontHeight, Graphics.TOP | Graphics.HCENTER);
         g.drawString(LocaleManager.getMessage("trail_canvas_course") + ": " + courseString,
-                midWidth + horizontalMovement,
-                midHeight + verticalMovement + (fontHeight * 2), Graphics.TOP | Graphics.HCENTER);
+                currLocPoint.X,
+                currLocPoint.Y + (fontHeight * 2), Graphics.TOP | Graphics.HCENTER);
+
     }
 
     /** Draw status bar */
@@ -620,14 +463,13 @@ public class TrailCanvas extends BaseCanvas {
         int fontHeight = currentFont.getHeight();
 
         /** Draw status */
-        g.setColor( Theme.getColor(Theme.TYPE_TEXTVALUE));
+        g.setColor(Theme.getColor(Theme.TYPE_TEXTVALUE));
 
         String satelliteCount = String.valueOf(controller.getSatelliteCount());
-        g.drawString(LocaleManager.getMessage("trail_canvas_status") + ": " + controller.getStatusText() + " ("
-                + satelliteCount + ")", 1, 0, Graphics.TOP | Graphics.LEFT);
+        g.drawString(LocaleManager.getMessage("trail_canvas_status") + ": " + controller.getStatusText() + " (" + satelliteCount + ")", 1, 0, Graphics.TOP | Graphics.LEFT);
 
         /** Draw status */
-        g.setColor( Theme.getColor(Theme.TYPE_TEXT));
+        g.setColor(Theme.getColor(Theme.TYPE_TEXT));
         if (lastPosition != null) {
 
             int positionAdd = currentFont.stringWidth("LAN:O");
@@ -644,11 +486,9 @@ public class TrailCanvas extends BaseCanvas {
                 String[] gridLabels = gridFormatter.getLabels();
                 String[] gridData = gridFormatter.getStrings(lastPosition.getWSG84Position());
                 
-                for(int i=0; i< gridLabels.length ; i++)
-                {
+                for (int i = 0; i < gridLabels.length; i++) {
                     // draw label
-                    g.drawString(gridLabels[i], 1, fontHeight*displayRow, Graphics.TOP
-                        | Graphics.LEFT);
+                    g.drawString(gridLabels[i], 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
 
                     //draw value
                     g.drawString(gridData[i], positionAdd, fontHeight * displayRow,
@@ -662,8 +502,7 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw current time */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_TIME) == true) {
                 String timeStamp = DateTimeUtil.convertToTimeStamp(now);
-                g.drawString(LocaleManager.getMessage("trail_canvas_time") + ": ", 1, fontHeight * displayRow, Graphics.TOP
-                        | Graphics.LEFT);
+                g.drawString(LocaleManager.getMessage("trail_canvas_time") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 g.drawString(timeStamp, positionAdd, fontHeight * displayRow,
                         Graphics.TOP | Graphics.LEFT);
                 displayRow++;
@@ -672,21 +511,18 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw speed information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_SPEED) == true) {
                 String spd;
-                SpeedFormatter formatter = new SpeedFormatter( controller.getSettings() );
+                SpeedFormatter formatter = new SpeedFormatter(controller.getSettings());
                 spd = formatter.getSpeedString(lastPosition.speed);
 
-                g.drawString(LocaleManager.getMessage("trail_canvas_speed") + ": ", 1, fontHeight * displayRow, Graphics.TOP
-                        | Graphics.LEFT);
-                g.drawString(spd, positionAdd, fontHeight
-                        * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(LocaleManager.getMessage("trail_canvas_speed") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(spd, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }
 
             /** Draw heading information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_HEADING) == true) {
                 String heading = lastPosition.getHeadingString();
-                g.drawString(LocaleManager.getMessage("trail_canvas_heading") + ": ", 1, fontHeight * displayRow, Graphics.TOP
-                        | Graphics.LEFT);
+                g.drawString(LocaleManager.getMessage("trail_canvas_heading") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 g.drawString(heading, positionAdd, fontHeight * displayRow,
                         Graphics.TOP | Graphics.LEFT);
                 displayRow++;
@@ -700,7 +536,6 @@ public class TrailCanvas extends BaseCanvas {
                 double distanceInKilometers = track.getDistance();
                 if (settings.getUnitsAsKilometers() == false) {
                     /** Distance in feets */
-
                     double distanceInMiles = UnitConverter.convertLength(
                             distanceInKilometers,
                             UnitConverter.UNITS_KILOMETERS,
@@ -719,10 +554,8 @@ public class TrailCanvas extends BaseCanvas {
                         units = " m";
                     }
                 }
-                g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": ", 1, fontHeight * displayRow, Graphics.TOP
-                        | Graphics.LEFT);
-                g.drawString(distance + units, positionAdd, fontHeight
-                        * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(distance + units, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }
 
@@ -734,7 +567,6 @@ public class TrailCanvas extends BaseCanvas {
 
                 if (settings.getUnitsAsKilometers() == false) {
                     /** Altitude in feets */
-
                     double altitudeInFeets = UnitConverter.convertLength(
                             altitudeInMeters, UnitConverter.UNITS_METERS,
                             UnitConverter.UNITS_FEET);
@@ -746,25 +578,19 @@ public class TrailCanvas extends BaseCanvas {
                     altitude = StringUtil.valueOf(altitudeInMeters, 2);
                     units = " m";
                 }
-                g.drawString(LocaleManager.getMessage("trail_canvas_altitude") + ": ", 1, fontHeight * displayRow, Graphics.TOP
-                        | Graphics.LEFT);
-                g.drawString(altitude + units, positionAdd, fontHeight
-                        * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(LocaleManager.getMessage("trail_canvas_altitude") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(altitude + units, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }
 
             /** Draw any other gps info */
             if (gpgsa != null) {
-                g.drawString(LocaleManager.getMessage("trail_canvas_fix") + ": ", 1, fontHeight * displayRow, Graphics.TOP
-                        | Graphics.LEFT);
-                g.drawString("" + gpgsa.getFixtype(), positionAdd, fontHeight
-                        * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(LocaleManager.getMessage("trail_canvas_fix") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString("" + gpgsa.getFixtype(), positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
 
-                g.drawString(LocaleManager.getMessage("trail_canvas_pdop") + ": ", 1, fontHeight * displayRow, Graphics.TOP
-                        | Graphics.LEFT);
-                g.drawString("" + gpgsa.getPdop(), positionAdd, fontHeight
-                        * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(LocaleManager.getMessage("trail_canvas_pdop") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString("" + gpgsa.getPdop(), positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
 
                 // g.drawString("HDOP:", 1, fontHeight * displayRow,
@@ -803,13 +629,10 @@ public class TrailCanvas extends BaseCanvas {
              * and draw on separate lines. Only draw the string if it is less
              * than 10 seconds old, so that old messages aren't left on screen
              */
-            
-            g.setColor( Theme.getColor(Theme.TYPE_ERROR) );
-            long ageOfLastMessage = System.currentTimeMillis()
-                    - Logger.getLogger().getTimeOfLastMessage();
+            g.setColor(Theme.getColor(Theme.TYPE_ERROR));
+            long ageOfLastMessage = System.currentTimeMillis() - Logger.getLogger().getTimeOfLastMessage();
             if (ageOfLastMessage < 10000) {
-                String lastLoggedMessage = LocaleManager.getMessage("trail_canvas_log") + ": "
-                        + Logger.getLogger().getLastMessage();
+                String lastLoggedMessage = LocaleManager.getMessage("trail_canvas_log") + ": " + Logger.getLogger().getLastMessage();
                 String[] loglines = StringUtil.chopStrings(lastLoggedMessage,
                         " ", currentFont, getWidth());
 
@@ -822,8 +645,7 @@ public class TrailCanvas extends BaseCanvas {
 
             long secondsSinceLastPosition = -1;
             if (lastPosition.date != null) {
-                secondsSinceLastPosition = (now.getTime() - lastPosition.date
-                        .getTime()) / 1000;
+                secondsSinceLastPosition = (now.getTime() - lastPosition.date.getTime()) / 1000;
             }
 
             if (secondsSinceLastPosition > 5) {
@@ -863,8 +685,7 @@ public class TrailCanvas extends BaseCanvas {
                 } else if (secondsSinceLastPosition == -1) {
                     timeSinceLastPosition = "No Time Info Available";
                 } else {
-                    timeSinceLastPosition = secondsSinceLastPosition
-                            + " " +
+                    timeSinceLastPosition = secondsSinceLastPosition + " " +
                             LocaleManager.getMessage("trail_canvas_seconds");
                 }
 
@@ -877,19 +698,17 @@ public class TrailCanvas extends BaseCanvas {
             }
 
         } else if (controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
-            g.drawString(LocaleManager.getMessage("trail_canvas_no_gps_fix") + " " + counter, 1, fontHeight, Graphics.TOP
-                    | Graphics.LEFT);
+            g.drawString(LocaleManager.getMessage("trail_canvas_no_gps_fix") + " " + counter, 1, fontHeight, Graphics.TOP | Graphics.LEFT);
         }
 
         /** Draw error texts */
-        g.setColor( Theme.getColor( Theme.TYPE_ERROR) );
+        g.setColor(Theme.getColor(Theme.TYPE_ERROR));
         if (error != null) {
             g.drawString("" + error, 1, height - (fontHeight * 3 + 2),
                     Graphics.TOP | Graphics.LEFT);
         }
         if (controller.getError() != null) {
-            g.drawString("" + controller.getError(), 1, height
-                    - (fontHeight * 2 + 2), Graphics.TOP | Graphics.LEFT);
+            g.drawString("" + controller.getError(), 1, height - (fontHeight * 2 + 2), Graphics.TOP | Graphics.LEFT);
         }
 
         /** Draw recorded position count */
@@ -919,27 +738,12 @@ public class TrailCanvas extends BaseCanvas {
         /** Handle zooming keys */
         switch (keyCode) {
             case (KEY_NUM1):
-                if (zoom < MAX_ZOOM) {
-                    // Zoom in
-                    zoom++;
-                    //if we are drawing maps...
-                    if(controller.getSettings().getDrawMap() != RecorderSettings.DRAW_MAP_NONE){
-                        zoom=MapProviderManager.validateZoomLevel(zoom);
-                    }
-                    // Calculate last position so that it recalculates the
-                    // canvas positions.
-                    setLastPosition(lastPosition);
-                }
+                MapProviderManager.manager().getSelectedMapProvider().zoomIn();
                 break;
 
             case (KEY_NUM3):
-                if (zoom > MIN_ZOOM) {
                     // Zoom out
-                    zoom--;
-                    // Calculate last position so that it recalculates the
-                    // canvas positions.
-                    setLastPosition(lastPosition);
-                }
+                MapProviderManager.manager().getSelectedMapProvider().zoomOut();
                 break;
 
             case (KEY_NUM7):
@@ -961,21 +765,28 @@ public class TrailCanvas extends BaseCanvas {
              * some buttons.
              */
         }
+
+        MapDrawContext mdc = new MapDrawContext(null, getMapCenter(), MapProviderManager.manager().getSelectedMapProvider().getZoomLevel(), getWidth(), getHeight());
+
         if (gameKey == UP || keyCode == KEY_NUM2) {
-            verticalMovement += movementSize;
+
+            setMapCenter(MapProviderManager.manager().getSelectedMapProvider().getCenterPositionWhenMoving(mdc, MapProvider.NORTH, movementSize));
+        //verticalMovement += movementSize;
         }
         if (gameKey == DOWN || keyCode == KEY_NUM8) {
-            verticalMovement -= movementSize;
+            //verticalMovement -= movementSize;
+            setMapCenter(MapProviderManager.manager().getSelectedMapProvider().getCenterPositionWhenMoving(mdc, MapProvider.SOUTH, movementSize));
         }
         if (gameKey == LEFT || keyCode == KEY_NUM4) {
-            horizontalMovement += movementSize;
+            //horizontalMovement += movementSize;
+            setMapCenter(MapProviderManager.manager().getSelectedMapProvider().getCenterPositionWhenMoving(mdc, MapProvider.WEST, movementSize));
         }
         if (gameKey == RIGHT || keyCode == KEY_NUM6) {
-            horizontalMovement -= movementSize;
+            //horizontalMovement -= movementSize;
+            setMapCenter(MapProviderManager.manager().getSelectedMapProvider().getCenterPositionWhenMoving(mdc, MapProvider.EAST, movementSize));
         }
         if (gameKey == FIRE || keyCode == KEY_NUM5) {
-            verticalMovement = 0;
-            horizontalMovement = 0;
+            setMapCenter(null);
         }
         this.repaint();
     }

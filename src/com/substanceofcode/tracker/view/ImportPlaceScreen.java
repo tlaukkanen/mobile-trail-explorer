@@ -132,7 +132,7 @@ public class ImportPlaceScreen extends Form implements CommandListener {
                                 Enumeration wpEnum = places.elements();
                                 while (wpEnum.hasMoreElements() == true) {
                                     Place wp = (Place) wpEnum.nextElement();
-                                    controller.savePlace( wp );
+                                    controller.addPlace( wp );
                                 }
 
                             } catch (IllegalStateException e) {

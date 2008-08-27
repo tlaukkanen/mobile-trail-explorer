@@ -22,6 +22,8 @@
 
 package com.substanceofcode.tracker.grid;
 
+import java.util.Hashtable;
+
 /**
  * every implementation should have a constructor, which accepts a GridPosition as an
  * argument. using getAsWSG84Position() it can convert the data to its own grid.
@@ -30,7 +32,29 @@ package com.substanceofcode.tracker.grid;
  */
 public abstract class GridPosition implements GridIdentifiers
 {
+    private Hashtable convertCache = new Hashtable();
 
+    public GridPosition()
+    {
+        //we are 
+        convertCache.put(getIdentifier(), this);
+    }
+    
+    public GridPosition convertToGridPosition(String gridIdentifier)
+ {
+        GridPosition pos = (GridPosition) convertCache.get(gridIdentifier);
+
+        if (pos == null) {
+            for (int i = 0; i < GridIdentifiers.formatters.length; i++) {
+                if (GridIdentifiers.formatters[i].getIdentifier().equals(gridIdentifier)) {
+                    pos = GridIdentifiers.formatters[i].convertPosition(this);
+                    convertCache.put(gridIdentifier, pos);
+                }
+            }
+        }
+        return pos;
+    }
+    
     /**
      * returns the position as a instance of WSG84Position (used for convert positions)
      * @return

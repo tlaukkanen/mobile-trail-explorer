@@ -194,7 +194,7 @@ public class PlaceForm extends Form implements CommandListener, ItemStateListene
 
             if (editing == false) {
                 /** Create new waypoint */
-                controller.savePlace(place);
+                controller.addPlace(place);
                 controller.showPlacesList();
             } else {
                 /** Update existing waypoint */

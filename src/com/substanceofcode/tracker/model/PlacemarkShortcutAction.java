@@ -39,7 +39,7 @@ public class PlacemarkShortcutAction implements ShortcutAction {
             int waypointCount = controller.getPlaces().size();
             String name = "WP" + String.valueOf(waypointCount + 1);
             Place waypoint = new Place(name, lp.latitude, lp.longitude);
-            controller.savePlace(waypoint);
+            controller.addPlace(waypoint);
         }
     }
 }

@@ -105,8 +105,6 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
             new Updater(settingsVersion).start();
         }
         
-        //Initialize the MapProviderManager here, before any of the methods get called
-        MapProviderManager.initialize();
         
         // Initialize timeout thread
         this.displayTime = SPLASH_SCREEN_TIMEOUT;

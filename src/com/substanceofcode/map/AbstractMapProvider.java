@@ -22,113 +22,126 @@
 
 package com.substanceofcode.map;
 
+import com.substanceofcode.tracker.grid.GridPosition;
+import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.tracker.model.Track;
+import com.substanceofcode.tracker.view.CanvasPoint;
 import com.substanceofcode.tracker.view.Logger;
-import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.tracker.view.Theme;
+import java.util.Vector;
+import javax.microedition.lcdui.Graphics;
 
 /**
  * Extend this class to implement a new map provider
  * 
  */
-public abstract class AbstractMapProvider implements MapProvider {
-    protected String storeName="NotSet"; //a cache-unique name to identify this cache among the others
-    protected String UrlFormat="NotSet"; // The Url format used to get tiles
-    protected String cacheDir="NotSet";  // don't think this is needed any more
-    protected String displayString="NotSet";// The String used to select a Provider in the settings screen
+public abstract class AbstractMapProvider implements MapProvider 
+{
         
-    public AbstractMapProvider(){
+    public AbstractMapProvider()
+    {
              
     }
     
-    public String getCacheDir() {
-        return cacheDir;
+    public void drawTrail(MapDrawContext mdc, Track trail, int color, boolean drawWholeTrail, int numPositionsToDraw)
+    {
+
+        try {
+            if (trail == null) {
+                return;
      }
 
-     public String getStoreName() {
-        return storeName;
-     }
-
-     public String getUrlFormat() {
-         return UrlFormat;
-     }
+            Graphics g = mdc.getGraphics();
      
-     public String getDisplayString() {
-         return displayString;
-     }
+            g.setColor(color);
     
-    /**
-     * Constructs the url request for the given tile. 
-     * Urls should be defined in extending classes by setting the UrlFormat variable
-     * eg UrlFormat="http://tah.openstreetmap.org/Tiles/tile/X/X/X.png"; The 'X' characters are delimiters used to 
-     * indicate the position of the z,x and y coordinates respectively.
-     * Override this method if the format is significantly different.
-     * This function internally calls setX ,setY and setZ methods for each of the passed arguments, 
-     * if the map provider needs further processing before constructing the url add the relevant code to the setN methods.
-     *  
-     * @param format
-     * @param x the X tile coordinate
-     * @param y the y tile coordinate
-     * @param z the zoom level of the tile
-     * @return A URL suitable for calling via the Connection api.
-     * @throws Exception
-     */
+            // TODO: implement the drawing based solely on numPositions.
+            //final int numPositionsToDraw = controller.getSettings()
+            //        .getNumberOfPositionToDraw();
 
-    public String makeurl(int x, int y, int z) {
-        int coords[] =  configureCoords(x,y,z);        
-        StringBuffer output=null;
-        String[] bits = StringUtil.split(UrlFormat, "X");
-        try{
-         output= new StringBuffer(bits[0]);
-        
-            output.append(coords[2]);
-            output.append(bits[1]);
-            output.append(coords[0]);
-            output.append(bits[2]);
-            output.append(coords[1]);
-            output.append(bits[3]);
-        }catch(ArrayIndexOutOfBoundsException aioobe){
-            Logger.error("makeurl: x="+x+",y="+y+",z="+z+"\nUrl="+UrlFormat);
+            final int numPositions;
+            synchronized (trail) {
+                /*
+                 * Synchronized so that no element can be added or removed
+                 * between getting the number of elements and getting the
+                 * elements themselfs.
+     */
+                numPositions = trail.getPositionCount();
+
+                /** Set increment value */
+                int increment;
+                if (drawWholeTrail) {
+                    increment = numPositions / numPositionsToDraw;
+                    if (increment < 1) {
+                        increment = 1;
         }
-        return output.toString();
+                } else {
+                    increment = 1;
     }
     
-    private final int[] configureCoords(int x , int y, int z){              
-        int[] a = { setX(x),setY(y),setZ(z)};
-        return a;
+                int positionsDrawn = 0;
+    
+                try {
+                    if (trail != null && trail.getEndPosition() != null) 
+                    {    
+    
+                        CanvasPoint lastPoint = convertPositionToScreen(mdc, 
+                                trail.getEndPosition().getWSG84Position() );
+    
+                        for (int index = numPositions - 2; index >= 0; index -= increment) {
+                            GridPosition pos = trail.getPosition(index).getWSG84Position();
+
+                            CanvasPoint point1 = convertPositionToScreen(mdc, pos);
+                            // debugging...
+                            // if(index == numPositions - 2) {
+                            // System.out.println("coord: " + point1.X + "," +
+                            // point1.Y);
+                            // }
+                            CanvasPoint point2 = lastPoint;
+
+                            g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
+
+                            lastPoint = point1;
+                            
+                            positionsDrawn++;
+                            if (!drawWholeTrail
+                                    && positionsDrawn > numPositionsToDraw) {
+                                break;
+    }
+                        }
+                    }
+                } catch (NullPointerException npe) {
+                    Logger.error("NPE while drawing trail");
+                }
+            }
+        } catch (Exception ex) {
+            Logger.warn("Exception occured while drawing trail: "
+                    + ex.toString());
+        }
     }
     
-    /**
-     * Modify the input X value if necessary
-     * @param x
-     * @return
-     */
-    protected int setX(int x){
-        return x;
+    
+    public void drawPlaces(MapDrawContext mdc, Vector places)
+    {
+
+        // Draw places
+        int placeCount = places.size();
+        Graphics g = mdc.getGraphics();
+        
+        g.setColor( Theme.getColor(Theme.TYPE_PLACEMARK));
+        for (int placeIndex = 0; placeIndex < placeCount; placeIndex++) {
+
+            Place place = (Place) places.elementAt(placeIndex);
+            double lat = place.getLatitude();
+            double lon = place.getLongitude();
+            CanvasPoint point = convertPositionToScreen(mdc, place.getPosition());
+            
+            if (point != null) {
+                g.drawString(place.getName(), point.X + 2, point.Y - 1,
+                        Graphics.BOTTOM | Graphics.LEFT);
+                g.drawRect(point.X - 1, point.Y - 1, 2, 2);
+    }
+}
     }
     
-    /**
-     * Modify the input Y value if necessary
-     * @param y
-     * @return
-     */
-    protected int setY(int y){
-        return y;
-    }
-    
-    /**
-     * Modify the input Z value if necessary
-     * @param z
-     * @return
-     */
-    protected int setZ(int z){
-        return z;
-    }
-    
-    /**
-     * Default implementation
-     * @param z
-     * @return
-     */
-    public int validateZoomLevel(int z){
-        return z;
-    }
 }

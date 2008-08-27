@@ -485,8 +485,13 @@ public final class GpsPosition implements Serializable {
         }
     }
     
+    private WSG84Position wsg84Position = null;
     public WSG84Position getWSG84Position()
     {
-        return new WSG84Position(this);
+        if(wsg84Position == null)
+        {
+            wsg84Position = new WSG84Position(this);
     }
+        return wsg84Position;
+}
 }

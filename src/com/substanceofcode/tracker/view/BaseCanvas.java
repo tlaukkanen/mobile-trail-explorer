@@ -62,6 +62,7 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     private Command manageTrailsCommand;
     private Command managePlacesCommand;
     private Command switchThemeCommand;
+    private Command geocodeCommand;
 
     /*
      * private Command markWaypointCommand; private Command
@@ -99,9 +100,13 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         switchThemeCommand = new Command(LocaleManager.getMessage("menu_switch_theme"), Command.ITEM, 6);
         addCommand(switchThemeCommand);
 
+        geocodeCommand = new Command(LocaleManager.getMessage("menu_find_place"), Command.ITEM, 7);
+        addCommand(geocodeCommand);
+        
         // Exit command
         exitCommand = new Command(LocaleManager.getMessage("menu_exit"), Command.EXIT, 10);
         addCommand(exitCommand);
+        
     }
 
     /** 
@@ -127,7 +132,10 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
             if (command == exitCommand) {
                 controller.exit();
             }
+            if (command == geocodeCommand) {
+                controller.showGeocode();
         }
+    }
     }
     
     /** 
