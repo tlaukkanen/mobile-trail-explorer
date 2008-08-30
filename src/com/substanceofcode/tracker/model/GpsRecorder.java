@@ -43,6 +43,7 @@ import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
+import com.substanceofcode.util.DateTimeUtil;
 
 /**
  * Timer based class that encapsulates recording data from a GPS device.
@@ -449,7 +450,9 @@ public class GpsRecorder {
                                     String hea = String.valueOf(currentPosition.course);
                                     uploadURL = StringUtil.replace(uploadURL, "@HEA@", hea);
                                     String spd = String.valueOf(currentPosition.speed);
-                                    uploadURL = StringUtil.replace(uploadURL, "@SPD@", spd);                                    
+                                    uploadURL = StringUtil.replace(uploadURL, "@SPD@", spd);
+                                    String time = DateTimeUtil.getUniversalDateStamp(currentPosition.date);
+                                    uploadURL = StringUtil.replace(uploadURL, "@TIME@", time);
                                     serialize = false;
                                 }
                                 conn = (HttpConnection) Connector.open(uploadURL);
