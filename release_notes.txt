@@ -19,6 +19,7 @@ Peter Reinhart
 Release Notes:
 
 v1.13 (xxx xth 2008)
++ Option to prevent Map tiles from being downloaded over the network (Cached tiles will still be displayed)
 + Bug fix: When the locale is changed manually, it will be saved (From Kaspar)
 + Bug fix: LocaleManager does now respect the user-selected locale (From Kaspar)
 + Simplified the addition for additional locales (From Kaspar)
