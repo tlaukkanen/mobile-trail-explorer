@@ -64,6 +64,7 @@ public class RecorderSettings {
     private static final String USEFILECACHE="fileCache";
     private static final String USE_BLUETOOTH_FIX = "bluetoothFix";
     private static final String GEOCODE = "geocode";
+    private static final String USE_NETWORK_FOR_MAPS="use-network-for-maps";
 
     /** Importing settings keys */
     private static final String IMPORT_FILE = "import-file";
@@ -648,6 +649,17 @@ public class RecorderSettings {
     /** Set bluetooth reading fix */
     public void setUseBTFix(boolean value) {
 	    settings.setBooleanProperty(USE_BLUETOOTH_FIX, value);
+	    saveSettings();
+    }
+    
+       /** Get bluetooth reading fix */
+    public boolean getUseNetworkForMaps() {
+	    return settings.getBooleanProperty(USE_NETWORK_FOR_MAPS, true);
+    }
+
+    /** Set bluetooth reading fix */
+    public void setUseNetworkForMaps(boolean value) {
+	    settings.setBooleanProperty(USE_NETWORK_FOR_MAPS, value);
 	    saveSettings();
     }
     

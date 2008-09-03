@@ -61,6 +61,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
     private ChoiceGroup drawingStyleGroup;
     
     private ChoiceGroup drawingMapsGroup;
+    
+    private ChoiceGroup otherMapSettingsGroup;
 
     private ChoiceGroup gridGroup;
 
@@ -129,6 +131,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             
             /** Save the maps properties */
             MapProviderManager.manager().setSelectedMapProvider(drawingMapsGroup.getSelectedIndex());
+            
+            settings.setUseNetworkForMaps(otherMapSettingsGroup.isSelected(0));
 
             /** Save the grids identifier */
             settings.setGrid(GridFormatterManager.getGridFormattersIdentifier()[gridGroup.getSelectedIndex()]);
@@ -264,11 +268,16 @@ public class DisplaySettingsForm extends Form implements CommandListener {
                 LocaleManager.getMessage("display_settings_form_map_display"),
                 ChoiceGroup.EXCLUSIVE, drawingMaps, null);
         
-        drawingMapsGroup.setSelectedIndex(MapProviderManager.manager().getSelectedIndex(), true);
-         
+        drawingMapsGroup.setSelectedIndex(MapProviderManager.manager().getSelectedIndex(), true);         
         this.append(drawingMapsGroup);
         
-
+        String[] otherMapSettings={"Use Network for maps"};
+           otherMapSettingsGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_other_map_settings"),
+                ChoiceGroup.MULTIPLE, otherMapSettings, null);
+           otherMapSettingsGroup.setSelectedIndex(0, controller.getUseNetworkForMaps());
+        this.append(otherMapSettingsGroup);
+        
+        /** Backlight options */
         String[] backlight = { LocaleManager.getMessage("display_settings_form_backlight_phone") /* Allow Off */,
                 LocaleManager.getMessage("display_settings_form_backlight_force") };
         backlightGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_form_backlight"),

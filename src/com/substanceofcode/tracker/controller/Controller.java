@@ -1305,6 +1305,15 @@ public class Controller {
     public boolean getUseBTFix() {
 	    return settings.getUseBTFix();
     }
+    
+    public boolean getUseNetworkForMaps() {
+        return settings.getUseNetworkForMaps();	    
+    }
+    
+    public void setUseNetworkForMaps(boolean b) {
+	settings.setUseNetworkForMaps(b);
+    }
+
 
     public boolean getNavigationStatus() {
         return navigationOn;
