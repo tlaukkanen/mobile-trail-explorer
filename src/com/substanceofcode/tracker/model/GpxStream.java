@@ -34,28 +34,44 @@ public class GpxStream {
 
     private final Controller controller;
 
+    private boolean fileCreated;
+
     public GpxStream(Controller controller) {
         this.controller = controller;
 
-        try {
-            String folder = controller.getSettings().getExportFolder();
-            folder += (folder.endsWith("/") ? "" : "/");
-            String timeStamp = DateTimeUtil.getCurrentDateStamp();
-            String fullPath = "file:///" + folder + "stream_"
-                    + timeStamp + ".gpx";
-            Track streamTrack = new Track(fullPath, true);
-            controller.loadTrack(streamTrack);
-            
-            // ----------------------------------------------------------
-            // Store details in our settings file to allow us to
-            // recover from crashes
-            // ----------------------------------------------------------
-            controller.getSettings().setStreamingStarted(fullPath);
+        fileCreated = false;
 
-            //controller.showTrail();
-        } catch (Exception e) {
-            controller.showError(LocaleManager.getMessage("trails_list_error") +
-                    ": " + e.toString());
-        }
+        createStreamFile();
+    }
+    
+    public synchronized void createStreamFile() {
+        // do IO operations in another thread to prevent UI freezing.
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    String folder = controller.getSettings().getExportFolder();
+                    folder += (folder.endsWith("/") ? "" : "/");
+                    String timeStamp = DateTimeUtil.getCurrentDateStamp();
+                    String fullPath = "file:///" + folder + "stream_"
+                            + timeStamp + ".gpx";
+                    Track streamTrack = new Track(fullPath, true);
+                    controller.loadTrack(streamTrack);
+                    
+                    // ---------------------------------------------------------
+                    // Store details in our settings file to allow us to
+                    // recover from crashes
+                    // ---------------------------------------------------------
+                    controller.getSettings().setStreamingStarted(fullPath);
+                    fileCreated = true;
+                } catch (Exception e) {
+                    controller.showError(LocaleManager.getMessage("trails_list_error") +
+                            ": " + e.toString());
+                }
+            }
+        }).start();
+    }
+
+    public synchronized boolean streamIsWritten() {
+        return fileCreated;
     }
 }

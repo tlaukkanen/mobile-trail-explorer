@@ -230,7 +230,6 @@ public class Controller {
 
     }
 
-    
     public Display getDisplay()
     {
         return display;
@@ -559,15 +558,17 @@ public class Controller {
                 }
 
                 // save gpx stream
-                if (settings.getExportToGPXStream() &&
+                if(settings.getExportToGPXStream() &&
                         !controller.getSettings().getStreamingStarted()) {
                     controller.newGpxStream();
 
                     // give the device some time for creating the file
-                    try {
-                        Thread.sleep(100);
-                    } catch (Exception e) {
-                        Logger.error(e.toString());
+                    while(gpxstream.streamIsWritten() == false) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (Exception e) {
+                            Logger.error(e.toString());
+                        }
                     }
                 }
 
@@ -1332,14 +1333,7 @@ public class Controller {
         return navpnt;
     }
 
-    public synchronized void newGpxStream() {
-
-        Logger.debug("starting new gpxstream");
-
-        new Thread() {
-            public synchronized void run() {
-                gpxstream = new GpxStream(controller);
-            }
-        }.start();
+    public void newGpxStream() {
+        gpxstream = new GpxStream(controller);
     }
 }
