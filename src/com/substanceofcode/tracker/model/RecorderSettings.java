@@ -665,7 +665,7 @@ public class RecorderSettings {
     }
     
     public boolean getFileCache() {
-        return settings.getBooleanProperty(USEJSR179, true);
+        return settings.getBooleanProperty(USEFILECACHE, true);
     }
 
     /** Set filecache support */
