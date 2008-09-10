@@ -86,6 +86,7 @@ import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
 import com.substanceofcode.localization.LocaleManager;
 import com.substanceofcode.tracker.model.GpxStream;
 import com.substanceofcode.tracker.view.GeocodeForm;
+import com.substanceofcode.tracker.view.UploadServicesList;
 
 /**
  * Controller contains methods for the application flow.
@@ -251,6 +252,10 @@ public class Controller {
             geocodeForm = new GeocodeForm(this);
         }
         display.setCurrent(geocodeForm);
+    }
+
+    public void showUploadTrailList(Track selectedTrail) {
+        display.setCurrent( new UploadServicesList(selectedTrail) );
     }
     
     private void executeShortcut(short shortcut) {

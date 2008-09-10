@@ -37,7 +37,6 @@ import com.substanceofcode.gpsdevice.MockGpsDevice;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.Track;
-import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.localization.LocaleManager;
 
 /**
@@ -60,6 +59,7 @@ public class TrailsList extends List implements CommandListener{
     private final Command useAsGhostTrailCommand;    
     private final Command importTrailCommand;
     private final Command exportTrailCommand;
+    private final Command uploadTrailCommand;
     
     private final Controller controller;
     
@@ -89,7 +89,10 @@ public class TrailsList extends List implements CommandListener{
                 Command.ITEM, 9));
         addCommand(exportTrailCommand = new Command(LocaleManager.getMessage("trails_list_menu_export_trail"),
                 Command.ITEM, 10));
-        addCommand(backCommand = new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 11));
+        uploadTrailCommand = new Command(LocaleManager.getMessage("trails_list_menu_upload_trail"), Command.ITEM, 11);
+        addCommand(uploadTrailCommand);
+        addCommand(backCommand = new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 12));
+
 
         refresh();
         
@@ -191,7 +194,13 @@ public class TrailsList extends List implements CommandListener{
                 Track selectedTrail = getSelectedTrack();
                 if(selectedTrail!=null) {
                     controller.showTrailActionsForm(selectedTrail, selectedTrailName);
-                }                
+                }
+            } else if(command == uploadTrailCommand) {
+                String selectedTrailName = getString(getSelectedIndex());
+                Track selectedTrail = getSelectedTrack();
+                if(selectedTrail!=null) {
+                    controller.showUploadTrailList(selectedTrail);
+                }
             } else if(command == newStreamTrailCommand){
                 if (controller.getSettings().getStreamingStarted()) {
                     controller.showStreamRecovery();

@@ -120,6 +120,10 @@ public class RecorderSettings {
     /** Locale */
     private static final String MTE_LOCALE = "locale";
 
+    /** Upload services */
+    private static final String OSM_USERNAME = "osm-username";
+    private static final String OSM_PASSWORD = "osm-password";
+
     /** 
      * Creates a new instance of RecorderSettings
      * @param midlet 
@@ -141,7 +145,36 @@ public class RecorderSettings {
     {
         return settings.getStringProperty(GEOCODE, "");
     }
-    
+
+    /**
+     * @return Username for OpenStreetMap service
+     */
+    public String getOpenStreetMapUsername() {
+        return settings.getStringProperty(OSM_USERNAME, "");
+    }
+
+    /**
+     * @return Password for OpenStreetMap service
+     */
+    public String getOpenStreetMapPassword() {
+        return settings.getStringProperty(OSM_PASSWORD, "");
+    }
+
+    /**
+     * Set OSM username.
+     */
+    public void setOpenStreetMapUsername(String username) {
+        settings.setStringProperty(OSM_USERNAME, username);
+        saveSettings();
+    }
+
+    /**
+     * Set OSM password
+     */
+    public void setOpenStreetMapPassword(String password) {
+        settings.setStringProperty(OSM_PASSWORD, password);
+        saveSettings();
+    }
     /**
      * set the geocode identifier
      * @param identifier
