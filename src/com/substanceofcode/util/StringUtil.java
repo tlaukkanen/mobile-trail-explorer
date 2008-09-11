@@ -209,6 +209,16 @@ public class StringUtil {
     public static String reverse(String text) {        
         return new StringBuffer(text).reverse().toString();
     }    
+    
+    public static String integerToString(int i)
+    {
+        String str1 = Integer.toString(i);
+        if(i<10 && i>=0)
+        {
+            str1 = "0" + str1;
+        }
+        return str1;
+    }
 
     /** Parse string to short, return defaultValue is parse fails */
     public static short parseShort(String value, short defaultValue) {

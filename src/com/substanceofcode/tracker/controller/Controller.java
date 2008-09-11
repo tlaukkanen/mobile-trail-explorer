@@ -82,11 +82,15 @@ import com.substanceofcode.tracker.view.PlacesCanvas;
 import com.substanceofcode.tracker.view.PlaceForm;
 import com.substanceofcode.tracker.view.PlaceList;
 import com.substanceofcode.tracker.view.SpeedometerCanvas;
+import com.substanceofcode.tracker.view.PlaceSurveyor;
 import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
 import com.substanceofcode.localization.LocaleManager;
 import com.substanceofcode.tracker.model.GpxStream;
+import com.substanceofcode.tracker.model.SurveyorShortcutAction;
 import com.substanceofcode.tracker.view.GeocodeForm;
 import com.substanceofcode.tracker.view.UploadServicesList;
+import com.substanceofcode.tracker.view.CalculateTimeForm;
+import com.substanceofcode.tracker.view.SurveyorForm;
 
 /**
  * Controller contains methods for the application flow.
@@ -101,11 +105,13 @@ public class Controller {
      * perhaps this class should be a proper singleton pattern?
      */
     private static Controller controller;
+    
     /** Status codes */
     public final static int STATUS_STOPPED = 0;
     public final static int STATUS_RECORDING = 1;
     public final static int STATUS_NOTCONNECTED = 2;
     public final static int STATUS_CONNECTING = 3;
+    
     /**
      * Vector of devices found during a bluetooth search
      */
@@ -164,6 +170,10 @@ public class Controller {
     private SmsScreen smsScreen;
     private ImportTrailScreen importTrailScreen;
     private GeocodeForm geocodeForm;
+    private PlaceSurveyor placeSurveyor;
+    private SurveyorForm surveyorForm; //names form
+    private CalculateTimeForm calculateTimeForm;
+
     /**
      * Display which we are drawing to
      */
@@ -197,9 +207,12 @@ public class Controller {
      * Navigation Place
      */
     private Place navpnt;
+    
+    private double distanceRemaining; 
     /** Shortcuts */
     private static final short SHORTCUTACTION_AUDIOMARK = 0;
     private static final short SHORTCUTACTION_PLACEMARK = 1;
+    private static final short SHORTCUTACTION_SURVEYOR = 3;
 
     /**
      * Creates a new instance of Controller which performs the following:
@@ -242,6 +255,10 @@ public class Controller {
     }
     
     public void executeStarShortcut() {
+        //this.showPlaceSurveyor();
+        // TODO: Get shortcut from settings
+        //ShortcutAction action = new AudioShortcutAction();
+        //action.execute();
         short shortcut = settings.getStarShortcut();
         executeShortcut( shortcut );
     }
@@ -266,6 +283,9 @@ public class Controller {
                 break;
             case SHORTCUTACTION_PLACEMARK:
                 action = new PlacemarkShortcutAction();
+                break;
+            case SHORTCUTACTION_SURVEYOR:
+                action = new SurveyorShortcutAction();
                 break;
             default:
         }
@@ -913,7 +933,7 @@ public class Controller {
     public void showSettings() {
         display.setCurrent(getSettingsList());
     }
-
+    
     /** Get instance of settings list */
     private SettingsList getSettingsList() {
         if (settingsList == null) {
@@ -1155,6 +1175,25 @@ public class Controller {
         display.setCurrent(displaySettingsForm);
     }
 
+    /** Show Waypoint Surveyor */
+    public void showPlaceSurveyor() {
+        Logger.debug("case3 at 1089");
+        if (placeSurveyor == null) {
+            placeSurveyor = new PlaceSurveyor(this);
+        }
+        display.setCurrent(placeSurveyor);
+    }
+    
+    /** Show Surveyor Name Form */
+    public void showSurveyorForm(Place made) {
+        Logger.debug("showSurveyorForm shown");
+        if (surveyorForm == null) {
+            surveyorForm = new SurveyorForm(this,made);
+        }
+        surveyorForm.setPlace(made);
+        display.setCurrent(surveyorForm);
+    }
+
     /** Set recording marker step */
     public void saveRecordingMarkerStep(int newStep) {
         settings.setRecordingMarkerInterval(newStep);
@@ -1341,4 +1380,34 @@ public class Controller {
     public void newGpxStream() {
         gpxstream = new GpxStream(controller);
     }
+
+    /** Show settings list */
+    public void showCalculateTimeForm() {
+        display.setCurrent(getCalculateTimeForm());
+    }
+
+    /** Set distance remaining */
+    public void setDistanceRemaining(double distance0)
+    {
+        Track currentTrack = recorder.getTrack();
+        //when saving, the distance is saved along with distance travelled
+        distanceRemaining = distance0 + currentTrack.getDistance();
+        Logger.debug("saving distance as " + Double.toString(distanceRemaining));
+    }
+    
+    public double getDistanceRemaining()
+    {
+        return distanceRemaining;
+    }
+    /** Get instance of settings list */
+    private CalculateTimeForm getCalculateTimeForm() {
+        if (calculateTimeForm == null) {
+            calculateTimeForm = new CalculateTimeForm(this);
+        }
+        double distance = controller.recorder.getTrack().getDistance();
+        calculateTimeForm.setDistanceRemaining(controller.distanceRemaining - distance);
+        return calculateTimeForm;
+    }
+    
+    
 }

@@ -15,6 +15,7 @@ Bastian Kämpfe
 Nicolas Marchildon
 Patric Oosterveld
 Peter Reinhart
+Vikas Yadav
 
 Release Notes:
 
@@ -25,6 +26,7 @@ v1.13 (xxx xth 2008)
 + Simplified the addition for additional locales (From Kaspar)
 + Find place by using Google service (From Kaspar)
 + German support tweaks (From Peter)
++ OpenStreetMap surveyor feature (From Vikas)
 
 v1.12 (August 13th 2008)
 + French support (Contribution from Nicolas)

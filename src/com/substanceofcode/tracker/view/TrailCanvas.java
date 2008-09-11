@@ -788,6 +788,7 @@ public class TrailCanvas extends BaseCanvas {
         if (gameKey == FIRE || keyCode == KEY_NUM5) {
             setMapCenter(null);
         }
+        
         this.repaint();
     }
 }

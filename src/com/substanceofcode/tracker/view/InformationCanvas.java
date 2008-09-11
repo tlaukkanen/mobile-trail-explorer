@@ -29,6 +29,7 @@ import com.substanceofcode.tracker.model.SpeedFormatter;
 import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.util.DateTimeUtil;
+import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
 
 import javax.microedition.lcdui.Canvas;
@@ -95,6 +96,8 @@ public class InformationCanvas extends BaseCanvas{
         String durationTime = "";
         String maximumSpeed = "";
         String averageSpeed = "";
+        String distanceRemaining = "";
+        String etaRemains = "";
         lineRow = titleHeight - firstRow;
         
         Track currentTrack = controller.getTrack();
@@ -107,6 +110,7 @@ public class InformationCanvas extends BaseCanvas{
             hea = position.getHeadingString();
             
             alt = lengthFormatter.getLengthString(position.altitude, false);
+            
 
             if(currentTrack!=null) {
                 dst = lengthFormatter.getLengthString(currentTrack.getDistance(), true); 
@@ -127,6 +131,28 @@ public class InformationCanvas extends BaseCanvas{
                     currentTrack.getAverageSpeed(), 
                     controller.getSettings().getUnitsAsKilometers(),
                     true);
+                }
+                
+                //now we have exact realtime distance that is still left
+                double distanceR = controller.getDistanceRemaining() - currentTrack.getDistance();
+                if(distanceR<0)
+                {
+                    etaRemains = "-na-"; 
+                    distanceRemaining="-na-";
+                }
+                else
+                {
+                    double secsR=3600 * distanceR/currentTrack.getAverageSpeed();
+                    double minsR = secsR/60;
+                    secsR = secsR % 60;
+                    double hoursR = minsR/60;
+                    minsR = minsR % 60;
+
+                    etaRemains = StringUtil.integerToString((int)hoursR) + ":" 
+                                    + StringUtil.integerToString((int)minsR) + ":" 
+                                    + StringUtil.integerToString((int)secsR);
+                    distanceRemaining = StringUtil.valueOf(distanceR,2);
+                    Logger.debug("calculating!" + Double.toString(distanceR) + "," + etaRemains);
                 }
             }
 
@@ -158,6 +184,8 @@ public class InformationCanvas extends BaseCanvas{
         drawNextHeader(g, LocaleManager.getMessage("information_canvas_trail"));
         drawNextString(g, LocaleManager.getMessage("information_canvas_distance"), dst);
         drawNextString(g, LocaleManager.getMessage("information_canvas_duration"), durationTime);
+        drawNextString(g, LocaleManager.getMessage("information_canvas_distance_remains"), distanceRemaining);
+        drawNextString(g, LocaleManager.getMessage("information_canvas_distance_eta"), etaRemains);
         if(currentTrack!=null) {
             if(currentTrack.getMinAltitudePosition()!=null) {
                 double minAltitude = currentTrack.getMinAltitudePosition().altitude;

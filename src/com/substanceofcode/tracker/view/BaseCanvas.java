@@ -63,6 +63,8 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
     private Command managePlacesCommand;
     private Command switchThemeCommand;
     private Command geocodeCommand;
+    private Command manageTime;
+    
 
     /*
      * private Command markWaypointCommand; private Command
@@ -100,6 +102,9 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         switchThemeCommand = new Command(LocaleManager.getMessage("menu_switch_theme"), Command.ITEM, 6);
         addCommand(switchThemeCommand);
 
+        // Trails command
+        manageTime = new Command("Calculate Time", Command.ITEM, 7);
+        addCommand(manageTime);
         geocodeCommand = new Command(LocaleManager.getMessage("menu_find_place"), Command.ITEM, 7);
         addCommand(geocodeCommand);
         
@@ -128,6 +133,9 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
             }
             if (command == switchThemeCommand) {
                 Theme.switchTheme();
+            }
+            if (command == manageTime) {
+                controller.showCalculateTimeForm();
             }
             if (command == exitCommand) {
                 controller.exit();
