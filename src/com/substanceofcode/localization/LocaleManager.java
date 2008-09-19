@@ -86,7 +86,11 @@ public class LocaleManager  {
         if (mteLocale == null)
             mteLocale = System.getProperty("microedition.locale");
 
-        //System.out.println("Localization language: " + mteLocale);
+        if (mteLocale == null || mteLocale.length()==0) {
+            mteLocale = "en";
+        }
+
+        System.out.println("Localization language: " + mteLocale);
 
         return initLocalizationSupport(mteLocale);     // NOI18N
     }
@@ -127,11 +131,11 @@ public class LocaleManager  {
                     // try broader???? locale (i.e. instead og en_US, try just en)
                     in = clazz.getResourceAsStream(prefix+"_"+locale.substring(0,2)+suffix);                                      
                 }
-            }            
+            }       
             if (in == null) {
                 // if not found or locale is not set, try default locale
                 in = clazz.getResourceAsStream(_MESSAGES_BUNDLE);
-            }                      
+            }
             if (in == null) {
                 // no messages bundle was found - initialization failed
                 _localizationErrorMessage = _processPattern(_INIT_LOCALIZATION_ERROR_MSG,new Object[] {"No messages found"}); // NOI18N

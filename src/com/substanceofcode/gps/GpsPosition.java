@@ -254,27 +254,32 @@ public final class GpsPosition implements Serializable {
 
         double sector = 22.5; // = 360 degrees / 16 sectors
 
-        String[] compass = { "N", "NE", "NE", "E", "E", "SE", "SE", "S", "S",
-                "SW", "SW", "W", "W", "NW", "NW", "N" };
+        String[] compass = { 
+            "N", "NNE", "NE", "ENE",
+            "E", "ESE", "SE", "SSE",
+            "S", "SSW", "SW", "WSW", 
+            "W", "WNW", "NW", "NNW", "N" };
 
         /* TODO: sometimes i get NA as output, if i enable LocaleManager...
         /*
-        String[] compass = { LocaleManager.getMessage("gps_position_n"),
-                             LocaleManager.getMessage("gps_position_ne"),
-                             LocaleManager.getMessage("gps_position_ne"),
-                             LocaleManager.getMessage("gps_position_e"),
-                             LocaleManager.getMessage("gps_position_e"),
-                             LocaleManager.getMessage("gps_position_se"),
-                             LocaleManager.getMessage("gps_position_se"),
-                             LocaleManager.getMessage("gps_position_s"),
-                             LocaleManager.getMessage("gps_position_s"),
-                             LocaleManager.getMessage("gps_position_sw"),
-                             LocaleManager.getMessage("gps_position_sw"),
-                             LocaleManager.getMessage("gps_position_w"),
-                             LocaleManager.getMessage("gps_position_w"),
-                             LocaleManager.getMessage("gps_position_nw"),
-                             LocaleManager.getMessage("gps_position_nw"),
-                             LocaleManager.getMessage("gps_position_n") };
+        String[] compass = {
+            LocaleManager.getMessage("gps_position_n"),
+            LocaleManager.getMessage("gps_position_nne"),
+            LocaleManager.getMessage("gps_position_ne"),
+            LocaleManager.getMessage("gps_position_ene"),
+            LocaleManager.getMessage("gps_position_e"),
+            LocaleManager.getMessage("gps_position_ese"),
+            LocaleManager.getMessage("gps_position_se"),
+            LocaleManager.getMessage("gps_position_sse"),
+            LocaleManager.getMessage("gps_position_s"),
+            LocaleManager.getMessage("gps_position_ssw"),
+            LocaleManager.getMessage("gps_position_sw"),
+            LocaleManager.getMessage("gps_position_wsw"),
+            LocaleManager.getMessage("gps_position_w"),
+            LocaleManager.getMessage("gps_position_wnw"),
+            LocaleManager.getMessage("gps_position_nw"),
+            LocaleManager.getMessage("gps_position_nnw"),
+            LocaleManager.getMessage("gps_position_n") };
         */
 
         String heading = "";
