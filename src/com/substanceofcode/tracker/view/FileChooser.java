@@ -56,6 +56,7 @@ public class FileChooser
     
     private Displayable previousScreen;
 
+    private Command customFolderCommand;
     private Command selectCommand;
     private Command cancelCommand;
     
@@ -75,9 +76,10 @@ public class FileChooser
         this.path = path;
         this.showFiles = showFiles;
         this.previousScreen = previousScreen;
-        
+
+        customFolderCommand = new Command(LocaleManager.getMessage("menu_enter_custom_folder"), Command.SCREEN, 2);
         selectCommand = new Command(LocaleManager.getMessage("menu_select"), Command.ITEM, 1);
-        cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.CANCEL, 2);
+        cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.CANCEL, 3);
         setSelectCommand(selectCommand);
         addCommand(cancelCommand);
 
@@ -176,6 +178,8 @@ public class FileChooser
             }
         } else if(command == cancelCommand) {
             this.goBack();
+        } else if(command == customFolderCommand) {
+            // TODO: Add code
         }
     }
     

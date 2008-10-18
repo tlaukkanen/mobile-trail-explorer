@@ -254,37 +254,15 @@ public final class GpsPosition implements Serializable {
 
         double sector = 22.5; // = 360 degrees / 16 sectors
 
-        String[] compass = { 
+        String[] compass = {
             "N", "NNE", "NE", "ENE",
             "E", "ESE", "SE", "SSE",
-            "S", "SSW", "SW", "WSW", 
+            "S", "SSW", "SW", "WSW",
             "W", "WNW", "NW", "NNW", "N" };
 
-        /* TODO: sometimes i get NA as output, if i enable LocaleManager...
-        /*
-        String[] compass = {
-            LocaleManager.getMessage("gps_position_n"),
-            LocaleManager.getMessage("gps_position_nne"),
-            LocaleManager.getMessage("gps_position_ne"),
-            LocaleManager.getMessage("gps_position_ene"),
-            LocaleManager.getMessage("gps_position_e"),
-            LocaleManager.getMessage("gps_position_ese"),
-            LocaleManager.getMessage("gps_position_se"),
-            LocaleManager.getMessage("gps_position_sse"),
-            LocaleManager.getMessage("gps_position_s"),
-            LocaleManager.getMessage("gps_position_ssw"),
-            LocaleManager.getMessage("gps_position_sw"),
-            LocaleManager.getMessage("gps_position_wsw"),
-            LocaleManager.getMessage("gps_position_w"),
-            LocaleManager.getMessage("gps_position_wnw"),
-            LocaleManager.getMessage("gps_position_nw"),
-            LocaleManager.getMessage("gps_position_nnw"),
-            LocaleManager.getMessage("gps_position_n") };
-        */
-
         String heading = "";
+        final int directionIndex = (int) (Math.floor((course - 11.25)/ sector) + 1);// we add one because north would otherwise be a -1 index
 
-        int directionIndex = (int) Math.floor(course / sector);
         heading = compass[directionIndex];
         return heading;
     }
@@ -326,13 +304,14 @@ public final class GpsPosition implements Serializable {
     public int getHeadingIndex() {
 
         final double sector = 22.5; // = 360 degrees / 16 sectors
-        final int[] compass = { 1 /* NNE */, 2 /* NE */, 3 /* ENE */,
+        final int[] compass = { 0 /* N */,1 /* NNE */, 2 /* NE */, 3 /* ENE */,
                 4 /* E */, 5 /* ESE */, 6 /* SE */, 7 /* SSE */,
                 8 /* S */, 9 /* SSW */, 10 /* SW */, 11 /* WSW */,
                 12 /* W */, 13 /* WNW */, 14 /* NW */, 15 /* NNW */, 0 /* N */};
         int heading = 0;
 
-        final int directionIndex = (int) Math.floor(course / sector);
+        final int directionIndex = (int) (Math.floor((course - 11.25)/ sector) + 1);// we add one because north would otherwise be a -1 index, and we add a reference to N as the zero index
+
         heading = compass[directionIndex];
         return heading;
     }
@@ -394,15 +373,17 @@ public final class GpsPosition implements Serializable {
         
         return alpha;
     }
+    
     public int getCourseCourseIndex(double course) {
         final double sector = 22.5; // = 360 degrees / 16 sectors
-        final int[] compass = { 1 /* NNE */, 2 /* NE */, 3 /* ENE */,
+        final int[] compass = { 0 /* N */, 1 /* NNE */, 2 /* NE */, 3 /* ENE */,
                 4 /* E */, 5 /* ESE */, 6 /* SE */, 7 /* SSE */,
                 8 /* S */, 9 /* SSW */, 10 /* SW */, 11 /* WSW */,
                 12 /* W */, 13 /* WNW */, 14 /* NW */, 15 /* NNW */, 0 /* N */};
         int heading = 0;
 
-        final int directionIndex = (int) Math.floor(course / sector);
+        final int directionIndex = (int) (Math.floor((course - 11.25)/ sector) + 1);
+
         heading = compass[directionIndex];
         return heading;
     }
