@@ -69,6 +69,7 @@ public class TileDownloader implements Runnable {
     private volatile Thread downloaderThread;
     private MercatorMapProvider mapProvider;
     Controller controller;
+    private static final int MAX_REDIRECTS = 5;
 
     public TileDownloader(MercatorMapProvider mP) {
         mapProvider = mP;
@@ -242,6 +243,9 @@ public class TileDownloader implements Runnable {
         HttpConnection conn = null;
         InputStream in = null;
         Tile tile = null;
+        int redirects;
+        int code;
+        String url;
         while (downloaderThread == thisThread && running) {
             try {
                 Thread.sleep(THREADDELAY);
@@ -260,28 +264,49 @@ public class TileDownloader implements Runnable {
                 }
                 try {
                     if (tile != null) {
-                        Logger.debug("TD: Requesting url " + tile.url);
-                        conn = (HttpConnection) Connector.open(tile.url);
+                        redirects = 0;
+                        url=tile.url;
+                        while (redirects < MAX_REDIRECTS) {
+                            Logger.debug("TD: Requesting url " + url);
+                            conn = (HttpConnection) Connector.open(url);
 
-                        in = conn.openInputStream();
+                            in = conn.openInputStream();
+                            code = conn.getResponseCode();
+                            Logger.debug("TD: Response code was " + conn.getResponseCode() + " " + conn.getResponseMessage());
+                            if (code == HttpConnection.HTTP_OK) {
+                                try {
+                                    // If we get a 200 response but then can't save
+                                    // the tile
+                                    // save a blank image there instead.
+                                    if (!tc.saveTile(tile, in)) {
+                                        tc.saveTile(tile, blankImage());
+                                    }
 
-                        Logger.debug("TD: Response code was " + conn.getResponseCode() + " " + conn.getResponseMessage());
-                        if (conn.getResponseCode() == 200) {
-                            try {
-                                // If we get a 200 response but then can't save
-                                // the tile
-                                // save a blank image there instead.
-                                if (!tc.saveTile(tile, in)) {
-                                    tc.saveTile(tile, blankImage());
+                                    Logger.debug("TD: Downloaded Tile " + tile.cacheKey);                                    
+                                } catch (Exception e) {
+                                    Logger.debug("TD: Error saving tile " + tile.cacheKey + ", " + e.getMessage());
+                                }finally{
+                                    break;
                                 }
-
-
-                                Logger.debug("TD: Downloaded Tile " + tile.cacheKey);
-                            } catch (Exception e) {
-                                Logger.debug("TD: Error saving tile " + tile.cacheKey + ", " + e.getMessage());
+                            } else {
+                                redirects++;
+                                if (code == HttpConnection.HTTP_MOVED_TEMP || //302
+                                        code == HttpConnection.HTTP_SEE_OTHER || //303
+                                        code == HttpConnection.HTTP_TEMP_REDIRECT || //307
+                                        code == HttpConnection.HTTP_MOVED_PERM) //301
+                                {
+                                    url = conn.getHeaderField("Location");
+                                }
+                                in.close();
+                                conn.close();
+                                in = null;
+                                conn = null;
+                                //give up if too many redirects
+                                if (redirects++ > MAX_REDIRECTS) {
+                                    tc.saveTile(tile, blankImage());
+                                    break;
+                                }
                             }
-                        } else {
-                            Logger.debug("TD: Tile " + tile.cacheKey + " got status " + conn.getResponseCode());
                         }
                     }
                 } catch (ConnectionNotFoundException e) {
