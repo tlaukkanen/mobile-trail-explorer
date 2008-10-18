@@ -40,9 +40,9 @@ import com.substanceofcode.tracker.controller.Controller;
 /**
  * Code to download tiles from various map servers See:
  * http://cfis.savagexi.com/articles/2006/05/03/google-maps-deconstructed
- * 
+ *
  * @author gjones
- * 
+ *
  */
 public class TileDownloader implements Runnable {
 
@@ -107,11 +107,11 @@ public class TileDownloader implements Runnable {
      * preferably retrieved from a cache, to save on network traffic. If the
      * tile is in the cache, it is returned to the caller. If not, a request for
      * the tile is added to the bottom of the <code>tileRequestQueue</code>
-     * 
+     *
      * The boolean <code>pushToTop</code> parameter allows for tiles to be
      * added to the top of the queue. This is used to try to ensure that the
      * tile containing the user's position is the first tile retrieved
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -181,7 +181,7 @@ public class TileDownloader implements Runnable {
      * faster than 3 tiles per second assuming 3x3 grid), at a low zoom level,
      * you can end up moving beyond the tiles you have just queued, and end up
      * queuing 100s of tiles without ever seeing them
-     * 
+     *
      * @param x -
      *                the x coordinate of the tile
      * @param y -
@@ -282,14 +282,13 @@ public class TileDownloader implements Runnable {
                                         tc.saveTile(tile, blankImage());
                                     }
 
-                                    Logger.debug("TD: Downloaded Tile " + tile.cacheKey);                                    
+                                    Logger.debug("TD: Downloaded Tile " + tile.cacheKey);
                                 } catch (Exception e) {
                                     Logger.debug("TD: Error saving tile " + tile.cacheKey + ", " + e.getMessage());
                                 }finally{
                                     break;
                                 }
                             } else {
-                                redirects++;
                                 if (code == HttpConnection.HTTP_MOVED_TEMP || //302
                                         code == HttpConnection.HTTP_SEE_OTHER || //303
                                         code == HttpConnection.HTTP_TEMP_REDIRECT || //307
@@ -350,7 +349,7 @@ public class TileDownloader implements Runnable {
 
     /**
      * Returns a placeholder image used until the correct tile can be displayed
-     * 
+     *
      * @return image
      */
     public Image loadingImage() {
@@ -385,7 +384,7 @@ public class TileDownloader implements Runnable {
      * Returns a blank tile, used when there is no valid tile to display This is
      * used to stop errors when requesting tiles beyond the edge of the map
      * Rather than throwing an exception
-     * 
+     *
      * @return A white image tile
      */
     public Image blankImage() {
@@ -403,7 +402,7 @@ public class TileDownloader implements Runnable {
      * Another placeholder image to display while fetching a tile. This one is
      * used to show that the image is already on the device (cached) and will be
      * shortly available
-     * 
+     *
      * @return
      */
     public Image loadingImageFromRmsCache() {
