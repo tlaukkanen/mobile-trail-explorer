@@ -22,14 +22,15 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.Place;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
+
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Will ask the user required text name for the POI given by the caller.
@@ -87,10 +88,10 @@ public class SurveyorForm extends Form implements CommandListener {
     
     /** Initialize commands */
     private void initializeCommands() {
-        okCommand = new Command("OK", Command.SCREEN, 1);
+        okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.SCREEN, 1);
         this.addCommand( okCommand );
         
-        cancelCommand = new Command("Cancel", Command.SCREEN, 2);
+        cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.SCREEN, 2);
         this.addCommand( cancelCommand );
     }
     

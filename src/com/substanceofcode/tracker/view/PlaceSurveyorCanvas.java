@@ -22,17 +22,15 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.Place;
-
-
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
 
-import com.substanceofcode.tracker.view.SurveyorForm;
+import com.substanceofcode.gps.GpsPosition;
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.tracker.model.Place;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Shows a list of POIs on screen with a designated key
@@ -40,9 +38,7 @@ import com.substanceofcode.tracker.view.SurveyorForm;
  * POIs are saved as regular place in text format.
  * @author Vikas Yadav
  */
-public class PlaceSurveyor extends BaseCanvas  {
-    
-    private Controller controller;
+public class PlaceSurveyorCanvas extends BaseCanvas  {
     
     private final Command backCommand;
     
@@ -85,12 +81,12 @@ public class PlaceSurveyor extends BaseCanvas  {
     /** Creates a new instance of WaypointList
      * @param controller 
      */
-    public PlaceSurveyor(Controller controller) {
+    public PlaceSurveyorCanvas(Controller controller) {
         //super(TITLE, List.IMPLICIT);        
         this.controller = controller;
         this.pointType=0;
         
-        this.addCommand(backCommand = new Command("Back", Command.BACK, 10));
+        this.addCommand(backCommand = new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 10));
     }
     
     public void commandAction(Command command, Displayable displayable) {
@@ -267,11 +263,11 @@ public class PlaceSurveyor extends BaseCanvas  {
     /** Paint waypoint list and distances to each waypoint */
     protected void paint(Graphics g) {
         /** Clear background */
-        g.setColor(255,255,255);
+        g.setColor(Theme.getColor(Theme.TYPE_BACKGROUND));
         g.fillRect(0,0,getWidth(),getHeight());
         
         /** Draw title */
-        g.setColor(0);
+        g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
         g.drawString("Surveyor", getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);               
         

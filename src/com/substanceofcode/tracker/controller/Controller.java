@@ -82,7 +82,7 @@ import com.substanceofcode.tracker.view.PlacesCanvas;
 import com.substanceofcode.tracker.view.PlaceForm;
 import com.substanceofcode.tracker.view.PlaceList;
 import com.substanceofcode.tracker.view.SpeedometerCanvas;
-import com.substanceofcode.tracker.view.PlaceSurveyor;
+import com.substanceofcode.tracker.view.PlaceSurveyorCanvas;
 import com.substanceofcode.tracker.view.WebRecordingSettingsForm;
 import com.substanceofcode.localization.LocaleManager;
 import com.substanceofcode.tracker.model.GpxStream;
@@ -170,7 +170,7 @@ public class Controller {
     private SmsScreen smsScreen;
     private ImportTrailScreen importTrailScreen;
     private GeocodeForm geocodeForm;
-    private PlaceSurveyor placeSurveyor;
+    private PlaceSurveyorCanvas placeSurveyor;
     private SurveyorForm surveyorForm; //names form
     private CalculateTimeForm calculateTimeForm;
 
@@ -1179,7 +1179,7 @@ public class Controller {
     public void showPlaceSurveyor() {
         Logger.debug("case3 at 1089");
         if (placeSurveyor == null) {
-            placeSurveyor = new PlaceSurveyor(this);
+            placeSurveyor = new PlaceSurveyorCanvas(this);
         }
         display.setCurrent(placeSurveyor);
     }
