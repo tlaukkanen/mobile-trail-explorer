@@ -56,7 +56,7 @@ public class SurveyorForm extends Form implements CommandListener {
      * @param controller 
      */
     public SurveyorForm(Controller controller,Place made0) {
-        super("Place");
+        super(LocaleManager.getMessage("surveyor_form_title"));
 
         Logger.debug("Surveyor constructor!");
         this.controller = controller;
@@ -81,7 +81,7 @@ public class SurveyorForm extends Form implements CommandListener {
     
     /** Initialize place fields (name, lon and lat) */
     private void initializeControls() {
-        nameField = new TextField("Name", "", 32, TextField.ANY);
+        nameField = new TextField(LocaleManager.getMessage("surveyor_form_name"), "", 32, TextField.ANY);
         nameField.setString(made.getName() + " ");
         this.append(nameField);
     }

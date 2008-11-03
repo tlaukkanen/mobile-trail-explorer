@@ -102,13 +102,13 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
         if(pointType == OSM_MORE) {
             if (keyCode==Canvas.KEY_NUM1) //level crossing
             {
-                made.setName("Level Crossing");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_1"));
                 Logger.debug("Surveyor level");
                 pointType = OSM_LEVEL;
             }
             else if (keyCode==Canvas.KEY_NUM2) //power tower
             {
-                made.setName("Power Tower");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_2"));
                 pointType = OSM_POWER;
                 repaint();
                 Logger.debug("Surveyor Power Tower");
@@ -116,47 +116,47 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
             }
             else if (keyCode==Canvas.KEY_NUM3) //power line
             {
-                made.setName("Power Line");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_3"));
                 pointType = OSM_POWERLINE;
                 Logger.debug("Surveyor PowerL");
             }
             else if (keyCode==Canvas.KEY_NUM4) //power line
             {
-                made.setName("Power Station");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_4"));
                 pointType = OSM_POWERSTATION;
                 Logger.debug("Surveyor PowerS");
             }
             else if (keyCode==Canvas.KEY_NUM5) //platform start
             {
-                made.setName("Platform Start");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_5"));
                 Logger.debug("Surveyor Platform Start");
             }
             else if (keyCode==Canvas.KEY_NUM6) //Platform End
             {
-                made.setName("Platform End");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_6"));
                 Logger.debug("Surveyor Platform End");
             }
             else if (keyCode==Canvas.KEY_NUM7) //bridge start
             {
-                made.setName("Bridge Start");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_7"));
                 Logger.debug("Surveyor Bridge Start");
             }
             else if (keyCode==Canvas.KEY_NUM8) //brudge End
             {
-                made.setName("Bridge End");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_8"));
                 Logger.debug("Surveyor Bridge End");
             }
         }
         else if(pointType == OSM_NAME) {
             pointType=0;
             if(keyCode == Canvas.KEY_NUM4) { //Road name
-                made.setName("Road:");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_9"));
             }
             else if(keyCode == Canvas.KEY_NUM5) { //Railway Station name
-                made.setName("RS:");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_10"));
             }
             else if(keyCode == Canvas.KEY_NUM6) { //Locality name
-                made.setName("Locality:");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_11"));
             }
             this.controller.showSurveyorForm(made);
             return;
@@ -172,23 +172,23 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
             Logger.debug("Direction?");
             if(keyCode == Canvas.KEY_NUM1) { //left
                 Logger.debug("Left");
-                name2=" Left";
+                name2=" " + LocaleManager.getMessage("place_surveyor_canvas_direction_left");
             }
             else if(keyCode == Canvas.KEY_NUM3) { //right
                 Logger.debug("Right");
-                name2 = " Right";
+                name2 = " " + LocaleManager.getMessage("place_surveyor_canvas_direction_right");;
             }
             made.setName(name + name2);
         }
         else {
             if (keyCode==Canvas.KEY_NUM1) //traffic
             {
-                made.setName("Signal");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_12"));
                 Logger.debug("Surveyor Signal");
             }
             else if (keyCode==Canvas.KEY_NUM2) //bus
             {
-                made.setName("Bus stop");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_13"));
                 pointType = OSM_ATM;
                 repaint();
                 Logger.debug("Surveyor Bus Stop");
@@ -197,7 +197,7 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
     
             else if (keyCode==Canvas.KEY_NUM3) //atm
             {
-                made.setName("ATM");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_14"));
                 pointType = OSM_ATM;
                 repaint();
                 Logger.debug("Surveyor ATM");
@@ -205,22 +205,22 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
             }
             else if (keyCode==Canvas.KEY_NUM4) //exit
             {
-                made.setName("Exit");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_15"));
                 Logger.debug("Surveyor Exit");
             }
             else if (keyCode==Canvas.KEY_NUM5)//entry
             {
-                made.setName("Entry");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_16"));
                 Logger.debug("Surveyor Entry");
             }
             else if (keyCode==Canvas.KEY_NUM6) //CUT
             {
-                made.setName("Cut");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_17"));
                 Logger.debug("Surveyor Cut");
             }
             else if (keyCode==Canvas.KEY_NUM7) //fuel
             {
-                made.setName("Fuel");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_18"));
                 pointType = OSM_FUEL;
                 repaint();
                 Logger.debug("Surveyor Fuel");
@@ -228,7 +228,7 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
             }
             else if (keyCode==Canvas.KEY_NUM8) //gate
             {
-                made.setName("Gate");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_19"));
                 pointType = OSM_GATE;
                 repaint();
                 Logger.debug("Surveyor Gate");
@@ -236,7 +236,7 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
             }
             else if (keyCode==Canvas.KEY_NUM9) //names
             {
-                made.setName("Name");
+                made.setName(LocaleManager.getMessage("place_surveyor_canvas_tag_20"));
                 pointType = OSM_NAME;
                 repaint();
                 Logger.debug("Surveyor name");
@@ -269,66 +269,64 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
         /** Draw title */
         g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
-        g.drawString("Surveyor", getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);               
+        g.drawString(LocaleManager.getMessage("place_surveyor_canvas_title"), getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
         
         if(pointType == OSM_MORE) { //more
-            g.drawString("Surveyor - More", getWidth()/2, 15, Graphics.TOP|Graphics.HCENTER);
+            g.drawString(LocaleManager.getMessage("place_surveyor_canvas_menu_more"), getWidth()/2, 15, Graphics.TOP|Graphics.HCENTER);
             
-            g.drawString("1   Level Crossing", 10, 35, Graphics.TOP|Graphics.LEFT);
-            g.drawString("2   Power Tower", 10, 50, Graphics.TOP|Graphics.LEFT);
-            g.drawString("3   Power Line", 10, 65, Graphics.TOP|Graphics.LEFT);
-            g.drawString("4   Power Substation", 10, 80, Graphics.TOP|Graphics.LEFT);
-            g.drawString("5   Platform Start", 10, 95, Graphics.TOP|Graphics.LEFT);
-            g.drawString("6   PLatform End", 10, 110, Graphics.TOP|Graphics.LEFT);
-            g.drawString("7   Bride Start", 10, 125, Graphics.TOP|Graphics.LEFT);
-            g.drawString("8   Bridge End", 10, 140, Graphics.TOP|Graphics.LEFT);
+            g.drawString("1   " + LocaleManager.getMessage("place_surveyor_canvas_tag_1"), 10, 35, Graphics.TOP|Graphics.LEFT);
+            g.drawString("2   " + LocaleManager.getMessage("place_surveyor_canvas_tag_2"), 10, 50, Graphics.TOP|Graphics.LEFT);
+            g.drawString("3   " + LocaleManager.getMessage("place_surveyor_canvas_tag_3"), 10, 65, Graphics.TOP|Graphics.LEFT);
+            g.drawString("4   " + LocaleManager.getMessage("place_surveyor_canvas_tag_4"), 10, 80, Graphics.TOP|Graphics.LEFT);
+            g.drawString("5   " + LocaleManager.getMessage("place_surveyor_canvas_tag_5"), 10, 95, Graphics.TOP|Graphics.LEFT);
+            g.drawString("6   " + LocaleManager.getMessage("place_surveyor_canvas_tag_6"), 10, 110, Graphics.TOP|Graphics.LEFT);
+            g.drawString("7   " + LocaleManager.getMessage("place_surveyor_canvas_tag_7"), 10, 125, Graphics.TOP|Graphics.LEFT);
+            g.drawString("8   " + LocaleManager.getMessage("place_surveyor_canvas_tag_8"), 10, 140, Graphics.TOP|Graphics.LEFT);
         }
         else if(pointType == OSM_NAME) { //names
-            g.drawString("Surveyor - " + made.getName(), getWidth()/2, 15, Graphics.TOP|Graphics.HCENTER);
+            g.drawString(LocaleManager.getMessage("place_surveyor_canvas_title") +
+                    " - " + made.getName(), getWidth()/2, 15, Graphics.TOP|Graphics.HCENTER);
             
-            g.drawString("4   Road Name", 10, 35, Graphics.TOP|Graphics.LEFT);
-            g.drawString("5   Railway Station Name", 10, 50, Graphics.TOP|Graphics.LEFT);
-            g.drawString("6   Locality Name", 10, 65, Graphics.TOP|Graphics.LEFT);
+            g.drawString("4   " + LocaleManager.getMessage("place_surveyor_canvas_tag_9a"), 10, 35, Graphics.TOP|Graphics.LEFT);
+            g.drawString("5   " + LocaleManager.getMessage("place_surveyor_canvas_tag_10a"), 10, 50, Graphics.TOP|Graphics.LEFT);
+            g.drawString("6   " + LocaleManager.getMessage("place_surveyor_canvas_tag_11a"), 10, 65, Graphics.TOP|Graphics.LEFT);
         }
-        else if(pointType>0) { //directions
-            g.drawString("Surveyor - " + made.getName(), getWidth()/2, 15, Graphics.TOP|Graphics.HCENTER);
+        else if(pointType > 0) { //directions
+            g.drawString(LocaleManager.getMessage("place_surveyor_canvas_title") +
+                    " - " + made.getName(), getWidth()/2, 15, Graphics.TOP|Graphics.HCENTER);
             
-            g.drawString("1   Left", 10, 35, Graphics.TOP|Graphics.LEFT);
-            g.drawString("3   Right", 10, 50, Graphics.TOP|Graphics.LEFT);
+            g.drawString("1   " + LocaleManager.getMessage("place_surveyor_canvas_direction_left"), 10, 35, Graphics.TOP|Graphics.LEFT);
+            g.drawString("3   " + LocaleManager.getMessage("place_surveyor_canvas_direction_right"), 10, 50, Graphics.TOP|Graphics.LEFT);
         }
         else { //everything else
             
             double latL=0,longL=0;
             GpsPosition lastPosition = null;
-            if(controller.getStatusCode() == Controller.STATUS_RECORDING)
-            {
-                Logger.debug("Surveyor, getting position");
-                lastPosition = controller.getPosition();
-                if(lastPosition!=null) {
-                    Logger.debug("Surveyor, got position");
-                    latL =lastPosition.latitude;
-                    longL = lastPosition.longitude;
-                }
+
+            Logger.debug("Surveyor, getting position");
+            lastPosition = controller.getPosition();
+            if(lastPosition != null) {
+                Logger.debug("Surveyor, got position");
+                latL =lastPosition.latitude;
+                longL = lastPosition.longitude;
+            } else {
+                latL = 0;
+                longL = 0;
             }
-            if(lastPosition==null)
-            {
-                Logger.debug("Surveyor, no position");
-                longL = 77;
-                latL = 23;
-            }
+
             made = null;
-            made = new Place("New",latL,longL);
+            made = new Place(LocaleManager.getMessage("place_surveyor_canvas_new_place"), latL, longL);
             
-            g.drawString("1   Traffic Signal", 10, 20, Graphics.TOP|Graphics.LEFT);
-            g.drawString("2   Bus Stop", 10, 35, Graphics.TOP|Graphics.LEFT);
-            g.drawString("3   ATM", 10, 50, Graphics.TOP|Graphics.LEFT);
-            g.drawString("4   Exit", 10, 65, Graphics.TOP|Graphics.LEFT);
-            g.drawString("5   Entry", 10, 80, Graphics.TOP|Graphics.LEFT);
-            g.drawString("6   Cut", 10, 95, Graphics.TOP|Graphics.LEFT);
-            g.drawString("7   Fuel", 10, 110, Graphics.TOP|Graphics.LEFT);
-            g.drawString("8   Gate", 10,125, Graphics.TOP|Graphics.LEFT);
-            g.drawString("9   Names", 10,140, Graphics.TOP|Graphics.LEFT); //names is a list
-            g.drawString("0   More", 10,155, Graphics.TOP|Graphics.LEFT); //more list
+            g.drawString("1   " + LocaleManager.getMessage("place_surveyor_canvas_tag_12"), 10, 20, Graphics.TOP|Graphics.LEFT);
+            g.drawString("2   " + LocaleManager.getMessage("place_surveyor_canvas_tag_13"), 10, 35, Graphics.TOP|Graphics.LEFT);
+            g.drawString("3   " + LocaleManager.getMessage("place_surveyor_canvas_tag_14"), 10, 50, Graphics.TOP|Graphics.LEFT);
+            g.drawString("4   " + LocaleManager.getMessage("place_surveyor_canvas_tag_15"), 10, 65, Graphics.TOP|Graphics.LEFT);
+            g.drawString("5   " + LocaleManager.getMessage("place_surveyor_canvas_tag_16"), 10, 80, Graphics.TOP|Graphics.LEFT);
+            g.drawString("6   " + LocaleManager.getMessage("place_surveyor_canvas_tag_17"), 10, 95, Graphics.TOP|Graphics.LEFT);
+            g.drawString("7   " + LocaleManager.getMessage("place_surveyor_canvas_tag_18"), 10, 110, Graphics.TOP|Graphics.LEFT);
+            g.drawString("8   " + LocaleManager.getMessage("place_surveyor_canvas_tag_19"), 10,125, Graphics.TOP|Graphics.LEFT);
+            g.drawString("9   " + LocaleManager.getMessage("place_surveyor_canvas_tag_20"), 10,140, Graphics.TOP|Graphics.LEFT); //names is a list
+            g.drawString("0   " + LocaleManager.getMessage("place_surveyor_canvas_menu_more"), 10,155, Graphics.TOP|Graphics.LEFT); //more list
         }
      }
 }
