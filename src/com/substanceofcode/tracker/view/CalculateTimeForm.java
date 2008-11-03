@@ -22,15 +22,15 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.model.Place;
-import com.substanceofcode.util.StringUtil;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
+
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.util.StringUtil;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * Will ask the user to provide a distance.
@@ -55,7 +55,7 @@ public class CalculateTimeForm extends Form implements CommandListener {
      * @param controller 
      */
     public CalculateTimeForm(Controller controller0) {
-        super("CalculateTime");
+        super(LocaleManager.getMessage("calculate_time_form_title"));
 
         Logger.debug("CalculateTime constructor!");
         this.controller = controller0;
@@ -66,7 +66,6 @@ public class CalculateTimeForm extends Form implements CommandListener {
         this.setCommandListener(this);
         Logger.debug("CalculateTimeForm is open!");
 
-        
         editing = false;
         oldPlaceName = "";
     }
@@ -78,16 +77,16 @@ public class CalculateTimeForm extends Form implements CommandListener {
     
     /** Initialize place fields (name, lon and lat) */
     private void initializeControls() {
-        distanceField = new TextField("Distance", "", 32, TextField.ANY);
+        distanceField = new TextField(LocaleManager.getMessage("calculate_time_form_distance"), "", 32, TextField.ANY);
         this.append(distanceField);
     }
     
     /** Initialize commands */
     private void initializeCommands() {
-        okCommand = new Command("OK", Command.SCREEN, 1);
+        okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.SCREEN, 1);
         this.addCommand( okCommand );
         
-        cancelCommand = new Command("Cancel", Command.SCREEN, 2);
+        cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.SCREEN, 2);
         this.addCommand( cancelCommand );
     }
 

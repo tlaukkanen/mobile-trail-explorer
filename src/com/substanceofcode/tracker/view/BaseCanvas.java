@@ -103,7 +103,7 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         addCommand(switchThemeCommand);
 
         // Trails command
-        manageTime = new Command("Calculate Time", Command.ITEM, 7);
+        manageTime = new Command(LocaleManager.getMessage("menu_calculate_time"), Command.ITEM, 7);
         addCommand(manageTime);
         geocodeCommand = new Command(LocaleManager.getMessage("menu_find_place"), Command.ITEM, 7);
         addCommand(geocodeCommand);
