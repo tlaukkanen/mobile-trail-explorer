@@ -58,6 +58,7 @@ public class PlaceList extends List implements CommandListener {
     private final Command exportAllPlacesCommand;
     private final Command importPlacesCommand;
     private final Command navigatePlaceCommand;
+    private final Command navigationOffCommand;
     private final Command centerMapOnPlaceCommand;
     
     private static final String TITLE = LocaleManager.getMessage("places_list_title");
@@ -87,6 +88,8 @@ public class PlaceList extends List implements CommandListener {
                 new Command(LocaleManager.getMessage("places_list_menu_import"), Command.ITEM, 7));
         this.addCommand(navigatePlaceCommand =
                 new Command(LocaleManager.getMessage("places_list_menu_navigate"), Command.ITEM, 8));
+        this.addCommand(navigationOffCommand =
+                new Command(LocaleManager.getMessage("places_list_menu_navigation_off"), Command.ITEM, 9));
         this.addCommand(centerMapOnPlaceCommand =
                 new Command(LocaleManager.getMessage("places_list_menu_center"), Command.ITEM, 10));
         this.addCommand(backCommand =
@@ -193,13 +196,17 @@ public class PlaceList extends List implements CommandListener {
                 controller.setNavigationPlace(selectedPlace);
             }
         }
+
+        if(command == navigationOffCommand) {
+            controller.turnNavigationOff();
+        }
         
         if(command == centerMapOnPlaceCommand) {
             Place selectedPlace = getSelectedPlace();
             if(selectedPlace != null) {
                 controller.getTrailCanvas().setMapCenter(selectedPlace.getPosition());
                 controller.showTrail();
-    }
+            }
         }
     }
     

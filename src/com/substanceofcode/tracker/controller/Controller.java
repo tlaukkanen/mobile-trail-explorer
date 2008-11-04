@@ -1369,12 +1369,33 @@ public class Controller {
     }
 
     public void setNavigationPlace(Place input) {
-        navpnt = new Place("NAVPL", input.getLatitude(), input.getLongitude());
-        setNavigationStatus(true);
+        boolean newplace = true;
+
+        if (getNavigationPlace() != null) {
+            newplace =! (input.getName().equals(getNavigationPlace().getName()));
+        }
+
+        navpnt = new Place(input.getName(), input.getLatitude(), input.getLongitude());
+        
+        if (newplace == true) {
+            setNavigationStatus(true);
+        } else {
+            if (getNavigationStatus() == false) {
+                setNavigationStatus(true);
+            } else {
+                setNavigationStatus(false);
+            }
+        }
     }
 
     public Place getNavigationPlace() {
         return navpnt;
+    }
+
+    public void turnNavigationOff() {
+        if (getNavigationStatus() == true) {
+            setNavigationStatus(false);
+        }
     }
 
     public void newGpxStream() {
