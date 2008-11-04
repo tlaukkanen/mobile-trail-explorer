@@ -30,7 +30,6 @@ import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
-import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.localization.LocaleManager;
@@ -89,7 +88,7 @@ public class PlaceList extends List implements CommandListener {
         this.addCommand(navigatePlaceCommand =
                 new Command(LocaleManager.getMessage("places_list_menu_navigate"), Command.ITEM, 8));
         this.addCommand(centerMapOnPlaceCommand =
-                new Command("Center Map On Place", Command.ITEM, 10));
+                new Command(LocaleManager.getMessage("places_list_menu_center"), Command.ITEM, 10));
         this.addCommand(backCommand =
                 new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 11));
 

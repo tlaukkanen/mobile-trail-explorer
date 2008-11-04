@@ -271,7 +271,7 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         drawingMapsGroup.setSelectedIndex(MapProviderManager.manager().getSelectedIndex(), true);         
         this.append(drawingMapsGroup);
         
-        String[] otherMapSettings={"Use Network for maps"};
+        String[] otherMapSettings={LocaleManager.getMessage("display_settings_form_use_newtork")};
            otherMapSettingsGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_other_map_settings"),
                 ChoiceGroup.MULTIPLE, otherMapSettings, null);
            otherMapSettingsGroup.setSelectedIndex(0, controller.getUseNetworkForMaps());
