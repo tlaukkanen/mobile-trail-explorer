@@ -260,12 +260,11 @@ public class ElevationCanvas extends BaseCanvas {
 
     private void drawTrail(Graphics g, final int top, final int bottom) {
         try {
-
             // Exit if we don't have anything to draw
             final GpsPosition temp = controller.getPosition();
             if (temp != null) {
                 lastPosition = temp;
-            }            
+            }
             if (lastPosition == null) {
                 return;
             }
@@ -313,7 +312,7 @@ public class ElevationCanvas extends BaseCanvas {
                     if (!manualZoom)
                     {
                       // Make sure the graph covers all the appropriate altitude
-                      // range.                    
+                      // range.
                       if (alt > this.maxAltitude) {
                           this.maxAltitude = alt;
                       }

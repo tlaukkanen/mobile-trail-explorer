@@ -418,37 +418,45 @@ public class TrailCanvas extends BaseCanvas {
     /** Draw navigation arrow */
     private void drawNavigationStatus(Graphics g) {
         GpsPosition currentPosition = controller.getPosition();
-        
+
         double distance = currentPosition.getDistanceFromPosition(
                 controller.getNavigationPlace().getLatitude(), 
                 controller.getNavigationPlace().getLongitude());
-        
+
         double course = currentPosition.getCourseFromPosition(
                 controller.getNavigationPlace().getLatitude(), 
                 controller.getNavigationPlace().getLongitude());
-        
+
         /* draw the arrow */
         drawNavigationArrow(g, course);
-        
+
         String courseString = StringUtil.valueOf(course, 2);
-        
-        LengthFormatter formatter = new LengthFormatter(controller.getSettings());
+
+        LengthFormatter formatter =
+                new LengthFormatter(controller.getSettings());
         String distanceString = formatter.getLengthString(distance, true);
-        
+
         Font currentFont = g.getFont();
         int fontHeight = currentFont.getHeight();
 
-        MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
-        MapDrawContext mdc = new MapDrawContext(g, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight());
-        CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWSG84Position());
-        
-        g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": " + distanceString,
+        MapProvider mapProvider =
+                MapProviderManager.manager().getSelectedMapProvider();
+        MapDrawContext mdc = new MapDrawContext(g, getMapCenter(),
+                mapProvider.getZoomLevel(), getWidth(), getHeight());
+        CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc,
+                lastPosition.getWSG84Position());
+
+        g.drawString(LocaleManager.getMessage("trail_canvas_heading_to") +
+                ": " + controller.getNavigationPlace().getName(),
                 currLocPoint.X,
                 currLocPoint.Y + fontHeight, Graphics.TOP | Graphics.HCENTER);
-        g.drawString(LocaleManager.getMessage("trail_canvas_course") + ": " + courseString,
+
+        g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": " + distanceString,
                 currLocPoint.X,
                 currLocPoint.Y + (fontHeight * 2), Graphics.TOP | Graphics.HCENTER);
-
+        g.drawString(LocaleManager.getMessage("trail_canvas_course") + ": " + courseString,
+                currLocPoint.X,
+                currLocPoint.Y + (fontHeight * 3), Graphics.TOP | Graphics.HCENTER);
     }
 
     /** Draw status bar */
@@ -690,10 +698,10 @@ public class TrailCanvas extends BaseCanvas {
                 }
 
                 g.drawString(LocaleManager.getMessage("trail_canvas_no_time_info"),
-                        1, height - (fontHeight * 4 + 6), Graphics.TOP | Graphics.LEFT);
+                        1, height - (fontHeight * 3 + 6), Graphics.TOP | Graphics.LEFT);
                 g.drawString(timeSinceLastPosition +
                         " " + LocaleManager.getMessage("trail_canvas_time_ago"),
-                        1, height - (fontHeight * 3 + 6), Graphics.TOP | Graphics.LEFT);
+                        1, height - (fontHeight * 2 + 6), Graphics.TOP | Graphics.LEFT);
 
             }
 
