@@ -31,6 +31,7 @@ import javax.microedition.location.LocationException;
 import javax.microedition.location.LocationListener;
 import javax.microedition.location.LocationProvider;
 import javax.microedition.location.QualifiedCoordinates;
+import javax.microedition.location.Coordinates;
 
 import com.substanceofcode.bluetooth.Device;
 import com.substanceofcode.gps.GpsPosition;
@@ -56,9 +57,9 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     private String extraInfo = "";
     GpsPosition gp = null;
     private static Jsr179Device _jsr179Device = null;
-    protected GpsPositionParser parser;
+    //protected GpsPositionParser parser;
 
-    public static QualifiedCoordinates qc;
+    private static QualifiedCoordinates qc;
     
     private LocationProvider locationProvider;
     
@@ -282,5 +283,11 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
             _jsr179Device = new Jsr179Device(address, alias);
         }
         return _jsr179Device;
+    }
+
+    public static double getCourse(double lat, double lon) {
+        Coordinates a = new Coordinates(lat, lon, Float.NaN);
+
+        return qc.azimuthTo(a);
     }
 }
