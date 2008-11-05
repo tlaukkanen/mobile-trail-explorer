@@ -57,6 +57,8 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     GpsPosition gp = null;
     private static Jsr179Device _jsr179Device = null;
     protected GpsPositionParser parser;
+
+    public static QualifiedCoordinates qc;
     
     private LocationProvider locationProvider;
     
@@ -85,7 +87,7 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                 // convert from m/s to km/h
                 float speedkmh = speed * 3.6f;
                 
-                QualifiedCoordinates qc = location.getQualifiedCoordinates();
+                qc = location.getQualifiedCoordinates();
                 float altitude = qc.getAltitude();
                 float hdop = qc.getHorizontalAccuracy();
                 

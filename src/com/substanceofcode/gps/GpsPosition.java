@@ -27,10 +27,16 @@ import java.io.IOException;
 import java.io.EOFException;
 import java.util.Date;
 
+import javax.microedition.location.Coordinates;
+
 import com.substanceofcode.data.Serializable;
 import com.substanceofcode.tracker.grid.WSG84Position;
 import com.substanceofcode.util.MathUtil;
 import com.substanceofcode.localization.LocaleManager;
+
+import com.substanceofcode.gpsdevice.Jsr179Device;
+import com.substanceofcode.gpsdevice.GpsUtilities;
+import com.substanceofcode.tracker.controller.Controller;
 
 /**
  * <p>
@@ -362,13 +368,25 @@ public final class GpsPosition implements Serializable {
         
         double alpha = 0;
         
-        if(lon1 != lon2 && lat1 != lat2) {
-            alpha = (MathUtil.acos((lat2 - lat1) / (Math.sqrt(MathUtil.pow(lat2 - lat1, 2) + MathUtil.pow(lon2 - lon1, 2)))) * 180 / Math.PI);
-            if(lon1 > lon2) {
-                alpha = 360 - alpha;
-            }
-        } else {
+        if (GpsUtilities.checkJsr179IsPresent() && Controller.getController().getUseJsr179()) {
             alpha = 0;
+/*
+            //TODO: check on non jsr-179 device!!!
+            //javax.microedition.location.Coordinates a = new javax.microedition.location.Coordinates(lat2, lon2, Float.NaN);
+            Coordinates a = new Coordinates(lat2, lon2, Float.NaN);
+
+            alpha = Jsr179Device.qc.azimuthTo(a); //azimuthTo from JSR-179 is much more accurate.
+ */
+        } else {
+            if(lon1 != lon2 && lat1 != lat2) {
+                alpha = (MathUtil.acos((lat2 - lat1) / (Math.sqrt(MathUtil.pow(lat2 - lat1, 2) + MathUtil.pow(lon2 - lon1, 2)))) * 180 / Math.PI);
+
+                if(lon1 > lon2) {
+                    alpha = 360 - alpha;
+                }
+            } else {
+                alpha = 0;
+            }
         }
         
         return alpha;
