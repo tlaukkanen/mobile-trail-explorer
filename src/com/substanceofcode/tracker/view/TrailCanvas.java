@@ -410,12 +410,12 @@ public class TrailCanvas extends BaseCanvas {
         navigationArrows = new Sprite(tempNaviArrows, spriteSize, spriteSize);
         navigationArrows.setPosition(currLocPoint.X - (spriteSize / 2), currLocPoint.Y - (spriteSize / 2));
 
-        int drawtox = currLocPoint.X + (int)(getWidth()*Math.sin(Math.PI/180*(course)));// course is to current waypoint(Place)
+        int drawtox = currLocPoint.X + (int)(getWidth()*Math.sin(Math.PI/180*(course))); //course is to current waypoint(Place)
         int drawtoy = currLocPoint.Y - (int)(getWidth()*Math.cos(Math.PI/180*(course)));
         g.drawLine((int)currLocPoint.X,(int)currLocPoint.Y,drawtox,drawtoy);
         int tempcolor=g.getColor();
         g.setColor (0, 0, 255);
-        drawtox = currLocPoint.X + (int)(getWidth()*Math.sin(Math.PI/180*(lastPosition.course)));//lastPosition.course is current heading
+        drawtox = currLocPoint.X + (int)(getWidth()*Math.sin(Math.PI/180*(lastPosition.course))); //lastPosition.course is current heading
         drawtoy = currLocPoint.Y - (int)(getWidth()*Math.cos(Math.PI/180*(lastPosition.course)));
         g.drawLine(currLocPoint.X,currLocPoint.Y,drawtox,drawtoy);
         g.setColor(tempcolor);
