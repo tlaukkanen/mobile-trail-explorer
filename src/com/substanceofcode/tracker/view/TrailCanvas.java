@@ -389,17 +389,16 @@ public class TrailCanvas extends BaseCanvas {
     
     /** Draw navigation arrow */
     private void drawNavigationArrow(Graphics g, double course) {
-        
         int spriteSize;
-        
+
          Image tempNaviArrows = ImageUtil.loadImage("/images/compass-arrows.png");
-        
+
         if (largeDisplay) {
             spriteSize = 22;
-            
+
             ImageUtil.scale(tempNaviArrows, tempNaviArrows.getWidth() * 2,
                     tempNaviArrows.getHeight() * 2);
-            
+
         } else {
             spriteSize = 11;
         }
@@ -407,9 +406,19 @@ public class TrailCanvas extends BaseCanvas {
         MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
         MapDrawContext mdc = new MapDrawContext(g, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight());
         CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWSG84Position());
-        
+
         navigationArrows = new Sprite(tempNaviArrows, spriteSize, spriteSize);
         navigationArrows.setPosition(currLocPoint.X - (spriteSize / 2), currLocPoint.Y - (spriteSize / 2));
+
+        int drawtox = currLocPoint.X + (int)(getWidth()*Math.sin(Math.PI/180*(course)));// course is to current waypoint(Place)
+        int drawtoy = currLocPoint.Y - (int)(getWidth()*Math.cos(Math.PI/180*(course)));
+        g.drawLine((int)currLocPoint.X,(int)currLocPoint.Y,drawtox,drawtoy);
+        int tempcolor=g.getColor();
+        g.setColor (0, 0, 255);
+        drawtox = currLocPoint.X + (int)(getWidth()*Math.sin(Math.PI/180*(lastPosition.course)));//lastPosition.course is current heading
+        drawtoy = currLocPoint.Y - (int)(getWidth()*Math.cos(Math.PI/180*(lastPosition.course)));
+        g.drawLine(currLocPoint.X,currLocPoint.Y,drawtox,drawtoy);
+        g.setColor(tempcolor);
 
         navigationArrows.setFrame(lastPosition.getCourseCourseIndex(course));
         navigationArrows.paint(g);
@@ -489,7 +498,7 @@ public class TrailCanvas extends BaseCanvas {
 
             /** Draw coordinates information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES) == true) {
-                
+
                 GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.TRAIL_CANVAS);
                 String[] gridLabels = gridFormatter.getLabels();
                 String[] gridData = gridFormatter.getStrings(lastPosition.getWSG84Position());
