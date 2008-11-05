@@ -369,14 +369,11 @@ public final class GpsPosition implements Serializable {
         double alpha = 0;
         
         if (GpsUtilities.checkJsr179IsPresent() && Controller.getController().getUseJsr179()) {
-            alpha = 0;
-/*
             //TODO: check on non jsr-179 device!!!
             //javax.microedition.location.Coordinates a = new javax.microedition.location.Coordinates(lat2, lon2, Float.NaN);
             Coordinates a = new Coordinates(lat2, lon2, Float.NaN);
 
             alpha = Jsr179Device.qc.azimuthTo(a); //azimuthTo from JSR-179 is much more accurate.
- */
         } else {
             if(lon1 != lon2 && lat1 != lat2) {
                 alpha = (MathUtil.acos((lat2 - lat1) / (Math.sqrt(MathUtil.pow(lat2 - lat1, 2) + MathUtil.pow(lon2 - lon1, 2)))) * 180 / Math.PI);
