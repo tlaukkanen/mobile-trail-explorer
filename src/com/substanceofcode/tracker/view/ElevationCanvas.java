@@ -336,7 +336,19 @@ public class ElevationCanvas extends BaseCanvas {
                 }
             }
 
-            int height = getYPos(lastPosition.altitude, top, bottom);
+            int height = 0;
+            if (lastPosition != null) {
+                height = getYPos(lastPosition.altitude, top, bottom);
+            }
+
+            if (height < -5000) { //set some reasonable limits
+                height = -5000; // This prevents the gui from stalling from wildly bad data
+            } // to do: should figure out why the data is bad in the first place.
+
+            if (height > 60000){
+                height = 60000;
+            }
+
             int right = this.getWidth() - (2 * MARGIN);
             // Draw red dot on current location
             g.drawImage(redDotImage, right + horizontalMovement, height,
