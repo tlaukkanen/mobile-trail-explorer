@@ -287,7 +287,6 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
 
     public static double getCourse(double lat, double lon) {
         Coordinates a = new Coordinates(lat, lon, Float.NaN);
-
         return qc.azimuthTo(a);
     }
 }
