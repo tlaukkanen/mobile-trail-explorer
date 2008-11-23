@@ -22,7 +22,6 @@
 package com.substanceofcode.map;
 
 import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.tracker.view.Logger;
 
 /**
  * This class is used to hold the references to all the specified MapProvider instances
@@ -41,7 +40,7 @@ public final class MapProviderManager {
     public static MapProviderManager manager() {
         if (singleton == null) {
             singleton = new MapProviderManager();
-    }
+        }
         return singleton;
     }
     
@@ -53,8 +52,8 @@ public final class MapProviderManager {
             if (ident.equals(mapproviders[i].getIdentifier())) {
                 selectedProvider = mapproviders[i];
                 break;
-    }
-    }
+            }
+        }
         selectedProvider.setState(MapProvider.ACTIVE);
     }
     
@@ -62,8 +61,8 @@ public final class MapProviderManager {
         for (int i = 0; i < mapproviders.length; i++) {
             if (mapproviders[i] == selectedProvider) {
                 return i;
-    }
-    }
+            }
+        }
         //if not found => return default
         return 0;
     }
@@ -77,11 +76,11 @@ public final class MapProviderManager {
             if(selectedProvider != null)
             {
                 selectedProvider.setState(MapProvider.INACTIVE);
-    }
+            }
             selectedProvider = mapproviders[indx];
             selectedProvider.setState(MapProvider.ACTIVE);
             Controller.getController().getSettings().setDrawMap(selectedProvider.getIdentifier());
-    }
+        }
     }
     
     public String[] getDisplayStrings() {

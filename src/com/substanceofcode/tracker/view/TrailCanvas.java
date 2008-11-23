@@ -272,8 +272,13 @@ public class TrailCanvas extends BaseCanvas {
         Image tempCompassArrows = ImageUtil.loadImage("/images/compass-arrows.png");
         compass = ImageUtil.loadImage("/images/compass.png");
         
-         // Check for high resolution (eg. N80 352x416)
-        if (width > 250) {
+        /*
+         * Check for high resolution (eg. N80 352x416)
+         * 240 (because 320x240) is a std. HxW dimension
+         * on width screen displays (eg e71)
+         * the small display settings looks better
+         */
+        if (width >= 240 && width < 320) {
             // Double the compass size
             largeDisplay = true;
             compass = ImageUtil.scale(compass, compass.getWidth() * 2, compass.getHeight() * 2);

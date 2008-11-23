@@ -22,14 +22,14 @@
 
 package com.substanceofcode.tracker.view;
 
-import com.substanceofcode.tracker.controller.Controller;
-import com.substanceofcode.localization.LocaleManager;
-
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Font;
+
+import com.substanceofcode.tracker.controller.Controller;
+import com.substanceofcode.localization.LocaleManager;
 
 /**
  * 

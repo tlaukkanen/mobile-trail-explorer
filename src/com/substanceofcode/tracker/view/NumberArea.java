@@ -25,7 +25,6 @@ package com.substanceofcode.tracker.view;
 import javax.microedition.lcdui.Graphics;
 
 import com.substanceofcode.util.StringUtil;
-import com.substanceofcode.tracker.view.Logger;
 
 /**
  *
@@ -59,7 +58,7 @@ public class NumberArea {
             if(numChar.compareTo(".")==0 || 
                numChar.compareTo(",")==0) {
                 setBlack(g);
-                Logger.info("char: " + numChar);
+                //Logger.info("char: " + numChar);
                 //g.fillRect(xinc+numSize.getWidth(), y, numSize.getLineWidth(), numSize.getLineWidth());
                 g.fillRoundRect(
                         xinc+numSize.getWidth()-numSize.getLineWidth(), y + numSize.getHeight() - numSize.getLineWidth(), 
