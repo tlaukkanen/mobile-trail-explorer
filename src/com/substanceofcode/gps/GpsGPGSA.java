@@ -60,12 +60,12 @@ public class GpsGPGSA implements Serializable {
     }
 
     public String getFixtype() {
-        String type = "N/A";
+        String type = "none";
         if (fixtype == 2) {
-            type = "2D";
+            type = "2d";
         }
         if (fixtype == 3) {
-            type = "3D";
+            type = "3d";
         }
         return type;
     }

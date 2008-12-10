@@ -157,14 +157,14 @@ public class GpxConverter extends TrackConverter {
         gpx.append("<time>").append(universalDateStamp).append("</time>\r\n");
         
         if (gpgsa != null) {
+            gpx.append("<fix>").append(String.valueOf(gpgsa.getFixtype()))
+                    .append("</fix>\r\n");
             gpx.append("<hdop>").append(String.valueOf(gpgsa.getHdop()))
                     .append("</hdop>\r\n");
             gpx.append("<vdop>").append(String.valueOf(gpgsa.getVdop()))
                     .append("</vdop>\r\n");
             gpx.append("<pdop>").append(String.valueOf(gpgsa.getPdop()))
-                    .append("</pdop>\r\n");            
-            gpx.append("<fixtype>").append(String.valueOf(gpgsa.getFixtype()))
-            .append("</fixtype>\r\n");
+                    .append("</pdop>\r\n");
         }
 
         gpx.append("</trkpt>\r\n");
