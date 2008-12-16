@@ -228,12 +228,12 @@ public class Place {
         // ------------------------------------------------------------------
         // Save the data to a file
         // ------------------------------------------------------------------
-        
-        // keeps UTF-8 as encoding (as specified in KML-XML-header...
-        output.writeUTF( exportData );
+        // encode to KML/GPX UTF-8
+        output.write(exportData.getBytes("UTF-8"));
         output.close();
         out.close();
         connection.close();
+
         // ----------------------------------------------------------------------
         // Notify progress
         // ----------------------------------------------------------------------
