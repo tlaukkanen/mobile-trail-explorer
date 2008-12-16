@@ -278,7 +278,7 @@ public class TrailCanvas extends BaseCanvas {
          * on width screen displays (eg e71)
          * the small display settings looks better
          */
-        if (width >= 240 && width < 320) {
+        if (width > 240 && width < 320) {
             // Double the compass size
             largeDisplay = true;
             compass = ImageUtil.scale(compass, compass.getWidth() * 2, compass.getHeight() * 2);
@@ -309,7 +309,6 @@ public class TrailCanvas extends BaseCanvas {
     /** Draw zoom scale bar */
     private void drawZoomScaleBar(Graphics g) {
         String text = "", unit = "";
-
 
         MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
         double pixelSize = mapProvider.getPixelSize(
