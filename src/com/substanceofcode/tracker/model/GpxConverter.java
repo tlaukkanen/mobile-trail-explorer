@@ -190,11 +190,17 @@ public class GpxConverter extends TrackConverter {
             String name = marker.getName();
             String link = marker.getReference();
 
+            if(name.length() < 1) {
+                name = "Marker-" + String.valueOf(i);
+            }
+
             gpx.append("<wpt lat=\"").append(lat).append("\" lon=\"").append(
                     lon).append("\">\r\n");
             gpx.append(" <name>").append(name).append("</name>\r\n");
             gpx.append(" <sym>Marker</sym>\r\n");
-            gpx.append(" <link href=\"").append(link).append("\" />");
+            if(link.length() >= 1) {
+                gpx.append(" <link href=\"").append(link).append("\" />");
+            }
             gpx.append("</wpt>\r\n");
         }
 
