@@ -41,9 +41,9 @@ import com.substanceofcode.tracker.view.Logger;
  * Caches tiles to the filesystem. A byproduct of this is that tiles can be
  * downloaded via an external program on a pc and transfered across by loading
  * them onto a memory card
- * 
+ *
  * @author gareth
- * 
+ *
  */
 public class FileCache implements TileCache, Runnable {
 
@@ -93,7 +93,7 @@ public class FileCache implements TileCache, Runnable {
      */
     public void initializeCache() {
         Logger.debug("Initializing FileCache");
-        
+
         try {
             Conn = (FileConnection) Connector.open(fullPath);
             if (Conn != null && !Conn.exists()) {
@@ -136,8 +136,8 @@ public class FileCache implements TileCache, Runnable {
         } catch (IOException e) {
             Logger.error("File: IOException: " + e.getMessage());
             e.printStackTrace();
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
+        } catch (SecurityException e) {
+         	Logger.error("File: SecurityException: " + e.getMessage());
         }
     }
 
@@ -152,7 +152,7 @@ public class FileCache implements TileCache, Runnable {
     /**
      * Take a Vector of tiles and attempt to serialize them all to the
      * filesystem
-     * 
+     *
      * @param tiles
      *                The vector of tiles to serialize
      * @return true if serialization was successful
@@ -171,10 +171,10 @@ public class FileCache implements TileCache, Runnable {
             // ------------------------------------------------------------------
 
             // Logger.debug("FILE: path is " + fullPath);
-            
+
             //Conn will be created once, in the initCache method
             // if Conn is subsequently lost, too bad, we won't try to recreate it
-            
+
             //if (Conn == null) {
             //    Conn = (FileConnection) Connector.open(fullPath);
            // }
@@ -243,7 +243,7 @@ public class FileCache implements TileCache, Runnable {
             } else {
                 Logger.debug("File: output stream is null");
             }
-            
+
             streamOut = null;
 
         } catch (IOException e) {
@@ -415,7 +415,7 @@ public class FileCache implements TileCache, Runnable {
      * before the byte array. Other things to check for are that the xyz ints
      * are all within the expected range (0-2^18ish) and the Strings are not
      * null. TODO: Implement this
-     * 
+     *
      * @return
      */
     private boolean verifyCacheIntegrity() {

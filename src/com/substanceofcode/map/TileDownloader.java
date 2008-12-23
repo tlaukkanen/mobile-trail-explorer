@@ -308,15 +308,10 @@ public class TileDownloader implements Runnable {
                             }
                         }
                     }
-                } catch (ConnectionNotFoundException e) {
-                    e.printStackTrace();
-                    Logger.error("TD run(): " + e.getMessage());
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    Logger.error("TD run(): " + e.getMessage());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Logger.error("TD run(): " + e.getMessage());
+                    Logger.error("TD run() IOException: " + e.getMessage());
+                 } catch (SecurityException e) {
+                    Logger.error("TD run() SecurityException: " + e.getMessage());
                 } finally {
                     if (in != null) {
                         try {
