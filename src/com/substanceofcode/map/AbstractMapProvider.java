@@ -33,16 +33,27 @@ import javax.microedition.lcdui.Graphics;
 
 /**
  * Extend this class to implement a new map provider
- * 
+ *
  */
-public abstract class AbstractMapProvider implements MapProvider 
+public abstract class AbstractMapProvider implements MapProvider
 {
-        
+
     public AbstractMapProvider()
     {
-             
+
     }
-    
+
+	//Many users have reported a NoSuchMethod error which can be traced to
+	//convertPositionToScreen call in this class's drawTrail() method.
+	//Redeclaring the method here seems to fix it without breaking anything else
+	// UPDATE: Seems to be limited to S40 devices
+
+	public abstract CanvasPoint convertPositionToScreen(MapDrawContext mdc, GridPosition position);
+
+	//Same for getIdentifier
+	public abstract String getIdentifier();
+
+
     public void drawTrail(MapDrawContext mdc, Track trail, int color, boolean drawWholeTrail, int numPositionsToDraw)
     {
 
@@ -52,9 +63,9 @@ public abstract class AbstractMapProvider implements MapProvider
      }
 
             Graphics g = mdc.getGraphics();
-     
+
             g.setColor(color);
-    
+
             // TODO: implement the drawing based solely on numPositions.
             //final int numPositionsToDraw = controller.getSettings()
             //        .getNumberOfPositionToDraw();
@@ -78,16 +89,16 @@ public abstract class AbstractMapProvider implements MapProvider
                 } else {
                     increment = 1;
     }
-    
+
                 int positionsDrawn = 0;
-    
+
                 try {
-                    if (trail != null && trail.getEndPosition() != null) 
-                    {    
-    
-                        CanvasPoint lastPoint = convertPositionToScreen(mdc, 
+                    if (trail != null && trail.getEndPosition() != null)
+                    {
+
+                        CanvasPoint lastPoint = convertPositionToScreen(mdc,
                                 trail.getEndPosition().getWSG84Position() );
-    
+
                         for (int index = numPositions - 2; index >= 0; index -= increment) {
                             GridPosition pos = trail.getPosition(index).getWSG84Position();
 
@@ -102,7 +113,7 @@ public abstract class AbstractMapProvider implements MapProvider
                             g.drawLine(point1.X, point1.Y, point2.X, point2.Y);
 
                             lastPoint = point1;
-                            
+
                             positionsDrawn++;
                             if (!drawWholeTrail
                                     && positionsDrawn > numPositionsToDraw) {
@@ -119,15 +130,15 @@ public abstract class AbstractMapProvider implements MapProvider
                     + ex.toString());
         }
     }
-    
-    
+
+
     public void drawPlaces(MapDrawContext mdc, Vector places)
     {
 
         // Draw places
         int placeCount = places.size();
         Graphics g = mdc.getGraphics();
-        
+
         g.setColor( Theme.getColor(Theme.TYPE_PLACEMARK));
         for (int placeIndex = 0; placeIndex < placeCount; placeIndex++) {
 
@@ -135,7 +146,7 @@ public abstract class AbstractMapProvider implements MapProvider
             double lat = place.getLatitude();
             double lon = place.getLongitude();
             CanvasPoint point = convertPositionToScreen(mdc, place.getPosition());
-            
+
             if (point != null) {
                 g.drawString(place.getName(), point.X + 2, point.Y - 1,
                         Graphics.BOTTOM | Graphics.LEFT);
@@ -143,5 +154,5 @@ public abstract class AbstractMapProvider implements MapProvider
     }
 }
     }
-    
+
 }
