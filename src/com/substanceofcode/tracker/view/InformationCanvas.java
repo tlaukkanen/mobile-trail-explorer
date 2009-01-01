@@ -200,6 +200,8 @@ public class InformationCanvas extends BaseCanvas{
     
     private void drawNextString(Graphics g, String name, String value) {
         if(lineRow<-BIG_FONT.getHeight()) {
+            lineRow += BIG_FONT.getHeight();
+            totalTextHeight += BIG_FONT.getHeight();
             return;
         }
         g.setFont(BIG_FONT);
@@ -218,6 +220,8 @@ public class InformationCanvas extends BaseCanvas{
     
     private void drawNextHeader(Graphics g, String header) {
         if(lineRow<-SMALL_FONT.getHeight()) {
+            lineRow += SMALL_FONT.getHeight();
+            totalTextHeight += SMALL_FONT.getHeight();
             return;
         }
         g.setFont(SMALL_FONT);
