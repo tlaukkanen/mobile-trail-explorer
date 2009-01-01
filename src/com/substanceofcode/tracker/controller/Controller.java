@@ -550,20 +550,21 @@ public class Controller {
         if(gpsDevice==null) {
             return;
         }
-        new Thread() {
-            public void run() {
-                try {
-                    if (gpsDevice instanceof BluetoothDevice) {
-                        ((BluetoothDevice) gpsDevice).connect();
-                        status = STATUS_STOPPED;
+        if (gpsDevice instanceof BluetoothDevice) {
+            new Thread() {
+                public void run() {
+                    try {
+                            ((BluetoothDevice) gpsDevice).connect();
+                            status = STATUS_STOPPED;
+
+                    } catch (Exception ex) {
+                        Logger.error("Error while connection to GPS: " + ex.toString());
+                        showError(LocaleManager.getMessage("controller_connecttogpsdevice_error")
+                                + ": " + ex.toString());
                     }
-                } catch (Exception ex) {
-                    Logger.error("Error while connection to GPS: " + ex.toString());
-                    showError(LocaleManager.getMessage("controller_connecttogpsdevice_error")
-                            + ": " + ex.toString());
                 }
-            }
-        }.start();
+            }.start();
+        }        
     }
 
     /** Method for starting and stopping the recording */
@@ -572,12 +573,11 @@ public class Controller {
         // Start Recording
         // --------------------------------------------------------------------------
         if (status != STATUS_RECORDING) {
-            Logger.info("Starting Recording");
-            // XXX : HACK(disabled)
+            Logger.info("Starting Recording");            
             Logger.debug("gpsDevice is " + gpsDevice);
             if (gpsDevice == null) {
                 showError(LocaleManager.getMessage("controller_startstop_error"));
-            } else {
+            } else {                
                 if( status==STATUS_NOTCONNECTED ) {
                     connectToGpsDevice();
                 }
@@ -619,7 +619,7 @@ public class Controller {
                 trailActionsForm = new TrailActionsForm(this);
             }
             display.setCurrent(trailActionsForm);
-        }
+        }       
     }
 
     /**
