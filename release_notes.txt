@@ -19,6 +19,10 @@ Vikas Yadav
 
 Release Notes:
 
+v1.14 (January xth 2009)
++ Fixed information screen scrolling (Tommi)
++ Splash screen hang fix (Issue 106)
+
 v1.13 (November 15th 2008)
 + Option to prevent Map tiles from being downloaded over the network (Cached tiles will still be displayed)
 + Bug fix: When the locale is changed manually, it will be saved (From Kaspar)
