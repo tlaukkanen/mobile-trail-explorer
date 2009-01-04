@@ -57,7 +57,7 @@ public class CH1903Position extends GridPosition
         }
         
         //convert the data
-        WSG84Position position = pos.getAsWSG84Position();
+        WGS84Position position = pos.getAsWGS84Position();
         
         double lat = position.getLatitude() * 3600;
         double lon = position.getLongitude() * 3600;
@@ -95,7 +95,7 @@ public class CH1903Position extends GridPosition
         return GRID_CH1903;
     }
 
-    public WSG84Position getAsWSG84Position() 
+    public WGS84Position getAsWGS84Position()
     {
         double xd = (((double)x) - 600000.0)/1000000.0;
         double yd = (((double)y) - 200000.0)/1000000.0;
@@ -114,7 +114,7 @@ public class CH1903Position extends GridPosition
                 - 0.0140 * yd * yd * yd;
               
         
-        return new WSG84Position(phi*100/36, lamda*100/36);
+        return new WGS84Position(phi*100/36, lamda*100/36);
     }
     
     

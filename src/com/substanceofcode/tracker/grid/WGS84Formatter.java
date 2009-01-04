@@ -1,5 +1,5 @@
 /*
- * WSG84Formatter.java
+ * WGS84Formatter.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -29,7 +29,7 @@ import com.substanceofcode.localization.LocaleManager;
  *
  * @author kaspar
  */
-public class WSG84Formatter implements GridFormatter
+public class WGS84Formatter implements GridFormatter
 {
     public String[] getLabels(int display_context) 
     {
@@ -54,7 +54,7 @@ public class WSG84Formatter implements GridFormatter
             return new String[]{"",""};
         }
         
-        WSG84Position pos = new WSG84Position(position);
+        WGS84Position pos = new WGS84Position(position);
         
         String lat;
         String lon;
@@ -75,7 +75,7 @@ public class WSG84Formatter implements GridFormatter
 
     public String getIdentifier() 
     {
-        return GRID_WSG84;
+        return GRID_WGS84;
     }
 
     public String getName() 
@@ -96,16 +96,16 @@ public class WSG84Formatter implements GridFormatter
                 throw new BadFormattedException(
                         LocaleManager.getMessage("wsg84_formatter_getgridpositionwithdata_error"));
             }
-            return new WSG84Position(latitude, longitude);
+            return new WGS84Position(latitude, longitude);
     }
 
     public GridPosition convertPosition(GridPosition position) 
     {
-        return new WSG84Position(position);
+        return new WGS84Position(position);
     }
 
     public GridPosition getEmptyPosition() 
     {
-        return new WSG84Position(0.0,0.0);
+        return new WGS84Position(0.0,0.0);
     }
 }

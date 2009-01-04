@@ -159,7 +159,7 @@ public class InformationCanvas extends BaseCanvas{
             /** Draw position using grid formatter. Usually lat/lon */
             GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.INFORMATION_CANVAS);
             String[] gridLabels = gridFormatter.getLabels();
-            String[] gridData = gridFormatter.getStrings(position.getWSG84Position());
+            String[] gridData = gridFormatter.getStrings(position.getWGS84Position());
 
             int infoPos = BIG_FONT.stringWidth("LAT:_:");
             

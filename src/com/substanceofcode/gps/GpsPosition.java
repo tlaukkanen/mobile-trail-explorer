@@ -28,7 +28,7 @@ import java.io.EOFException;
 import java.util.Date;
 
 import com.substanceofcode.data.Serializable;
-import com.substanceofcode.tracker.grid.WSG84Position;
+import com.substanceofcode.tracker.grid.WGS84Position;
 import com.substanceofcode.util.MathUtil;
 import com.substanceofcode.localization.LocaleManager;
 
@@ -482,13 +482,13 @@ public final class GpsPosition implements Serializable {
         }
     }
     
-    private WSG84Position wsg84Position = null;
-    public WSG84Position getWSG84Position()
+    private WGS84Position wgs84Position = null;
+    public WGS84Position getWGS84Position()
     {
-        if(wsg84Position == null)
+        if(wgs84Position == null)
         {
-            wsg84Position = new WSG84Position(this);
+            wgs84Position = new WGS84Position(this);
     }
-        return wsg84Position;
+        return wgs84Position;
 }
 }

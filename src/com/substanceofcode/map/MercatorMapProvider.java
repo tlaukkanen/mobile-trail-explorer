@@ -23,7 +23,7 @@
 package com.substanceofcode.map;
 
 import com.substanceofcode.tracker.grid.GridPosition;
-import com.substanceofcode.tracker.grid.WSG84Position;
+import com.substanceofcode.tracker.grid.WGS84Position;
 import com.substanceofcode.tracker.view.CanvasPoint;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.ProjectionUtil;
@@ -32,7 +32,7 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 /**
- * this class is kind of the old MapProider. just overwrite all abstract methods in your subclass
+ * this class is kind of the old MapProvider. just overwrite all abstract methods in your subclass
  * 
  * @author kaspar
  */
@@ -58,9 +58,6 @@ import javax.microedition.lcdui.Image;
     private TileDownloader tileDownloader = null;
     
     
-    
-    
-    
     /**
      * 
      * @return the url-format for fetching the tile
@@ -76,14 +73,10 @@ import javax.microedition.lcdui.Image;
             tileDownloader = new TileDownloader(this);
             tileDownloader.start();
         }
-        WSG84Position center = mdc.getMapCenter().getAsWSG84Position();
-        if (center != null) {
-            // System.out.println("lastPos not null");
-            if (tileDownloader != null && tileDownloader.isStarted() == true) {
-                // System.out.println("td not null and td was started");
+        WGS84Position center = mdc.getMapCenter().getAsWGS84Position();
+        if (center != null) {            
+            if (tileDownloader != null && tileDownloader.isStarted() == true) {               
                 int[] pt = MapLocator.conv(center.getLatitude(), center.getLongitude(), mdc.getZoomLevel());
-
-                // System.out.println("zoom = "+zoom);
 
                 // Get the tile images in the priority order. Unavailable images are returned as null
                 for (int i = 0; i < tilePriorities.length; i++) {
@@ -91,7 +84,7 @@ import javax.microedition.lcdui.Image;
                         int imageIndex = tilePriorities[i];
                         mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], mdc.getZoomLevel(), false);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Logger.error("MMP:"+e.getMessage());
                     }
                 }
 
@@ -137,7 +130,7 @@ import javax.microedition.lcdui.Image;
     public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels) 
     {
         //convert the center
-        WSG84Position centerPos = mdc.getMapCenter().getAsWSG84Position();
+        WGS84Position centerPos = mdc.getMapCenter().getAsWGS84Position();
         CanvasPoint centerPoint = ProjectionUtil.toCanvasPoint(centerPos.getLatitude()
                 , centerPos.getLongitude(), mdc.getZoomLevel());
         
@@ -168,7 +161,7 @@ import javax.microedition.lcdui.Image;
         
         if(mdc.getMapCenter() != null)
         {
-            WSG84Position pos = mdc.getMapCenter().getAsWSG84Position();
+            WGS84Position pos = mdc.getMapCenter().getAsWGS84Position();
             lat = pos.getLatitude();
             lng = pos.getLongitude();
         }
@@ -177,15 +170,15 @@ import javax.microedition.lcdui.Image;
     }    
 
     public CanvasPoint convertPositionToScreen(MapDrawContext mdc, GridPosition position) 
-    {
+    {      
         //convert the center
-        WSG84Position centerPos = mdc.getMapCenter().getAsWSG84Position();
+        WGS84Position centerPos = mdc.getMapCenter().getAsWGS84Position();
         CanvasPoint centerPoint = ProjectionUtil.toCanvasPoint(centerPos.getLatitude()
                 , centerPos.getLongitude(), mdc.getZoomLevel());
         
         
         //convert the position
-        WSG84Position pos = position.getAsWSG84Position();
+        WGS84Position pos = position.getAsWGS84Position();
         CanvasPoint merc = ProjectionUtil.toCanvasPoint(pos.getLatitude(),
                 pos.getLongitude(), mdc.getZoomLevel());
 
@@ -198,9 +191,7 @@ import javax.microedition.lcdui.Image;
                 (int) (relativeY));
         return relativePoint;
     }
-    
-    
-    
+ 
     
     public String getCacheDir()
     {
@@ -228,7 +219,7 @@ import javax.microedition.lcdui.Image;
         return output.toString();
     }
     
-        private final int[] configureCoords(int x , int y, int z){              
+    private final int[] configureCoords(int x , int y, int z){
         int[] a = { setX(x),setY(y),setZ(z)};
         return a;
     }

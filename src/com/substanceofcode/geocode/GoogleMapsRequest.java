@@ -23,7 +23,7 @@
 package com.substanceofcode.geocode;
 
 import com.substanceofcode.tracker.grid.GridPosition;
-import com.substanceofcode.tracker.grid.WSG84Position;
+import com.substanceofcode.tracker.grid.WGS84Position;
 import com.substanceofcode.util.StringUtil;
 import java.io.InputStream;
 import javax.microedition.io.Connector;
@@ -99,7 +99,7 @@ public class GoogleMapsRequest extends GeocodeRequest
                 return;
             }
             
-            location = new WSG84Position(Double.valueOf(data[2]).doubleValue(), Double.valueOf(data[3]).doubleValue());
+            location = new WGS84Position(Double.valueOf(data[2]).doubleValue(), Double.valueOf(data[3]).doubleValue());
             updateStatus(STATUS_FOUND);
             
         } catch (Exception e) {

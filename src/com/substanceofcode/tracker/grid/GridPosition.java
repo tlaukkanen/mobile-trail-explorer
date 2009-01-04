@@ -26,7 +26,7 @@ import java.util.Hashtable;
 
 /**
  * every implementation should have a constructor, which accepts a GridPosition as an
- * argument. using getAsWSG84Position() it can convert the data to its own grid.
+ * argument. using getAsWGS84Position() it can convert the data to its own grid.
  *
  * @author kaspar
  */
@@ -56,10 +56,10 @@ public abstract class GridPosition implements GridIdentifiers
     }
     
     /**
-     * returns the position as a instance of WSG84Position (used for convert positions)
+     * returns the position as a instance of WGS84Position (used for convert positions)
      * @return
      */
-    public abstract WSG84Position getAsWSG84Position();
+    public abstract WGS84Position getAsWGS84Position();
     
     /**
      * returns the same name as in GridFormatter

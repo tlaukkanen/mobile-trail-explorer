@@ -92,16 +92,16 @@ public abstract class AbstractMapProvider implements MapProvider
 
                 int positionsDrawn = 0;
 
-                try {
-                    if (trail != null && trail.getEndPosition() != null)
+         
+                    if (trail != null && trail.getEndPosition() != null) 
                     {
-
-                        CanvasPoint lastPoint = convertPositionToScreen(mdc,
-                                trail.getEndPosition().getWSG84Position() );
+                        
+                        CanvasPoint lastPoint = convertPositionToScreen(mdc, 
+                                trail.getEndPosition().getWGS84Position() );
 
                         for (int index = numPositions - 2; index >= 0; index -= increment) {
-                            GridPosition pos = trail.getPosition(index).getWSG84Position();
-
+                            GridPosition pos = trail.getPosition(index).getWGS84Position();
+                            
                             CanvasPoint point1 = convertPositionToScreen(mdc, pos);
                             // debugging...
                             // if(index == numPositions - 2) {
@@ -117,13 +117,10 @@ public abstract class AbstractMapProvider implements MapProvider
                             positionsDrawn++;
                             if (!drawWholeTrail
                                     && positionsDrawn > numPositionsToDraw) {
-                                break;
-    }
+                                break;    
                         }
                     }
-                } catch (NullPointerException npe) {
-                    Logger.error("NPE while drawing trail");
-                }
+                } 
             }
         } catch (Exception ex) {
             Logger.warn("Exception occured while drawing trail: "

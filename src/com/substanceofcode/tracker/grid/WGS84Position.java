@@ -1,5 +1,5 @@
 /*
- * WSG84Position.java
+ * WGS84Position.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -28,42 +28,42 @@ import com.substanceofcode.gps.GpsPosition;
  *
  * @author kaspar
  */
-public class WSG84Position extends GridPosition
+public class WGS84Position extends GridPosition
 {
     private double latitude;
     private double longitude;
 
-    public WSG84Position(double latitude, double longitude)
+    public WGS84Position(double latitude, double longitude)
     {
         this.latitude = latitude;
         this.longitude = longitude;
     }
     
-    public WSG84Position(GpsPosition position)
+    public WGS84Position(GpsPosition position)
     {
         latitude = position.latitude;
         longitude = position.longitude;
     }
     
-    public WSG84Position(GridPosition pos)
+    public WGS84Position(GridPosition pos)
     {
-        WSG84Position position = pos.getAsWSG84Position();
+        WGS84Position position = pos.getAsWGS84Position();
         
         latitude = position.getLatitude();
         longitude = position.getLongitude();
     }
 
     //just for unserialize...
-    protected WSG84Position() 
+    protected WGS84Position()
     {
     }
     
     public String getIdentifier() 
     {
-        return GRID_WSG84;
+        return GRID_WGS84;
     }
 
-    public WSG84Position getAsWSG84Position() 
+    public WGS84Position getAsWGS84Position()
     {
         return this;
     }
@@ -85,7 +85,7 @@ public class WSG84Position extends GridPosition
 
     public GridPosition clone() 
     {
-        return new WSG84Position(this);
+        return new WGS84Position(this);
     }
 
     public GridPosition unserialize(String[] data) throws Exception 
@@ -97,6 +97,6 @@ public class WSG84Position extends GridPosition
         double lat = Double.parseDouble(data[2]);
         double lon = Double.parseDouble(data[3]);
         
-        return new WSG84Position(lat, lon);
+        return new WGS84Position(lat, lon);
     }
 }

@@ -32,7 +32,7 @@ import javax.microedition.io.file.FileConnection;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.tracker.grid.GridPosition;
-import com.substanceofcode.tracker.grid.WSG84Position;
+import com.substanceofcode.tracker.grid.WGS84Position;
 import com.substanceofcode.localization.LocaleManager;
 
 /**
@@ -66,7 +66,7 @@ public class Place {
      * @param longitude Longitude position value of this place. 
      */
     public Place(String name, double latitude, double longitude) {
-        this(name, new WSG84Position(latitude, longitude));
+        this(name, new WGS84Position(latitude, longitude));
     }
     
     public Place clone()
@@ -92,14 +92,14 @@ public class Place {
      * @return Latitude value.
      */
     public double getLatitude() {
-        return position.getAsWSG84Position().getLatitude();
+        return position.getAsWGS84Position().getLatitude();
     }
     
     /** Get longitude
      * @return Longitude value.
      */
     public double getLongitude() {
-        return position.getAsWSG84Position().getLongitude();
+        return position.getAsWGS84Position().getLongitude();
     }
     
     public GridPosition getPosition()

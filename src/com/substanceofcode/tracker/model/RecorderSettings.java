@@ -27,7 +27,7 @@ import javax.microedition.midlet.MIDlet;
 
 import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.tracker.grid.GridPosition;
-import com.substanceofcode.tracker.grid.WSG84Position;
+import com.substanceofcode.tracker.grid.WGS84Position;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.util.Version;
@@ -313,7 +313,7 @@ public class RecorderSettings {
     
     /** Get export folder. Default is C:/ */
     public String getExportFolder() {
-        return settings.getStringProperty(EXPORT_FOLDER, "C:/");
+        return settings.getStringProperty(EXPORT_FOLDER, "root1/");
     }
 
     /** Set export folder. */
@@ -393,7 +393,7 @@ public class RecorderSettings {
                 }
                 if(position == null)
                 {
-                    position = new WSG84Position(latValue, lonValue);
+                    position = new WGS84Position(latValue, lonValue);
                 }
 
                 Place newPlace = new Place(name, position);
@@ -414,9 +414,9 @@ public class RecorderSettings {
         while (wpEnum.hasMoreElements() == true) {
             Place wp = (Place) wpEnum.nextElement();
             GridPosition pos = wp.getPosition();
-            WSG84Position pos84 = pos.getAsWSG84Position();
+            WGS84Position pos84 = pos.getAsWGS84Position();
 
-            //store the wsg84 anyway, so that if a grid would be removed, the place is not lost
+            //store the wgs84 anyway, so that if a grid would be removed, the place is not lost
             String latString = String.valueOf(pos84.getLatitude());
             String lonString = String.valueOf(pos84.getLongitude());
 

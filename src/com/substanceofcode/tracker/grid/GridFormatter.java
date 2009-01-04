@@ -26,7 +26,7 @@ package com.substanceofcode.tracker.grid;
  * steps to implement a new GridFormatter
  * 
  * - make a new class which implements the GridFormatter interface (look at 
- *   WSG84Formatter as an example)
+ *   WGS84Formatter as an example)
  * - subclass GridPosition and implement the abstract methods
  * - register your XXXGridPosition and XXXGridFormatter at GridIdentifiers
  * 

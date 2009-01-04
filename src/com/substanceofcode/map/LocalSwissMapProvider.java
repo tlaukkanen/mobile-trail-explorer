@@ -168,7 +168,7 @@ public class LocalSwissMapProvider extends AbstractMapProvider {
 
             double pixelSize = getPixelSize(mdc);
 
-            CH1903Position point = (CH1903Position) mdc.getMapCenter().convertToGridPosition(CH1903Position.GRID_CH1903);//new CH1903Position(lastPosition.getWSG84Position());
+            CH1903Position point = (CH1903Position) mdc.getMapCenter().convertToGridPosition(CH1903Position.GRID_CH1903);//new CH1903Position(lastPosition.getWGS84Position());
 
 
             Point2D bottomLeft = new Point2D(point.getX() - (mdc.getScreenWidth() / 2) * pixelSize,
@@ -263,6 +263,7 @@ public class LocalSwissMapProvider extends AbstractMapProvider {
             
             //Logger.debug("lsmp " + bLx + " " + bLy + " " + tRx + " " + tRy + " ");
             //horizontal lines
+            Logger.debug("LSMP: 1. called convertPositionToScreen()");
             for (int i = bLy; i <= tRy; i += gridDistance) {
                 CanvasPoint screenPoint = this.convertPositionToScreen(mdc, new CH1903Position(bLx * 1000, i * 1000));
                 String str = String.valueOf(i);

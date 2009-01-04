@@ -22,7 +22,7 @@
 
 package com.substanceofcode.util;
 
-import com.substanceofcode.tracker.grid.WSG84Position;
+import com.substanceofcode.tracker.grid.WGS84Position;
 import com.substanceofcode.tracker.model.Point2D;
 import com.substanceofcode.tracker.view.CanvasPoint;
 import com.substanceofcode.util.Float11;
@@ -68,7 +68,7 @@ public class ProjectionUtil {
                 (int) (normalised.getY() * scale));
     }
     
-    public static WSG84Position toGridPosition(CanvasPoint point, int zoom)
+    public static WGS84Position toGridPosition(CanvasPoint point, int zoom)
     {
         double scale = (1 << zoom) * TILE_SIZE;
         double x = point.X / scale;
@@ -78,7 +78,7 @@ public class ProjectionUtil {
         double lng = (x - 0.5)*360;
         double lat = 360/Math.PI * (Float11.atan(Float11.exp(-(y - 0.5)*2*Math.PI)) - Math.PI/4);
         
-        return new WSG84Position(lat, lng);
+        return new WGS84Position(lat, lng);
     }
     
     public static double pixelSize(double lat, double lng, int zoom) {

@@ -100,7 +100,7 @@ public class TrailCanvas extends BaseCanvas {
             return mapCenter;
         }
         if (lastPosition != null) {
-            return lastPosition.getWSG84Position();
+            return lastPosition.getWGS84Position();
         }
         return null;
     }
@@ -151,7 +151,7 @@ public class TrailCanvas extends BaseCanvas {
             // Draw maps first, as they will fill the screen
             // and we don't want to occlude other items
 
-            MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
+            MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();           
             MapDrawContext mdc = new MapDrawContext(g, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight());
 
             try {
@@ -164,7 +164,7 @@ public class TrailCanvas extends BaseCanvas {
             }
             /** Draw status bar */
             try {
-            drawStatusBar(g);
+                drawStatusBar(g);
             } catch (Exception ex) {
                 Logger.fatal("drawStatusBar Exception: " + ex.getMessage());
                 ex.printStackTrace();
@@ -190,7 +190,7 @@ public class TrailCanvas extends BaseCanvas {
             Track ghostTrail = controller.getGhostTrail();
             //drawTrail(g, ghostTrail, Theme.getColor(Theme.TYPE_GHOSTTRAIL), true);
             try {
-                if (getMapCenter() != null) {
+                if (getMapCenter() != null) {                   
                     mapProvider.drawTrail(mdc, ghostTrail, Theme.getColor(Theme.TYPE_GHOSTTRAIL), true,
                             controller.getSettings().getNumberOfPositionToDraw());
                 }
@@ -213,10 +213,10 @@ public class TrailCanvas extends BaseCanvas {
             }
 
             /** Draw current location with red dot */
-            // Logger.debug("c: "+lastPosition + " lastPos: " + lastPosition.getWSG84Position());
+            // Logger.debug("c: "+lastPosition + " lastPos: " + lastPosition.getWGS84Position());
             try {
-                if (getMapCenter() != null) {
-                    CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWSG84Position());
+                if (getMapCenter() != null) {                    
+                    CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWGS84Position());
                     g.drawImage(redDotImage, currLocPoint.X, currLocPoint.Y, Graphics.VCENTER | Graphics.HCENTER);
                 }
             } catch (Exception ex) {
@@ -409,7 +409,7 @@ public class TrailCanvas extends BaseCanvas {
 
         MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
         MapDrawContext mdc = new MapDrawContext(g, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight());
-        CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWSG84Position());
+        CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWGS84Position());
 
         navigationArrows = new Sprite(tempNaviArrows, spriteSize, spriteSize);
         navigationArrows.setPosition(currLocPoint.X - (spriteSize / 2), currLocPoint.Y - (spriteSize / 2));
@@ -455,9 +455,9 @@ public class TrailCanvas extends BaseCanvas {
         MapProvider mapProvider =
                 MapProviderManager.manager().getSelectedMapProvider();
         MapDrawContext mdc = new MapDrawContext(g, getMapCenter(),
-                mapProvider.getZoomLevel(), getWidth(), getHeight());
+                mapProvider.getZoomLevel(), getWidth(), getHeight());        
         CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc,
-                lastPosition.getWSG84Position());
+                lastPosition.getWGS84Position());
 
         g.drawString(LocaleManager.getMessage("trail_canvas_heading_to") +
                 ": " + controller.getNavigationPlace().getName(),
@@ -505,7 +505,7 @@ public class TrailCanvas extends BaseCanvas {
 
                 GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.TRAIL_CANVAS);
                 String[] gridLabels = gridFormatter.getLabels();
-                String[] gridData = gridFormatter.getStrings(lastPosition.getWSG84Position());
+                String[] gridData = gridFormatter.getStrings(lastPosition.getWGS84Position());
                 
                 for (int i = 0; i < gridLabels.length; i++) {
                     // draw label
