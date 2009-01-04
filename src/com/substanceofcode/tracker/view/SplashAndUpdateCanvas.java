@@ -168,8 +168,8 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
     public void run() {
         long waitMilliSeconds = this.displayTime;
         try{
-        	Thread.sleep(waitMilliSeconds);
             Controller.getController().initialize();
+        	Thread.sleep(waitMilliSeconds);
         }catch (InterruptedException ex) {
             ex.printStackTrace();
         }
