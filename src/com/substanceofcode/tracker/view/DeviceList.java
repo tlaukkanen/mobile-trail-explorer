@@ -159,7 +159,7 @@ public class DeviceList extends List implements Runnable, CommandListener {
                 } else {
                     this.set(0,
                             LocaleManager.getMessage(
-                            "device_list_serach_result_no_device"),
+                            "device_list_search_result_no_device"),
                             null);
                     status = STATUS_COMPLETE;
                 }
