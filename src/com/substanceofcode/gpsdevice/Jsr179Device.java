@@ -139,11 +139,13 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     public void init() {
 
         try {
+            Logger.debug("Initializing JSR179");
             if (locationProvider == null) {
+                Logger.debug("Initializing criteria");
                 Criteria criteria = new Criteria();
                 criteria.setSpeedAndCourseRequired(true);
                 criteria.setAltitudeRequired(true);
-
+                Logger.debug(logPrefix + "Initializing location provider");
                 locationProvider = LocationProvider.getInstance(criteria);
             }
             Logger.debug(logPrefix + "LocationProvider state: "
@@ -160,11 +162,14 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
                     + e.getMessage());
         } catch (SecurityException e) {
             Logger.fatal(logPrefix + "init failed due to permission restriction.");
+        } catch (Exception e) {
+            Logger.fatal(logPrefix + "init failed due to " + e.toString()
+                    + " " + e.getMessage());
         }
     }
 
     public void run() {
-
+        Logger.debug(logPrefix + "Jsr179Device.run() started");
         Vector nmeaStrings = new Vector();
         Logger.info(logPrefix + "Starting Jsr179Device.run()");   
 
@@ -278,10 +283,16 @@ public class Jsr179Device extends GpsDeviceImpl implements Runnable {
     }
 
     public static Device getDevice(String address, String alias) {
+        try {
         Logger.debug("getDevice called");
-        if(_jsr179Device == null) {
-            _jsr179Device = new Jsr179Device(address, alias);
+            if(_jsr179Device == null) {
+                _jsr179Device = new Jsr179Device(address, alias);
+            }
+        } catch(Exception ex) {
+            Logger.fatal("Exception in Jsr179Device.getDevice(): " +
+                    ex.toString() + ": " + ex.getMessage());
         }
+        Logger.debug("getDevice returning");
         return _jsr179Device;
     }
 

@@ -44,24 +44,30 @@ public class GpsDeviceFactory {
      *         permission to run
      */
     public static Device createDevice(String address, String alias) {
-        Logger.debug("address is " + address);
-        Device dev = null;
-        if ("internal".equals(address)) {
-            // Jsr179Device requires permission, which it might not get.
-            // In that event we need to abort this creation process so a new
-            // device can be selected.
-            // Create an internal (non bluetooth) gps device
-            if (GpsUtilities.checkJsr179IsPresent()
-                    && Controller.getController().getUseJsr179()) {
-                dev =  Jsr179Device.getDevice(address, alias);
-                Logger.debug("dev is "+dev);
-            }
-        } else if ("Mock".equals(address)) {
-            dev = new MockGpsDevice(address, alias);
-        } else {
+        try {
+            Logger.debug("address is " + address);
+            Device dev = null;
+            if ("internal".equals(address)) {
+                // Jsr179Device requires permission, which it might not get.
+                // In that event we need to abort this creation process so a new
+                // device can be selected.
+                // Create an internal (non bluetooth) gps device
+                if (GpsUtilities.checkJsr179IsPresent()
+                        && Controller.getController().getUseJsr179()) {
+                    dev =  Jsr179Device.getDevice(address, alias);
+                    Logger.debug("dev is " + dev);
+                }
+            } else if ("Mock".equals(address)) {
+                dev = new MockGpsDevice(address, alias);
+            } else {
 
-            dev = new BluetoothGPSDeviceImpl(address, alias);
+                dev = new BluetoothGPSDeviceImpl(address, alias);
+            }
+            return dev;
+        } catch(Exception ex) {
+            Logger.fatal("Exception in GpsDeviceFactory.createDevice " +
+                    ex.toString() + " " + ex.getMessage());
+            return null;
         }
-        return dev;
     }
 }

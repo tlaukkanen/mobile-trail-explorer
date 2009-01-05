@@ -75,24 +75,32 @@ public class LocaleManager  {
      * @return true if the intialization was succesfull, false if there was any problem.
      */        
     public static boolean initLocalizationSupport() {
-        String mteLocale = null;
-        
-        controller = Controller.getController();
-        
-        if (controller != null && controller.getSettings() != null){
-            mteLocale = controller.getSettings().getMteLocale();
+
+        try {
+            String mteLocale = null;
+
+            controller = Controller.getController();
+
+            if (controller != null && controller.getSettings() != null){
+                mteLocale = controller.getSettings().getMteLocale();
+            }
+
+            if (mteLocale == null)
+                mteLocale = System.getProperty("microedition.locale");
+
+            if (mteLocale == null || mteLocale.length()==0) {
+                mteLocale = "en";
+            }
+
+            System.out.println("Localization language: " + mteLocale);
+
+            return initLocalizationSupport(mteLocale);     // NOI18N
+        } catch(Exception ex) {
+            Logger.fatal("Exception in " +
+                    "LocaleManager.initLocalizationSupport():" + ex.toString() +
+                    " " + ex.getMessage());
+            return false;
         }
-
-        if (mteLocale == null)
-            mteLocale = System.getProperty("microedition.locale");
-
-        if (mteLocale == null || mteLocale.length()==0) {
-            mteLocale = "en";
-        }
-
-        System.out.println("Localization language: " + mteLocale);
-
-        return initLocalizationSupport(mteLocale);     // NOI18N
     }
     
     /**
@@ -151,6 +159,8 @@ public class LocaleManager  {
             }
         } catch (Exception e) {
             // houston we have a problem
+            Logger.fatal("Exception in LocaleManager.initLocalizationSupport " +
+                    e.getMessage());
             _localizationErrorMessage = _processPattern(_INIT_LOCALIZATION_ERROR_MSG,new Object[] {e.getMessage()});
         }
         return false;

@@ -406,18 +406,22 @@ public class Controller {
      * See if there are any supported JSRs that provide a location api ie Jsr179
      */
     public void searchDevicesByJsr() {
+        try {
+            if (devices == null) {
+                devices = new Vector();
+            } else {
+                devices.removeAllElements();
+            }
 
-        if (devices == null) {
-            devices = new Vector();
-        } else {
-            devices.removeAllElements();
-        }
 
-
-        if (GpsUtilities.checkJsr179IsPresent()) {
-            Device dev = Jsr179Device.getDevice("internal",
-                    "Internal GPS (Jsr 179)");
-            devices.addElement(dev);
+            if (GpsUtilities.checkJsr179IsPresent()) {
+                Device dev = Jsr179Device.getDevice("internal",
+                        "Internal GPS (Jsr 179)");
+                devices.addElement(dev);
+            }
+        } catch(Exception ex) {
+            Logger.fatal("Exception in Controller.searchDevicesByJsr: " +
+                    ex.toString() + " " + ex.getMessage());
         }
     }
 
