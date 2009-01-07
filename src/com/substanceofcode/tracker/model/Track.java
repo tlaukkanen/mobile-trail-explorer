@@ -571,7 +571,6 @@ public class Track implements Serializable {
             throw new Exception(LocaleManager.getMessage("track_writetofile_exception_stream")
                     + ": " + ex.toString());
         }
-        // PrintStream output = new PrintStream(out);
         DataOutputStream output = new DataOutputStream(out);
 
         // ------------------------------------------------------------------
@@ -598,14 +597,14 @@ public class Track implements Serializable {
         // ------------------------------------------------------------------
         // Save the data to a file
         // ------------------------------------------------------------------
-
-        // faster, apparently
-        output.write(exportData.getBytes());
+        // encode to KML/GPX UTF-8
+        output.write(exportData.getBytes("UTF-8"));
         end = System.currentTimeMillis();
         Logger.debug("Wrote file in " +(end-start)+"ms");
         output.close();
         out.close();
         connection.close();
+
         // ----------------------------------------------------------------------
         // Notify progress
         // ----------------------------------------------------------------------
