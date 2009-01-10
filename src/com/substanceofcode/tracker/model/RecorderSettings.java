@@ -311,9 +311,9 @@ public class RecorderSettings {
         saveSettings();
     }
     
-    /** Get export folder. Default is C:/ */
+    /** Get export folder. Default is E:/ */
     public String getExportFolder() {
-        return settings.getStringProperty(EXPORT_FOLDER, "root1/");
+        return settings.getStringProperty(EXPORT_FOLDER, "E:/");
     }
 
     /** Set export folder. */
