@@ -36,14 +36,14 @@ public class WGS84Formatter implements GridFormatter
         switch(display_context)
         {
             case(INFORMATION_CANVAS):
-                return new String[]{LocaleManager.getMessage("wsg84_formatter_lat"),
-                                    LocaleManager.getMessage("wsg84_formatter_lon")};
+                return new String[]{LocaleManager.getMessage("wgs84_formatter_lat"),
+                                    LocaleManager.getMessage("wgs84_formatter_lon")};
             case(PLACE_FORM):
-                return new String[]{LocaleManager.getMessage("wsg84_formatter_latitude"),
-                                    LocaleManager.getMessage("wsg84_formatter_longitude")};
+                return new String[]{LocaleManager.getMessage("wgs84_formatter_latitude"),
+                                    LocaleManager.getMessage("wgs84_formatter_longitude")};
             default: //trail-canvas
-                return new String[]{LocaleManager.getMessage("wsg84_formatter_lat"),
-                                    LocaleManager.getMessage("wsg84_formatter_lon")};
+                return new String[]{LocaleManager.getMessage("wgs84_formatter_lat"),
+                                    LocaleManager.getMessage("wgs84_formatter_lon")};
         }
     }
 
@@ -82,7 +82,7 @@ public class WGS84Formatter implements GridFormatter
     {
         // it seems nokia s40 jvm can not handle this
         //return LocaleManager.getMessage("wsg84_name");
-        return "WSG84";
+        return "WGS84";
     }
 
     public GridPosition getGridPositionWithData(String[] data) throws BadFormattedException 
@@ -94,7 +94,7 @@ public class WGS84Formatter implements GridFormatter
                 longitude = Double.parseDouble(data[1]);
             } catch (Exception e) {
                 throw new BadFormattedException(
-                        LocaleManager.getMessage("wsg84_formatter_getgridpositionwithdata_error"));
+                        LocaleManager.getMessage("wgs84_formatter_getgridpositionwithdata_error"));
             }
             return new WGS84Position(latitude, longitude);
     }
