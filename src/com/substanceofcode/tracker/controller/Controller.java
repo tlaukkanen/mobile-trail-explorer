@@ -94,7 +94,7 @@ import com.substanceofcode.tracker.view.SurveyorForm;
 
 /**
  * Controller contains methods for the application flow.
- * 
+ *
  * @author Tommi Laukkanen
  * @author Mario Sansone
  */
@@ -105,13 +105,13 @@ public class Controller {
      * perhaps this class should be a proper singleton pattern?
      */
     private static Controller controller;
-    
+
     /** Status codes */
     public final static int STATUS_STOPPED = 0;
     public final static int STATUS_RECORDING = 1;
     public final static int STATUS_NOTCONNECTED = 2;
     public final static int STATUS_CONNECTING = 3;
-    
+
     /**
      * Vector of devices found during a bluetooth search
      */
@@ -207,8 +207,8 @@ public class Controller {
      * Navigation Place
      */
     private Place navpnt;
-    
-    private double distanceRemaining; 
+
+    private double distanceRemaining;
     /** Shortcuts */
     private static final short SHORTCUTACTION_AUDIOMARK = 0;
     private static final short SHORTCUTACTION_PLACEMARK = 1;
@@ -224,7 +224,7 @@ public class Controller {
      * <li> Apply backlight settings
      * </ul>
      * @param midlet
-     * @param display 
+     * @param display
      */
     public Controller(MIDlet midlet, Display display) {
         Controller.controller = this;
@@ -253,7 +253,7 @@ public class Controller {
         short shortcut = settings.getPoundShortcut();
         executeShortcut( shortcut );
     }
-    
+
     public void executeStarShortcut() {
         //this.showPlaceSurveyor();
         // TODO: Get shortcut from settings
@@ -262,7 +262,7 @@ public class Controller {
         short shortcut = settings.getStarShortcut();
         executeShortcut( shortcut );
     }
-    
+
     public void showGeocode() {
         if(geocodeForm == null)
         {
@@ -274,7 +274,7 @@ public class Controller {
     public void showUploadTrailList(Track selectedTrail) {
         display.setCurrent( new UploadServicesList(selectedTrail) );
     }
-    
+
     private void executeShortcut(short shortcut) {
         ShortcutAction action = null;
         switch(shortcut) {
@@ -305,7 +305,7 @@ public class Controller {
                     getElevationCanvas(),
                     new InformationCanvas(),
                     new PlacesCanvas(),
-                    new SatelliteCanvas(), 
+                    new SatelliteCanvas(),
                     new SkyCanvas(),
                     new SpeedometerCanvas()
                 };
@@ -341,12 +341,13 @@ public class Controller {
             backlight.backlightOn();
         }
         useJsr179 = settings.getJsr179();
+        useFileCache = settings.getFileCache();
     }
 
     /**
      * XXX : mchr : This may not be a sensible exposure but is currently needed
      * for the AlertHandler class.
-     * 
+     *
      * @return
      */
     public MIDlet getMIDlet() {
@@ -364,7 +365,7 @@ public class Controller {
     /**
      * Tells this Controller if the Backlight class should keep the backlight on
      * or switch to phone's default behaviour
-     * 
+     *
      * @param xiBacklightOn
      *                <ul>
      *                <li>true = keep backlight always on
@@ -462,7 +463,7 @@ public class Controller {
 
     /**
      * Utility method to add the contents of one vector to another
-     * 
+     *
      * @param dest
      *                the Vector into which the new contents are added
      * @param src
@@ -568,7 +569,7 @@ public class Controller {
                     }
                 }
             }.start();
-        }        
+        }
     }
 
     /** Method for starting and stopping the recording */
@@ -577,11 +578,11 @@ public class Controller {
         // Start Recording
         // --------------------------------------------------------------------------
         if (status != STATUS_RECORDING) {
-            Logger.info("Starting Recording");            
+            Logger.info("Starting Recording");
             Logger.debug("gpsDevice is " + gpsDevice);
             if (gpsDevice == null) {
                 showError(LocaleManager.getMessage("controller_startstop_error"));
-            } else {                
+            } else {
                 if( status==STATUS_NOTCONNECTED ) {
                     connectToGpsDevice();
                 }
@@ -623,7 +624,7 @@ public class Controller {
                 trailActionsForm = new TrailActionsForm(this);
             }
             display.setCurrent(trailActionsForm);
-        }       
+        }
     }
 
     /**
@@ -646,7 +647,7 @@ public class Controller {
         }
     }
 
-    /** 
+    /**
      * Get waypoints.
      * @return Get waypoints.
      */
@@ -668,10 +669,10 @@ public class Controller {
 
     /**
      * Save the current trail
-     * 
+     *
      * @param xiListener
      *                TODO
-     * @param name 
+     * @param name
      */
     public void saveTrail(AlertHandler xiListener, String name) {
         // XXX : mchr : Vulnerable to NPE...
@@ -697,12 +698,12 @@ public class Controller {
         }
     }
 
-    /** 
+    /**
      * Mark new waypoint
      * @param lat
-     * @param lon 
+     * @param lon
      */
-    public void markPlace(GridPosition position) 
+    public void markPlace(GridPosition position)
     {
         if (placeForm == null) {
             Logger.debug("Creating new place form");
@@ -721,9 +722,9 @@ public class Controller {
         display.setCurrent(placeForm);
     }
 
-    /** 
+    /**
      * Edit waypoint
-     * @param wp 
+     * @param wp
      */
     public void editPlace(Place wp) {
         Logger.debug("Editing waypoint");
@@ -881,11 +882,11 @@ public class Controller {
     /** Show export settings */
     public void showExportSettings(final Displayable displayable) {
 
-        /** 
+        /**
          * Trying to avoid deadlock by displaying the FileChooser in another
          * thread. Otherwise you'll be getting the following warning:
-         *     To avoid potential deadlock, operations that may block, such as 
-         *     networking, should be performed in a different thread than the 
+         *     To avoid potential deadlock, operations that may block, such as
+         *     networking, should be performed in a different thread than the
          *     commandAction() handler.
          */
         Thread t = new Thread() {
@@ -937,7 +938,7 @@ public class Controller {
     public void showSettings() {
         display.setCurrent(getSettingsList());
     }
-    
+
     /** Get instance of settings list */
     private SettingsList getSettingsList() {
         if (settingsList == null) {
@@ -965,7 +966,7 @@ public class Controller {
 
     /**
      * Show displayable object.
-     * @param displayable 
+     * @param displayable
      */
     public void showDisplayable(Displayable displayable) {
         display.setCurrent(displayable);
@@ -1039,7 +1040,7 @@ public class Controller {
 
     /**
      * Show error message to the user
-     * 
+     *
      * @param message
      *                Message which should shown to the user
      * @param seconds
@@ -1110,7 +1111,7 @@ public class Controller {
     }
 
     /** Update selected waypoint */
-    public void updateWaypoint(Place oldWaypoint, Place newWaypoint) 
+    public void updateWaypoint(Place oldWaypoint, Place newWaypoint)
     {
         Enumeration waypointEnum = places.elements();
         while (waypointEnum.hasMoreElements()) {
@@ -1130,7 +1131,7 @@ public class Controller {
     }
 
     /** Remove selected waypoint
-     * @param wp 
+     * @param wp
      */
     public void removePlace(Place wp) {
         places.removeElement(wp);
@@ -1187,7 +1188,7 @@ public class Controller {
         }
         display.setCurrent(placeSurveyor);
     }
-    
+
     /** Show Surveyor Name Form */
     public void showSurveyorForm(Place made) {
         Logger.debug("showSurveyorForm shown");
@@ -1350,15 +1351,15 @@ public class Controller {
     public void setUseBTFix(boolean b) {
 	    settings.setUseBTFix(b);
     }
-    
+
     public boolean getUseBTFix() {
 	    return settings.getUseBTFix();
     }
-    
+
     public boolean getUseNetworkForMaps() {
-        return settings.getUseNetworkForMaps();	    
+        return settings.getUseNetworkForMaps();
     }
-    
+
     public void setUseNetworkForMaps(boolean b) {
 	settings.setUseNetworkForMaps(b);
     }
@@ -1380,7 +1381,7 @@ public class Controller {
         }
 
         navpnt = new Place(input.getName(), input.getLatitude(), input.getLongitude());
-        
+
         if (newplace == true) {
             setNavigationStatus(true);
         } else {
@@ -1419,7 +1420,7 @@ public class Controller {
         distanceRemaining = distance0 + currentTrack.getDistance();
         Logger.debug("saving distance as " + Double.toString(distanceRemaining));
     }
-    
+
     public double getDistanceRemaining()
     {
         return distanceRemaining;
@@ -1433,6 +1434,6 @@ public class Controller {
         calculateTimeForm.setDistanceRemaining(controller.distanceRemaining - distance);
         return calculateTimeForm;
     }
-    
-    
+
+
 }

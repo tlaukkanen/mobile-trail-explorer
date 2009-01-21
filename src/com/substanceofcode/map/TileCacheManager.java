@@ -36,9 +36,9 @@ import com.substanceofcode.tracker.view.Logger;
  * and doesn't require permission for each read/write operation. FileCache will
  * be slowest and biggest, but requires permission to read write from (every
  * single time on an N80).
- * 
+ *
  * @author gjones
- * 
+ *
  */
 
 public class TileCacheManager implements Runnable {
@@ -54,22 +54,24 @@ public class TileCacheManager implements Runnable {
   //  private String storename;
     private Thread cacheManagerThread;
     private boolean rmsEnabled=false;
-    private boolean fileCacheEnabled = true;//Controller.getController().getUseFileCache();
+    private boolean fileCacheEnabled = false;
     private static int THREADDELAY=200;
-    
+
     private MercatorMapProvider mapProvider;
-    
+
     public TileCacheManager(MercatorMapProvider mP) {
         mapProvider = mP;
         //this.storename = storename;
         cacheManagerThread = new Thread(this);
         cacheManagerThread.start();
-        
+
         Logger.debug("Initializing TileCacheManager, storename=" + mapProvider.getIdentifier());
         //this.storename = storename;
 //        rmsCache = new RMSCache(storename);
-        
+
         memCache = new MemCache(mP);
+        fileCacheEnabled=Controller.getController().getUseFileCache();
+        Logger.debug("TCM: file cache is "+(fileCacheEnabled?"enabled":"disabled"));
         if (fileCacheEnabled) {
             fileCache = new FileCache();
     }
@@ -90,7 +92,7 @@ public class TileCacheManager implements Runnable {
 
     /**
      * Create an Image from the input stream data, then save it to the cache(s)
-     * 
+     *
      * @param tile
      * @param is -
      *                Inputstream containing the tile data Returns boolean true
@@ -154,12 +156,12 @@ public class TileCacheManager implements Runnable {
     }
 
     /**
-     * 
+     *
      * Add a tile to the relevant queues, so that they will get saved to the
      * caches Is this even used? Yes, in the case where a blank image is saved
      * when the http response did not have an image in it TODO: refactor this
      * out, tiles must have an inputStream
-     * 
+     *
      * @param tile
      * @param im
      */
@@ -230,7 +232,7 @@ public class TileCacheManager implements Runnable {
     /**
      * Check the caches for a tile. If it is found in the RMS cache move it to
      * the memCache for performance improvement
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -253,7 +255,7 @@ public class TileCacheManager implements Runnable {
             // We won't read the tile directly out of the RMS,
             // instead we'll add a request to the queue that will
             // eventually copy the tile to the memcache
-            
+
             try {
                 if (!Rms2MemQueue.contains(tileName)) {
                     Logger
@@ -263,7 +265,7 @@ public class TileCacheManager implements Runnable {
                 }
 
                 result = 1;
-                
+
             } catch (Exception e) {
                 Logger.error("checkCache: " + e.getMessage());
                 e.printStackTrace();
@@ -292,7 +294,7 @@ public class TileCacheManager implements Runnable {
     /**
      * Retrieve a tile from the memcache, then extract the image inside it ,and
      * return that
-     * 
+     *
      * @param x
      * @param y
      * @param z
