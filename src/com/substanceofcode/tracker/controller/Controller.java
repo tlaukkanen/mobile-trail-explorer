@@ -295,11 +295,8 @@ public class Controller {
     }
 
     public void initialize() {
+        recorder = new GpsRecorder(this);
 
-        // logger = Logger.getLogger(settings);
-        // XXX : mchr : Dependency from Logger to getTrailCanvas prevents this
-        // array definition from being any higher - we have to tell the Logger
-        // class about the RecorderSettings which in turn depend on midlet
         screens = new BaseCanvas[]{
                     getTrailCanvas(),
                     getElevationCanvas(),
@@ -311,7 +308,7 @@ public class Controller {
                 };
         String gpsAddress = settings.getGpsDeviceConnectionString();
 
-        recorder = new GpsRecorder(this);
+
         if (gpsAddress.length() > 0) {
 
             try {
