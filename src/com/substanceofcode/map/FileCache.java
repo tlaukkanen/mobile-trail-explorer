@@ -22,6 +22,9 @@
 
 package com.substanceofcode.map;
 
+import com.substanceofcode.data.FileIOException;
+import com.substanceofcode.data.FileSystem;
+import com.substanceofcode.data.Serializable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -36,6 +39,7 @@ import javax.microedition.lcdui.Image;
 
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
+import java.util.Enumeration;
 
 /**
  * Caches tiles to the filesystem. A byproduct of this is that tiles can be
@@ -58,7 +62,8 @@ public class FileCache implements TileCache, Runnable {
     private static final String cacheName = "MTEFileCache";
     private String fullPath = "";
     private String exportFolder = "";
-
+    private long maxOffset=0;
+    private String maxKey="";
     // Default scope so it can be seen by the RMSCache
     Hashtable availableTileList = new Hashtable();
 
@@ -90,58 +95,163 @@ public class FileCache implements TileCache, Runnable {
     /**
      * Try to find a cache dir and if found, create a list of the files within
      * it. The files will be loaded only when they are requested
+     *
+     * 20090123: write a list of tiles and offsets to the RMS, then the next time
+     * we initialize, load that list up, then check whether the last tile on the
+     * list is still in the cache, if so then we have some confidence the list still
+     * corresponds to the cache, just parse any extra tiles that may have been added
+     * . If a tile is not found, invalidate the list and build a new one.
      */
     public void initializeCache() {
-        Logger.debug("Initializing FileCache");
+        long start,end;
+        Logger.info("Initializing FileCache");
+        start=System.currentTimeMillis();
 
-        try {
-            Conn = (FileConnection) Connector.open(fullPath);
-            if (Conn != null && !Conn.exists()) {
-                // The file doesn't exist, we are done initializing
-                Logger.debug("File: file does not exist");
-                Conn.create();
-            } else {
-                streamIn = Conn.openDataInputStream();
-
-                // streamOut = Conn.openDataOutputStream();
-                Logger.debug("streamIn is " + streamIn + ", streamOut is "
-                        + streamOut);
-                Logger.debug("Conn.availableSize()=" + Conn.availableSize());
-                boolean reading = true;
-                while (reading) {
-                    // There's no way of detecting the end of the stream
-                    // short of getting an IOexception
-                    try {
-                        Tile t = Tile.getTile(streamIn);
-
-                        Logger.debug("t is " + t.cacheKey + ", offset is "
-                                + t.offset);
-                        if (t != null) {
-                            availableTileList.put(t.cacheKey,
-                                    new Long(t.offset));
-                        }
-                    } catch (Exception ioe) {
-                        reading = false;
-                    }
-
-                }
-                Logger.debug("FILE: read " + availableTileList.size()
-                        + " tiles");
-
-                streamIn.close();
-
-                streamIn = null;
+            try {
+                Conn = (FileConnection) Connector.open(fullPath);
+            } catch (IOException ex) {
+                Logger.debug("File: failed to open " + fullPath);
             }
 
-        } catch (IOException e) {
-            Logger.error("File: IOException: " + e.getMessage());
-            e.printStackTrace();
-        } catch (SecurityException e) {
-         	Logger.error("File: SecurityException: " + e.getMessage());
+        if(readTileListFromRms()){
+            end=System.currentTimeMillis();
+            Logger.debug("Finished Initialisation in "+(end-start) +"ms");
+            Logger.debug("File: read tilelist from RMS OK");
+        }
+         else{
+            try {
+
+                if (Conn != null && !Conn.exists()) {
+                    // The file doesn't exist, we are done initializing
+                    Logger.debug("File: file does not exist");
+                    //create the file so we can start writing to it
+                    Conn.create();
+                } else {
+                    streamIn = Conn.openDataInputStream();
+
+             //       Logger.debug("Conn.availableSize()=" + Conn.availableSize());
+                    boolean reading = true;
+                    while (reading) {
+                        // There's no way of detecting the end of the stream
+                        // short of getting an IOexception
+                        try {
+                            Tile t = Tile.getTile(streamIn);
+
+                            Logger.debug("t is " + t.cacheKey + ", offset is "
+                                    + t.offset);
+                            if (t != null) {
+                                availableTileList.put(t.cacheKey,
+                                        new Long(t.offset));
+                            }
+                        } catch (Exception ioe) {
+                            reading = false;
+                        }
+
+                    }
+                    Logger.debug("FILE: read " + availableTileList.size()
+                            + " tiles");
+
+                    streamIn.close();
+
+                    streamIn = null;
+                }
+                storeTileListToRms();
+                end=System.currentTimeMillis();
+                Logger.debug("Finished Initialisation in "+(end-start) +"ms");
+            } catch (IOException e) {
+                Logger.error("File: IOException: " + e.getMessage());
+                e.printStackTrace();
+            } catch (SecurityException e) {
+                Logger.error("File: SecurityException: " + e.getMessage());
+            }
         }
     }
 
-    public long checkCacheOffset(String name) {
+
+    private boolean readTileListFromRms(){
+        Logger.debug("File:readTileListFromRms");
+         boolean result=false;
+            Serializable x=
+            new Serializable(){
+                public String getMimeType(){return "";}
+                public void serialize(DataOutputStream dos) throws IOException {
+                 }
+                public void unserialize(DataInputStream dis) throws IOException {
+                    short len ;
+                    byte[] bytes;
+                    String key;
+                    long offset;
+                    int count=0;
+                    Logger.debug("File:readTileListFromRms.unserialize");
+                    boolean reading=true;
+                    while (reading) {
+                        try{
+                            len = dis.readShort();
+                            bytes = new byte[len];
+                            dis.read(bytes, 0, len);
+                            key = new String(bytes);
+                            offset=dis.readLong();
+                            if(offset>maxOffset){
+                                maxOffset=offset;
+                                maxKey=key;
+                            }
+                            count++;
+                            availableTileList.put(key, new Long(offset));
+                        }catch(IOException io){
+                            reading=false;
+                        }
+                    }
+                    Logger.debug("File:read " +count+"tiles");
+                }
+            };
+        try {
+            if(FileSystem.getFileSystem().containsFile("TileList")){
+                x.unserialize(FileSystem.getFileSystem().getFile("TileList"));
+                result=checkCache(maxKey);
+            }else{
+                Logger.debug("TileList not found, will create");
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return result;
+    }
+
+    private void storeTileListToRms(){
+        Logger.debug("storeTileListToRms");
+        long start,end;
+        start=System.currentTimeMillis();
+        try {
+            FileSystem.getFileSystem().saveFile("TileList", new Serializable(){
+                public String getMimeType(){return "tileList";}
+                public void serialize(DataOutputStream dos) throws IOException {
+                    Logger.debug("storeTileListToRms.serialize");
+                    String key;
+                     byte[] keyBytes;
+                     long offset;
+                     Enumeration e =availableTileList.keys();
+                     while(e.hasMoreElements()){
+                      //   Logger.debug("serializing a tile");
+                         key=  (String)(e.nextElement());
+                     //    Logger.debug("key= "+key);
+                         keyBytes = key.getBytes();
+                        dos.writeShort(keyBytes.length);
+                        dos.write(keyBytes);
+                        offset= ((Long)availableTileList.get(key)).longValue();
+                       // Logger.debug("offset= "+offset);
+                        dos.writeLong(offset);
+                     }
+                 }
+                public void unserialize(DataInputStream dis) throws IOException {}
+            }, true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        end=System.currentTimeMillis();
+        Logger.debug("Wrote tileList to RMS in " +(end-start) +"ms");
+    }
+
+    public long getOffset(String name) {
         long offset = -1;
         if (availableTileList.containsKey(name)) {
             offset = ((Long) availableTileList.get(name)).longValue();
@@ -235,6 +345,10 @@ public class FileCache implements TileCache, Runnable {
                             new Long(Tile.totalOffset));
                     Logger.debug("availableTileList size="
                             + availableTileList.size());
+                    //Must do this to keep the rms copy up to date
+                    //Maybe we can avoid doing this on every write, but then we may
+                    //end up with unindexed tiles in the cache
+                    storeTileListToRms();
                   }else{
                       Logger.debug("Not Writing tile, already serialized:" +t.cacheKey);
                   }
@@ -271,21 +385,19 @@ public class FileCache implements TileCache, Runnable {
         Tile t = null;
         boolean reading = true;
         if (checkCache(name)) {
-
             if (Conn != null) {
                 try {
                     if (streamIn == null) {
                         InputStream x = Conn.openInputStream();
-                        Logger.debug("Skipping " + checkCacheOffset(name)
+                        Logger.debug("Skipping " + getOffset(name)
                                 + " bytes");
-                        x.skip(checkCacheOffset(name));
+                        x.skip(getOffset(name));
 
                         streamIn = new DataInputStream(x);
                     }
                     if (streamIn != null) {
 
-                       // int counter = 0;
-                        while (reading) {
+                        while (reading) { //do we still need this
                             try {
                                 // Assuming that a concatenated bunch of tiles
                                 // can
@@ -295,18 +407,15 @@ public class FileCache implements TileCache, Runnable {
                                 if (t != null && t.cacheKey != null
                                         && t.cacheKey.equals(name)) {
                                     // Found the right tile
-                                  //  counter++;
-                                  //  Logger.debug("Found tile after " + counter
-                                    //        + " iterations");
                                     break;
                                 }
                                 //counter++;
                             } catch (IOException e) {
-                                Logger.debug("Didn't find the tile...");
+                                Logger.debug("File IOException: Didn't find the tile...");
                                 reading = false;
                                 e.printStackTrace();
                             } catch (Exception e) {
-                                Logger.debug("Didn't find the tile...");
+                                Logger.debug("Didn't find the tile..." +e.getMessage());
                                 reading = false;
                                 e.printStackTrace();
                             }
@@ -316,10 +425,13 @@ public class FileCache implements TileCache, Runnable {
                     }
                 } catch (IOException e1) {
                     // TODO Auto-generated catch block
+                    Logger.error("File IOException" + name);
                     e1.printStackTrace();
                 } catch (NullPointerException npe) {
                     Logger.debug("Caught NPE: name is " + name);
                 }
+            }else{
+                Logger.error("Con was null. Initialisation error");
             }
         }
         return t;
@@ -327,7 +439,7 @@ public class FileCache implements TileCache, Runnable {
 
     public boolean checkCache(String name) {
         if (availableTileList.containsKey(name)) {
-            Logger.debug("Found tile in filecache: " + name);
+
             return true;
         } else {
           //  Logger.debug("Didn't find tile in filecache: " + name);
@@ -390,10 +502,8 @@ public class FileCache implements TileCache, Runnable {
                                             + e.getMessage());
                         }
                     } else {
-                        // Logger.getLogger()
-                        // .log("FILE: FILEProcessQueueEmpty, yielding "+
-                        // fileProcessQueue.size(), Logger.DEBUG);
-                        Thread.yield();
+                       //  Logger.debug("FILE: FILEProcessQueueEmpty, sleeping ");
+                        Thread.sleep(1000);
 
                     }
                 } catch (Exception e) {
