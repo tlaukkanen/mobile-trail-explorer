@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Image;
-
+import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 
 /**
