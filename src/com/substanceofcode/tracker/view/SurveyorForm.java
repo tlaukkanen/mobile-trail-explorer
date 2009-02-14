@@ -48,14 +48,14 @@ public class SurveyorForm extends Form implements CommandListener {
     private Command okCommand;
     private Command cancelCommand;
     
-    private boolean editing;
+    //private boolean editing;
     private String oldPlaceName;
-    
+
     /** 
      * Creates a new instance of PlaceForm
      * @param controller 
      */
-    public SurveyorForm(Controller controller,Place made0) {
+    public SurveyorForm(Controller controller, Place made0) {
         super(LocaleManager.getMessage("surveyor_form_title"));
 
         Logger.debug("Surveyor constructor!");
@@ -70,13 +70,14 @@ public class SurveyorForm extends Form implements CommandListener {
         Logger.debug("Surveyor Form is open!");
 
         
-        editing = false;
+        //editing = false;
         oldPlaceName = "";
     }
     
     public void setPlace(Place made0)
     {
         this.made = made0;
+        nameField.setString(made.getName() + " ");
     }
     
     /** Initialize place fields (name, lon and lat) */
@@ -89,15 +90,15 @@ public class SurveyorForm extends Form implements CommandListener {
     /** Initialize commands */
     private void initializeCommands() {
         okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.SCREEN, 1);
-        this.addCommand( okCommand );
+        this.addCommand(okCommand);
         
         cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.SCREEN, 2);
-        this.addCommand( cancelCommand );
+        this.addCommand(cancelCommand);
     }
     
     /** Set values according to a place object */
     public void setValues(String name, String lat, String lon) {
-        nameField.setString( name );
+        nameField.setString(name);
         oldPlaceName = name;
     }
     
@@ -107,13 +108,13 @@ public class SurveyorForm extends Form implements CommandListener {
         Logger.debug("Setting name: " + wp.getName());
         nameField.setString(wp.getName());
         Logger.debug("Setting latitude: " + wp.getLatitude());
-        String latitude = String.valueOf( wp.getLatitude() );
-        if(latitude.length()>16) {
+        String latitude = String.valueOf(wp.getLatitude());
+        if(latitude.length() > 16) {
             latitude = latitude.substring(0, 16);
         }
         Logger.debug("Setting longitude: " + wp.getLongitude());
-        String longitude = String.valueOf( wp.getLongitude() );
-        if(longitude.length()>16) {
+        String longitude = String.valueOf(wp.getLongitude());
+        if(longitude.length() > 16) {
             longitude = longitude.substring(0, 16);
         }
         Logger.debug("Setting strings");
@@ -125,15 +126,15 @@ public class SurveyorForm extends Form implements CommandListener {
     public void commandAction(Command command, Displayable displayable) {
 
         if( command == okCommand ) {
-            Logger.debug("Surveyor Form command ,  ok!");
+            Logger.debug("Surveyor Form command, ok!");
             // Save waypoint
             String name = nameField.getString();
             made.setName(name);
-            controller.addPlace( made );
+            controller.addPlace(made);
             controller.showTrail();
         }
         if( command == cancelCommand ) {
-            Logger.debug("Surveyor Form command ,  cancel!");
+            Logger.debug("Surveyor Form command, cancel!");
             // Do nothing -> show trail
             controller.showTrail();
         }
