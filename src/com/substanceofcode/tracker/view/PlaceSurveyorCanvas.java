@@ -26,6 +26,7 @@ import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Graphics;
+import javax.microedition.lcdui.Font;
 
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.controller.Controller;
@@ -47,7 +48,7 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
     /** Type of the current point */
     private int pointType;
     
-    //private SurveyorForm nameForm;
+    private final static Font SMALL_FONT = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
 
     /** Traffic Signal */
     protected static final int OSM_TRAFFIC_SIGNAL = 1;
@@ -348,11 +349,12 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
     }
 
     void drawPlaceText(Graphics g, int key, String text, int whitespace) {
+        g.setFont(SMALL_FONT);
         g.drawString(key + "   " + text, 10, whitespace, Graphics.TOP|Graphics.LEFT);
     }
 
     void drawPlaceMenu(Graphics g, String[] menuArray) {
-        int y = 3; // start space between title
+        int y = 2; // start space between title
         int key = 1;
 
         for(int i = 0; i < menuArray.length; i++) {
@@ -374,28 +376,30 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
         /** Draw title */
         g.setColor(Theme.getColor(Theme.TYPE_TITLE));
         g.setFont(titleFont);
-        g.drawString(LocaleManager.getMessage("place_surveyor_canvas_title"), getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
+        g.drawString(LocaleManager.getMessage("place_surveyor_canvas_title"),
+                getWidth()/2, 1, Graphics.TOP|Graphics.HCENTER);
         
         if(pointType == OSM_MORE) { //more
-            g.drawString(LocaleManager.getMessage("place_surveyor_canvas_menu_more"), getWidth()/2, whiteSpace, Graphics.TOP|Graphics.HCENTER);
+            g.drawString(LocaleManager.getMessage("place_surveyor_canvas_menu_more"),
+                    getWidth()/2, whiteSpace, Graphics.TOP|Graphics.HCENTER);
 
             drawPlaceMenu(g, OSM_MOREMENU);
         }
         else if(pointType == OSM_NAME) { //names
             g.drawString(LocaleManager.getMessage("place_surveyor_canvas_title") +
-                    " - " + made.getName(), getWidth()/2, 15, Graphics.TOP|Graphics.HCENTER);
+                    " - " + made.getName(), getWidth()/2, whiteSpace, Graphics.TOP|Graphics.HCENTER);
 
             drawPlaceMenu(g, OSM_NAMEMENU);
         }
         else if(pointType == OSM_MAXSPEED) { // maxspeed
-            g.drawString(LocaleManager.getMessage("place_surveyor_canvas_menu_more"), getWidth()/2, whiteSpace, Graphics.TOP|Graphics.HCENTER);
+            g.drawString(LocaleManager.getMessage("place_surveyor_canvas_menu_maxspeed"),
+                    getWidth()/2, whiteSpace, Graphics.TOP|Graphics.HCENTER);
 
             drawPlaceMenu(g, OSM_MAXSPEEDMENU);
-
         }
         else if(pointType > 0) { //directions
             g.drawString(LocaleManager.getMessage("place_surveyor_canvas_title") +
-                    " - " + made.getName(), getWidth()/2, 15, Graphics.TOP|Graphics.HCENTER);
+                    " - " + made.getName(), getWidth()/2, whiteSpace, Graphics.TOP|Graphics.HCENTER);
             
             drawPlaceMenu(g, OSM_DIRECTIONSMENU);
         }

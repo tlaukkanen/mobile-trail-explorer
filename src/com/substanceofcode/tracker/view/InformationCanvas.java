@@ -22,6 +22,10 @@
 
 package com.substanceofcode.tracker.view;
 
+import javax.microedition.lcdui.Canvas;
+import javax.microedition.lcdui.Font;
+import javax.microedition.lcdui.Graphics;
+
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.model.GridFormatterManager;
 import com.substanceofcode.tracker.model.LengthFormatter;
@@ -31,10 +35,6 @@ import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
-
-import javax.microedition.lcdui.Canvas;
-import javax.microedition.lcdui.Font;
-import javax.microedition.lcdui.Graphics;
 
 /**
  * Information canvas is used to display textual information about the current
@@ -250,9 +250,9 @@ public class InformationCanvas extends BaseCanvas{
     private void handleKeys(int keyCode) {
         int gameKey = getGameAction(keyCode);
         /** Handle up/down presses so that informations are scrolled */
-        if(gameKey==Canvas.UP) {
+        if(gameKey == Canvas.UP) {
             firstRow -= BIG_FONT.getHeight();
-            if(firstRow<0) {
+            if(firstRow < 0) {
                 firstRow = 0;
             }
         }
