@@ -31,7 +31,7 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-import com.substanceofcode.tracker.TrailExplorerMidlet;
+import com.substanceofcode.tracker.MobileTrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.util.StringUtil;
@@ -66,7 +66,7 @@ public final class AboutScreen extends Canvas {
 
     private static final String[] aboutText = { "Mobile Trail Explorer,",
             LocaleManager.getMessage("about_screen_version") +
-            ": " + TrailExplorerMidlet.VERSION.toString(),
+            ": " + MobileTrailExplorerMidlet.VERSION.toString(),
             LocaleManager.getMessage("about_screen_copyright") +
             " 2005-2008", "Tommi Laukkanen", "",
             LocaleManager.getMessage("about_screen_licence"),

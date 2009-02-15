@@ -35,7 +35,7 @@ import javax.microedition.lcdui.Font;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.map.MapProviderManager;
-import com.substanceofcode.tracker.TrailExplorerMidlet;
+import com.substanceofcode.tracker.MobileTrailExplorerMidlet;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Marker;
 import com.substanceofcode.tracker.model.RecorderSettings;
@@ -94,10 +94,10 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         Version settingsVersion = controller.getSettings().getVersionNumber();
         if(settingsVersion == null){
             // This is fresh install use current version
-            settingsVersion = TrailExplorerMidlet.VERSION;
+            settingsVersion = MobileTrailExplorerMidlet.VERSION;
         }
         
-        Version difference = TrailExplorerMidlet.VERSION.compareVersion(settingsVersion);
+        Version difference = MobileTrailExplorerMidlet.VERSION.compareVersion(settingsVersion);
         this.updateRequired = difference.major > 0 || (difference.major == 0 && difference.minor > 0);
      
         
@@ -111,9 +111,9 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         timeoutThread = new Thread(this);
         timeoutThread.start();
 
-        Version version = TrailExplorerMidlet.VERSION;
+        Version version = MobileTrailExplorerMidlet.VERSION;
         versionText = version.toString();
-        if(TrailExplorerMidlet.BETA) {
+        if(MobileTrailExplorerMidlet.BETA) {
             versionText += " (BETA)";
         }
     }
@@ -217,7 +217,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         
         public Updater(Version initialVersion){
             this.initialVersion = initialVersion;
-            this.finalVersion = TrailExplorerMidlet.VERSION;
+            this.finalVersion = MobileTrailExplorerMidlet.VERSION;
         }
         
         public void run(){

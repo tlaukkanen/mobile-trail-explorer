@@ -1,5 +1,5 @@
 /*
- * TrailExplorerMidlet.java
+ * MobileTrailExplorerMidlet.java
  *
  * Copyright (C) 2005-2008 Tommi Laukkanen
  * http://www.substanceofcode.com
@@ -35,7 +35,7 @@ import com.substanceofcode.util.Version;
  * MIDlet class for the Mobile Trail Explorer application.
  * @author  Tommi Laukkanen
  */
-public class TrailExplorerMidlet extends MIDlet {
+public class MobileTrailExplorerMidlet extends MIDlet {
     
     /** 
      * The current Version of this Mobile Trail Explorer. (Major, Minor, Build) 
@@ -58,7 +58,7 @@ public class TrailExplorerMidlet extends MIDlet {
      * <li> Display the splash
      * </ul>
      */
-    public TrailExplorerMidlet() {
+    public MobileTrailExplorerMidlet() {
     	try{
 	        Display disp = Display.getDisplay(this);
 	        controller = new Controller(this, disp);
