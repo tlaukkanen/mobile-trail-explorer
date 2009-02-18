@@ -288,7 +288,6 @@ public class GpsPositionParser {
             }
         }else{
            Logger.info("Error with lat or long");
-            return;
         }
 
         int course = 0;

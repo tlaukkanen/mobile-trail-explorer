@@ -147,7 +147,8 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
         if(!isAppInitialized) {
             info += " " + LocaleManager.getMessage("splash_starting_up");
         }
-        g.drawString(info, 1, 1, Graphics.TOP|Graphics.LEFT);
+        int infoWidth = g.getFont().stringWidth(info);
+        g.drawString(info, getWidth()/2-infoWidth/2, 1, Graphics.TOP|Graphics.LEFT);
 
         // Copyright
         String copyrightText = "© 2009 Tommi Laukkanen";
