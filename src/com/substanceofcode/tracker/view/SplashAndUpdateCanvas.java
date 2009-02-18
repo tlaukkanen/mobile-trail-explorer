@@ -1,7 +1,7 @@
 /*
  * SplashAndUpdateCanvas.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -148,6 +148,15 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
             info += " " + LocaleManager.getMessage("splash_starting_up");
         }
         g.drawString(info, 1, 1, Graphics.TOP|Graphics.LEFT);
+
+        // Copyright
+        String copyrightText = "© 2009 Tommi Laukkanen";
+        int copyrightTextLength = g.getFont().stringWidth(copyrightText);
+        g.drawString(
+                copyrightText,
+                getWidth()/2 - copyrightTextLength/2,
+                getHeight(),
+                Graphics.LEFT|Graphics.BASELINE);
         
         if(updateRequired){
             g.setColor(0xFF0000);
