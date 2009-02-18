@@ -156,7 +156,7 @@ public class SplashAndUpdateCanvas extends Canvas implements Runnable {
                 copyrightText,
                 getWidth()/2 - copyrightTextLength/2,
                 getHeight(),
-                Graphics.LEFT|Graphics.BASELINE);
+                Graphics.LEFT|Graphics.BOTTOM);
         
         if(updateRequired){
             g.setColor(0xFF0000);
