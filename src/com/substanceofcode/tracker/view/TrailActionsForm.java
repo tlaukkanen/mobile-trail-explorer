@@ -265,6 +265,21 @@ public class TrailActionsForm extends Form implements CommandListener,
         }
     }
 
+    /** update the filename if it is based on a timestamp from same day */
+    public void updateTimestamp() {
+        String name=trailNameField.getString() ;
+        String timestamp=DateTimeUtil.getCurrentDateStamp();
+        // check if the filename is based on the current day, then update
+        // the filename. This prevents "File already exists" exceptions on
+        // some Nokia phones when saving the trail again. The date is based
+        // on the following pattern: yyyymmdd_hhmmss
+        if(name.startsWith(timestamp.substring(0,9))) {
+            name = timestamp ;
+
+            this.trailNameField.setString(name);
+        }
+    }
+
     /** Export the current recorded trail to a file with the specified format */
     private void exportTrail(int exportFormat, AlertHandler xiListen) {
         String lType = "";

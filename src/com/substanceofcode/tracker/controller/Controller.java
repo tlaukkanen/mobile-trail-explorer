@@ -619,6 +619,8 @@ public class Controller {
             // recorder.setTrack(lTest);
             if (trailActionsForm == null) {
                 trailActionsForm = new TrailActionsForm(this);
+            } else {
+                trailActionsForm.updateTimestamp() ;
             }
             display.setCurrent(trailActionsForm);
         }
