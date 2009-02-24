@@ -153,7 +153,7 @@ public class SettingsList extends List implements CommandListener {
             }
         }
         if (command == backCommand) {
-            controller.showTrail();
+            controller.showCurrentDisplay();
         }
     }
 }

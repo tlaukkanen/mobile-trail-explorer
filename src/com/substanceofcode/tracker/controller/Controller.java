@@ -832,6 +832,7 @@ public class Controller {
 
     /** Show trail */
     public void showTrail() {
+        currentDisplayIndex = 0;
         display.setCurrent(getTrailCanvas());
     }
 
@@ -1294,6 +1295,18 @@ public class Controller {
 
         BaseCanvas nextCanvas = screens[currentDisplayIndex];
         if (nextCanvas != null) {
+            display.setCurrent(screens[currentDisplayIndex]);
+        }
+    }
+
+    public void showCurrentDisplay() {
+        if(currentDisplayIndex >= screens.length) {
+            currentDisplayIndex = 0;
+        }
+
+        BaseCanvas currentCanvas = screens[currentDisplayIndex];
+        if(currentCanvas != null) {
+            currentCanvas.setFullScreenMode(true);
             display.setCurrent(screens[currentDisplayIndex]);
         }
     }
