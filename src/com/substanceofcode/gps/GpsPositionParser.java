@@ -244,7 +244,7 @@ public class GpsPositionParser {
      * $GPRMC,041107.000,A,6131.2028,N,02356.8782,E,18.28,198.00,270906,,,A*5
      * 
      */
-    private void parseGPRMC(String record) {
+    private synchronized void parseGPRMC(String record) {
         
         String[] values = StringUtil.split(record, DELIMITER);
 
@@ -540,7 +540,7 @@ public class GpsPositionParser {
      * 
      * @param record
      */
-    private void parseGPGSA(String record) {    	
+    private synchronized void parseGPGSA(String record) {
         String[] values = StringUtil.split(record, DELIMITER);             
         //String mode=values[1];
           int fixtype=StringUtil.parseShort(values[2], (short) 0);

@@ -40,7 +40,7 @@ public class BluetoothGPSDeviceImpl
         implements Runnable, BluetoothDevice {
     //private StreamConnection connection;
     //private InputStreamReader reader;
-    private Thread thread;    
+    private Thread thread;
    
     /** 
      * Explicit no arg constructor to allow for mock implementations
@@ -66,8 +66,6 @@ public class BluetoothGPSDeviceImpl
     public String getAlias() {
         return alias;
     }
-    /** Connect to GPS device */
-    private boolean isConnected = false;
 
     public synchronized void connect() throws IOException {
         Logger.debug("Start thread Connecting to " + this.getAlias());
@@ -112,7 +110,7 @@ public class BluetoothGPSDeviceImpl
             Logger.info("Starting BluetoothGpsDevice.run()");
             
             boolean useBTFix = Controller.getController().getUseBTFix();
-            
+
             while (Thread.currentThread() == thread) {
                 try {
                     StringBuffer output = new StringBuffer();
@@ -152,7 +150,7 @@ public class BluetoothGPSDeviceImpl
                         // Ignore but don't bother trying to parse, just loop
                         // around to the next iteration;
                         continue;
-                    }               
+                    }
                     // only parse items beginning with '$', such as "$GPRMC,..."
                     // and "$GPGSA,..." etc...
                     String nmeaString = output.toString();
@@ -207,7 +205,7 @@ public class BluetoothGPSDeviceImpl
                     }
                 } catch (NullPointerException npe) {
                     Logger.warn(
-                            "UNEXPECTED EXCEPTION Caught in BluetoothGPSDevice.run(), attempting to continue: " + npe.getMessage() + "\n" + npe.getClass());
+                            "UNEXPECTED NULLPOINTER EXCEPTION Caught in BluetoothGPSDevice.run(), attempting to continue: " + npe.getMessage() + "\n" + npe.getClass());
                     npe.printStackTrace();
                 } catch (Exception e) {
                     Logger.warn(
@@ -221,7 +219,7 @@ public class BluetoothGPSDeviceImpl
                 Logger.fatal("UNEXPECTED Exception! Caught in BluetoothGPSDevice.run() : " + e.toString());
             } else {
                 // Should never reach here, but.... never say never??
-                Logger.fatal("UNEXPECTED " + e.getClass().getName() + "! Caught in BluetoothGPSDevice.run() : " + e.toString());
+                Logger.fatal("FATAL UNEXPECTED " + e.getClass().getName() + "! Caught in BluetoothGPSDevice.run() : " + e.toString());
             }
         }
         Logger.info("Thread BluetoothGPSDevice.run() finished.");

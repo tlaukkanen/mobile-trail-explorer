@@ -22,7 +22,6 @@
 
 package com.substanceofcode.map;
 
-import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
 import com.substanceofcode.data.Serializable;
 import java.io.DataInputStream;
@@ -267,7 +266,7 @@ public class FileCache implements TileCache, Runnable {
      *                The vector of tiles to serialize
      * @return true if serialization was successful
      */
-    public boolean writeToFileCache(Vector tiles) {
+    public synchronized boolean writeToFileCache(Vector tiles) {
         boolean result = false;
         String fullPath = "";
         String exportFolder = Controller.getController().getSettings()
