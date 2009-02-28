@@ -264,7 +264,7 @@ public class PlaceSurveyorCanvas extends BaseCanvas  {
             }
             else if(keyCode == Canvas.KEY_NUM2) { //right
                 Logger.debug("Right");
-                name2 = " " + LocaleManager.getMessage("place_surveyor_canvas_direction_right");;
+                name2 = " " + LocaleManager.getMessage("place_surveyor_canvas_direction_right");
             }
             made.setName(name + name2);
         }
