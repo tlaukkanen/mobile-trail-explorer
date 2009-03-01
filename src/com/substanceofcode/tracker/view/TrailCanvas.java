@@ -75,6 +75,9 @@ public class TrailCanvas extends BaseCanvas {
     private Sprite compassArrows;
     private Sprite navigationArrows;
     private boolean largeDisplay;
+    private long currentTime;
+    private long oldTime;
+    private boolean showAudioRecStatus;
 
     /**
      * Creates a new instance of TrailCanvas
@@ -167,6 +170,14 @@ public class TrailCanvas extends BaseCanvas {
                 drawStatusBar(g);
             } catch (Exception ex) {
                 Logger.fatal("drawStatusBar Exception: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
+            /** Draw audio recording status */
+            try {
+                drawAudioRecStatus(g);
+            } catch (Exception ex) {
+                Logger.fatal("drawAudioRecStatus Exception: " + ex.getMessage());
                 ex.printStackTrace();
             }
 
@@ -470,6 +481,39 @@ public class TrailCanvas extends BaseCanvas {
         g.drawString(LocaleManager.getMessage("trail_canvas_course") + ": " + courseString,
                 currLocPoint.X,
                 currLocPoint.Y + (fontHeight * 3), Graphics.TOP | Graphics.HCENTER);
+    }
+
+    /** Draw audio recording status */
+    private void drawAudioRecStatus(Graphics g) {
+        int height = getHeight();
+
+        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN,
+                Font.SIZE_SMALL));
+        Font currentFont = g.getFont();
+        int fontHeightSmall = currentFont.getHeight();
+
+        g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN,
+                Font.SIZE_LARGE));
+        currentFont = g.getFont();
+        int fontHeight = currentFont.getHeight();
+
+        g.setColor(Theme.getColor(Theme.TYPE_ERROR));
+        if (controller.getAudioRecOn()) {
+            /** Switch status every ...  ms */
+            currentTime = System.currentTimeMillis();
+            if (Math.abs(currentTime-oldTime)>500) {
+                oldTime = currentTime;
+                showAudioRecStatus = !showAudioRecStatus;
+            }
+            if (showAudioRecStatus) {
+                g.drawImage(redDotImage,
+                        1, height - (fontHeight + fontHeightSmall * 3),
+                        Graphics.LEFT | Graphics.TOP);
+            }
+            g.drawString(LocaleManager.getMessage("trail_canvas_audio_rec"),
+                    10, height - (fontHeight + fontHeightSmall * 3 + 6),
+                    Graphics.TOP | Graphics.LEFT);
+        }
     }
 
     /** Draw status bar */

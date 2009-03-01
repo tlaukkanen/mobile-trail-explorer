@@ -91,6 +91,7 @@ import com.substanceofcode.tracker.view.GeocodeForm;
 import com.substanceofcode.tracker.view.UploadServicesList;
 import com.substanceofcode.tracker.view.CalculateTimeForm;
 import com.substanceofcode.tracker.view.SurveyorForm;
+import com.substanceofcode.tracker.view.MultimediaSettingsForm;
 
 /**
  * Controller contains methods for the application flow.
@@ -214,6 +215,8 @@ public class Controller {
     private static final short SHORTCUTACTION_PLACEMARK = 1;
     private static final short SHORTCUTACTION_SURVEYOR = 3;
 
+    /** status of audio recording */
+    private boolean audioRecOn = false;
     /**
      * Creates a new instance of Controller which performs the following:
      * <ul>
@@ -452,6 +455,10 @@ public class Controller {
 
     public void showKeySettings() {
         display.setCurrent(new KeySettingsList());
+    }
+
+    public void showMultimediaSettings() {
+        display.setCurrent(new MultimediaSettingsForm(this));
     }
 
     public void showWebRecordingSettings() {
@@ -1437,6 +1444,7 @@ public class Controller {
     {
         return distanceRemaining;
     }
+
     /** Get instance of settings list */
     private CalculateTimeForm getCalculateTimeForm() {
         if (calculateTimeForm == null) {
@@ -1447,5 +1455,11 @@ public class Controller {
         return calculateTimeForm;
     }
 
-
+    /** Status of audio Recording */
+    public boolean getAudioRecOn() {
+        return audioRecOn;
+    }
+    public void setAudioRecOn(boolean status) {
+        audioRecOn = status;
+    }
 }

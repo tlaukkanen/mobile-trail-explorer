@@ -47,10 +47,11 @@ public class SettingsList extends List implements CommandListener {
     private final static int RECORDING = 2;
     private final static int WEB_RECORDING = 3;
     private final static int DISPLAY = 4;
-    private final static int DEVELOPMENT_MENU = 5;
-    private final static int ABOUT = 6;
-    private final static int SMS = 8;
-    private final static int KEYS = 7;
+    private final static int MULTIMEDIA = 5;
+    private final static int DEVELOPMENT_MENU = 6;
+    private final static int ABOUT = 7;
+    private final static int KEYS = 8;
+    private final static int SMS = 9;
     private final static boolean SMS_AVAILABLE;
 
     static {
@@ -87,6 +88,7 @@ public class SettingsList extends List implements CommandListener {
         this.append(LocaleManager.getMessage("settings_list_recording"), null);
         this.append(LocaleManager.getMessage("settings_list_web_recording"), null);
         this.append(LocaleManager.getMessage("settings_list_display"), null);
+        this.append(LocaleManager.getMessage("settings_list_multimedia"), null);
         this.append(LocaleManager.getMessage("settings_list_development_menu"), null);
         this.append(LocaleManager.getMessage("settings_list_about"), null);
         this.append(LocaleManager.getMessage("settings_list_keys"), null);
@@ -147,6 +149,10 @@ public class SettingsList extends List implements CommandListener {
 
                 case (SMS):
                     controller.showSMSScreen();
+                    break;
+
+                case (MULTIMEDIA):
+                    controller.showMultimediaSettings();
                     break;
 
                 default:

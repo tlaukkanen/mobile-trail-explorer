@@ -25,7 +25,6 @@ import java.util.Enumeration;
 import java.util.Vector;
 import javax.microedition.midlet.MIDlet;
 
-import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.tracker.grid.GridPosition;
 import com.substanceofcode.tracker.grid.WGS84Position;
 import com.substanceofcode.tracker.view.Logger;
@@ -123,6 +122,15 @@ public class RecorderSettings {
     /** Upload services */
     private static final String OSM_USERNAME = "osm-username";
     private static final String OSM_PASSWORD = "osm-password";
+
+    /** Multimedia */
+    /** Audio */
+    private static final String MM_AUDIO_ENCODING = "mm-audio-encoding";
+    private static final String MM_AUDIO_INDEX = "mm-audio-index";
+    private static final String MM_AUDIO_ENCODING_DEFAULT = "";
+    private static final int MM_AUDIO_INDEX_DEFAULT = 0;
+    private static final String MM_AUDIO_SUFFIX = "mm-audio-suffix";
+    private static final String MM_AUDIO_SUFFIX_DEFAULT = "wav";
 
     /** 
      * Creates a new instance of RecorderSettings
@@ -741,5 +749,48 @@ public class RecorderSettings {
     public void setMteLocale(String locale) {
         settings.setStringProperty(MTE_LOCALE, locale);
         saveSettings();
+    }
+
+    /**
+     * get previous used audio encoding string
+     */
+    public String getAudioEncoding() {
+        return settings.getStringProperty(MM_AUDIO_ENCODING, MM_AUDIO_ENCODING_DEFAULT);
+    }
+
+    /**
+     * Set the audio encoding string
+     */
+    public void setAudioEncoding(String audioEncoding) {
+        settings.setStringProperty(MM_AUDIO_ENCODING, audioEncoding);
+    }
+
+    /*
+     * get index number to mark previous used codec in audio choice group
+     */
+    public int getAudioIndex() {
+        return settings.getIntProperty(MM_AUDIO_INDEX, MM_AUDIO_INDEX_DEFAULT);
+    }
+
+    /*
+     * Remember the position in audio encoding choicegroup
+     * (easier than comparing a lot of strings)
+     */
+    public void setAudioIndex(int index) {
+        settings.setIntProperty(MM_AUDIO_INDEX, index);
+    }
+
+    /**
+     * get file suffix used when saving audio notes
+     */
+    public String getAudioSuffix() {
+        return settings.getStringProperty(MM_AUDIO_SUFFIX, MM_AUDIO_SUFFIX_DEFAULT);
+    }
+
+    /**
+     * Set the file suffix used when saving audio notes
+     */
+    public void setAudioSuffix(String audioSuffix) {
+        settings.setStringProperty(MM_AUDIO_SUFFIX, audioSuffix);
     }
 }

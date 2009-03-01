@@ -52,17 +52,28 @@ public class AudioShortcutAction implements ShortcutAction {
             Controller controller = Controller.getController();
             GpsPosition pos = controller.getPosition();
 
+            //get encoding settings
+            RecorderSettings settings = controller.getSettings();
+            String audioEncoding = settings.getAudioEncoding();
+            String audioSuffix = settings.getAudioSuffix();
+
             Track track = controller.getTrack();
             String audioFile = LocaleManager.getMessage("audio_shortcut_action_file_prefix")
-                    + dateStamp + ".wav";
+                    + dateStamp + "." + audioSuffix;
             Marker audioMarker =
                     new Marker(pos,
                                LocaleManager.getMessage("audio_shortcut_action_marker_name"),
                                audioFile);
-            track.addMarker( audioMarker );
+            track.addMarker(audioMarker);
+
+            if ((audioEncoding != null) && !audioEncoding.equals("")) {
+                audioEncoding = "?" + audioEncoding;
+            } else {
+                audioEncoding = "";
+            }
             
             try {
-                p = Manager.createPlayer("capture://audio");
+                p = Manager.createPlayer("capture://audio" + audioEncoding);
                 p.realize();
                 rc = (RecordControl) p.getControl("RecordControl");
                 
@@ -75,23 +86,27 @@ public class AudioShortcutAction implements ShortcutAction {
                 rc.startRecord();
                 p.start();
                 bRecStarted = true;
+                controller.setAudioRecOn(bRecStarted);
             } catch (IOException ex) {
                 controller.setError(LocaleManager.getMessage("audio_shortcut_ioexception")
                         + ": " + ex.getMessage());
                 ex.printStackTrace();
+                controller.setAudioRecOn(false);
             } catch (MediaException ex) {
                 controller.setError(LocaleManager.getMessage("audio_shortcut_mediaexception")
                         + ": " + ex.getMessage());
                 ex.printStackTrace();
+                controller.setAudioRecOn(false);
             }
         } else {
+            Controller controller = Controller.getController();
             try {
                 // Stop recording
                 rc.commit();
                 p.close();
                 bRecStarted = false;
+                controller.setAudioRecOn(bRecStarted);
             } catch (IOException ex) {
-                Controller controller = Controller.getController();
                 controller.setError(LocaleManager.getMessage("audio_shortcut_ioexception")
                         + ": " + ex.getMessage());
                 ex.printStackTrace();
