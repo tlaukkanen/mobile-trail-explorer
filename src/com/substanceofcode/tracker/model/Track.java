@@ -140,7 +140,7 @@ public class Track implements Serializable {
      *                existing GPX stream
      * @throws IOException
      */
-    public Track(String fullPath, boolean newStream) throws IOException {
+    public Track(String fullPath, boolean newStream) throws IOException,SecurityException {
         this();
         isStreaming = true;
         try {
@@ -175,10 +175,20 @@ public class Track implements Serializable {
                 streamOut.flush();
             }
         } catch (IOException e) {
-            // ------------------------------------------------------------------
+            closeStreams();
+            throw e;
+        }catch(SecurityException e){
+            closeStreams();
+            Logger.error("Track: Security Exception: "+e.getMessage());
+        }
+    }
+
+    private void closeStreams(){
+                    // ------------------------------------------------------------------
             // If we get any IOException we must ensure that we close all stream
             // objects
             // ------------------------------------------------------------------
+        try{
             if (streamPrint != null) {
                 streamPrint.close();
                 streamPrint = null;
@@ -193,7 +203,8 @@ public class Track implements Serializable {
                 streamConnection.close();
                 streamConnection = null;
             }
-            throw e;
+        }catch(Exception e){
+            Logger.error("Exception while closing streams: "+e.getMessage());
         }
     }
 
