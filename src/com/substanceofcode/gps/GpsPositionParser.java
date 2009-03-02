@@ -244,6 +244,8 @@ public class GpsPositionParser {
      * $GPRMC,041107.000,A,6131.2028,N,02356.8782,E,18.28,198.00,270906,,,A*5
      * 
      */
+
+    /* Sony Ericsson JP-7 phones require the synchronization here to work */
     private synchronized void parseGPRMC(String record) {
         
         String[] values = StringUtil.split(record, DELIMITER);
@@ -540,6 +542,7 @@ public class GpsPositionParser {
      * 
      * @param record
      */
+    /* Sony Ericsson JP-7 phones require the synchronization here to work */
     private synchronized void parseGPGSA(String record) {
         String[] values = StringUtil.split(record, DELIMITER);             
         //String mode=values[1];

@@ -266,6 +266,7 @@ public class FileCache implements TileCache, Runnable {
      *                The vector of tiles to serialize
      * @return true if serialization was successful
      */
+    /* Sony Ericsson JP-7 phones require the synchronization here to work */
     public synchronized boolean writeToFileCache(Vector tiles) {
         boolean result = false;
         String fullPath = "";
