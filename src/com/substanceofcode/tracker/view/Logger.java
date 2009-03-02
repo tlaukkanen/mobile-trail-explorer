@@ -291,7 +291,8 @@ public class Logger extends Form implements CommandListener {
     }
     
     private void refreshWriteLogCommand(){
-        this.removeCommand(writeLogToFileSystemCommand);
+        if(writeLogToFileSystemCommand!=null)
+            removeCommand(writeLogToFileSystemCommand);
         if (settings.getWriteLog()) {
             this.addCommand(writeLogToFileSystemCommand = new Command(
                     LocaleManager.getMessage("logger_menu_dont_write_log"),
