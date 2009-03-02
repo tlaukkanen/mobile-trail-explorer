@@ -56,6 +56,7 @@ import com.substanceofcode.tracker.controller.Controller;
  * @author Barry Redmond
  */
 public final class GpsPosition implements Serializable {
+    public static final double EarthRadiusInKm = 6371.0;
 
     /***************************************************************************
      * 
@@ -334,7 +335,7 @@ public final class GpsPosition implements Serializable {
     }
 
     /**
-     * Calculate distance from given coordinates
+     * Calculate great circle distance from given coordinates
      * @param latitude
      * @param longitude
      * @return 
@@ -349,7 +350,7 @@ public final class GpsPosition implements Serializable {
                 + Math.cos(lat1)
                 * Math.cos(lat2)
                 * MathUtil.pow(Math.sin((lon1 - lon2) / 2), 2)));
-        return distance * 6371.0;
+        return distance * EarthRadiusInKm;
     }
     
     /**
