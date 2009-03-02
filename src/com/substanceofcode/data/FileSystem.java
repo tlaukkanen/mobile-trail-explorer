@@ -105,6 +105,7 @@ public class FileSystem {
         } catch (RecordStoreException e) {
             //either of these exceptions will mean the fileTable
             //is not initialized, causing problems later
+            Logger.debug("FileSystem construction error "+e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,7 +133,7 @@ public class FileSystem {
      * Saves the specified 'file' to the RMS/FileSystem.
      * 
      * @param filename The name of the file to save.
-     * @param mimeType The type of file, (can be any string if mimeType is not appropriate for the applicaiton)
+     * @param mimeType The type of file, (can be any string if mimeType is not appropriate for the application)
      * @param file The 'file' to write. 
      * @param overwrite If true, will overwrite any previously saved file with that name, if false will throw a FileIOException if there is a file of that name already in the system.
      * @throws FileIOException If 'overwrite' is false and a file with the specified 'filename' already exists in the FileSystem. OR if any other error occurs when saving the data.
@@ -193,6 +194,7 @@ public class FileSystem {
             fileTable.put(filename, fl);
             this.writeFileTableToRMS();
         } catch (RecordStoreException e) {
+            Logger.debug("FileSystem saveFile error "+e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
@@ -235,6 +237,7 @@ public class FileSystem {
             resultArray = baos.toByteArray();
             baos.close();
         } catch (RecordStoreException e) {
+            Logger.debug("FileSystem getFile ("+filename+") error "+e.getMessage());
             throw new FileIOException(LocaleManager.getMessage("file_system_recordstoreexception")
                     + ": " + e.getMessage());
         } catch (IOException e) {
@@ -324,6 +327,7 @@ public class FileSystem {
         }
         try {
             FileLocator fl = (FileLocator) (fileTable.get(filename));
+         //   Logger.debug("FileSystem: fl="+fl +"\n filename="+filename+"\n fl.recordStores.length="+fl.recordStores.length );
             String recordStoreName = fl.recordStores[0];
             RecordStore recordStore = RecordStore.openRecordStore(recordStoreName, false);
             for (int i = 0; i < fl.recordStores.length; i++) {
@@ -342,6 +346,7 @@ public class FileSystem {
             fileTable.remove(filename);
             writeFileTableToRMS();
         } catch (RecordStoreException e) {
+            Logger.debug("FileSystem deleteFile ("+filename+") error "+e.getMessage());
             throw new FileIOException(e.getMessage());
         }
     }
@@ -383,6 +388,7 @@ public class FileSystem {
             recordsInCurrentRecordStore = 0;
             this.writeFileTableToRMS();
         } catch (RecordStoreException e) {
+            Logger.error("formatFileSystem()" + e.getMessage());
             throw new FileIOException(e.getMessage());
         }
     }
@@ -418,6 +424,7 @@ public class FileSystem {
             dos.close();
             baos.close();
         } catch (RecordStoreException e) {
+            Logger.error("writeFileTableToRMS()" + e.getMessage());
             e.printStackTrace();
             throw new FileIOException(LocaleManager.getMessage("file_system_error_rms"));
         } catch (IOException e) {
