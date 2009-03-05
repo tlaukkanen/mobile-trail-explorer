@@ -92,6 +92,27 @@ public class Track implements Serializable {
     private GpsPosition maxAltitude;
     private GpsPosition minAltitude;
 
+    private double maxLatitude= -1;
+    private double minLatitude= 99;
+    private double maxLongitude=-400;
+    private double minLongitude=400;
+
+    public double getMaxLatitude() {
+        return maxLatitude;
+    }
+
+    public double getMaxLongitude() {
+        return maxLongitude;
+    }
+
+    public double getMinLatitude() {
+        return minLatitude;
+    }
+
+    public double getMinLongitude() {
+        return minLongitude;
+    }
+
     /** The Tracks name */
     private String name = null;
 
@@ -140,7 +161,7 @@ public class Track implements Serializable {
      *                existing GPX stream
      * @throws IOException
      */
-    public Track(String fullPath, boolean newStream) throws IOException,SecurityException {
+    public Track(String fullPath, boolean newStream) throws IOException {
         this();
         isStreaming = true;
         try {
@@ -381,6 +402,10 @@ public class Track implements Serializable {
             maxSpeedPosition = pos;
             maxAltitude = pos;
             minAltitude = pos;
+            minLatitude = pos.latitude;
+            maxLatitude = pos.latitude;
+            minLongitude = pos.longitude;
+            maxLongitude = pos.longitude;
         }
 
         /** Check for max speed */
@@ -395,6 +420,18 @@ public class Track implements Serializable {
         if( maxAltitude.altitude < pos.altitude ) {
             maxAltitude = pos;
         }
+
+        if (minLatitude > pos.latitude)
+            minLatitude = pos.latitude;
+
+        if (maxLatitude < pos.latitude)
+            maxLatitude = pos.latitude;
+
+        if (minLongitude > pos.longitude)
+            minLongitude = pos.longitude;
+
+        if (maxLongitude < pos.longitude)
+            maxLongitude = pos.longitude;
 
         trackPoints.addElement(pos);
 

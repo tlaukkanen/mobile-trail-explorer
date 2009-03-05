@@ -59,7 +59,7 @@ public class GpxConverter extends TrackConverter {
 
         StringBuffer gpx = new StringBuffer();
         addHeader(gpx);
-
+        addBounds(track,gpx);
         // Create places
         gpx.append(createPlaceMarks(places));
 
@@ -81,6 +81,17 @@ public class GpxConverter extends TrackConverter {
         // Finalize the GPX
         addFooter(gpx);
         return gpx.toString();
+    }
+    /**
+     * Add the bounds element which defines a bounding box containing all the points
+     * @param gpx
+     * <bounds minlat="37.221354973"
+     *     minlon="-121.987776104"
+     *     maxlat="37.330222065"
+     *    maxlon="-121.892523821"/>
+     */
+    private static void addBounds(Track track,StringBuffer gpx){
+        gpx.append("<bounds minLat=\""+track.getMinLatitude()+"\" maxLat=\""+track.getMaxLatitude()+"\" minLon=\""+track.getMinLongitude()+"\" maxLon=\""+track.getMaxLongitude()+"\"/>\r\n");
     }
     
     /** Convert place to GPX format.
