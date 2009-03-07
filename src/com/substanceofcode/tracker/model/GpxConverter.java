@@ -91,7 +91,7 @@ public class GpxConverter extends TrackConverter {
      *    maxlon="-121.892523821"/>
      */
     private static void addBounds(Track track,StringBuffer gpx){
-        gpx.append("<bounds minLat=\""+track.getMinLatitude()+"\" maxLat=\""+track.getMaxLatitude()+"\" minLon=\""+track.getMinLongitude()+"\" maxLon=\""+track.getMaxLongitude()+"\"/>\r\n");
+        gpx.append("<bounds minlat=\""+track.getMinLatitude()+"\" maxlat=\""+track.getMaxLatitude()+"\" minlon=\""+track.getMinLongitude()+"\" maxlon=\""+track.getMaxLongitude()+"\"/>\r\n");
     }
     
     /** Convert place to GPX format.
