@@ -59,7 +59,7 @@ public class GpxConverter extends TrackConverter {
 
         StringBuffer gpx = new StringBuffer();
         addHeader(gpx);
-        addBounds(track,gpx);
+        addMetaData(track,gpx);
         // Create places
         gpx.append(createPlaceMarks(places));
 
@@ -81,6 +81,12 @@ public class GpxConverter extends TrackConverter {
         // Finalize the GPX
         addFooter(gpx);
         return gpx.toString();
+    }
+
+    private static void addMetaData(Track track,StringBuffer gpx){
+        gpx.append("<metadata>");     
+        addBounds(track,gpx);
+        gpx.append("</metadata>");
     }
     /**
      * Add the bounds element which defines a bounding box containing all the points
@@ -120,7 +126,11 @@ public class GpxConverter extends TrackConverter {
      */
     public static void addHeader(StringBuffer gpx) {
         gpx.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-        gpx.append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\" creator=\"Mobile Trail Explorer\">\r\n");
+        gpx.append("<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" " +
+                "version=\"1.1\" creator=\"Mobile Trail Explorer\" " +
+                "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                "xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 " +
+                "http://www.topografix.com/GPX/1/1/gpx.xsd\" >\r\n");
     }
 
     /**
