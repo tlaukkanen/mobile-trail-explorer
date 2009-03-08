@@ -55,16 +55,15 @@ import javax.microedition.lcdui.Image;
     // The priority order of downloading the tiles. These are the indexes as depicted above
     static private final int tilePriorities[] = new int[] { 4, 1, 3, 5, 7, 0, 2, 6, 8 };
 
-    private TileDownloader tileDownloader = null;
-    
-    
+    private TileDownloader tileDownloader = null;     
     /**
      * 
      * @return the url-format for fetching the tile
      */
     public abstract String getUrlFormat();
-    
-    
+    //Nokia S40 JVM seems to have a problem inheriting abstract definitions
+    //So we have to do it manually.
+    public abstract String getIdentifier();
 
     public void drawMap(MapDrawContext mdc) {
 
@@ -82,11 +81,11 @@ import javax.microedition.lcdui.Image;
                 for (int i = 0; i < tilePriorities.length; i++) {
                     try {
                         int imageIndex = tilePriorities[i];
-                        mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], mdc.getZoomLevel(), false);
+                        mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], mdc.getZoomLevel(), false,true);
                     } catch (Exception e) {
                         Logger.error("MMP:"+e.getMessage());
                     }
-                }
+                }             
 
                 // Alpha blending
                     /*
@@ -109,10 +108,8 @@ import javax.microedition.lcdui.Image;
                 }
             }
         }
-
     }
     
-
     public void setState(int state) 
     {
         //clean up the cache
@@ -129,11 +126,15 @@ import javax.microedition.lcdui.Image;
     
     public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels) 
     {
+        GridPosition result=null;
         //convert the center
-        WGS84Position centerPos = mdc.getMapCenter().getAsWGS84Position();
+        
+        if (mdc.getMapCenter()!=null){
+            WGS84Position centerPos = mdc.getMapCenter().getAsWGS84Position();
+
         CanvasPoint centerPoint = ProjectionUtil.toCanvasPoint(centerPos.getLatitude()
                 , centerPos.getLongitude(), mdc.getZoomLevel());
-        
+
         switch(direction)
         {
             case(NORTH):
@@ -149,8 +150,9 @@ import javax.microedition.lcdui.Image;
                 centerPoint.X -= dPixels;
                 break;
         }
-        
-        return ProjectionUtil.toGridPosition(centerPoint, mdc.getZoomLevel());
+            result=ProjectionUtil.toGridPosition(centerPoint, mdc.getZoomLevel());
+        }
+        return result;
     }
     
 
