@@ -438,6 +438,7 @@ public class GpsRecorder {
                             DataOutputStream dos=null;
                             try{
                                 boolean serialize = true;
+                                GpsGPGSA gpgsa= currentPosition.getGpgsa();
                                 if(uploadURL.indexOf("@LAT@")>0) {
                                     String lat = String.valueOf(currentPosition.latitude);
                                     uploadURL = StringUtil.replace(uploadURL, "@LAT@", lat);
@@ -451,6 +452,14 @@ public class GpsRecorder {
                                     uploadURL = StringUtil.replace(uploadURL, "@HEA@", hea);
                                     String spd = String.valueOf(currentPosition.speed);
                                     uploadURL = StringUtil.replace(uploadURL, "@SPD@", spd);
+                                    String fix = String.valueOf(gpgsa.getFixtype());
+                                    uploadURL = StringUtil.replace(uploadURL, "@FIX@", fix);
+                                    String hdop = String.valueOf(gpgsa.getHdop());
+                                    uploadURL = StringUtil.replace(uploadURL, "@HDOP@", hdop);
+                                    String pdop = String.valueOf(gpgsa.getPdop());
+                                    uploadURL = StringUtil.replace(uploadURL, "@PDOP@", pdop);
+                                    String sat = String.valueOf(controller.getSatelliteCount());
+                                    uploadURL = StringUtil.replace(uploadURL, "@SAT@", sat);
                                     String time = DateTimeUtil.getUniversalDateStamp(currentPosition.date);
                                     uploadURL = StringUtil.replace(uploadURL, "@TIME@", time);
                                     serialize = false;

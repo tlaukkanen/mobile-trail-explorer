@@ -97,7 +97,7 @@ public class WebRecordingSettingsForm extends Form implements CommandListener {
 
         String url = settings.getUploadURL();
         uploadUrlField = new TextField(LocaleManager.getMessage("web_recording_settings_form_upload_url"),
-                url, 128, TextField.URL);
+                url, 256, TextField.URL);
         this.append(uploadUrlField);
     }
 }
