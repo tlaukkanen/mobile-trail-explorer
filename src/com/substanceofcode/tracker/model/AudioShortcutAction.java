@@ -68,8 +68,6 @@ public class AudioShortcutAction implements ShortcutAction {
 
             if ((audioEncoding != null) && !audioEncoding.equals("")) {
                 audioEncoding = "?" + audioEncoding;
-            } else {
-                audioEncoding = "";
             }
             
             try {

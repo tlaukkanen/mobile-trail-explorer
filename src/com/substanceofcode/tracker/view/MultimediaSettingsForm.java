@@ -24,20 +24,10 @@ package com.substanceofcode.tracker.view;
 
 import java.util.*;
 
-import javax.microedition.lcdui.*;
-import javax.microedition.media.*;
-import javax.microedition.media.MediaException;
-import javax.microedition.media.control.VideoControl;
-import javax.microedition.amms.control.camera.*;
-
-import javax.microedition.io.*;
-import javax.microedition.io.file.*;
-
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.TextField;
 import javax.microedition.lcdui.ChoiceGroup;
 
 import com.substanceofcode.tracker.controller.Controller;
