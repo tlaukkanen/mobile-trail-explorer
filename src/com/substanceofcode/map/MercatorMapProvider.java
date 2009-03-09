@@ -33,15 +33,15 @@ import javax.microedition.lcdui.Image;
 
 /**
  * this class is kind of the old MapProvider. just overwrite all abstract methods in your subclass
- * 
+ *
  * @author kaspar
  */
 
 
 
  public abstract class MercatorMapProvider extends AbstractMapProvider {
-    
-    
+
+
     // Variables needed by the map generator
     // Order of map tile indexes:
     // 0 1 2
@@ -55,9 +55,9 @@ import javax.microedition.lcdui.Image;
     // The priority order of downloading the tiles. These are the indexes as depicted above
     static private final int tilePriorities[] = new int[] { 4, 1, 3, 5, 7, 0, 2, 6, 8 };
 
-    private TileDownloader tileDownloader = null;     
+    private TileDownloader tileDownloader = null;
     /**
-     * 
+     *
      * @return the url-format for fetching the tile
      */
     public abstract String getUrlFormat();
@@ -73,28 +73,28 @@ import javax.microedition.lcdui.Image;
             tileDownloader.start();
         }
         WGS84Position center = mdc.getMapCenter().getAsWGS84Position();
-        if (center != null) {            
-            if (tileDownloader != null && tileDownloader.isStarted() == true) {               
+        if (center != null) {
+            if (tileDownloader != null && tileDownloader.isStarted() == true) {
                 int[] pt = MapLocator.conv(center.getLatitude(), center.getLongitude(), mdc.getZoomLevel());
 
                 // Get the tile images in the priority order. Unavailable images are returned as null
                 for (int i = 0; i < tilePriorities.length; i++) {
                     try {
                         int imageIndex = tilePriorities[i];
-                        mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], mdc.getZoomLevel(), false,true);
+                        mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], mdc.getZoomLevel(), false);
                     } catch (Exception e) {
                         Logger.error("MMP:"+e.getMessage());
                     }
-                }             
+                }
 
                 // Alpha blending
                     /*
                  * int [] rgbData=null; images[0].getRGB(rgbData, 0, 256, 0,
                  * 0, 256, 256); int col = rgbData[1]&0x00FFFFFF; int alpha =
                  * 128<<24; col+=alpha; rgbData[1]=col;
-                 * 
+                 *
                  * g.drawRGB(rgbData,0,256,0,0,256,256,true);
-                 * 
+                 *
                  */
 
                 // Blit the images to the canvas
@@ -109,8 +109,8 @@ import javax.microedition.lcdui.Image;
             }
         }
     }
-    
-    public void setState(int state) 
+
+    public void setState(int state)
     {
         //clean up the cache
         if(state == MapProvider.INACTIVE)
@@ -122,13 +122,13 @@ import javax.microedition.lcdui.Image;
             }
         }
     }
-    
-    
-    public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels) 
+
+
+    public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels)
     {
         GridPosition result=null;
         //convert the center
-        
+
         if (mdc.getMapCenter()!=null){
             WGS84Position centerPos = mdc.getMapCenter().getAsWGS84Position();
 
@@ -154,31 +154,31 @@ import javax.microedition.lcdui.Image;
         }
         return result;
     }
-    
 
-    public double getPixelSize(MapDrawContext mdc) 
+
+    public double getPixelSize(MapDrawContext mdc)
     {
         double lat = 0;
         double lng = 0;
-        
+
         if(mdc.getMapCenter() != null)
         {
             WGS84Position pos = mdc.getMapCenter().getAsWGS84Position();
             lat = pos.getLatitude();
             lng = pos.getLongitude();
         }
-        
-        return ProjectionUtil.pixelSize(lat, lng, mdc.getZoomLevel());
-    }    
 
-    public CanvasPoint convertPositionToScreen(MapDrawContext mdc, GridPosition position) 
-    {      
+        return ProjectionUtil.pixelSize(lat, lng, mdc.getZoomLevel());
+    }
+
+    public CanvasPoint convertPositionToScreen(MapDrawContext mdc, GridPosition position)
+    {
         //convert the center
         WGS84Position centerPos = mdc.getMapCenter().getAsWGS84Position();
         CanvasPoint centerPoint = ProjectionUtil.toCanvasPoint(centerPos.getLatitude()
                 , centerPos.getLongitude(), mdc.getZoomLevel());
-        
-        
+
+
         //convert the position
         WGS84Position pos = position.getAsWGS84Position();
         CanvasPoint merc = ProjectionUtil.toCanvasPoint(pos.getLatitude(),
@@ -193,22 +193,22 @@ import javax.microedition.lcdui.Image;
                 (int) (relativeY));
         return relativePoint;
     }
- 
-    
+
+
     public String getCacheDir()
     {
         //looks like this is not used anymore
-        return "NotSet"; 
+        return "NotSet";
     }
-    
+
     public String makeurl(int x, int y, int z)
     {
-        int coords[] =  configureCoords(x,y,z);        
+        int coords[] =  configureCoords(x,y,z);
         StringBuffer output=null;
         String[] bits = StringUtil.split(getUrlFormat(), "X");
         try{
          output= new StringBuffer(bits[0]);
-        
+
             output.append(coords[2]);
             output.append(bits[1]);
             output.append(coords[0]);
@@ -220,12 +220,12 @@ import javax.microedition.lcdui.Image;
         }
         return output.toString();
     }
-    
+
     private final int[] configureCoords(int x , int y, int z){
         int[] a = { setX(x),setY(y),setZ(z)};
         return a;
     }
-    
+
     /**
      * Modify the input X value if necessary
      * @param x
@@ -234,7 +234,7 @@ import javax.microedition.lcdui.Image;
     protected int setX(int x){
         return x;
     }
-    
+
     /**
      * Modify the input Y value if necessary
      * @param y
@@ -243,7 +243,7 @@ import javax.microedition.lcdui.Image;
     protected int setY(int y){
         return y;
     }
-    
+
     /**
      * Modify the input Z value if necessary
      * @param z
