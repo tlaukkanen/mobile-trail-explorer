@@ -97,13 +97,14 @@ public abstract class GridPosition implements GridIdentifiers
      */
     //Re: issue 145. S40 devices have a problem identifing gridPositions
     //Explicitly adding the class definition seems to fix it
+    //kratky.honza modified this function to work with N40
     public static GridPosition unserializeGridPosition(String[] data)
     {
-        for(int i=0 ; i<GridPosition.gridPositions.length ; i++)
+        for(int i=0 ; i<GridIdentifiers.gridPositions.length ; i++)
         {
             try
             {
-                return GridPosition.gridPositions[i].unserialize(data);
+                return GridIdentifiers.gridPositions[i].unserialize(data);
             } catch (Exception e) {
             }
         }
