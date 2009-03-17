@@ -77,7 +77,7 @@ public class CalculateTimeForm extends Form implements CommandListener {
     
     /** Initialize place fields (name, lon and lat) */
     private void initializeControls() {
-        distanceField = new TextField(LocaleManager.getMessage("calculate_time_form_distance"), "", 32, TextField.ANY);
+        distanceField = new TextField(LocaleManager.getMessage("calculate_time_form_distance"), "", 32, TextField.DECIMAL);
         this.append(distanceField);
     }
     
@@ -92,21 +92,24 @@ public class CalculateTimeForm extends Form implements CommandListener {
 
     /** Handle commands */
     public void commandAction(Command command, Displayable displayable) {
-
-        if( command == okCommand ) {
-            Logger.debug("CalculateTimeForm command ,  ok!");
-            // Save waypoint
-            String distance = distanceField.getString();
-            double distance2 = Double.parseDouble("0" + distance);;
-            Logger.debug("99!-" + Double.toString(distance2));
-            controller.setDistanceRemaining(distance2);
-            Logger.debug("100!");
-            controller.showTrail();
-        }
-        if( command == cancelCommand ) {
-            Logger.debug("CalculateTimeForm command ,  cancel!");
-            // Do nothing -> show trail
-            controller.showTrail();
+        try {
+            if( command == okCommand ) {
+                Logger.debug("CalculateTimeForm command ,  ok!");
+                // Save waypoint
+                String distance = distanceField.getString();
+                double distance2 = Double.parseDouble("0" + distance);
+                Logger.debug("99!-" + Double.toString(distance2));
+                controller.setDistanceRemaining(distance2);
+                Logger.debug("100!");
+                controller.showTrail();
+            }
+            if( command == cancelCommand ) {
+                Logger.debug("CalculateTimeForm command ,  cancel!");
+                // Do nothing -> show trail
+                controller.showTrail();
+            }
+        } catch(Exception ex) {
+            // Do nothing
         }
     }
 }
