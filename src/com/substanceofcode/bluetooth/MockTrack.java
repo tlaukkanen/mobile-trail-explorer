@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -29,6 +29,7 @@ import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.StringUtil;
 
 public class MockTrack extends Track{
+private GpsPosition lastPosition = null;
 private final String trackData = ""
 + "-3.384551,50.86268,61.3\n"
 + "-3.384568,50.862671,60.3\n"
@@ -1398,15 +1399,29 @@ private final String trackData = ""
 
 
         short course = 0;
-        double altitude = Double.parseDouble(coords[2]);
-        double speed = 12.34;
+        double altitude = Double.parseDouble(coords[2]);        
         double longitudeDouble = Double.parseDouble(coords[0]);
         double latitudeDouble = Double.parseDouble(coords[1]);
+        double speed = 0;
         Date date = new Date();
-        gp=new GpsPosition(course, longitudeDouble, latitudeDouble, speed,
-                altitude, date,null);
-        }else{
-            
+        //If we have a lastPosition get the difference and the distance
+        //and calculate the speed
+        //Note: Calculated speed is not representative of the speed the actual track was recorded at
+        //This is because there can be as much as a 2 second delay in updating the position
+        //whereas in the mocktrack positions are returned almost exactly 1 sec intervals
+
+            if (lastPosition != null){
+                double distInKm =lastPosition.getDistanceFromPosition(latitudeDouble, longitudeDouble);
+                //In seconds
+                double timeDiff = (date.getTime() -lastPosition.date.getTime())/1000;
+                //In hours
+                timeDiff = timeDiff/3600;
+                //Speed im km/h
+                speed = distInKm/timeDiff;//mph
+                course = (short)lastPosition.getCourseFromPosition(latitudeDouble, longitudeDouble);
+            }
+            gp = new GpsPosition(course, longitudeDouble,latitudeDouble, speed,altitude, date,null);
+            lastPosition = gp;
         }
      }
      catch(ArrayIndexOutOfBoundsException aioobe){
