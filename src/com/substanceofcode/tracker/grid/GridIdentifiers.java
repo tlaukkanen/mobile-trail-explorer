@@ -31,16 +31,30 @@ package com.substanceofcode.tracker.grid;
 public interface GridIdentifiers
 {
     public final static String GRID_WGS84 = "WGS84";
+    public final static String GRID_WGS84_D_M = "WGS84 Degree/Min";
+    public final static String GRID_WGS84_D_M_S = "WGS84 Degree/Min/Sec";
     public final static String GRID_CH1903 = "Swiss Grid";
 
 
     /**
      * there should be an instance of each XXXPosition of each GridImplementation
      */
-    public static final GridPosition[] gridPositions = new GridPosition[]{new WGS84Position(), new CH1903Position() };
+    public static final GridPosition[] gridPositions = 
+        new GridPosition[]{
+              new WGS84Position()
+            , new WGS84PositionDegreeMin()
+            , new WGS84PositionDegreeMinSec()
+            , new CH1903Position()
+        };
 
     /**
      * there should be an instance of each GridFormatter. The default-formatter has to be on first place (wgs84)
      */
-    public final static GridFormatter[] formatters = {new WGS84Formatter(), new CH1903Formatter()};
+    public final static GridFormatter[] formatters = 
+        new GridFormatter[] {
+              new WGS84Formatter()
+            , new WGS84FormatterDegreeMin()
+            , new WGS84FormatterDegreeMinSec()
+            , new CH1903Formatter()
+        };
 }

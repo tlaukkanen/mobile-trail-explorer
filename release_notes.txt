@@ -16,13 +16,15 @@ Nicolas Marchildon
 Patric Oosterveld
 Peter Reinhart
 Vikas Yadav
+Marco van Ecks
 
 Release Notes:
 
-v1.14 (January xth 2009)
-+ Improved MapCache initialization time.
+v1.14 (March xth 2009)
++ Improved MapCache initialization time
 + Fixed information screen scrolling (Tommi)
 + Splash screen hang fix (Issue 106)
++ WGS84 coordinates in degrees and minutes (Issue 162, Thanks Marco can Eck)
 
 v1.13 (November 15th 2008)
 + Option to prevent Map tiles from being downloaded over the network (Cached tiles will still be displayed)

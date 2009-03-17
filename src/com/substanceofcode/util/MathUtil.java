@@ -252,4 +252,18 @@ public class MathUtil {
         // Return our estimate
         return n;
     }
+    
+    public final static int abs(int in) {
+        if (in < 0.0) {
+            return in * -1;
+        }
+        return in;
+    }
+    
+    public final static double abs(double in) {
+        if (in < 0.0) {
+            return in * -1.0;
+        }
+        return in;
+    }
 }
