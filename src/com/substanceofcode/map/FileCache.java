@@ -105,64 +105,66 @@ public class FileCache implements TileCache, Runnable {
         long start,end;
         Logger.info("Initializing FileCache");
         start=System.currentTimeMillis();
-
+        try {
             try {
                 Conn = (FileConnection) Connector.open(fullPath);
             } catch (IOException ex) {
                 Logger.debug("File: failed to open " + fullPath);
             }
 
-        if(readTileListFromRms()){
-            end=System.currentTimeMillis();
-            Logger.debug("Finished Initialisation in "+(end-start) +"ms");
-            Logger.debug("File: read tilelist from RMS OK");
-        }
-         else{
-            try {
-
-                if (Conn != null && !Conn.exists()) {
-                    // The file doesn't exist, we are done initializing
-                    Logger.debug("File: file does not exist");
-                    //create the file so we can start writing to it
-                    Conn.create();
-                } else {
-                    streamIn = Conn.openDataInputStream();
-
-             //       Logger.debug("Conn.availableSize()=" + Conn.availableSize());
-                    boolean reading = true;
-                    while (reading) {
-                        // There's no way of detecting the end of the stream
-                        // short of getting an IOexception
-                        try {
-                            Tile t = Tile.getTile(streamIn);
-
-                            Logger.debug("t is " + t.cacheKey + ", offset is "
-                                    + t.offset);
-                            if (t != null) {
-                                availableTileList.put(t.cacheKey,
-                                        new Long(t.offset));
-                            }
-                        } catch (Exception ioe) {
-                            reading = false;
-                        }
-
-                    }
-                    Logger.debug("FILE: read " + availableTileList.size()
-                            + " tiles");
-
-                    streamIn.close();
-
-                    streamIn = null;
-                }
-                storeTileListToRms();
+            if(readTileListFromRms()){
                 end=System.currentTimeMillis();
                 Logger.debug("Finished Initialisation in "+(end-start) +"ms");
-            } catch (IOException e) {
-                Logger.error("File: IOException: " + e.getMessage());
-                e.printStackTrace();
-            } catch (SecurityException e) {
-                Logger.error("File: SecurityException: " + e.getMessage());
+                Logger.debug("File: read tilelist from RMS OK");
+            } else{
+                try {
+
+                    if (Conn != null && !Conn.exists()) {
+                        // The file doesn't exist, we are done initializing
+                        Logger.debug("File: file does not exist");
+                        //create the file so we can start writing to it
+                        Conn.create();
+                    } else {
+                        streamIn = Conn.openDataInputStream();
+
+                 //       Logger.debug("Conn.availableSize()=" + Conn.availableSize());
+                        boolean reading = true;
+                        while (reading) {
+                            // There's no way of detecting the end of the stream
+                            // short of getting an IOexception
+                            try {
+                                Tile t = Tile.getTile(streamIn);
+
+                                Logger.debug("t is " + t.cacheKey + ", offset is "
+                                        + t.offset);
+                                if (t != null) {
+                                    availableTileList.put(t.cacheKey,
+                                            new Long(t.offset));
+                                }
+                            } catch (Exception ioe) {
+                                reading = false;
+                            }
+
+                        }
+                        Logger.debug("FILE: read " + availableTileList.size()
+                                + " tiles");
+
+                        streamIn.close();
+
+                        streamIn = null;
+                    }
+                    storeTileListToRms();
+                    end=System.currentTimeMillis();
+                    Logger.debug("Finished Initialisation in "+(end-start) +"ms");
+                } catch (IOException e) {
+                    Logger.error("File: IOException: " + e.getMessage());
+                    e.printStackTrace();
+                } catch (SecurityException e) {
+                    Logger.error("File: SecurityException: " + e.getMessage());
+                }
             }
+        }catch(Exception ex) {
+            Logger.fatal("Error in FC.initializeCache() " + ex.getMessage());
         }
     }
 
