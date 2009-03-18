@@ -1,7 +1,7 @@
 /*
  * MobileTrailExplorerMidlet.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Created on August 14th 2006
@@ -43,7 +43,7 @@ public class MobileTrailExplorerMidlet extends MIDlet {
     public static final Version VERSION = new Version(1, 14, 0);
     
     /** Beta flag */
-    public static final boolean BETA = true;
+    public static final boolean BETA = false;
     
     /**
      * Local Controller object

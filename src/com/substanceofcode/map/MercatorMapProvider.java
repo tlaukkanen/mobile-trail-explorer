@@ -66,47 +66,50 @@ import javax.microedition.lcdui.Image;
     public abstract String getIdentifier();
 
     public void drawMap(MapDrawContext mdc) {
+        try {
+            if (tileDownloader == null) {
+                Logger.debug("Starting TileDownloader Instance:");
+                tileDownloader = new TileDownloader(this);
+                tileDownloader.start();
+            }
+            WGS84Position center = mdc.getMapCenter().getAsWGS84Position();
+            if (center != null) {
+                if (tileDownloader != null && tileDownloader.isStarted() == true) {
+                    int[] pt = MapLocator.conv(center.getLatitude(), center.getLongitude(), mdc.getZoomLevel());
 
-        if (tileDownloader == null) {
-            Logger.debug("Starting TileDownloader Instance:");
-            tileDownloader = new TileDownloader(this);
-            tileDownloader.start();
-        }
-        WGS84Position center = mdc.getMapCenter().getAsWGS84Position();
-        if (center != null) {
-            if (tileDownloader != null && tileDownloader.isStarted() == true) {
-                int[] pt = MapLocator.conv(center.getLatitude(), center.getLongitude(), mdc.getZoomLevel());
-
-                // Get the tile images in the priority order. Unavailable images are returned as null
-                for (int i = 0; i < tilePriorities.length; i++) {
-                    try {
-                        int imageIndex = tilePriorities[i];
-                        mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], mdc.getZoomLevel(), false);
-                    } catch (Exception e) {
-                        Logger.error("MMP:"+e.getMessage());
+                    // Get the tile images in the priority order. Unavailable images are returned as null
+                    for (int i = 0; i < tilePriorities.length; i++) {
+                        try {
+                            int imageIndex = tilePriorities[i];
+                            mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], mdc.getZoomLevel(), false);
+                        } catch (Exception e) {
+                            Logger.error("MMP:"+e.getMessage());
+                        }
                     }
-                }
 
-                // Alpha blending
-                    /*
-                 * int [] rgbData=null; images[0].getRGB(rgbData, 0, 256, 0,
-                 * 0, 256, 256); int col = rgbData[1]&0x00FFFFFF; int alpha =
-                 * 128<<24; col+=alpha; rgbData[1]=col;
-                 *
-                 * g.drawRGB(rgbData,0,256,0,0,256,256,true);
-                 *
-                 */
+                    // Alpha blending
+                        /*
+                     * int [] rgbData=null; images[0].getRGB(rgbData, 0, 256, 0,
+                     * 0, 256, 256); int col = rgbData[1]&0x00FFFFFF; int alpha =
+                     * 128<<24; col+=alpha; rgbData[1]=col;
+                     *
+                     * g.drawRGB(rgbData,0,256,0,0,256,256,true);
+                     *
+                     */
 
-                // Blit the images to the canvas
-                int x = mdc.getScreenWidth()/2 - pt[2]; // The top left corner
-                int y = mdc.getScreenHeight()/2 - pt[3];  // of the middle tile
-                int anchor = Graphics.TOP | Graphics.LEFT;
-                for (int i = 0; i < 9; i++) {
-                    if (mapTiles[i] != null) {
-                        mdc.getGraphics().drawImage(mapTiles[i], x + (m[i] * TileDownloader.TILE_SIZE), y + (n[i] * TileDownloader.TILE_SIZE), anchor);
+                    // Blit the images to the canvas
+                    int x = mdc.getScreenWidth()/2 - pt[2]; // The top left corner
+                    int y = mdc.getScreenHeight()/2 - pt[3];  // of the middle tile
+                    int anchor = Graphics.TOP | Graphics.LEFT;
+                    for (int i = 0; i < 9; i++) {
+                        if (mapTiles[i] != null) {
+                            mdc.getGraphics().drawImage(mapTiles[i], x + (m[i] * TileDownloader.TILE_SIZE), y + (n[i] * TileDownloader.TILE_SIZE), anchor);
+                        }
                     }
                 }
             }
+        }catch(Exception ex) {
+            Logger.error("Error in MMP.drawMap() " + ex.getMessage());
         }
     }
 

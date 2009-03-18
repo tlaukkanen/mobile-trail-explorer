@@ -1,7 +1,7 @@
 /*
  * TileDownloader.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import javax.microedition.io.ConnectionNotFoundException;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 import javax.microedition.lcdui.Graphics;
@@ -239,102 +238,106 @@ public class TileDownloader implements Runnable {
      * from the internet.
      */
     public void run() {
-        Thread thisThread = Thread.currentThread();
-        HttpConnection conn = null;
-        InputStream in = null;
-        Tile tile = null;
-        int redirects;
-        int code;
-        String url;
-        while (downloaderThread == thisThread && running) {
-            try {
-                Thread.sleep(THREADDELAY);
-            } catch (InterruptedException e1) {
-                Logger.debug("TD: Thread Interrupted");
-                e1.printStackTrace();
-            }
-            if (tileQueue.size() > 0) {
-                Logger.debug("tileQueue size=" + tileQueue.size());
-                synchronized (tileQueue) {
-                    if (tileQueue.size() > 0) {
-                        Logger.debug("TD: queue size is:" + tileQueue.size());
-                        tile = (Tile) tileQueue.firstElement();
-                        tileQueue.removeElementAt(0);
-                    }
-                }
+        try {
+            Thread thisThread = Thread.currentThread();
+            HttpConnection conn = null;
+            InputStream in = null;
+            Tile tile = null;
+            int redirects;
+            int code;
+            String url;
+            while (downloaderThread == thisThread && running) {
                 try {
-                    if (tile != null) {
-                        redirects = 0;
-                        url=tile.url;
-                        while (redirects < MAX_REDIRECTS) {
-                            Logger.debug("TD: Requesting url " + url);
-                            conn = (HttpConnection) Connector.open(url);
+                    Thread.sleep(THREADDELAY);
+                } catch (InterruptedException e1) {
+                    Logger.debug("TD: Thread Interrupted");
+                    e1.printStackTrace();
+                }
+                if (tileQueue.size() > 0) {
+                    Logger.debug("tileQueue size=" + tileQueue.size());
+                    synchronized (tileQueue) {
+                        if (tileQueue.size() > 0) {
+                            Logger.debug("TD: queue size is:" + tileQueue.size());
+                            tile = (Tile) tileQueue.firstElement();
+                            tileQueue.removeElementAt(0);
+                        }
+                    }
+                    try {
+                        if (tile != null) {
+                            redirects = 0;
+                            url=tile.url;
+                            while (redirects < MAX_REDIRECTS) {
+                                Logger.debug("TD: Requesting url " + url);
+                                conn = (HttpConnection) Connector.open(url);
 
-                            in = conn.openInputStream();
-                            code = conn.getResponseCode();
-                            Logger.debug("TD: Response code was " + conn.getResponseCode() + " " + conn.getResponseMessage());
-                            if (code == HttpConnection.HTTP_OK) {
-                                try {
-                                    // If we get a 200 response but then can't save
-                                    // the tile
-                                    // save a blank image there instead.
-                                    if (!tc.saveTile(tile, in)) {
-                                        tc.saveTile(tile, blankImage());
+                                in = conn.openInputStream();
+                                code = conn.getResponseCode();
+                                Logger.debug("TD: Response code was " + conn.getResponseCode() + " " + conn.getResponseMessage());
+                                if (code == HttpConnection.HTTP_OK) {
+                                    try {
+                                        // If we get a 200 response but then can't save
+                                        // the tile
+                                        // save a blank image there instead.
+                                        if (!tc.saveTile(tile, in)) {
+                                            tc.saveTile(tile, blankImage());
+                                        }
+
+                                        Logger.debug("TD: Downloaded Tile " + tile.cacheKey);
+                                    } catch (Exception e) {
+                                        Logger.debug("TD: Error saving tile " + tile.cacheKey + ", " + e.getMessage());
+                                    }finally{
+                                        break;
                                     }
-
-                                    Logger.debug("TD: Downloaded Tile " + tile.cacheKey);
-                                } catch (Exception e) {
-                                    Logger.debug("TD: Error saving tile " + tile.cacheKey + ", " + e.getMessage());
-                                }finally{
-                                    break;
-                                }
-                            } else {
-                                if (code == HttpConnection.HTTP_MOVED_TEMP || //302
-                                        code == HttpConnection.HTTP_SEE_OTHER || //303
-                                        code == HttpConnection.HTTP_TEMP_REDIRECT || //307
-                                        code == HttpConnection.HTTP_MOVED_PERM) //301
-                                {
-                                    url = conn.getHeaderField("Location");
-                                }
-                                in.close();
-                                conn.close();
-                                in = null;
-                                conn = null;
-                                //give up if too many redirects
-                                if (redirects++ > MAX_REDIRECTS) {
-                                    tc.saveTile(tile, blankImage());
-                                    break;
+                                } else {
+                                    if (code == HttpConnection.HTTP_MOVED_TEMP || //302
+                                            code == HttpConnection.HTTP_SEE_OTHER || //303
+                                            code == HttpConnection.HTTP_TEMP_REDIRECT || //307
+                                            code == HttpConnection.HTTP_MOVED_PERM) //301
+                                    {
+                                        url = conn.getHeaderField("Location");
+                                    }
+                                    in.close();
+                                    conn.close();
+                                    in = null;
+                                    conn = null;
+                                    //give up if too many redirects
+                                    if (redirects++ > MAX_REDIRECTS) {
+                                        tc.saveTile(tile, blankImage());
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                } catch (IOException e) {
-                    Logger.error("TD run() IOException: " + e.getMessage());
-                 } catch (SecurityException e) {
-                    Logger.error("TD run() SecurityException: " + e.getMessage());
-                } finally {
-                    if (in != null) {
-                        try {
-                            in.close();
-                        } catch (IOException ioe) {
+                    } catch (IOException e) {
+                        Logger.error("TD run() IOException: " + e.getMessage());
+                     } catch (SecurityException e) {
+                        Logger.error("TD run() SecurityException: " + e.getMessage());
+                    } finally {
+                        if (in != null) {
+                            try {
+                                in.close();
+                            } catch (IOException ioe) {
+                            }
+                            in = null;
                         }
-                        in = null;
-                    }
-                    if (conn != null) {
-                        try {
-                            conn.close();
-                        } catch (IOException ioe) {
+                        if (conn != null) {
+                            try {
+                                conn.close();
+                            } catch (IOException ioe) {
+                            }
+                            conn = null;
                         }
-                        conn = null;
                     }
+                    // Force garbage collecting
+                    System.gc();
+                } else {
+                    // Logger.debug("Tilequeue is empty");
+                    // tileQueue.size(),Logger.DEBUG);
+                    Thread.yield();
                 }
-                // Force garbage collecting
-                System.gc();
-            } else {
-                // Logger.debug("Tilequeue is empty");
-                // tileQueue.size(),Logger.DEBUG);
-                Thread.yield();
             }
+        }catch(Exception ex) {
+            Logger.fatal("TD: run() " + ex.getMessage());
         }
     }
 
@@ -348,31 +351,37 @@ public class TileDownloader implements Runnable {
      * @return image
      */
     public Image loadingImage() {
-        if (loadingImage[nullImageCounter] != null) {
+        try {
+            if (loadingImage[nullImageCounter] != null) {
 
+                Image p = loadingImage[nullImageCounter];
+                nullImageCounter++;
+                if (nullImageCounter > 8) {
+                    nullImageCounter = 0;
+                }
+                return p;
+            }
+            // Create the loading image
+            loadingImage[nullImageCounter] = Image.createImage(TILE_SIZE, TILE_SIZE);
+            Graphics g = loadingImage[nullImageCounter].getGraphics();
+            g.setColor(255, 200, 200);
+            g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+            g.setColor(128, 128, 128);
+            // Draw a boundary around the image
+            g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
+            g.drawString(LocaleManager.getMessage("tile_downloader_loading") + "..." + nullImageCounter, 10, 10, Graphics.TOP | Graphics.LEFT);
             Image p = loadingImage[nullImageCounter];
+            // Logger.debug("Returning new nullImage " + nullImageCounter);
             nullImageCounter++;
             if (nullImageCounter > 8) {
                 nullImageCounter = 0;
             }
             return p;
+        }catch(Exception ex) {
+            Logger.fatal("TD: loadingImage(): " + ex.getMessage());
+            return null;
         }
-        // Create the loading image
-        loadingImage[nullImageCounter] = Image.createImage(TILE_SIZE, TILE_SIZE);
-        Graphics g = loadingImage[nullImageCounter].getGraphics();
-        g.setColor(255, 200, 200);
-        g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
-        g.setColor(128, 128, 128);
-        // Draw a boundary around the image
-        g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
-        g.drawString(LocaleManager.getMessage("tile_downloader_loading") + "..." + nullImageCounter, 10, 10, Graphics.TOP | Graphics.LEFT);
-        Image p = loadingImage[nullImageCounter];
-        // Logger.debug("Returning new nullImage " + nullImageCounter);
-        nullImageCounter++;
-        if (nullImageCounter > 8) {
-            nullImageCounter = 0;
-        }
-        return p;
+
     }
 
     /**
