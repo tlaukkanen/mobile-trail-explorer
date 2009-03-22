@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -40,7 +40,7 @@ import com.substanceofcode.localization.LocaleManager;
 
 /**
  * <p>A file-system overlay for the RMS</p>
- * 
+ *
  * This class allows 'files' to be written to the RMS, and retrieved via a 'filename'.<br>
  * A 'file' can be any class which implements the Serializable interface.<br>
  * This class deals with all the issues of space, and spliting up files into smaller chunks,
@@ -57,7 +57,7 @@ import com.substanceofcode.localization.LocaleManager;
  *     <li>File location (Serialized File locator)
  *   </ul>
  * </ul>
- * 
+ *
  * @author Barry
  */
 public class FileSystem {
@@ -68,7 +68,7 @@ public class FileSystem {
     private static final String RMS_FILE_INDEX = "rms_files_index";
     private static FileSystem fileSystem = null;
     /**
-     * A hashtable from 'String' (filename) to 'Filelocator'. 
+     * A hashtable from 'String' (filename) to 'Filelocator'.
      */
     private Hashtable fileTable;
     private int currentRecordStoreNumber;
@@ -124,25 +124,25 @@ public class FileSystem {
         return fileSystem;
     }
 
-    public void saveFile(String filename, Serializable file, boolean overwrite) 
+    public void saveFile(String filename, Serializable file, boolean overwrite)
             throws FileIOException {
         this.saveFile(filename, file.getMimeType(), file, overwrite);
     }
 
     /**
      * Saves the specified 'file' to the RMS/FileSystem.
-     * 
+     *
      * @param filename The name of the file to save.
      * @param mimeType The type of file, (can be any string if mimeType is not appropriate for the application)
-     * @param file The 'file' to write. 
+     * @param file The 'file' to write.
      * @param overwrite If true, will overwrite any previously saved file with that name, if false will throw a FileIOException if there is a file of that name already in the system.
      * @throws FileIOException If 'overwrite' is false and a file with the specified 'filename' already exists in the FileSystem. OR if any other error occurs when saving the data.
      */
     public void saveFile(
-            String filename, 
-            String mimeType, 
-            Serializable file, 
-            boolean overwrite) 
+            String filename,
+            String mimeType,
+            Serializable file,
+            boolean overwrite)
                 throws FileIOException {
         if (this.fileTable.containsKey(filename)) {
             if (!overwrite) {
@@ -168,6 +168,12 @@ public class FileSystem {
                     + ":- " + e1.getMessage());
         }
         int bytesWritten = 0;
+        //If data is empty, numRecords is 0, then recordStores is 0 which
+        //creates an  ArrayOutOfBounds error when reading or deleting the file...
+		if(data.length==0){
+			Logger.warn("FileSystem: attempting to write a zero length file");
+			return;
+        }
         int numRecords = data.length / RMS_RECORD_SIZE + (data.length % RMS_RECORD_SIZE == 0 ? 0 : 1);
         String[] recordStores = new String[numRecords];
         int[] records = new int[numRecords];
@@ -203,7 +209,7 @@ public class FileSystem {
 
     /**
      * Returns the file (as a DataInputStream) specified by the 'filname'
-     * 
+     *
      * @param filename the file to return.
      * @return the file specified by the filname, as a byte array.
      * @throws FileIOException if the filename doesn't exist, or other IO problems occur.
@@ -250,7 +256,7 @@ public class FileSystem {
     /**
      * Returns a Vector of Strings corrosponding to the filenames stored in this
      * FileSystem.
-     * 
+     *
      * @return a Vector of Strings corrosponding to the filenames stored in this FileSystem.
      */
     public Vector /*String*/ listFiles() {
@@ -266,9 +272,9 @@ public class FileSystem {
     /**
      * Returns a Vector of Strings corrosponding to the filenames of all 'files' with a 'mimeType' that
      * matches 'fileType'
-     * 
+     *
      * @param fileType The type of files to get.
-     * 
+     *
      * @return a Vector of Strings corrosponding to the filenames of all 'files' with a 'mimeType' that
      * matches 'fileType'
      */
@@ -315,7 +321,7 @@ public class FileSystem {
     /**
      * <p>Deletes the file with the specified filename from the FileSystem. </p>
      * Deletes any empty RecordStores this action causes along the way.
-     * 
+     *
      * @param filename the file to delete
      * @throws FileIOException if the filename doesn't exist in the filesystem, or other IO problems occur.
      */
@@ -328,23 +334,25 @@ public class FileSystem {
         try {
             FileLocator fl = (FileLocator) (fileTable.get(filename));
          //   Logger.debug("FileSystem: fl="+fl +"\n filename="+filename+"\n fl.recordStores.length="+fl.recordStores.length );
-            String recordStoreName = fl.recordStores[0];
-            RecordStore recordStore = RecordStore.openRecordStore(recordStoreName, false);
-            for (int i = 0; i < fl.recordStores.length; i++) {
-                if (!recordStoreName.equals(fl.recordStores[i])) {
-                    recordStoreName = fl.recordStores[i];
-                    recordStore.closeRecordStore();
-                    RecordStore.openRecordStore(fl.recordStores[i], false);
-                }
-                recordStore.deleteRecord(fl.recordNumbers[i]);
-            }
-            if (recordStore.getSize() == 0) {
-                recordStore.closeRecordStore();
-                RecordStore.deleteRecordStore(recordStoreName);
-            }
-            recordStore.closeRecordStore();
-            fileTable.remove(filename);
-            writeFileTableToRMS();
+			 if (fl.recordStores.length > 0) {
+				String recordStoreName = fl.recordStores[0];
+				RecordStore recordStore = RecordStore.openRecordStore(recordStoreName, false);
+				for (int i = 0; i < fl.recordStores.length; i++) {
+					if (!recordStoreName.equals(fl.recordStores[i])) {
+						recordStoreName = fl.recordStores[i];
+						recordStore.closeRecordStore();
+						RecordStore.openRecordStore(fl.recordStores[i], false);
+					}
+					recordStore.deleteRecord(fl.recordNumbers[i]);
+				}
+				if (recordStore.getSize() == 0) {
+					recordStore.closeRecordStore();
+					RecordStore.deleteRecordStore(recordStoreName);
+				}
+				recordStore.closeRecordStore();
+			}
+			fileTable.remove(filename);
+			writeFileTableToRMS();
         } catch (RecordStoreException e) {
             Logger.debug("FileSystem deleteFile ("+filename+") error "+e.getMessage());
             throw new FileIOException(e.getMessage());
@@ -372,9 +380,9 @@ public class FileSystem {
 
     /**
      * <p>Formats the filesystem, deleting ALL files, and ALL RecordStores along the way.</p>
-     * 
+     *
      * This is a very extreme and will delete ALL information stored in the RMS, use with care.
-     * 
+     *
      * @throws FileIOException if there is a problem deleting any of the RecordStores.
      */
     public void formatFileSystem() throws FileIOException {
