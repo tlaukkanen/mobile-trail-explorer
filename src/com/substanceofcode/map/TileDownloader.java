@@ -54,7 +54,7 @@ public class TileDownloader implements Runnable {
     private int lastZoomLevel = 0; // Used to detect a change of zoom level
     public static final int TILE_SIZE = 256;
     private int gridSize = 9; // This is the assumed maximum = 256px *3
-    public Image[] loadingImage = new Image[gridSize];
+    public Image loadingImage = null;
     public Image blankImage = null;
     public Image loadingRmsCachedImage = null;
     public Image loadingFileCachedImage = null;
@@ -352,31 +352,19 @@ public class TileDownloader implements Runnable {
      */
     public Image loadingImage() {
         try {
-            if (loadingImage[nullImageCounter] != null) {
-
-                Image p = loadingImage[nullImageCounter];
-                nullImageCounter++;
-                if (nullImageCounter > 8) {
-                    nullImageCounter = 0;
-                }
-                return p;
+            if (loadingImage != null) {
+				return loadingImage;
             }
             // Create the loading image
-            loadingImage[nullImageCounter] = Image.createImage(TILE_SIZE, TILE_SIZE);
-            Graphics g = loadingImage[nullImageCounter].getGraphics();
+            loadingImage = Image.createImage(TILE_SIZE, TILE_SIZE);
+            Graphics g = loadingImage.getGraphics();
             g.setColor(255, 200, 200);
             g.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
             g.setColor(128, 128, 128);
             // Draw a boundary around the image
             g.drawRect(0, 0, TILE_SIZE, TILE_SIZE);
             g.drawString(LocaleManager.getMessage("tile_downloader_loading") + "..." + nullImageCounter, 10, 10, Graphics.TOP | Graphics.LEFT);
-            Image p = loadingImage[nullImageCounter];
-            // Logger.debug("Returning new nullImage " + nullImageCounter);
-            nullImageCounter++;
-            if (nullImageCounter > 8) {
-                nullImageCounter = 0;
-            }
-            return p;
+            return loadingImage;
         }catch(Exception ex) {
             Logger.fatal("TD: loadingImage(): " + ex.getMessage());
             return null;
