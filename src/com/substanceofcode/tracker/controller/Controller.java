@@ -498,6 +498,13 @@ public class Controller {
         return devices;
     }
 
+    /**
+     * Return the current registered gps device
+     */
+    public Device getGpsDevice(){
+	        return gpsDevice;
+    }
+
     /** Set GPS device */
     public void setGpsDevice(String address, String alias) {
         gpsDevice = GpsDeviceFactory.createDevice(address, alias);

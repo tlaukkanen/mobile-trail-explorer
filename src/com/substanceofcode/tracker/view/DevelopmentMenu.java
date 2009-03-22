@@ -36,7 +36,7 @@ import com.substanceofcode.localization.LocaleManager;
  * help with Debugging and also to give some insight into what is going on in
  * the background
  * </p>
- * 
+ *
  * @author Barry Redmond
  */
 public class DevelopmentMenu extends List implements CommandListener {
@@ -48,67 +48,74 @@ public class DevelopmentMenu extends List implements CommandListener {
 
     private GpsParsingMetricsScreen gpsParsingMetricsScreen;
     private Logger loggerScreen;
+    private GpsMessagesScreen gpsMsgScreen;
 
     private static final int METRICS = 0;
     private static final int LOGGER = 1;
-    private static final int JSR179 = 2;
-    private static final int FILECACHE = 3;
-    private static final int BLUETOOTH_FIX = 4;
-    
+    private static final int GPS_MESSAGES = 2;
+    private static final int JSR179 = 3;
+    private static final int FILECACHE = 4;
+    private static final int BLUETOOTH_FIX = 5;
+
+
     //Jsr179 related stuff
     private static boolean useJsr179b = false;
     private static final String useJsr179= LocaleManager.getMessage("development_menu_usejsr179");
     private static final String dontUsejsr179 = LocaleManager.getMessage("development_menu_dontusejsr179");
     private String jsr179 = useJsr179;
-    
+
     //Filecache related stuff
     private static boolean useFileCacheb = false;
     private static final String useFileCache= LocaleManager.getMessage("development_menu_usefilecache");
     private static final String dontUseFileCache = LocaleManager.getMessage("development_menu_dontusefilecache");
     private String fileCache = useFileCache;
-    
+
     // Bluetooth reading fix related stuff
     //private static boolean BTFixEnabled = false;
     private static final String useBTFix = LocaleManager.getMessage("development_menu_usebtfix");
     private static final String dontUseBTFix = LocaleManager.getMessage("development_menu_dontusebtfix");
     private String BTFix = useBTFix;
-    
+
+    //Gps  Messages
+    private static final String gpsMessages = LocaleManager.getMessage("development_menu_gps_messages");
+
     private RecorderSettings settings;
 
     public DevelopmentMenu() {
         super(LocaleManager.getMessage("development_menu_title"), List.IMPLICIT);
-        
+
         settings=CONTROLLER.getSettings();
         useJsr179b=settings.getJsr179();
         setJsrString();
-        
+
         useFileCacheb=settings.getFileCache();
         setFileCacheString();
-        
+
         BTFix = CONTROLLER.getUseBTFix() ? dontUseBTFix : useBTFix;
-        
-        this.append(LocaleManager.getMessage("development_menu_parsing_metrics"), null);
-        this.append(LocaleManager.getMessage("development_menu_log"), null);
-        
+
+        append(LocaleManager.getMessage("development_menu_parsing_metrics"), null); //0
+        append(LocaleManager.getMessage("development_menu_log"), null); //1
+		append(gpsMessages, null);//2
         //these next two toggle certain features on or off
         //Uncomment these if you want to play with them (they don't quite work yet...)
         // be sure to uncomment the 'refresh' method below as well
-        this.append(jsr179, null);
-        this.append(fileCache, null);
-        append(BTFix, null);
+        append(jsr179, null); //3
+        append(fileCache, null);//4
+        append(BTFix, null);//5
 
-        this.addCommand(backCommand = new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 2));
-        this.addCommand(okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.OK, 1));
-        this.setSelectCommand(okCommand);
-        this.setCommandListener(this);
+
+        addCommand(backCommand = new Command(LocaleManager.getMessage("menu_back"), Command.BACK, 2));
+        addCommand(okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.OK, 1));
+        setSelectCommand(okCommand);
+        setCommandListener(this);
     }
-    
+
     private void refresh(){
-    	delete(4);
-        this.delete(3);
-        this.delete(2);        
-        this.append(jsr179,null);
-        this.append(fileCache,null);
+    	delete(BLUETOOTH_FIX);
+        delete(FILECACHE);
+        delete(JSR179);
+        append(jsr179,null);
+        append(fileCache,null);
         append(BTFix, null);
     }
 
@@ -120,6 +127,15 @@ public class DevelopmentMenu extends List implements CommandListener {
             gpsParsingMetricsScreen.refresh();
         }
         CONTROLLER.showDisplayable(gpsParsingMetricsScreen);
+    }
+
+    private void showGpsMessagesScreen() {
+	        if (gpsMsgScreen == null) {
+	            gpsMsgScreen = new GpsMessagesScreen();
+	            gpsMsgScreen.setPreviousScreen(this);
+	        }
+
+	        CONTROLLER.showDisplayable(gpsMsgScreen);
     }
 
     private void showLoggerScreen() {
@@ -137,7 +153,7 @@ public class DevelopmentMenu extends List implements CommandListener {
         setJsrString();
         CONTROLLER.setUseJsr179(useJsr179b);
     }
-    
+
     private void setJsrString(){
         if (useJsr179b) {
             jsr179 = dontUsejsr179;
@@ -145,13 +161,13 @@ public class DevelopmentMenu extends List implements CommandListener {
             jsr179 =useJsr179 ;
         }
     }
-    
+
     private void toggleFileCacheSupport() {
         useFileCacheb = !useFileCacheb;
         setFileCacheString();
         CONTROLLER.setUseFileCache(useFileCacheb);
     }
-    
+
     private void setFileCacheString(){
         if (useFileCacheb) {
             fileCache = dontUseFileCache;
@@ -181,6 +197,9 @@ public class DevelopmentMenu extends List implements CommandListener {
                         showLoggerScreen();
                         Logger.getLogger().refresh();
                         break;
+					case(GPS_MESSAGES):
+						showGpsMessagesScreen();
+                        break;
                     case (JSR179):
                         toggleJsr179Support();
                         refresh();
@@ -192,10 +211,11 @@ public class DevelopmentMenu extends List implements CommandListener {
                         CONTROLLER.showSettings();
                         break;
                     case(BLUETOOTH_FIX):
-                	toggleBTFix();
+                		toggleBTFix();
                         refresh();
                         CONTROLLER.showSettings();
                         break;
+
                 }
             } else if (command == backCommand) {
                 CONTROLLER.showSettings();

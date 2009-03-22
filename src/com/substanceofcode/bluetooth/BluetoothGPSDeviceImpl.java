@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -30,39 +30,43 @@ import com.substanceofcode.gpsdevice.GpsDeviceImpl;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.localization.LocaleManager;
+import java.io.OutputStream;
 
 /**
  * This class represents bluetooth devices that provide gps information
  * @author gareth
  */
-public class BluetoothGPSDeviceImpl 
-        extends GpsDeviceImpl 
+public class BluetoothGPSDeviceImpl
+        extends GpsDeviceImpl
         implements Runnable, BluetoothDevice {
     //private StreamConnection connection;
     //private InputStreamReader reader;
     private Thread thread;
-   
-    /** 
+    private StreamConnection connection;
+    private InputStreamReader reader;
+    public OutputStream outputStream;
+
+    /**
      * Explicit no arg constructor to allow for mock implementations
      * of subclasses
      *
      */
     public BluetoothGPSDeviceImpl() {
     }
-    
+
     /** Creates a new instance of BluetoothDevice */
     public BluetoothGPSDeviceImpl(String address, String alias) {
         super(address, alias);
         this.alias = alias;
         this.address = address;
     }
-    
+
     public String getAddress() {
         String url;
         url = address;
         return url;
     }
-    
+
     public String getAlias() {
         return alias;
     }
@@ -70,8 +74,9 @@ public class BluetoothGPSDeviceImpl
     public synchronized void connect() throws IOException {
         Logger.debug("Start thread Connecting to " + this.getAlias());
 
-        connection = (StreamConnection) Connector.open("btspp://" + this.getAddress() + ":1", Connector.READ);
+        connection = (StreamConnection) Connector.open("btspp://" + this.getAddress() + ":1", Connector.READ_WRITE);
             reader = new InputStreamReader(connection.openInputStream());
+            outputStream=  connection.openOutputStream();
 
         if (thread != null) {
             return;
@@ -79,7 +84,7 @@ public class BluetoothGPSDeviceImpl
             thread = new Thread(this);
             thread.start();
     }
-    
+
     /** Disconnect from bluetooth device */
     public synchronized void disconnect() {
 
@@ -102,13 +107,12 @@ public class BluetoothGPSDeviceImpl
         connection = null;
         thread = null;
     }
-    private StreamConnection connection;
-    private InputStreamReader reader;
-   
+
+
     public void run() {
         try {
             Logger.info("Starting BluetoothGpsDevice.run()");
-            
+
             boolean useBTFix = Controller.getController().getUseBTFix();
 
             while (Thread.currentThread() == thread) {
@@ -117,7 +121,7 @@ public class BluetoothGPSDeviceImpl
 
                     // Read one line and try to parse it.
                     int input;
-                    
+
                     while ((input = reader.read()) != LINE_DELIMITER) {
                         if (input == -1) {
                             Logger.debug("bt:run -1");
@@ -164,7 +168,7 @@ public class BluetoothGPSDeviceImpl
                 // This happens quite often on my N80, and it spells death for
                 // the current trail
                 //
-                catch (IOException ie) {                    
+                catch (IOException ie) {
                     final Controller controller = Controller.getController();
                     boolean isRecording = (controller.getStatusCode() != Controller.STATUS_STOPPED);
                     if (isRecording == false) {
@@ -185,7 +189,7 @@ public class BluetoothGPSDeviceImpl
                     int count = 0;
                     // Try to reconnect if we are still recording
                     // Reconnecting only applies to BT devices
-                    
+
                     while (isRecording && !connected) {
                         try {
                             this.connect();
