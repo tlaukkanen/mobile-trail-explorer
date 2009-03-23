@@ -291,8 +291,10 @@ class MessageEditor extends Form implements CommandListener {
 
     public void commandAction(Command c, Displayable d) {
         if (c == okCommand) {
-
-            gpsMessages.put(messageNameField.getString(), messageField.getString().toUpperCase());
+			String name=messageNameField.getString();
+			String value= messageField.getString().toUpperCase();
+			if(!"".equals(name) && !"".equals(value))
+                gpsMessages.put(name, value);
             //if editing and the key (name) has changed, remove the old version now.
             if (editMode && !messageNameField.getString().equals(message)) {
                 gpsMessages.remove(message);
