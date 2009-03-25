@@ -41,19 +41,19 @@ public class GpsPositionParser {
     private static GpsPositionParser gpsPositionParser;
 
    private final Logger logger = Logger.getLogger();
-    
+
     private GpsPosition currentPosition;
     private GpsGPGSA currentDilutionOfPrecision;
-    
+
     private double lastAltitude;
     private short satelliteCount;
     private double maxSpeed;
     private final Vector satellites;
-    
+
     /**
      * A temporary Vector of GpsSatellites which gets copied over to the variable 'satellites' every
      * time all the GPGSV strings in the sequence has finished.
-     * 
+     *
      * Only gets initialized once, and then cleared rather than creating a new one to reduce Object creation
      * overheads.
      */
@@ -65,7 +65,7 @@ public class GpsPositionParser {
         }
         return gpsPositionParser;
     }
-    
+
     private GpsPositionParser() {
         this.satellites = new Vector();
         this.currentPosition = null;
@@ -80,8 +80,8 @@ public class GpsPositionParser {
     public synchronized GpsPosition getGpsPosition() {
         return currentPosition;
     }
-    
-    private synchronized void setGpsPosition(GpsPosition pos) {
+
+    public synchronized void setGpsPosition(GpsPosition pos) {
         this.currentPosition = pos;
     }
 
@@ -140,7 +140,7 @@ public class GpsPositionParser {
       //  Logger.debug("Parsing: "+record);
         recordMetrics(record);
         //Chop the checksum off, we don't want to parse it
-        record=record.substring(0,record.indexOf('*'));        
+        record=record.substring(0,record.indexOf('*'));
         if (record.startsWith("$GPRMC")) {
             try{
     //            Logger.debug("5");
@@ -169,8 +169,8 @@ public class GpsPositionParser {
             }catch(IndexOutOfBoundsException e){
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()");
             }
-        } 
-        // Don't know the type, ignore and don't bother trying to parse, it'll still be logged in the Metrics, 
+        }
+        // Don't know the type, ignore and don't bother trying to parse, it'll still be logged in the Metrics,
         // so we can know if there's a type that is being recieved but not parsed.
         /*else {
             try{
@@ -184,7 +184,7 @@ public class GpsPositionParser {
 
         /**
          * RMC 15 GGA 5 GSA 5
-         * 
+         *
          */
     }
 
@@ -192,7 +192,7 @@ public class GpsPositionParser {
      * <h2>$GPRMC</h2>
      * <p>
      * Recommended minimum specific GPS/Transit data
-     * 
+     *
      * <pre>
      *      eg1. $GPRMC,081836,A,3751.65,S,14507.36,E,000.0,360.0,130998,011.3,E*62
      *      eg2. $GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191194,020.3,E*68
@@ -209,7 +209,7 @@ public class GpsPositionParser {
      * <br>
      *      eg3. $GPRMC,220516,A,5133.82,N,00042.24,W,173.8,231.8,130694,004.2,W*70
      *      1    2    3    4    5     6    7    8      9     10  11 12
-     * 
+     *
      * <br>
      *      1   220516     Time Stamp
      *      2   A          validity - A-ok, V-invalid
@@ -238,16 +238,16 @@ public class GpsPositionParser {
      *      11   = E or W
      *      12   = Checksum
      * </pre>
-     * 
+     *
      * <hr size=1>
      * Parse coordinates, speed and heading information. Example value:<br>
      * $GPRMC,041107.000,A,6131.2028,N,02356.8782,E,18.28,198.00,270906,,,A*5
-     * 
+     *
      */
 
     /* Sony Ericsson JP-7 phones require the synchronization here to work */
     private synchronized void parseGPRMC(String record) {
-        
+
         String[] values = StringUtil.split(record, DELIMITER);
 
         // First value = $GPRMC
@@ -300,13 +300,13 @@ public class GpsPositionParser {
                 course = 180;
             }
         }
-        
-        
+
+
         // if we have a speed value, work out the Miles Per Hour
         if (groundSpeed > 0) {
-            // km/h = knots * 1.852            	 
+            // km/h = knots * 1.852
             speed = (int) ((groundSpeed) * 1.852);
-            
+
             if (speed > maxSpeed){
             	maxSpeed=speed;
             }
@@ -317,7 +317,7 @@ public class GpsPositionParser {
         }
 
         if (warning.equals("A")) {
-            GpsPosition pos = new GpsPosition(record, (short) course, 
+            GpsPosition pos = new GpsPosition(record, (short) course,
                     longitudeDouble, latitudeDouble, speed, getLastAltitude());
             pos.setGpgsa(currentDilutionOfPrecision);
             this.setGpsPosition(pos);
@@ -338,7 +338,7 @@ public class GpsPositionParser {
      * <th>Example Data </th>
      * <th>Description </th>
      * </tr>
-     * 
+     *
      * <tr>
      * <td>Sentence Identifier</td>
      * <td>$GPGGA</td>
@@ -402,7 +402,7 @@ public class GpsPositionParser {
      * </tr>
      * </table>
      * <p>
-     * 
+     *
      * <p>
      * Global Positioning System Fix Data. Time, position and fix related data
      * for a GPS receiver.
@@ -412,7 +412,7 @@ public class GpsPositionParser {
      * hhmmss.ss = UTC of position <br>
      * llll.ll = latitude of position<br>
      * a = N or S<br>
-     * 
+     *
      * yyyyy.yy = Longitude of position<br>
      * a = E or W <br>
      * x = GPS Quality indicator (0=no fix, 1=GPS fix, 2=Dif. GPS fix) <br>
@@ -422,11 +422,11 @@ public class GpsPositionParser {
      * M = units of antenna altitude, meters <br>
      * x.x = Geoidal separation<br>
      * M = units of geoidal separation, meters <br>
-     * 
+     *
      * x.x = Age of Differential GPS data (seconds) <br>
      * xxxx = Differential reference station ID <br>
      * <p>
-     * 
+     *
      * <pre>
      *      eg3. $GPGGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*hh
      *      1    = UTC of Position
@@ -446,25 +446,25 @@ public class GpsPositionParser {
      *      14   = Diff. reference station ID#
      *      15   = Checksum
      * </pre>
-     * 
+     *
      * http://aprs.gids.nl/nmea/
      */
     private synchronized void parseGPGGA(String record) {
         String[] values = StringUtil.split(record, DELIMITER);
         short isFixed = StringUtil.parseShort(values[6], (short) 0);
         satelliteCount = StringUtil.parseShort(values[7], (short) 0);
-        
+
         if (isFixed > 0) {
             lastAltitude = StringUtil.parseDouble( values[9], 0d );
         }
 
     }
-    
+
     /**
      * <h2>$GPGSV</h2>
      * <p>
      * GPS Satellites in view
-     * 
+     *
      * <pre>
      *      eg. $GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74
      *      $GPGSV,3,2,11,14,25,170,00,16,57,208,39,18,67,296,40,19,40,246,00*74
@@ -483,9 +483,9 @@ public class GpsPositionParser {
      *      12-15= Information about third SV, same as field 4-7
      *      16-19= Information about fourth SV, same as field 4-7
      * </pre>
-     * 
+     *
      * <hr size=1>
-     * 
+     *
      * <u>Satellite information</u><br/>
      * $GPGSV,2,1,08,01,40,083,46,02,17,308,41,12,07,344,39,14,22,228,45*75<br/>
      * <br/> Where: GSV Satellites in view 2 Number of sentences for full data 1
@@ -495,13 +495,13 @@ public class GpsPositionParser {
      */
     private synchronized void parseGPGSV(String record) {
         String[] values = StringUtil.split(record, DELIMITER);
-        
+
         final short cyclePos = StringUtil.parseShort(values[2], (short) 0);
         if (cyclePos == 1) {
             // New cycle started, copy over last cycles satellites and blank.
             copyLastCycleSatellitesAndClear();
         }
-    
+
         int index = 4;
         while(index+3 < values.length){
             short satelliteNumber = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
@@ -513,7 +513,7 @@ public class GpsPositionParser {
                     azimuth);
                 this.tempSatellites.addElement(sat);
             }
-        }       
+        }
     }
 
     /**
@@ -522,7 +522,7 @@ public class GpsPositionParser {
      * <h2>$GPGSA</h2>
      * <p>
      * GPS DOP and active satellites
-     * 
+     *
      * <pre>
      *      eg1. $GPGSA,A,3,,,,,,16,18,,22,24,,,3.6,2.1,2.2*3C
      *      eg2. $GPGSA,A,3,19,28,14,18,27,22,31,39,,,,,1.7,1.0,1.3*35
@@ -539,17 +539,17 @@ public class GpsPositionParser {
      *      16   = HDOP
      *      17   = VDOP
      * </pre>
-     * 
+     *
      * @param record
      */
     /* Sony Ericsson JP-7 phones require the synchronization here to work */
     private synchronized void parseGPGSA(String record) {
-        String[] values = StringUtil.split(record, DELIMITER);             
+        String[] values = StringUtil.split(record, DELIMITER);
         //String mode=values[1];
           int fixtype=StringUtil.parseShort(values[2], (short) 0);
           if (fixtype>1){
           	int [] svid =new int[13];
-          	for(int i = 2;i<15;i++){        
+          	for(int i = 2;i<15;i++){
           		try{
           		svid[i-2]=StringUtil.parseShort(values[i], (short) 0);
           		}
@@ -562,13 +562,13 @@ public class GpsPositionParser {
           	oi.setPdop(values[15]);
           	oi.setHdop(values[16]);
           	oi.setVdop(values[17]);
-            
+
             currentDilutionOfPrecision = oi;
           }
-  
+
     }
 
-    
+
     /**
      * Track Made Good and Ground Speed.
      *
@@ -605,7 +605,7 @@ public class GpsPositionParser {
         String groundSpeedKmph=values[7];
         boolean speedinKmph=values[8]=="K"?true:false;
     }
-	
+
     private void copyLastCycleSatellitesAndClear() {
         if(this.tempSatellites == null){
             return;
@@ -646,7 +646,7 @@ public class GpsPositionParser {
     public boolean isValidNMEASentence(String n) {
         boolean result = false;
         byte[] bs = n.getBytes();
-        
+
         if (n != null && n.length() > 0 && n.charAt(0) == '$'
                 && n.charAt(n.length() - 3) == '*') {
             String checksum = n.substring(n.indexOf('*') + 1, n.length());

@@ -217,7 +217,7 @@ public class Jsr179Device extends GpsDeviceImpl {
                             String nmeaString = output.toString();
                             if (parser.isValidNMEASentence(nmeaString)) {
                             //    Logger.debug("String is ok, parsing");
-                                parser.parseNMEA(nmeaString);
+                                parser.parse(nmeaString);
 
                             } else {
                                 Logger.error("JSR179:String was NOT ok:" + nmeaString);
