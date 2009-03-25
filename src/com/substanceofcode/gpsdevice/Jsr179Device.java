@@ -132,9 +132,7 @@ public class Jsr179Device extends GpsDeviceImpl {
 
     protected Jsr179Device(String address, String alias) {
         super(address, alias);
-        //Calling init in the constructor activates the device
-        //We might just want to list the device and use another
-        //init();
+        init();
     }
 
     /**
