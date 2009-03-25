@@ -43,7 +43,6 @@ import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.gpsdevice.GpsDevice;
 import com.substanceofcode.gpsdevice.GpsDeviceFactory;
 import com.substanceofcode.gpsdevice.GpsUtilities;
-import com.substanceofcode.gpsdevice.Jsr179Device;
 import com.substanceofcode.gpsdevice.MockGpsDevice;
 import com.substanceofcode.tracker.grid.GridPosition;
 import com.substanceofcode.tracker.model.AlertHandler;
@@ -340,7 +339,7 @@ public class Controller {
         if (settings.getBacklightOn()) {
             backlight.backlightOn();
         }
-        useJsr179 = settings.getJsr179();
+     //   useJsr179 = settings.getJsr179();
         useFileCache = settings.getFileCache();
     }
 
@@ -389,18 +388,12 @@ public class Controller {
     }
 
     public void searchDevices() {
-        // Jsr179 will find external bluetooth devices if a suitable internal
-        // one can't be found
-        // So really we only want to do one of these searches, ie use the
-        // location api if
-        // it is present, search bluetooth devices if it isn't
-        if (useJsr179 && GpsUtilities.checkJsr179IsPresent()) {
-            Logger.debug("Using JSR179 for Location services");
-            searchDevicesByJsr();
-        } else {
-            Logger.debug("Using bluetooth for Location services");
-            searchBTDevices();
-        }
+		//Search first for  jsr179 device, then add in any bluetooth devices
+        Logger.debug("Checking JSR179 for Location services");
+        searchDevicesByJsr();
+
+        Logger.debug("Searching bluetooth for Location services");
+        searchBTDevices();
     }
 
     /**
@@ -416,9 +409,19 @@ public class Controller {
 
 
             if (GpsUtilities.checkJsr179IsPresent()) {
-                Device dev = Jsr179Device.getDevice("internal",
-                        "Internal GPS (Jsr 179)");
-                devices.addElement(dev);
+			  //Don't actually create the device here, as we may only
+			  //be listing it, let the setGPSDevice method actually create it
+			  //Device dev = Jsr179Device.getDevice("internal","Internal GPS");
+			  Device dev = new Device(){
+					public String getAlias() {
+						return "Internal GPS";
+					}
+
+					public String getAddress() {
+						return "internal";
+                    }
+				};
+				devices.addElement(dev);
             }
         } catch(Exception ex) {
             Logger.fatal("Exception in Controller.searchDevicesByJsr: " +
@@ -446,7 +449,11 @@ public class Controller {
             }
             Logger.debug("Getting devices.");
             //addDevices(devices, bt.getDevices());
-            devices = bt.getDevices();
+      	 	//May already be some elements so add these on.
+			for (int i =0;i<bt.getDevices().size();i++){
+			  //devices=bt.getDevices().elementAt(i));
+			  devices.addElement(bt.getDevices().elementAt(i));
+            }
         } catch (Exception ex) {
             Logger.error("Error in Controller.searchDevices: " + ex.toString());
             ex.printStackTrace();
@@ -508,7 +515,8 @@ public class Controller {
     /** Set GPS device */
     public void setGpsDevice(String address, String alias) {
         gpsDevice = GpsDeviceFactory.createDevice(address, alias);
-        settings.setGpsDeviceConnectionString(gpsDevice.getAddress());
+        if(gpsDevice!=null)
+        	settings.setGpsDeviceConnectionString(gpsDevice.getAddress());
     }
 
     /** Set Mock GPS device */
@@ -567,7 +575,7 @@ public class Controller {
             return;
         }
         if (gpsDevice instanceof BluetoothDevice) {
-            new Thread() {
+            new Thread("ConnectToGPS") {
                 public void run() {
                     try {
                             ((BluetoothDevice) gpsDevice).connect();
@@ -860,9 +868,9 @@ public class Controller {
         if (trailCanvas == null) {
             GpsPosition initialPosition = null;
             try {
-                initialPosition = this.recorder.getPositionFromRMS();
+                initialPosition = recorder.getPositionFromRMS();
             } catch (Exception anyException) {/* discard */
-
+				Logger.error("Error:"+anyException.getMessage());
             }
             trailCanvas = new TrailCanvas(initialPosition);
         }
@@ -903,10 +911,10 @@ public class Controller {
          *     networking, should be performed in a different thread than the
          *     commandAction() handler.
          */
-        Thread t = new Thread() {
+        Thread t = new Thread("FileChooser") {
 
             public void run() {
-                super.run();
+               // super.run();
                 display.setCurrent(getFileChooser(displayable));
             }
         };
@@ -1082,7 +1090,7 @@ public class Controller {
                     Logger.warn("IllegalArgumetException occured in showAlert");
                 }
             }
-        });
+        },"AlertThread");
         t.start();
         return alert;
     }
@@ -1119,7 +1127,7 @@ public class Controller {
             public void run() {
                 Display.getDisplay(midlet).setCurrent(alert);
             }
-        });
+        },"ProgressAlertThread");
         t.start();
         return alert;
     }
@@ -1356,14 +1364,14 @@ public class Controller {
         return display.numAlphaLevels();
     }
 
-    public void setUseJsr179(boolean b) {
-        useJsr179 = b;
-        settings.setJsr179(useJsr179);
-    }
+    //public void setUseJsr179(boolean b) {
+    //    useJsr179 = b;
+    //    settings.setJsr179(useJsr179);
+    //}
 
-    public boolean getUseJsr179() {
-        return settings.getJsr179();
-    }
+    //public boolean getUseJsr179() {
+    //    return settings.getJsr179();
+    //}
 
     public void setUseFileCache(boolean b) {
         useFileCache = b;
@@ -1411,11 +1419,7 @@ public class Controller {
         if (newplace == true) {
             setNavigationStatus(true);
         } else {
-            if (getNavigationStatus() == false) {
-                setNavigationStatus(true);
-            } else {
-                setNavigationStatus(false);
-            }
+            setNavigationStatus(!getNavigationStatus());
         }
     }
 

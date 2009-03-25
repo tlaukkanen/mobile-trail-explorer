@@ -53,16 +53,15 @@ public class DevelopmentMenu extends List implements CommandListener {
     private static final int METRICS = 0;
     private static final int LOGGER = 1;
     private static final int GPS_MESSAGES = 2;
-    private static final int JSR179 = 3;
-    private static final int FILECACHE = 4;
-    private static final int BLUETOOTH_FIX = 5;
+    private static final int FILECACHE = 3;
+    private static final int BLUETOOTH_FIX = 4;
 
 
     //Jsr179 related stuff
-    private static boolean useJsr179b = false;
-    private static final String useJsr179= LocaleManager.getMessage("development_menu_usejsr179");
-    private static final String dontUsejsr179 = LocaleManager.getMessage("development_menu_dontusejsr179");
-    private String jsr179 = useJsr179;
+    //private static boolean useJsr179b = false;
+    //private static final String useJsr179= LocaleManager.getMessage("development_menu_usejsr179");
+    //private static final String dontUsejsr179 = LocaleManager.getMessage("development_menu_dontusejsr179");
+    //private String jsr179 = useJsr179;
 
     //Filecache related stuff
     private static boolean useFileCacheb = false;
@@ -85,8 +84,8 @@ public class DevelopmentMenu extends List implements CommandListener {
         super(LocaleManager.getMessage("development_menu_title"), List.IMPLICIT);
 
         settings=CONTROLLER.getSettings();
-        useJsr179b=settings.getJsr179();
-        setJsrString();
+       // useJsr179b=settings.getJsr179();
+       // setJsrString();
 
         useFileCacheb=settings.getFileCache();
         setFileCacheString();
@@ -99,7 +98,7 @@ public class DevelopmentMenu extends List implements CommandListener {
         //these next two toggle certain features on or off
         //Uncomment these if you want to play with them (they don't quite work yet...)
         // be sure to uncomment the 'refresh' method below as well
-        append(jsr179, null); //3
+        //append(jsr179, null); //3
         append(fileCache, null);//4
         append(BTFix, null);//5
 
@@ -113,8 +112,8 @@ public class DevelopmentMenu extends List implements CommandListener {
     private void refresh(){
     	delete(BLUETOOTH_FIX);
         delete(FILECACHE);
-        delete(JSR179);
-        append(jsr179,null);
+//        delete(JSR179);
+//        append(jsr179,null);
         append(fileCache,null);
         append(BTFix, null);
     }
@@ -148,19 +147,19 @@ public class DevelopmentMenu extends List implements CommandListener {
         CONTROLLER.showDisplayable(loggerScreen);
     }
 
-    private void toggleJsr179Support() {
-        useJsr179b = !useJsr179b;
-        setJsrString();
-        CONTROLLER.setUseJsr179(useJsr179b);
-    }
+//    private void toggleJsr179Support() {
+//        useJsr179b = !useJsr179b;
+//        setJsrString();
+//        CONTROLLER.setUseJsr179(useJsr179b);
+//    }
 
-    private void setJsrString(){
-        if (useJsr179b) {
-            jsr179 = dontUsejsr179;
-        } else {
-            jsr179 =useJsr179 ;
-        }
-    }
+//    private void setJsrString(){
+//        if (useJsr179b) {
+//            jsr179 = dontUsejsr179;
+//        } else {
+//            jsr179 =useJsr179 ;
+//        }
+//    }
 
     private void toggleFileCacheSupport() {
         useFileCacheb = !useFileCacheb;
@@ -200,11 +199,11 @@ public class DevelopmentMenu extends List implements CommandListener {
 					case(GPS_MESSAGES):
 						showGpsMessagesScreen();
                         break;
-                    case (JSR179):
-                        toggleJsr179Support();
-                        refresh();
-                        CONTROLLER.showSettings();
-                        break;
+           //         case (JSR179):
+           //             toggleJsr179Support();
+           //             refresh();
+           //             CONTROLLER.showSettings();
+           //             break;
                     case(FILECACHE):
                         toggleFileCacheSupport();
                         refresh();

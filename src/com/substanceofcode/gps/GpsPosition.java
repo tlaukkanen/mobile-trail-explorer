@@ -32,16 +32,11 @@ import com.substanceofcode.tracker.grid.WGS84Position;
 import com.substanceofcode.util.MathUtil;
 import com.substanceofcode.localization.LocaleManager;
 
-// does this work on devices without jsr179?
-import com.substanceofcode.gpsdevice.Jsr179Device;
-import com.substanceofcode.gpsdevice.GpsUtilities;
-import com.substanceofcode.tracker.controller.Controller;
-
 /**
  * <p>
  * All the information representing a single GPS position
  * </p>
- * 
+ *
  * A GPSPosition stores the following information:
  * <ul>
  * <li>Latitude
@@ -51,7 +46,7 @@ import com.substanceofcode.tracker.controller.Controller;
  * <li>Course
  * <li>Date/Time
  * </ul>
- * 
+ *
  * @author Tommi
  * @author Barry Redmond
  */
@@ -59,10 +54,10 @@ public final class GpsPosition implements Serializable {
     public static final double EarthRadiusInKm = 6371.0;
 
     /***************************************************************************
-     * 
+     *
      * Because all the local variables are FINAL they can be allowed the
      * 'public' access modifier.
-     * 
+     *
      **************************************************************************/
 
     /** The 'raw' GPS data, as received from the GPS Device */
@@ -96,7 +91,7 @@ public final class GpsPosition implements Serializable {
         this(rawData, course, longitudeDouple, latitudeDouple, speed, altitude,
                 date,null);
     }
-    
+
     public GpsPosition(String rawData, short course, double longitudeDouple,
             double latitudeDouple, double speed, double altitude) {
         this(rawData, course, longitudeDouple, latitudeDouple, speed, altitude,
@@ -105,7 +100,7 @@ public final class GpsPosition implements Serializable {
 
     /**
      * Creates a new instance of GpsPosition
-     * 
+     *
      * @param rawData
      *                the 'raw' GPS data String, as received from the GPS
      *                device.
@@ -143,7 +138,7 @@ public final class GpsPosition implements Serializable {
 
     /**
      * Creates a new instance of GpsPosition
-     * 
+     *
      * @param course
      *                the course/direction at this GpsPosition
      * @param longitudeDouple
@@ -168,7 +163,7 @@ public final class GpsPosition implements Serializable {
         this.date = date;
         this.gpgsa = null;
     }
-    
+
     public GpsPosition(short course, double longitudeDouble,
             double latitudeDouble, double speed, double altitude, Date date,GpsGPGSA gpgsa) {
         this.rawData = null;
@@ -185,18 +180,18 @@ public final class GpsPosition implements Serializable {
      * Reads 'All' the informatino about this GpsPosition from the
      * DataInputStream parameter
      * </p>
-     * 
+     *
      * This method should be the exact opposite of
      * {@link GpsPosition#serialize(DataOutputStream)}.<br>
      * i.e. This method should ALWAYS read the same number of bytes as
      * {@link GpsPosition#serialize(DataOutputStream)} wrote.<br>
-     * 
+     *
      * @param dis
      *                The DataInputStream to read the data from
-     * 
+     *
      * @throws IOException
      *                 if there is a problem reading from the DataInputStream
-     * 
+     *
      * @see GpsPosition#serialize(DataOutputStream)
      */
     public GpsPosition(DataInputStream dis) throws IOException {
@@ -228,11 +223,11 @@ public final class GpsPosition implements Serializable {
      * <p>
      * Compare to another GpsPosition
      * <p>
-     * 
+     *
      * Positions are considered to be equal IF both their latitudes AND their
      * longitudes are exactly equal.
      * @param position
-     * @return 
+     * @return
      */
     public boolean equals(GpsPosition position) {
         if (longitude == position.longitude && latitude == position.latitude) {
@@ -244,7 +239,7 @@ public final class GpsPosition implements Serializable {
 
     /**
      * Returns the 'raw' GPS string as recieved from the GPS device.
-     * 
+     *
      * @return the 'raw' GPS string as recieved from the GPS device.
      */
     public String getRawString() {
@@ -253,7 +248,7 @@ public final class GpsPosition implements Serializable {
 
     /**
      * Get heading in string format. Example N, NE, S
-     * 
+     *
      * @return the heading in string format
      */
     public String getHeadingString() {
@@ -304,7 +299,7 @@ public final class GpsPosition implements Serializable {
      * <td>15 = NNW</td>
      * </tr>
      * </table>
-     * 
+     *
      * @return The heading as an index from 0 - 15.
      */
     public int getHeadingIndex() {
@@ -328,7 +323,7 @@ public final class GpsPosition implements Serializable {
      * </p>
      * Using formula from: http://williams.best.vwh.net/avform.htm#Dist
      * @param position
-     * @return 
+     * @return
      */
     public double getDistanceFromPosition(GpsPosition position) {
         return getDistanceFromPosition(position.latitude, position.longitude);
@@ -338,7 +333,7 @@ public final class GpsPosition implements Serializable {
      * Calculate great circle distance from given coordinates
      * @param latitude
      * @param longitude
-     * @return 
+     * @return
      */
     public double getDistanceFromPosition(double latitude, double longitude) {
         double lat1 = (Math.PI / 180.0) * this.latitude;
@@ -352,40 +347,37 @@ public final class GpsPosition implements Serializable {
                 * MathUtil.pow(Math.sin((lon1 - lon2) / 2), 2)));
         return distance * EarthRadiusInKm;
     }
-    
+
     /**
      * Calculate course from given coordinates
      * @param latitude
      * @param longitude
-     * @return 
+     * @return
      */
     public double getCourseFromPosition(double latitude, double longitude) {
-        
+
         double lat1 = this.latitude;
         double lon1 = this.longitude;
         double lat2 = latitude;
         double lon2 = longitude;
-        
-        double alpha = 0;
-        
-        if (GpsUtilities.checkJsr179IsPresent() && Controller.getController().getUseJsr179()) {
-            // does this work on devices without jsr179?
-            alpha = Jsr179Device.getCourse(lat2, lon2);
-        } else {
-            if(lon1 != lon2 && lat1 != lat2) {
-                alpha = (MathUtil.acos((lat2 - lat1) / (Math.sqrt(MathUtil.pow(lat2 - lat1, 2) + MathUtil.pow(lon2 - lon1, 2)))) * 180 / Math.PI);
 
-                if(lon1 > lon2) {
-                    alpha = 360 - alpha;
-                }
-            } else {
-                alpha = 0;
-            }
-        }
-        
+        double alpha = 0;
+
+
+		if(lon1 != lon2 && lat1 != lat2) {
+			alpha = (MathUtil.acos((lat2 - lat1) / (Math.sqrt(MathUtil.pow(lat2 - lat1, 2) + MathUtil.pow(lon2 - lon1, 2)))) * 180 / Math.PI);
+
+			if(lon1 > lon2) {
+				alpha = 360 - alpha;
+			}
+		} else {
+			alpha = 0;
+		}
+
+
         return alpha;
     }
-    
+
     public int getCourseCourseIndex(double course) {
         final double sector = 22.5; // = 360 degrees / 16 sectors
         final int[] compass = { 0 /* N */, 1 /* NNE */, 2 /* NE */, 3 /* ENE */,
@@ -405,16 +397,16 @@ public final class GpsPosition implements Serializable {
      * Writes 'All' the information about the GpsPosition to the
      * DataOutputStream parameter.
      * </p>
-     * 
+     *
      * This method should be the exact opposite of
      * {@link GpsPosition#unserialize(DataInputStream)}..
-     * 
+     *
      * @param dos
      *                The DataOutputStream to write all the data to.
-     * 
+     *
      * @throws IOException
      *                 if there is a problem writing to the DataOutputStream.
-     * 
+     *
      * @see GpsPosition#unserialize(DataInputStream)
      */
     public void serialize(DataOutputStream dos) throws IOException {
@@ -449,8 +441,8 @@ public final class GpsPosition implements Serializable {
 
         return MIMETYPE;
     }
-    
-    /** 
+
+    /**
      * Set extra information like pdop, if available
      * @param gpgsa
      */
@@ -465,7 +457,7 @@ public final class GpsPosition implements Serializable {
         try {
             if (dis.readBoolean()) {
                 rawData=dis.readUTF();
-            } 
+            }
             longitude = dis.readDouble();
             latitude = dis.readDouble();
             speed = dis.readDouble();
@@ -473,7 +465,7 @@ public final class GpsPosition implements Serializable {
             altitude = dis.readDouble();
             if ( dis.readBoolean()) {
                 date =new Date(dis.readLong());
-            } 
+            }
             if (dis.readBoolean()) {
                 gpgsa.unserialize(dis);
             }
@@ -482,7 +474,7 @@ public final class GpsPosition implements Serializable {
                     + ": " + ex.getMessage());
         }
     }
-    
+
     private WGS84Position wgs84Position = null;
     public WGS84Position getWGS84Position()
     {
