@@ -1,7 +1,7 @@
 /*
  * GpsRecorder.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -435,10 +435,10 @@ public class GpsRecorder {
                         boolean uploadToWeb = settings.getWebRecordingUsage();
                         uploadURL = controller.getSettings().getUploadURL();
                         if(uploadToWeb && !uploadURL.equals("")){
-                            DataOutputStream dos=null;
+                            DataOutputStream dos = null;
                             try{
                                 boolean serialize = true;
-                                GpsGPGSA gpgsa= currentPosition.getGpgsa();
+                                GpsGPGSA gpgsa = currentPosition.getGpgsa();
                                 if(uploadURL.indexOf("@LAT@")>0) {
                                     String lat = String.valueOf(currentPosition.latitude);
                                     uploadURL = StringUtil.replace(uploadURL, "@LAT@", lat);

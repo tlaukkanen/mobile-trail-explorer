@@ -1,7 +1,7 @@
 /*
  * MapProviderManager.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,11 @@ import com.substanceofcode.tracker.controller.Controller;
  */
 public final class MapProviderManager {
     
-    private static MapProvider[] mapproviders = {new NullMapProvider(), new OsmMapProvider(), new TahMapProvider(), new LocalSwissMapProvider()};
+    private static MapProvider[] mapproviders = {new NullMapProvider(),
+                                                 new OsmMapProvider(),
+                                                 new TahMapProvider(),
+                                                 new LocalSwissMapProvider(),
+                                                 new CycleMapProvider()};
     private MapProvider selectedProvider = null;
     private static MapProviderManager singleton = null;
     

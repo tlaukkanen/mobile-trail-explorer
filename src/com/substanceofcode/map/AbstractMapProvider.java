@@ -1,7 +1,7 @@
 /*
  * AbstractMapProvider.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -148,8 +148,7 @@ public abstract class AbstractMapProvider implements MapProvider
                 g.drawString(place.getName(), point.X + 2, point.Y - 1,
                         Graphics.BOTTOM | Graphics.LEFT);
                 g.drawRect(point.X - 1, point.Y - 1, 2, 2);
+            }
+        }
     }
-}
-    }
-
 }
