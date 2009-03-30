@@ -32,9 +32,21 @@ public class CycleMapProvider extends  MercatorMapProvider
 {
     private int zoomLevel = 12;
 
+    static int counter = 0;
+
     public String getUrlFormat()
     {
-    return "http://a.andy.sandbox.cloudmade.com/tiles/cycle/X/X/X.png";
+        counter = (counter + 1) % 3;
+        
+        switch(counter) {
+            case 0:
+                return "http://a.andy.sandbox.cloudmade.com/tiles/cycle/X/X/X.png";
+            case 1:
+                return "http://b.andy.sandbox.cloudmade.com/tiles/cycle/X/X/X.png";
+            case 2:
+            default:
+                return "http://c.andy.sandbox.cloudmade.com/tiles/cycle/X/X/X.png";
+        }
     }
 
     public String getIdentifier()
@@ -54,8 +66,8 @@ public class CycleMapProvider extends  MercatorMapProvider
         if(zoomLevel > 17)
         {
             zoomLevel = 17;
+    	}
     }
-}
 
     public void zoomOut() {
         zoomLevel--;
