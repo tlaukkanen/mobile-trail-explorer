@@ -21,7 +21,7 @@ Marco van Ecks
 Release Notes:
 v1.15 (xxx xxx 2009)
 + Added a screen to the development menu to allow NMEA messages to be sent to the GPS device.
-
++ Added OpenCycleMap as MapProvider
 
 v1.14 (March xth 2009)
 + Improved MapCache initialization time
