@@ -83,7 +83,7 @@ public class WGS84Position extends GridPosition
         return new String[]{getIdentifier(), "0.1", String.valueOf(getLatitude()), String.valueOf(getLongitude())};
     }
 
-    public GridPosition clone() 
+    public GridPosition cloneGridPosition() 
     {
         return new WGS84Position(this);
     }

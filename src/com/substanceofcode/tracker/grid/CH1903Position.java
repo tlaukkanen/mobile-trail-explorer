@@ -123,7 +123,7 @@ public class CH1903Position extends GridPosition
         return new String[]{getIdentifier(), "0.1", String.valueOf(getX()), String.valueOf(getY())};
     }
 
-    public GridPosition clone() 
+    public GridPosition cloneGridPosition() 
     {
         return new CH1903Position(this);
     }

@@ -16,12 +16,13 @@ Nicolas Marchildon
 Patric Oosterveld
 Peter Reinhart
 Vikas Yadav
-Marco van Ecks
+Marco van Eck
 
 Release Notes:
 v1.15 (xxx xxx 2009)
 + Added a screen to the development menu to allow NMEA messages to be sent to the GPS device.
 + Added OpenCycleMap as MapProvider
++ Added few extra grids
 
 v1.14 (March xth 2009)
 + Improved MapCache initialization time

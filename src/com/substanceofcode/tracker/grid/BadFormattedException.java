@@ -26,7 +26,7 @@ package com.substanceofcode.tracker.grid;
  *
  * @author kaspar
  */
-class BadFormattedException extends Exception 
+public class BadFormattedException extends Exception 
 {
 
     public BadFormattedException(String msg) 

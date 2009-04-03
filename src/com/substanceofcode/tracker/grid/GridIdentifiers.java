@@ -34,6 +34,9 @@ public interface GridIdentifiers
     public final static String GRID_WGS84_D_M = "WGS84 Degree/Min";
     public final static String GRID_WGS84_D_M_S = "WGS84 Degree/Min/Sec";
     public final static String GRID_CH1903 = "Swiss Grid";
+    public final static String GRID_RT90_2_5_gon_v = "Swedish Grid RT(90) 2.5 gon V";
+    public final static String GRID_SWEREF99_TM = "SWEREF99 TM";
+    public final static String GRID_UTM = "UTM";
 
 
     /**
@@ -45,6 +48,9 @@ public interface GridIdentifiers
             , new WGS84PositionDegreeMin()
             , new WGS84PositionDegreeMinSec()
             , new CH1903Position()
+            , new RT90Position() 
+            , new SWEREFTMPosition()
+            , new UTMPosition()
         };
 
     /**
@@ -56,5 +62,8 @@ public interface GridIdentifiers
             , new WGS84FormatterDegreeMin()
             , new WGS84FormatterDegreeMinSec()
             , new CH1903Formatter()
+            , new GraussKrugerFormatter(new RT90Position()) 
+            , new GraussKrugerFormatter(new SWEREFTMPosition())
+            , new UTMFormatter()
         };
 }

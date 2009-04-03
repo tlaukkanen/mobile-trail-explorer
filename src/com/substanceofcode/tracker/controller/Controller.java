@@ -736,7 +736,7 @@ public class Controller {
          */
         Logger.debug("Setting place to form");
         int waypointCount = places.size();
-        placeForm.setPlace(new Place("WP" + String.valueOf(waypointCount + 1), position));
+        placeForm.setPlace(new Place("WP" + String.valueOf(waypointCount + 1), position),position.getIdentifier());
 
         placeForm.setEditingFlag(false);
         Logger.debug("Set placeForm as current");
@@ -756,7 +756,7 @@ public class Controller {
         if (placeForm == null) {
             placeForm = new PlaceForm(this);
         }
-        placeForm.setPlace(wp);
+        placeForm.setPlace(wp,controller.getSettings().getGrid());
         placeForm.setEditingFlag(true);
         Logger.debug("Setting current display to display waypoint details");
         display.setCurrent(placeForm);

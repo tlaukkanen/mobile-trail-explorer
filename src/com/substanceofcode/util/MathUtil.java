@@ -260,6 +260,13 @@ public class MathUtil {
         return in;
     }
     
+    public final static long abs(long in) {
+        if (in < 0.0) {
+            return in * -1;
+        }
+        return in;
+    }
+
     public final static double abs(double in) {
         if (in < 0.0) {
             return in * -1.0;

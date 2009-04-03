@@ -69,9 +69,9 @@ public class Place {
         this(name, new WGS84Position(latitude, longitude));
     }
     
-    public Place clone()
+    public Place clonePlace()
     {
-        return new Place(new String(name), position.clone());
+        return new Place(new String(name), position.cloneGridPosition());
     }
     
     /** Get place name

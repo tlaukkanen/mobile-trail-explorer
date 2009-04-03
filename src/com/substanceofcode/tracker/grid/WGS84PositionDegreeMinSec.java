@@ -90,7 +90,7 @@ public class WGS84PositionDegreeMinSec extends GridPosition {
         return new WGS84Position(lan, lon);
     }
 
-    public GridPosition clone() {
+    public GridPosition cloneGridPosition() {
         return new WGS84PositionDegreeMinSec(this);
     }
     

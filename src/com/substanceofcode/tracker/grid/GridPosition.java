@@ -71,7 +71,7 @@ public abstract class GridPosition implements GridIdentifiers
      * clones the receiver
      * @return
      */
-    public abstract GridPosition clone();
+    public abstract GridPosition cloneGridPosition();
     
     /**
      * serialize the GridPosition, without using | and \
