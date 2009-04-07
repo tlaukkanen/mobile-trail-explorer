@@ -204,6 +204,11 @@ public class Track implements Serializable {
         }
     }
 
+    /** Remove the latest position from trail. */
+    void removeLastPosition() {
+        trackPoints.removeElementAt(trackPoints.size()-1);
+    }
+
     private void closeStreams(){
                     // ------------------------------------------------------------------
             // If we get any IOException we must ensure that we close all stream

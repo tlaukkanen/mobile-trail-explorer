@@ -84,7 +84,8 @@ public class GpsRecorder {
     int recordedCount = 0;
     boolean isValidPosition = false;
     GpsPosition currentPosition = null;
-    GpsGPGSA currentGPGSA = null;  
+    GpsGPGSA currentGPGSA = null;
+    boolean useFilter = true;
         
     /**
      * Constructor - sets up local variables then launches the instance in a
@@ -97,6 +98,7 @@ public class GpsRecorder {
         intervalSeconds = settings.getRecordingInterval();
         intervalMarkerStep = settings.getRecordingMarkerInterval();
         uploadURL = settings.getUploadURL();
+        useFilter = settings.getFilterTrail();
 
         /** Start recorder timer as fixed rate (in every 1 second) */
         RecorderTask recorderTask = new RecorderTask();
@@ -416,6 +418,16 @@ public class GpsRecorder {
                     if (currentPosition != null && !stopped) {
 
                         rmsRecorder.setGpsPosition(currentPosition);
+
+                        /** Apply the filtering before the new position is added */
+                        int posCount = recordedTrack.getPositionCount();
+                        if(useFilter && posCount>2) {
+                            GpsPosition lastPos = recordedTrack.getPosition(posCount-1);
+                            GpsPosition oneFromLastPos = recordedTrack.getPosition(posCount-2);
+                            if(RecorderFilter.canRemovePreviousPosition(lastPos, oneFromLastPos, lastPosition)){
+                                recordedTrack.removeLastPosition();
+                            }
+                        }
 
                         recordedTrack.addPosition(currentPosition);
                         if (intervalMarkerStep > 0 && recordedCount > 0

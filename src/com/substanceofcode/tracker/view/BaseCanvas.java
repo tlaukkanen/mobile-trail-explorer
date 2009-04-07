@@ -145,7 +145,24 @@ public abstract class BaseCanvas extends Canvas implements CommandListener {
         }
     }
     }
-    
+
+    /**
+     * Handle pointer presses
+     * @param x
+     * @param y
+     */
+    protected void pointerPressed(int x, int y) {
+        super.pointerPressed(x, y);
+        int width = getWidth();
+        int height = getHeight();
+        // Switch display if pointer is pressed
+        if(x>0 && x<width && y>0 && y<height) {
+            controller.switchDisplay();
+        }
+    }
+
+
+
     /** 
      * Key pressed handler
      * @param keyCode 

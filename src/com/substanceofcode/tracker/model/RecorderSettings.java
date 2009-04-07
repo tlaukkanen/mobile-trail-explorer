@@ -80,6 +80,7 @@ public class RecorderSettings {
     private static final String RECORDING_MAX_SPEED = "recording-max-speed";
     private static final String RECORDING_MAX_ACCELERATION = "recording-max-acceleration";
     private static final String RECORDING_MIN_DISTANCE = "recording-min-distance";
+    private static final String FILTER_TRAIL = "filter-trail";
     private static final String UPLOAD_URL = "upload-url";
     private static final String UPLOAD_USE = "upload-use";
 
@@ -90,6 +91,8 @@ public class RecorderSettings {
     public static final String DISPLAY_HEADING = "display-heading";
     public static final String DISPLAY_ALTITUDE = "display-altitude";
     public static final String DISPLAY_DISTANCE = "display-distance";
+    public static final String DISPLAY_QUALITY = "display-quality";
+
 
     /** Trail Saving Keys */
     public static final String EXPORT_TO_KML = "export-to-kml";
@@ -143,6 +146,22 @@ public class RecorderSettings {
             Logger.error("Error occured while creating an instance "
                     + "of Settings class: " + ex.toString());
         }
+    }
+
+    /**
+     * Do we need to filter the recorded trail?
+     * @return true if filtering is active
+     */
+    public boolean getFilterTrail() {
+        return settings.getBooleanProperty(FILTER_TRAIL, true);
+    }
+
+    /**
+     * Define if we need to filter the recorded trail on the fly.
+     * @param useFilter
+     */
+    public void setFilterTrail(boolean useFilter) {
+        settings.setBooleanProperty(FILTER_TRAIL, useFilter);
     }
 
     /**

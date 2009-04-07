@@ -23,6 +23,8 @@ v1.15 (xxx xxx 2009)
 + Added a screen to the development menu to allow NMEA messages to be sent to the GPS device.
 + Added OpenCycleMap as MapProvider
 + Added few extra grids
++ Added trail recording filtering option (only works for in-memory recordings)
++ Added an option to hide the signal quality from main view
 
 v1.14 (March xth 2009)
 + Improved MapCache initialization time

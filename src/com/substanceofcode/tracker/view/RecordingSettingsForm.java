@@ -51,6 +51,8 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     private TextField maxAccelerationField;
     private TextField minDistanceField;
 
+    private ChoiceGroup filterGroup;
+
     private ChoiceGroup saveGpxStream;
 
     /** 
@@ -78,6 +80,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             int maxAcceleration = 50;
             int minDistance = 5;
             boolean sGpxStream = false;
+            boolean useFilter = true;
             try{
                 // TODO: Add max speed and acceleration
                 newInterval = Integer.valueOf( intervalText ).intValue();
@@ -89,7 +92,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 String minDistanceText = minDistanceField.getString();
                 minDistance = Integer.valueOf(minDistanceText).intValue();
                 sGpxStream = saveGpxStream.isSelected(0);
-
+                useFilter = filterGroup.isSelected(0);
             }catch(Exception ex) {
                 ex.printStackTrace();
                 newInterval = 10;
@@ -103,6 +106,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             settings.setMaxAcceleration(maxAcceleration);
             settings.setMinDistance(minDistance);
             settings.setExportToGPXStream(sGpxStream);
+            settings.setFilterTrail(useFilter);
             
             controller.showSettings();
         } else {
@@ -165,6 +169,16 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 6,
                 TextField.NUMERIC);
         this.append(minDistanceField);
+
+        boolean filterTrail = settings.getFilterTrail();
+        filterGroup = new ChoiceGroup(
+                LocaleManager.getMessage("recording_use_filter"),
+                ChoiceGroup.MULTIPLE);
+        filterGroup.append(
+                LocaleManager.getMessage("recording_use_filter"),
+                null);
+        filterGroup.setSelectedIndex(0, filterTrail);
+        this.append(filterGroup);
 
         boolean saveGpx = settings.getExportToGPXStream();
 

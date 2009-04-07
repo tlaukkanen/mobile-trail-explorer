@@ -1,7 +1,7 @@
 /*
  * TrailCanvas.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * Created on August 14th 2006
@@ -649,46 +649,19 @@ public class TrailCanvas extends BaseCanvas {
             }
 
             /** Draw any other gps info */
-            if (gpgsa != null) {
-                g.drawString(LocaleManager.getMessage("trail_canvas_fix") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
-                g.drawString("" + gpgsa.getFixtype(), positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
-                displayRow++;
+            /** Draw distance information */
+            if (settings.getDisplayValue(RecorderSettings.DISPLAY_DISTANCE) == true) {
+                if (gpgsa != null) {
+                    g.drawString(LocaleManager.getMessage("trail_canvas_fix") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                    g.drawString("" + gpgsa.getFixtype(), positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                    displayRow++;
 
-                g.drawString(LocaleManager.getMessage("trail_canvas_pdop") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
-                g.drawString("" + gpgsa.getPdop(), positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
-                displayRow++;
-
-                // g.drawString("HDOP:", 1, fontHeight * displayRow,
-                // Graphics.TOP | Graphics.LEFT);
-                // g.drawString(""+gpgsa.getHdop(), positionAdd, fontHeight *
-                // displayRow, Graphics.TOP
-                // | Graphics.LEFT);
-                // displayRow++;
-
-                // g.drawString("VDOP:", 1, fontHeight * displayRow,
-                // Graphics.TOP | Graphics.LEFT);
-                // g.drawString(""+gpgsa.getVdop(), positionAdd, fontHeight *
-                // displayRow, Graphics.TOP
-                // | Graphics.LEFT);
-                // displayRow++;
+                    g.drawString(LocaleManager.getMessage("trail_canvas_pdop") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                    g.drawString("" + gpgsa.getPdop(), positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                    displayRow++;
+                }
             }
 
-            /*
-            Vector places = controller.getPlaces();
-            if (places != null) {
-                g.drawString("WP:", 1, fontHeight * displayRow, Graphics.TOP
-                        | Graphics.LEFT);
-                g.drawString(String.valueOf(places.size()), positionAdd,
-                        fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
-                displayRow++;
-            }*/
-
-            /** Debugging free mem */
-            // long freeMem = Runtime.getRuntime().freeMemory();
-            // g.drawString("Freemem:" + freeMem, 1, fontHeight * displayRow,
-            // Graphics.TOP
-            // | Graphics.LEFT);
-            // displayRow++;
             /**
              * Draw the last logged message. Split the string on a word boundary
              * and draw on separate lines. Only draw the string if it is less

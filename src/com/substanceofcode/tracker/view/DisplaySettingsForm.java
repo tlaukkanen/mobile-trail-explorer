@@ -48,28 +48,18 @@ public class DisplaySettingsForm extends Form implements CommandListener {
 
     /** Commands */
     private Command okCommand;
-
     private Command cancelCommand;
 
     /** Controls */
     private ChoiceGroup unitGroup;
-
     private ChoiceGroup displayGroup;
-    
     private TextField drawingLimitField;
-
     private ChoiceGroup drawingStyleGroup;
-    
     private ChoiceGroup drawingMapsGroup;
-    
     private ChoiceGroup otherMapSettingsGroup;
-
     private ChoiceGroup gridGroup;
-
     private ChoiceGroup backlightGroup;
-
     private ChoiceGroup localeGroup;
-
 
     /** Creates a new instance of DisplaySettingsForm */
     public DisplaySettingsForm(Controller controller) {
@@ -116,12 +106,14 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             boolean showAltitude = displayGroup.isSelected(3);
             boolean showDistance = displayGroup.isSelected(4);
             boolean showTime = displayGroup.isSelected(5);
+            boolean showQuality = displayGroup.isSelected(6);
             settings.setDisplayValue(RecorderSettings.DISPLAY_COORDINATES, showCoordinates);
             settings.setDisplayValue(RecorderSettings.DISPLAY_SPEED, showSpeed);
             settings.setDisplayValue(RecorderSettings.DISPLAY_HEADING, showHeading);
             settings.setDisplayValue(RecorderSettings.DISPLAY_ALTITUDE, showAltitude);
             settings.setDisplayValue(RecorderSettings.DISPLAY_DISTANCE, showDistance);
             settings.setDisplayValue(RecorderSettings.DISPLAY_TIME, showTime);
+            settings.setDisplayValue(RecorderSettings.DISPLAY_QUALITY, showQuality);
 
             /** 5. Save the number of position to draw value. */
             settings.setNumberOfPositionToDraw(Integer.parseInt(drawingLimitField.getString()));
@@ -202,7 +194,8 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             LocaleManager.getMessage("display_settings_form_heading"),
             LocaleManager.getMessage("display_settings_form_altitude"),
             LocaleManager.getMessage("display_settings_form_distance"),
-            LocaleManager.getMessage("display_settings_form_time") };
+            LocaleManager.getMessage("display_settings_form_time"),
+            LocaleManager.getMessage("display_settings_form_signal_quality")};
 
         displayGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_form_display"),
                 ChoiceGroup.MULTIPLE, displayItems, null);
@@ -225,6 +218,9 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         boolean showTime = settings
                 .getDisplayValue(RecorderSettings.DISPLAY_TIME);
         displayGroup.setSelectedIndex(5, showTime);
+        boolean showQuality = settings
+                .getDisplayValue(RecorderSettings.DISPLAY_QUALITY);
+        displayGroup.setSelectedIndex(6, showQuality);
         
         this.append(displayGroup);
         
