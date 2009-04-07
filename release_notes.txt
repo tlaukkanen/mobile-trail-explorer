@@ -1,6 +1,6 @@
 Mobile Trail Explorer
 
-Copyright (c) 2006-2008 Tommi Laukkanen
+Copyright (c) 2006-2009 Tommi Laukkanen
 http://www.substanceofcode.com
 
 Contributors:
