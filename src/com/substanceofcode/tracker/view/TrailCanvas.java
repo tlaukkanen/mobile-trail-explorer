@@ -650,7 +650,7 @@ public class TrailCanvas extends BaseCanvas {
 
             /** Draw any other gps info */
             /** Draw distance information */
-            if (settings.getDisplayValue(RecorderSettings.DISPLAY_DISTANCE) == true) {
+            if (settings.getDisplayValue(RecorderSettings.DISPLAY_QUALITY) == true) {
                 if (gpgsa != null) {
                     g.drawString(LocaleManager.getMessage("trail_canvas_fix") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                     g.drawString("" + gpgsa.getFixtype(), positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
