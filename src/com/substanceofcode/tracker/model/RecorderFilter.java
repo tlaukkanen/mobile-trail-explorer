@@ -22,7 +22,6 @@ package com.substanceofcode.tracker.model;
 
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.util.MathUtil;
-import java.util.Vector;
 
 /**
  * Filter for reducing recorded positions.
@@ -57,7 +56,7 @@ public class RecorderFilter {
         double angleDelta = MathUtil.abs(lastAngle - currentAngle);
 
         // Check the tolerance (0.09 radians = 5 degrees)
-        if (angleDelta > 0.09) {
+        if (angleDelta > 0.04) {
             return false;
         } else {
             return true;
