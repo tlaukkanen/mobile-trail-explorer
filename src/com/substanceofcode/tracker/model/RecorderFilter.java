@@ -45,20 +45,24 @@ public class RecorderFilter {
         // Calculate last angle of trail
         double latDelta = oneFromLastPos.latitude - lastPos.latitude;
         double lonDelta = oneFromLastPos.longitude - lastPos.longitude;
-        double lastAngle = MathUtil.atan(latDelta / lonDelta);
+        //double lastAngle = MathUtil.atan(latDelta / lonDelta);
+        double last = latDelta / lonDelta;
 
         // Calculate current angle
         double latDelta2 = lastPos.latitude - newPos.latitude;
         double lonDelta2 = lastPos.longitude - newPos.longitude;
-        double currentAngle = MathUtil.atan(latDelta2 / lonDelta2);
+        //double currentAngle = MathUtil.atan(latDelta2 / lonDelta2);
+        double current = latDelta2 / lonDelta2;
 
         // Get absolute value of direction change
-        double angleDelta = MathUtil.abs(lastAngle - currentAngle);
+        //double angleDelta = MathUtil.abs(lastAngle - currentAngle);
+        double bls = MathUtil.abs(last - current);
 
         // Check the tolerance (0.09 radians = 5 degrees)
-        if (angleDelta > 0.04) {
+        if (bls > 0.1) {
             return false;
         } else {
+            System.out.println("can remove");
             return true;
         }
     }
