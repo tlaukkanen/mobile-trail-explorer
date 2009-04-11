@@ -424,7 +424,7 @@ public class GpsRecorder {
                         if(useFilter && posCount>2) {
                             GpsPosition lastPos = recordedTrack.getPosition(posCount-1);
                             GpsPosition oneFromLastPos = recordedTrack.getPosition(posCount-2);
-                            if(RecorderFilter.canRemovePreviousPosition(lastPos, oneFromLastPos, lastPosition)){
+                            if(RecorderFilter.canRemovePreviousPosition(oneFromLastPos, lastPos, currentPosition)){
                                 recordedTrack.removeLastPosition();
                             }
                         }
