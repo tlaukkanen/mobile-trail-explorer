@@ -106,6 +106,14 @@ public class GpsRecorder {
         recorderTimer.scheduleAtFixedRate(recorderTask, 1000, 1000);
     }
 
+    /**
+     * Set filtering usage.
+     * @param useFiltering
+     */
+    public void setFiltering(boolean useFiltering) {
+        this.useFilter = useFiltering;
+    }
+
     /** 
      * Set interval for recording
      * @param seconds 

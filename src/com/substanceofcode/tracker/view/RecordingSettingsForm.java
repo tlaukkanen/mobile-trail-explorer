@@ -100,6 +100,7 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             }
             controller.saveRecordingInterval(newInterval);
             controller.saveRecordingMarkerStep(newStep);
+            controller.saveRecordingFiltering(useFilter);
             
             RecorderSettings settings = controller.getSettings();
             settings.setMaxRecordedSpeed(maxSpeed);

@@ -265,6 +265,10 @@ public class Controller {
         executeShortcut( shortcut );
     }
 
+    public void saveRecordingFiltering(boolean useFilter) {
+        this.recorder.setFiltering(useFilter);
+    }
+
     public void showGeocode() {
         if(geocodeForm == null)
         {
