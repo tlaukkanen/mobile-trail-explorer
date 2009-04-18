@@ -1,7 +1,7 @@
 /*
  * Track.java
  *
- * Copyright (C) 2005-2008 Tommi Laukkanen
+ * Copyright (C) 2005-2009 Tommi Laukkanen
  * http://www.substanceofcode.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -206,14 +206,21 @@ public class Track implements Serializable {
 
     /** Remove the latest position from trail. */
     void removeLastPosition() {
-        trackPoints.removeElementAt(trackPoints.size()-1);
+        final int lastIndex = trackPoints.size()-1;
+        if(trackPoints.size()>1) {
+            // Remove last distance
+           final GpsPosition p1 = (GpsPosition) trackPoints.elementAt(lastIndex);
+           final GpsPosition p2 = (GpsPosition) trackPoints.elementAt(lastIndex-1);
+           double tripLength = p1.getDistanceFromPosition(p2);
+           distance -= tripLength;
+        }
+        trackPoints.removeElementAt(lastIndex);
     }
 
     private void closeStreams(){
-                    // ------------------------------------------------------------------
-            // If we get any IOException we must ensure that we close all stream
-            // objects
-            // ------------------------------------------------------------------
+        /* If we get any IOException we must ensure that we close all stream
+         * objects
+         */
         try{
             if (streamPrint != null) {
                 streamPrint.close();
