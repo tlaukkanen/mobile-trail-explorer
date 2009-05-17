@@ -823,11 +823,10 @@ public class Controller {
      * XXX : mchr : Should we not try and save the trail?
      */
     public void exit() {
-        this.disconnect();
-        // pause the current track
-        // this is here mainly for testing purposes,
-        // don't know whether it should remain here.
+        // pause the current track if we are still recording
         this.pause();
+        this.disconnect();
+        
         if (status == STATUS_RECORDING) {
             controller.startStop();
         }
@@ -1273,7 +1272,7 @@ public class Controller {
      * Pause the track and save it to the RMS
      */
     public void pause() {
-        if (controller.getStatusCode() == Controller.STATUS_RECORDING) {
+        if (status == Controller.STATUS_RECORDING) {
             Logger.debug("Pausing current track");
             recorder.getTrack().pause();
         }
