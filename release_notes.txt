@@ -17,6 +17,7 @@ Patric Oosterveld
 Peter Reinhart
 Vikas Yadav
 Marco van Eck
+Joachim Wilke
 
 Release Notes:
 v1.15 (xxx xxx 2009)
@@ -25,6 +26,7 @@ v1.15 (xxx xxx 2009)
 + Added few extra grids
 + Added trail recording filtering option (only works for in-memory recordings)
 + Added an option to hide the signal quality from main view
++ Display distances less than 1Km as xyz meters 
 
 v1.14 (March xth 2009)
 + Improved MapCache initialization time

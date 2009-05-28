@@ -52,7 +52,7 @@ import com.substanceofcode.tracker.model.SpeedFormatter;
 /**
  * TrailCanvas is a main view for the application. It contains a current
  * recording status and current position.
- * 
+ *
  * @author Tommi Laukkanen
  * @author Mario Sansone
  */
@@ -81,21 +81,21 @@ public class TrailCanvas extends BaseCanvas {
 
     /**
      * Creates a new instance of TrailCanvas
-     * 
+     *
      * @param initialPosition
      */
     public TrailCanvas(GpsPosition initialPosition) {
         super();
         this.setLastPosition(initialPosition);
-        
+
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
         counter = 0;
 
         calculateDisplaySize(getWidth(), getHeight());
     }
 
-    /** 
-     * 
+    /**
+     *
      * @return the current center of the map. never use variable mapCenter, since it is null when the map is fixed on currentlocation
      */
     public GridPosition getMapCenter() {
@@ -109,42 +109,42 @@ public class TrailCanvas extends BaseCanvas {
     }
 
     /**
-     * 
+     *
      * @param pos set the center of the map. if set to null, then map will follow currentPosition
      */
     public void setMapCenter(GridPosition pos) {
         mapCenter = pos;
     }
 
-    /** 
+    /**
      * Paint trails and maps
-     * @param g 
+     * @param g
      */
     public void paint(Graphics gr) {
-        
+
         Image buffer = Image.createImage(getWidth(), getHeight());
         Graphics g = buffer.getGraphics();
-        
+
         try {
             final int height = getHeight();
             final int width = getWidth();
 
 
-            /** 
-             * Some phones like N95 can resize their screen 
+            /**
+             * Some phones like N95 can resize their screen
              * (e.g rotating the Display)
              */
             if (width / 2 != midWidth || height / 2 != midHeight) {
                 calculateDisplaySize(width, height);
             }
-            
+
             /** Get last position from recorder */
             final GpsPosition temp = controller.getPosition();
             if (temp != null) {
                 setLastPosition(temp);
                 gpgsa = temp.getGpgsa();
                 }
-            
+
             /** Fill background with backgroundcolor */
             g.setColor(Theme.getColor(Theme.TYPE_BACKGROUND));
             g.fillRect(0, 0, width, height);
@@ -154,7 +154,7 @@ public class TrailCanvas extends BaseCanvas {
             // Draw maps first, as they will fill the screen
             // and we don't want to occlude other items
 
-            MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();           
+            MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
             MapDrawContext mdc = new MapDrawContext(g, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight());
 
             try {
@@ -201,7 +201,7 @@ public class TrailCanvas extends BaseCanvas {
             Track ghostTrail = controller.getGhostTrail();
             //drawTrail(g, ghostTrail, Theme.getColor(Theme.TYPE_GHOSTTRAIL), true);
             try {
-                if (getMapCenter() != null) {                   
+                if (getMapCenter() != null) {
                     mapProvider.drawTrail(mdc, ghostTrail, Theme.getColor(Theme.TYPE_GHOSTTRAIL), true,
                             controller.getSettings().getNumberOfPositionToDraw());
                 }
@@ -226,7 +226,7 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw current location with red dot */
             // Logger.debug("c: "+lastPosition + " lastPos: " + lastPosition.getWGS84Position());
             try {
-                if (getMapCenter() != null) {                    
+                if (getMapCenter() != null) {
                     CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWGS84Position());
                     g.drawImage(redDotImage, currLocPoint.X, currLocPoint.Y, Graphics.VCENTER | Graphics.HCENTER);
                 }
@@ -234,7 +234,7 @@ public class TrailCanvas extends BaseCanvas {
                 Logger.fatal("drawCurrentLocation Exception: " + ex.getMessage());
                 ex.printStackTrace();
             }
-            
+
             /** Draw naviagation status */
             try {
                 if (controller.getNavigationStatus() == true) {
@@ -260,13 +260,13 @@ public class TrailCanvas extends BaseCanvas {
                 Logger.fatal("drawZoomScaleBar Exception: " + ex.getMessage());
                 ex.printStackTrace();
             }
-            
+
             gr.drawImage(buffer, 0, 0, Graphics.TOP | Graphics.LEFT);
-            
+
         } catch (Exception e) {
             Logger.debug("Caught exception tc.paint: " + e.getMessage());
         }
-        
+
     }
 
     public void setLastPosition(GpsPosition position) {
@@ -278,11 +278,11 @@ public class TrailCanvas extends BaseCanvas {
     private void calculateDisplaySize(int width, int height) {
         midWidth = width / 2;
         midHeight = height / 2;
-        movementSize = width / 8;              
+        movementSize = width / 8;
 
         Image tempCompassArrows = ImageUtil.loadImage("/images/compass-arrows.png");
         compass = ImageUtil.loadImage("/images/compass.png");
-        
+
         /*
          * Check for high resolution (eg. N80 352x416)
          * 240 (because 320x240) is a std. HxW dimension
@@ -303,7 +303,7 @@ public class TrailCanvas extends BaseCanvas {
             compassArrows.setPosition(width - 22, 11);
         }
     }
-    
+
     /** Draw compass */
     protected void drawCompass(Graphics g) {
         if (lastPosition != null) {
@@ -401,7 +401,7 @@ public class TrailCanvas extends BaseCanvas {
         g.drawString(text + unit, MARGIN_LEFT + scaleLength - textWidth / 2,
                 getHeight() - MARGIN_BOTTOM - 2, Graphics.BOTTOM | Graphics.LEFT);
     }
-    
+
     /** Draw navigation arrow */
     private void drawNavigationArrow(Graphics g, double course) {
         int spriteSize;
@@ -438,17 +438,17 @@ public class TrailCanvas extends BaseCanvas {
         navigationArrows.setFrame(lastPosition.getCourseCourseIndex(course));
         navigationArrows.paint(g);
     }
-    
+
     /** Draw navigation arrow */
     private void drawNavigationStatus(Graphics g) {
         GpsPosition currentPosition = controller.getPosition();
 
         double distance = currentPosition.getDistanceFromPosition(
-                controller.getNavigationPlace().getLatitude(), 
+                controller.getNavigationPlace().getLatitude(),
                 controller.getNavigationPlace().getLongitude());
 
         double course = currentPosition.getCourseFromPosition(
-                controller.getNavigationPlace().getLatitude(), 
+                controller.getNavigationPlace().getLatitude(),
                 controller.getNavigationPlace().getLongitude());
 
         /* draw the arrow */
@@ -459,6 +459,8 @@ public class TrailCanvas extends BaseCanvas {
         LengthFormatter formatter =
                 new LengthFormatter(controller.getSettings());
         String distanceString = formatter.getLengthString(distance, true);
+        if (distanceString.charAt(0) == '0')
+            distanceString = formatter.getLengthString(distance * 1000, false);
 
         Font currentFont = g.getFont();
         int fontHeight = currentFont.getHeight();
@@ -466,7 +468,7 @@ public class TrailCanvas extends BaseCanvas {
         MapProvider mapProvider =
                 MapProviderManager.manager().getSelectedMapProvider();
         MapDrawContext mdc = new MapDrawContext(g, getMapCenter(),
-                mapProvider.getZoomLevel(), getWidth(), getHeight());        
+                mapProvider.getZoomLevel(), getWidth(), getHeight());
         CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc,
                 lastPosition.getWGS84Position());
 
@@ -518,7 +520,7 @@ public class TrailCanvas extends BaseCanvas {
 
     /** Draw status bar */
     private void drawStatusBar(Graphics g) {
-        
+
         // int width = getWidth();
         int height = getHeight();
 
@@ -550,7 +552,7 @@ public class TrailCanvas extends BaseCanvas {
                 GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.TRAIL_CANVAS);
                 String[] gridLabels = gridFormatter.getLabels();
                 String[] gridData = gridFormatter.getStrings(lastPosition.getWGS84Position());
-                
+
                 for (int i = 0; i < gridLabels.length; i++) {
                     // draw label
                     g.drawString(gridLabels[i], 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
@@ -709,7 +711,7 @@ public class TrailCanvas extends BaseCanvas {
                                 " " + hours + " " +
                                 LocaleManager.getMessage("trail_canvas_hours");
                     } else if (hours > 0) {
-                        timeSinceLastPosition = hours + " " + 
+                        timeSinceLastPosition = hours + " " +
                                 LocaleManager.getMessage("trail_canvas_hours") +
                                 " " + minutes + " " +
                                 LocaleManager.getMessage("trail_canvas_minutes");
@@ -760,15 +762,15 @@ public class TrailCanvas extends BaseCanvas {
         /*
          * String gpsUrl = m_controller.getGpsUrl(); g.drawString("GPS: " +
          * gpsUrl, 1, height - (fontHeight + 2), Graphics.TOP|Graphics.LEFT );
-         */      
+         */
     }
 
     public TrailCanvas() {
     }
 
-    /** 
+    /**
      * Handle key presses.
-     * @param keyCode 
+     * @param keyCode
      */
     public void keyPressed(int keyCode) {
         super.keyPressed(keyCode);
@@ -787,7 +789,7 @@ public class TrailCanvas extends BaseCanvas {
             case (KEY_NUM7):
                 // Change theme
                 Theme.switchTheme();
-                break;       
+                break;
 
             default:
         }
@@ -826,7 +828,7 @@ public class TrailCanvas extends BaseCanvas {
         if (gameKey == FIRE || keyCode == KEY_NUM5) {
             setMapCenter(null);
         }
-        
+
         this.repaint();
     }
 }
