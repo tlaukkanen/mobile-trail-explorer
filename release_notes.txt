@@ -21,6 +21,7 @@ Joachim Wilke
 
 Release Notes:
 v1.15 (xxx xxx 2009)
++ Added a patch from Wolfram to implement Nautical miles (thanks Wolfram!).
 + Added a screen to the development menu to allow NMEA messages to be sent to the GPS device.
 + Added OpenCycleMap as MapProvider
 + Added few extra grids

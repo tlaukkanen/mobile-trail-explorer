@@ -78,6 +78,7 @@ public class TrailCanvas extends BaseCanvas {
     private long currentTime;
     private long oldTime;
     private boolean showAudioRecStatus;
+    private int scaleParts = 0;
 
     /**
      * Creates a new instance of TrailCanvas
@@ -317,55 +318,129 @@ public class TrailCanvas extends BaseCanvas {
         }
     }
 
+    /** Calculate the length of the scale bar in cuurent units
+     *
+     * @param pixelSize size of a pixel in meter
+     */
+    private double calcBarDist(double pixelSize, int maxScaleLength, int distanceUnitType)
+    {
+        int scaleLength;
+        //int scaleParts;
+        double barDist = 0.1;
+
+        scaleLength = (int) (barDist / pixelSize);
+        while (scaleLength <= maxScaleLength) {
+            barDist *= 10;
+            scaleLength = (int) (barDist / pixelSize);
+        }
+
+        barDist /= 10;
+        scaleLength = (int) (barDist / pixelSize);
+
+        if ((scaleLength * 5) < maxScaleLength) {
+            barDist *= 5;
+            scaleParts = 5;
+        } else {
+            if ((scaleLength * 2) < maxScaleLength) {
+                barDist *= 2;
+            }
+            scaleParts = 4;
+        }
+        return barDist;
+    }
     /** Draw zoom scale bar */
     private void drawZoomScaleBar(Graphics g) {
         String text = "", unit = "";
 
         MapProvider mapProvider = MapProviderManager.manager().getSelectedMapProvider();
+
+        //pixelSize in [meter/pixel]
         double pixelSize = mapProvider.getPixelSize(
                 new MapDrawContext(null, getMapCenter(), mapProvider.getZoomLevel(), getWidth(), getHeight()));
-        double barDist = 1;
-        int scaleLength;
-        int scaleParts;
-        RecorderSettings settings = controller.getSettings();
 
+        //Length in unit of the current setting
+        double barDist = 0.1;
+
+        //Size in pixel?
+        int scaleLength;
+        int maxScaleLength;
+
+        //Fetch the current settings
+        RecorderSettings settings = controller.getSettings();
 
         g.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN,
                 Font.SIZE_SMALL));
-        final int MARGIN_LEFT = 2; // left margin of the complete zoom scale
-        // bar
-        final int MARGIN_BOTTOM = 3; // bottom margin of the complete zoom
-        // scale bar
 
-        scaleLength = getWidth() / 2;
-        pixelSize *= scaleLength;
+        // left margin of the complete zoom scale bar
+        final int MARGIN_LEFT = 2;
+        // bottom margin of the complete zoom scale bar
+        final int MARGIN_BOTTOM = 3; 
 
-        if (!settings.getUnitsAsKilometers()) {
-            if (pixelSize > 1600) {
-                pixelSize /= (1000 * UnitConverter.KILOMETERS_IN_A_MILE);
-                unit = "ml";
-            } else {
-                pixelSize /= UnitConverter.METERS_IN_A_FOOT;
-                unit = "ft";
+        //Start value for scalebar length calculation in pixel
+        maxScaleLength = getWidth() / 2;
+
+        //Convert size from [meter/pixel] in [current unit/pixel]
+        pixelSize = UnitConverter.convertLength(pixelSize ,UnitConverter.UNITS_METERS, settings.getDistanceUnitType());
+        //Calculate the lengts oft the scale bar in current units
+        barDist = calcBarDist(pixelSize, maxScaleLength, settings.getDistanceUnitType());
+        //Length of the scalebar in pixel
+        scaleLength = (int) (barDist / pixelSize);
+
+        /*
+         * Build text for the right end of the scale bar and get width of this
+         * text
+         */
+        LengthFormatter lengthFormatter = new LengthFormatter(settings);
+        switch (settings.getDistanceUnitType())
+        {
+            case UnitConverter.UNITS_MILES:
+            {
+                if (barDist > 1) {
+                    unit = lengthFormatter.getUnitString(UnitConverter.UNITS_MILES);
+                    //text = lengthFormatter.getLengthString(barDist, UnitConverter.UNITS_MILES, false,2);
+                    text = StringUtil.valueOf(barDist, 0);
+                } else {
+                    //Convert size from [meter/pixel] in [current unit/pixel]
+                    pixelSize = UnitConverter.convertLength(pixelSize ,UnitConverter.UNITS_MILES, UnitConverter.UNITS_FEET);
+                    //Calculate the lengts oft the scale bar in current units
+                    barDist = calcBarDist(pixelSize, maxScaleLength, UnitConverter.UNITS_FEET);
+                    //Length of the scalebar in pixel
+                    scaleLength = (int) (barDist / pixelSize);
+                    unit = lengthFormatter.getUnitString(UnitConverter.UNITS_FEET);
+                    //text = StringUtil.valueOf( UnitConverter.convertLength(barDist, UnitConverter.UNITS_MILES, UnitConverter.UNITS_FEET),0);
+                    text = StringUtil.valueOf( barDist,0);
+                }
+                break;
             }
-        }
-
-        while (barDist < pixelSize) {
-            barDist *= 10;
-        }
-        barDist /= 10;
-        if ((barDist * 5) < pixelSize) {
-            barDist *= 5;
-            scaleParts = 5;
-        } else {
-            if ((barDist * 2) < pixelSize) {
-                barDist *= 2;
+            case UnitConverter.UNITS_KILOMETERS: 
+            {
+                if (barDist > 1) {
+                    unit = lengthFormatter.getUnitString(UnitConverter.UNITS_KILOMETERS);
+                    //text = lengthFormatter.getLengthString(barDist,UnitConverter.UNITS_KILOMETERS, false,0);
+                    text = StringUtil.valueOf(barDist, 0);
+                } else {
+                    unit = lengthFormatter.getUnitString(UnitConverter.UNITS_METERS);
+                    text = lengthFormatter.getLengthString(barDist, UnitConverter.UNITS_METERS, false,0 );
+                }
+                break;
             }
-            scaleParts = 4;
+            case UnitConverter.UNITS_NAUTICAL_MILES: 
+            {
+                if(barDist > 1) {
+                    unit = lengthFormatter.getUnitString(UnitConverter.UNITS_NAUTICAL_MILES);
+                    //text = lengthFormatter.getLengthString(barDist, UnitConverter.UNITS_NAUTICAL_MILES, false,0);
+                    text = StringUtil.valueOf(barDist, 0);
+                } else {
+                    unit = lengthFormatter.getUnitString(UnitConverter.UNITS_NAUTICAL_MILES);
+                    text = StringUtil.valueOf(barDist, 2);
+                }
+            }
+            break;
         }
 
-        scaleLength = (int) (scaleLength * barDist / pixelSize);
+        int textWidth = g.getFont().stringWidth(text);
 
+        //Draw scalebar line
         g.setColor(Theme.getColor(Theme.TYPE_LINE)); // black color
         g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT + scaleLength, getHeight() - MARGIN_BOTTOM);
         g.drawLine(MARGIN_LEFT, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT,
@@ -374,30 +449,17 @@ public class TrailCanvas extends BaseCanvas {
                 MARGIN_LEFT + scaleLength, getHeight() - MARGIN_BOTTOM - 3);
 
         /* Divide the complete scale bar into smaller parts */
+
         int scalePartLength = (int) (scaleLength / scaleParts);
         for (int i = 1; i < scaleParts; i++) {
             g.drawLine(MARGIN_LEFT + scalePartLength * i, getHeight() - MARGIN_BOTTOM, MARGIN_LEFT + scalePartLength * i,
                     getHeight() - MARGIN_BOTTOM - 2);
         }
 
-        /*
-         * Build text for the right end of the scale bar and get width of this
-         * text
-         */
-        if (settings.getUnitsAsKilometers()) {
-            if (barDist > 1000) {
-                barDist /= 1000;
-                unit = "km";
-            } else {
-                unit = "m";
-            }
-        }
-        text = Integer.toString((int) barDist);
-
-        int textWidth = g.getFont().stringWidth(text);
-
+        //Draw left end text
         g.drawString("0", MARGIN_LEFT - 1, getHeight() - MARGIN_BOTTOM - 2,
                 Graphics.BOTTOM | Graphics.LEFT);
+        //Draw right end text
         g.drawString(text + unit, MARGIN_LEFT + scaleLength - textWidth / 2,
                 getHeight() - MARGIN_BOTTOM - 2, Graphics.BOTTOM | Graphics.LEFT);
     }
@@ -459,8 +521,6 @@ public class TrailCanvas extends BaseCanvas {
         LengthFormatter formatter =
                 new LengthFormatter(controller.getSettings());
         String distanceString = formatter.getLengthString(distance, true);
-        if (distanceString.charAt(0) == '0')
-            distanceString = formatter.getLengthString(distance * 1000, false);
 
         Font currentFont = g.getFont();
         int fontHeight = currentFont.getHeight();
@@ -593,60 +653,30 @@ public class TrailCanvas extends BaseCanvas {
                 g.drawString(heading, positionAdd, fontHeight * displayRow,
                         Graphics.TOP | Graphics.LEFT);
                 displayRow++;
-            }
+            } 
 
             /** Draw distance information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_DISTANCE) == true) {
                 String distance;
-                String units;
+                
+                LengthFormatter lengthFormatter = new LengthFormatter(controller.getSettings());
+                
                 Track track = controller.getTrack();
-                double distanceInKilometers = track.getDistance();
-                if (settings.getUnitsAsKilometers() == false) {
-                    /** Distance in feets */
-                    double distanceInMiles = UnitConverter.convertLength(
-                            distanceInKilometers,
-                            UnitConverter.UNITS_KILOMETERS,
-                            UnitConverter.UNITS_MILES);
-
-                    distance = StringUtil.valueOf(distanceInMiles, 2);
-                    units = " ml";
-                } else {
-                    /** Distance in meters. */
-                    if (distanceInKilometers > 5) {
-                        distance = StringUtil.valueOf(distanceInKilometers, 2);
-                        units = " km";
-                    } else {
-                        distance = StringUtil.valueOf(
-                                distanceInKilometers * 1000, 0);
-                        units = " m";
-                    }
-                }
+                distance = lengthFormatter.getLengthString(track.getDistance(),true);
                 g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
-                g.drawString(distance + units, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(distance, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }
 
             /** Draw heading information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE) == true) {
                 String altitude;
-                String units;
+                
                 double altitudeInMeters = lastPosition.altitude;
-
-                if (settings.getUnitsAsKilometers() == false) {
-                    /** Altitude in feets */
-                    double altitudeInFeets = UnitConverter.convertLength(
-                            altitudeInMeters, UnitConverter.UNITS_METERS,
-                            UnitConverter.UNITS_FEET);
-
-                    altitude = StringUtil.valueOf(altitudeInFeets, 2);
-                    units = " ft";
-                } else {
-                    /** Altitude in meters */
-                    altitude = StringUtil.valueOf(altitudeInMeters, 2);
-                    units = " m";
-                }
+                LengthFormatter lengthFormatter = new LengthFormatter(controller.getSettings());
+                altitude = lengthFormatter.getAltitudeString(altitudeInMeters,true, 2);
                 g.drawString(LocaleManager.getMessage("trail_canvas_altitude") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
-                g.drawString(altitude + units, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
+                g.drawString(altitude, positionAdd, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
                 displayRow++;
             }
 

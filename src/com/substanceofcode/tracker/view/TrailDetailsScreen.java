@@ -23,20 +23,19 @@
 package com.substanceofcode.tracker.view;
 
 import java.io.IOException;
-
-import javax.microedition.lcdui.AlertType;
+import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.lcdui.TextField;
+import javax.microedition.lcdui.AlertType;
 
-import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.data.FileSystem;
+import com.substanceofcode.data.FileIOException;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.Track;
-import com.substanceofcode.tracker.model.UnitConverter;
+import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
 
@@ -84,15 +83,11 @@ public class TrailDetailsScreen extends Form implements CommandListener {
                 trailName, 100, TextField.ANY);
         this.append(titleBox);
 
-        final boolean kilometers = controller.getSettings().getUnitsAsKilometers();
-        final double dist;
-        if (kilometers) {
-            dist = trail.getDistance();
-        } else {
-            dist = UnitConverter.convertLength(trail.getDistance(), UnitConverter.UNITS_KILOMETERS, UnitConverter.UNITS_MILES);
-        }
+        LengthFormatter lengthFormatter = new LengthFormatter(controller.getSettings());
+        String distanceString = lengthFormatter.getLengthString(trail.getDistance(),true);
+        
         StringItem distanceItem = new StringItem(LocaleManager.getMessage("trail_details_screen_distance"),
-                StringUtil.valueOf(dist, 3) + (kilometers ? "Km" : "Mi"));
+                distanceString);
         this.append(distanceItem);
 
         StringItem pointsItem =

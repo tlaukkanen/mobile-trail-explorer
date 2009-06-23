@@ -91,6 +91,7 @@ public class InformationCanvas extends BaseCanvas{
         int charHeight = BIG_FONT.getHeight();
         String spd = "";
         String hea = "";
+        String course = "";
         String alt = "";
         String dst = "";
         String durationTime = "";
@@ -104,14 +105,14 @@ public class InformationCanvas extends BaseCanvas{
         LengthFormatter lengthFormatter = new LengthFormatter( controller.getSettings() );
         if(position!=null) {
             
-            SpeedFormatter formatter = new SpeedFormatter( controller.getSettings() );
-            spd = formatter.getSpeedString(position.speed);
+            SpeedFormatter speedFormatter = new SpeedFormatter( controller.getSettings() );
+            spd = speedFormatter.getSpeedString(position.speed);
             
             hea = position.getHeadingString();
+            course = position.course + "°";
             
-            alt = lengthFormatter.getLengthString(position.altitude, false);
+            alt = lengthFormatter.getAltitudeString(position.altitude, true, 2);
             
-
             if(currentTrack!=null) {
                 dst = lengthFormatter.getLengthString(currentTrack.getDistance(), true); 
                 if(currentTrack.getStartPosition()!=null &&
@@ -121,16 +122,11 @@ public class InformationCanvas extends BaseCanvas{
                         currentTrack.getEndPosition().date);   
                 }
                 if(currentTrack.getMaxSpeedPosition()!=null) {
-                    maximumSpeed = UnitConverter.getSpeedString(
-                        currentTrack.getMaxSpeedPosition().speed, 
-                        controller.getSettings().getUnitsAsKilometers(),
-                        true);
+                    maximumSpeed = speedFormatter.getSpeedString(currentTrack.getMaxSpeedPosition().speed);
                 }
                 if(currentTrack.getAverageSpeed()!= 0) {
-                    averageSpeed = UnitConverter.getSpeedString(
-                    currentTrack.getAverageSpeed(), 
-                    controller.getSettings().getUnitsAsKilometers(),
-                    true);
+                    averageSpeed = speedFormatter.getSpeedString(currentTrack.getAverageSpeed());
+                    
                 }
                 
                 //now we have exact realtime distance that is still left
@@ -151,12 +147,13 @@ public class InformationCanvas extends BaseCanvas{
                     etaRemains = StringUtil.integerToString((int)hoursR) + ":" 
                                     + StringUtil.integerToString((int)minsR) + ":" 
                                     + StringUtil.integerToString((int)secsR);
-                    distanceRemaining = StringUtil.valueOf(distanceR,2);
+                    //distanceRemaining = StringUtil.valueOf(distanceR,2);
+                    distanceRemaining = lengthFormatter.getLengthString(distanceR, true);
                     Logger.debug("calculating!" + Double.toString(distanceR) + "," + etaRemains);
                 }
             }
 
-            /** Draw position using grid formatter. Usually lat/lon */
+            /** Draw position using grid speedFormatter. Usually lat/lon */
             GridFormatterManager gridFormatter = new GridFormatterManager(controller.getSettings(), GridFormatterManager.INFORMATION_CANVAS);
             String[] gridLabels = gridFormatter.getLabels();
             String[] gridData = gridFormatter.getStrings(position.getWGS84Position());
@@ -174,7 +171,10 @@ public class InformationCanvas extends BaseCanvas{
         
 
         drawNextString(g, LocaleManager.getMessage("information_canvas_altitude"), alt);
-        drawNextString(g, LocaleManager.getMessage("information_canvas_heading"), hea);
+        //Distance between the strings
+        int distance = 30;
+        drawNextStrings(g, LocaleManager.getMessage(
+                "information_canvas_heading"), hea, course, distance);
         
         drawNextHeader(g, LocaleManager.getMessage("information_canvas_speed_info"));
         drawNextString(g, LocaleManager.getMessage("information_canvas_speed"), spd);
@@ -188,11 +188,11 @@ public class InformationCanvas extends BaseCanvas{
         drawNextString(g, LocaleManager.getMessage("information_canvas_distance_eta"), etaRemains);
         if(currentTrack!=null) {
             if(currentTrack.getMinAltitudePosition()!=null) {
-                double minAltitude = currentTrack.getMinAltitudePosition().altitude;
-                String minAltString = lengthFormatter.getLengthString(minAltitude, false);
-                double maxAltitude = currentTrack.getMaxAltitudePosition().altitude;
-                String maxAltString = lengthFormatter.getLengthString(maxAltitude, false);
-                String trailAltitude = minAltString + " - " + maxAltString;
+                double minAltitude = currentTrack.getMinAltitude();
+                String minAltString = lengthFormatter.getAltitudeString(minAltitude, false, 2);
+                double maxAltitude = currentTrack.getMaxAltitude();
+                String maxAltString = lengthFormatter.getAltitudeString(maxAltitude, false, 2);
+                String trailAltitude = minAltString + " - " + maxAltString + lengthFormatter.getAltitudeUnitString();
                 drawNextString(g, LocaleManager.getMessage("information_canvas_altitude"), trailAltitude);
             }
         }
@@ -214,6 +214,21 @@ public class InformationCanvas extends BaseCanvas{
                 g.drawString(value, column, lineRow, Graphics.TOP|Graphics.LEFT);
             }
         }
+        lineRow += BIG_FONT.getHeight();
+        totalTextHeight += BIG_FONT.getHeight();
+    }
+    
+        private void drawNextStrings(Graphics g, String name, String value1, String value2, int distance) {
+        if(lineRow<-BIG_FONT.getHeight()) {
+            return;
+        }
+        g.setFont(BIG_FONT);
+        g.setColor( Theme.getColor(Theme.TYPE_TEXT) );
+        g.drawString(name, 1, lineRow, Graphics.TOP|Graphics.LEFT);
+        g.setColor( Theme.getColor(Theme.TYPE_TEXTVALUE) );
+        int column = (name.length()>4 ? BIG_VALUE_COL : VALUE_COL);
+        g.drawString(value1, column, lineRow, Graphics.TOP|Graphics.LEFT);
+        g.drawString(value2, column + distance, lineRow, Graphics.TOP|Graphics.LEFT);
         lineRow += BIG_FONT.getHeight();
         totalTextHeight += BIG_FONT.getHeight();
     }

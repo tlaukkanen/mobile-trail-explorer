@@ -33,6 +33,7 @@ import com.substanceofcode.map.MapProviderManager;
 import com.substanceofcode.tracker.controller.Controller;
 import com.substanceofcode.tracker.model.GridFormatterManager;
 import com.substanceofcode.tracker.model.RecorderSettings;
+import com.substanceofcode.tracker.model.UnitConverter;
 import com.substanceofcode.localization.LocaleManager;
 
 /**
@@ -95,9 +96,21 @@ public class DisplaySettingsForm extends Form implements CommandListener {
             
             RecorderSettings settings = controller.getSettings();
             
-            /** 1. Save used units */
-            boolean isKilometersSelected = unitGroup.isSelected(0);
-            settings.setUnitsAsKilometers(isKilometersSelected);
+            /** 1. Save used units, default is kilometer */
+            int selectedDistanceUnitType = 0;
+            if(unitGroup.isSelected(0)== true)
+            {
+                selectedDistanceUnitType = UnitConverter.UNITS_KILOMETERS;
+            }
+            if(unitGroup.isSelected(1)== true)
+            {
+                selectedDistanceUnitType = UnitConverter.UNITS_MILES;
+            }
+            if(unitGroup.isSelected(2)== true)
+            {
+                selectedDistanceUnitType = UnitConverter.UNITS_NAUTICAL_MILES;
+            }
+            settings.setDistanceUnitType(selectedDistanceUnitType);
 
             /** 2. Save displayable items */
             boolean showCoordinates = displayGroup.isSelected(0);
@@ -178,13 +191,26 @@ public class DisplaySettingsForm extends Form implements CommandListener {
         this.append(localeGroup);
 
         String[] units = { LocaleManager.getMessage("display_settings_form_kilometers"),
-                           LocaleManager.getMessage("display_settings_form_miles") };
+                           LocaleManager.getMessage("display_settings_form_miles"),
+                           LocaleManager.getMessage("display_settings_form_nautical_miles")};
+        
         unitGroup = new ChoiceGroup(LocaleManager.getMessage("display_settings_form_units"),
                 ChoiceGroup.EXCLUSIVE, units, null);
-        if (settings.getUnitsAsKilometers()) {
-            unitGroup.setSelectedIndex(0, true);
-        } else {
-            unitGroup.setSelectedIndex(1, true);
+        switch (settings.getDistanceUnitType())
+        {
+            case UnitConverter.UNITS_KILOMETERS:
+            {
+                unitGroup.setSelectedIndex(0, true);
+            }
+            case  UnitConverter.UNITS_MILES:
+            {
+                unitGroup.setSelectedIndex(1, false);
+            }
+            case  UnitConverter.UNITS_NAUTICAL_MILES:
+            {
+                unitGroup.setSelectedIndex(2, false);
+            }
+
         }
         this.append(unitGroup);
 

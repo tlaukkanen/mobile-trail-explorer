@@ -22,7 +22,6 @@
 package com.substanceofcode.tracker.view;
 
 import java.util.Date;
-import java.util.Enumeration;
 
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
@@ -33,6 +32,9 @@ import com.substanceofcode.tracker.model.Track;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.ImageUtil;
 import com.substanceofcode.localization.LocaleManager;
+import com.substanceofcode.tracker.model.LengthFormatter;
+import com.substanceofcode.tracker.model.UnitConverter;
+import com.substanceofcode.tracker.model.RecorderSettings;
 
 /**
  * <p> Elevation canvas shows the change in elevation over the course of the Trail
@@ -48,23 +50,34 @@ public class ElevationCanvas extends BaseCanvas {
     private static final int X_SCALE_DISTANCE = 1;
     private static final int X_MIN_ZOOM = Integer.MAX_VALUE & X_SCALE_SCALE_MASK;
     private static final int X_MAX_ZOOM = 0;
-    private static final int MAX_ZOOM_ALT = 14000;
+    //Values for minimum and maximum altitude which appear "reasonable" to humans
+    private static final double[] altLevels = {1.0, 5.0, 10.0, 25.0, 50.0,
+                                               100.0, 125.0, 250.0, 500.0, 1000.0,
+                                               1250.0, 2500.0, 5000.0, 10000.0,
+                                               12500.0, 25000.0};
+    private static int altitudeZoomValue = 0;
 
     private final int MARGIN = this.getWidth() > 200 ? 5 : 2;
-
+    //In pixel
     private final int verticalMovementSize, horizontalMovementSize;
+    //In meter
     private int verticalMovement, horizontalMovement;
+    //Number of increments between minimun and maximum altitude
+    private int maxPositions = 5;
 
     private GpsPosition lastPosition;
     private Image redDotImage;
+    //Pixel per meter?
     private int xScale, yScale;
     private boolean gridOn;
     
-    private int altitudeZoomIncrement = 10;
-
+    //In meter
     private double minAltitude, maxAltitude;
+    private double minAltitudeCurUnit, maxAltitudeCurUnit;
     
     private boolean manualZoom = false;
+
+    private RecorderSettings settings;
 
     public ElevationCanvas(GpsPosition initialPosition) {
         super();
@@ -75,35 +88,53 @@ public class ElevationCanvas extends BaseCanvas {
         this.horizontalMovementSize = this.getWidth() / 8;
         this.verticalMovement = this.horizontalMovement = 0;
         this.xScale = X_SCALE_TIME | X_MAX_ZOOM;
+        this.settings = controller.getSettings();
 
         this.gridOn = true;
 
         redDotImage = ImageUtil.loadImage("/images/red-dot.png");
 
-        this.setMinMaxValues();
+        this.setMinMaxValues(altitudeZoomValue);
     }
 
-    private void setMinMaxValues() {
-        if (lastPosition == null) {
-            this.minAltitude = -20000;
-            this.maxAltitude = 20000;
+    /** Get the minimum and maximum altitude values of the current track
+     * 
+     */
+    private void setMinMaxValues(int altLevelOffset) {
+        double altMin , altMax, altDiff;
+
+        Track curTrack = controller.getTrack();
+        LengthFormatter lengthFormatter = new LengthFormatter(settings);
+        int altitudeUnitType = lengthFormatter.getAltitudeUnitType();
+
+
+        //Set initial values if the track is still empty
+        if(curTrack.getPositionCount() == 0){
+            //Initial values in current unit
+            minAltitudeCurUnit = 0;
+            maxAltitudeCurUnit = 20000;
         } else {
-            this.maxAltitude = this.minAltitude = lastPosition.altitude;
-        }
-        try {
-            Enumeration positionTrail = controller.getTrack()
-                    .getTrackPointsEnumeration();
-            while (positionTrail.hasMoreElements()) {
-                double altitude = ((GpsPosition) positionTrail.nextElement()).altitude;
-                if (altitude > maxAltitude) {
-                    maxAltitude = altitude;
+            try {
+                //Get maximum altitude in Meter and convert to current Unit
+                altMax = UnitConverter.convertLength(curTrack.getMaxAltitude(), UnitConverter.UNITS_METERS, altitudeUnitType);
+                //Get minimum altitude in Meter and convert to current Unit
+                altMin = UnitConverter.convertLength(curTrack.getMinAltitude(), UnitConverter.UNITS_METERS, altitudeUnitType);
+                //Calculate the difference between minium and maximum altitude
+                altDiff = calculateAltitudeDiff(altMax - altMin, altLevelOffset);
+                //Calculate the minimum altitude
+                minAltitudeCurUnit = calculateMinAltitude(altMin, altDiff);
+                //Check if we need a bigger range
+                if( altMax > minAltitudeCurUnit + altDiff)
+                {
+                    //Recalculate the difference between minium and maximum
+                    //altitude and get the range one index bigger
+                    altDiff = calculateAltitudeDiff(altMax - altMin, altLevelOffset + 1);
                 }
-                if (altitude < minAltitude) {
-                    minAltitude = altitude;
-                }
+                maxAltitudeCurUnit = minAltitudeCurUnit + altDiff;
             }
-        } catch (NullPointerException e) {
-            // ignore.
+            catch (Exception ex) {
+                //ignore it
+            }
         }
     }
 
@@ -111,11 +142,18 @@ public class ElevationCanvas extends BaseCanvas {
         g.setColor( Theme.getColor(Theme.TYPE_BACKGROUND) );
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
+        // Top position in pixel where to start drawing grid
         final int top = drawTitle(g, 0);
 
         g.setFont(Font.getFont(Font.FACE_MONOSPACE, Font.STYLE_PLAIN,
                 Font.SIZE_SMALL));
+        //Bottom position in pixel
         final int bottom = this.getHeight() - (2 * MARGIN);
+        //Refresh min/max altitude before repaint
+        if (!manualZoom)
+        {
+            setMinMaxValues(0);
+        }
         drawYAxis(g, top, bottom);
 
         drawXAxis(g, MARGIN, this.getWidth() - 2 * MARGIN, top, bottom);
@@ -145,16 +183,17 @@ public class ElevationCanvas extends BaseCanvas {
     }
 
     private void drawYAxis(Graphics g, final int top, final int bottom) {
+
         g.setColor( Theme.getColor(Theme.TYPE_LINE) );
+
         // Draw the vertical Axis
         g.drawLine(MARGIN, top, MARGIN, bottom);
 
-        // Draw the top altitude
-
-        drawAltitudeBar(g, top, this.maxAltitude);
+        // Draw the top altitude in current unit
+        drawAltitudeBar(g, top, this.maxAltitudeCurUnit);
 
         // Draw the bottom altitude
-        drawAltitudeBar(g, bottom, this.minAltitude);
+        drawAltitudeBar(g, bottom, this.minAltitudeCurUnit);
 
         // Draw intermediate altitude positions.
 
@@ -164,24 +203,32 @@ public class ElevationCanvas extends BaseCanvas {
          */
         final int availableHeight = bottom - top;
         final int spaceHeight = g.getFont().getHeight() * 2;
-        int maxPositions = (availableHeight / spaceHeight) - 1;
-        if (maxPositions > 5) {
-            maxPositions = 5;
-        }
-        maxPositions = 5;
+
         int pixelIncrement = availableHeight / maxPositions;
-        double altitudeIncrement = (this.maxAltitude - this.minAltitude)
+        //Increment in current unit
+        double altitudeIncrement = (this.maxAltitudeCurUnit - this.minAltitudeCurUnit)
                 / maxPositions;
         int yPos = bottom - pixelIncrement;
-        double yAlt = this.minAltitude + altitudeIncrement;
+        double yAlt = this.minAltitudeCurUnit + altitudeIncrement;
         for (int i = 1; i < maxPositions; i++, yPos -= pixelIncrement, yAlt += altitudeIncrement) {
             drawAltitudeBar(g, yPos, yAlt);
         }
     }
 
     private void drawAltitudeBar(Graphics g, int pixel, double altitude) {
+        int decimalCount = 0;
         g.drawLine(1, pixel, 2 * (MARGIN - 1) + 1, pixel);
-        final String altString = getAltitudeString(altitude);
+
+        //Get the altitude as string with unit appended
+        LengthFormatter height = new LengthFormatter(settings.getDistanceUnitType());
+        //Check if there are decimals after ".". If yes, show them
+        if(altitude % 1 != 0)
+        {
+            decimalCount = 1;
+        }
+
+        final String altString = height.getAltitudeString(altitude, true, decimalCount, true);
+        
         g.drawString(altString, MARGIN + 2, pixel, Graphics.BOTTOM
                 | Graphics.LEFT);
         if (this.gridOn) {
@@ -191,38 +238,6 @@ public class ElevationCanvas extends BaseCanvas {
             g.drawLine(2 * (MARGIN - 1) + 1, pixel, right, pixel);
             g.setColor(color);
         }
-    }
-
-    /**
-     * <p>
-     * Gets the altitude as a string to 1 decimal place
-     * </p>
-     * 
-     */
-    private String getAltitudeString(double altitude) {
-        // FIXME: allow for imperial units too.
-        final int ACCURACY = 1;
-        StringBuffer result = new StringBuffer();
-        String altitudeAsString = Double.toString(altitude);
-        // final int decimalLocation = altitudeAsString.indexOf('.');
-
-        int accuracyReached = 0;
-        boolean reachedDecimal = false;
-        for (int i = 0; i < altitudeAsString.length(); i++) {
-            final char c = altitudeAsString.charAt(i);
-            if (c == '.') {
-                reachedDecimal = true;
-            } else if (reachedDecimal) {
-                accuracyReached++;
-            }
-            if (accuracyReached < ACCURACY) {
-                result.append(c);
-            } else {
-                break;
-            }
-        }
-
-        return result.append('m').toString();
     }
 
     private void drawXAxis(Graphics g, final int left, final int right,
@@ -271,11 +286,17 @@ public class ElevationCanvas extends BaseCanvas {
 
             double currentLatitude = lastPosition.latitude;
             double currentLongitude = lastPosition.longitude;
-            double currentAltitude = lastPosition.altitude;
+            //
+            LengthFormatter lengthFormatter = new LengthFormatter(settings);
+            int altUnitType = lengthFormatter.getAltitudeUnitType();
+
+            //Convert to current unit
+            double currentAltitude = UnitConverter.convertLength(lastPosition.altitude, UnitConverter.UNITS_METERS, altUnitType);
             Date currentTime = lastPosition.date;
 
             double lastLatitude = currentLatitude;
             double lastLongitude = currentLongitude;
+            //In current unit
             double lastAltitude = currentAltitude;
             Date lastTime = currentTime;
 
@@ -308,18 +329,8 @@ public class ElevationCanvas extends BaseCanvas {
 
                     double lat = pos.latitude;
                     double lon = pos.longitude;
-                    double alt = pos.altitude;
-                    if (!manualZoom)
-                    {
-                      // Make sure the graph covers all the appropriate altitude
-                      // range.
-                      if (alt > this.maxAltitude) {
-                          this.maxAltitude = alt;
-                      }
-                      if (alt < this.minAltitude) {
-                          this.minAltitude = alt;
-                      }
-                    }
+                    //Convert altitude from meter in current unit
+                    double alt = UnitConverter.convertLength(pos.altitude, UnitConverter.UNITS_METERS, altUnitType);
                     Date time = pos.date;
                     CanvasPoint point1 = convertPosition(lat, lon, alt, time,
                             top, bottom);
@@ -331,16 +342,17 @@ public class ElevationCanvas extends BaseCanvas {
 
                     lastLatitude = pos.latitude;
                     lastLongitude = pos.longitude;
-                    lastAltitude = pos.altitude;
+                    lastAltitude = alt;
                     lastTime = pos.date;
                 }
             }
 
             int height = 0;
             if (lastPosition != null) {
-                height = getYPos(lastPosition.altitude, top, bottom);
+                //Pass altitude in current unit
+                height = getYPos(currentAltitude, top, bottom);
             }
-
+/*
             if (height < -5000) { //set some reasonable limits
                 height = -5000; // This prevents the gui from stalling from wildly bad data
             } // to do: should figure out why the data is bad in the first place.
@@ -348,7 +360,7 @@ public class ElevationCanvas extends BaseCanvas {
             if (height > 60000){
                 height = 60000;
             }
-
+*/
             int right = this.getWidth() - (2 * MARGIN);
             // Draw red dot on current location
             g.drawImage(redDotImage, right + horizontalMovement, height,
@@ -385,15 +397,18 @@ public class ElevationCanvas extends BaseCanvas {
             xPos = 0;
             return null;
         }
+        //Pass altitude in current unit
         int yPos = getYPos(altitude, top, bottom);
         return new CanvasPoint(xPos, yPos);
     }
 
     private int getYPos(double altitude, final int top, final int bottom) {
         final double availableHeight = bottom - top;
-        final double altitudeDiff = this.maxAltitude - this.minAltitude;
-        final double oneMetre = availableHeight / altitudeDiff;
-        int pixels = (int) ((altitude - minAltitude) * oneMetre);
+        final double altitudeDiff = this.maxAltitudeCurUnit - this.minAltitudeCurUnit;
+        //Number of pixels for one current unit
+        final double oneUnit = availableHeight / altitudeDiff;
+        //Height in pixels
+        int pixels = (int) ((altitude - minAltitudeCurUnit) * oneUnit);
         return bottom - (MARGIN + pixels) + verticalMovement;
     }
 
@@ -403,40 +418,38 @@ public class ElevationCanvas extends BaseCanvas {
         /** Handle zooming keys */
         switch (keyCode) {
             case (KEY_NUM1):
+
                 // Zoom in vertically
                 manualZoom = true;
-                if (maxAltitude - minAltitude > 20) {
-                    if((maxAltitude - altitudeZoomIncrement)<minAltitude) {
-                        maxAltitude -= altitudeZoomIncrement;
-                        minAltitude += altitudeZoomIncrement;
-                        altitudeZoomIncrement /= 2;
-                    } else {
-                        setMinMaxValues();
-                        altitudeZoomIncrement = 10;
-                    }                    
+                if(altitudeZoomValue <= 0)
+                {
+                    altitudeZoomValue = 0;
                 }
+                else
+                {
+                    altitudeZoomValue = altitudeZoomValue - 1;
+                }
+                setMinMaxValues(altitudeZoomValue);
                 break;
 
             case (KEY_NUM2):
                 // Fix altitude scale
                 manualZoom = false;
-                setMinMaxValues();
-                altitudeZoomIncrement = 10;
+                setMinMaxValues(0);
                 break;
 
             case (KEY_NUM3):
                 // Zoom out vertically
-                if(maxAltitude<MAX_ZOOM_ALT) {
-                    manualZoom = true;
-                    maxAltitude += altitudeZoomIncrement;
-                    if(minAltitude>0) {
-                        minAltitude -= altitudeZoomIncrement;
-                    }
-                    if(minAltitude<0) {
-                        minAltitude = 0;
-                    }
-                    altitudeZoomIncrement *= 2;
+                manualZoom = true;
+                if(altitudeZoomValue > altLevels.length - 1)
+                {
+                    altitudeZoomValue = altLevels.length - 1;
                 }
+                else
+                {
+                    altitudeZoomValue = altitudeZoomValue + 1;
+                }
+                setMinMaxValues(altitudeZoomValue);
                 break;
 
             case (KEY_NUM7):
@@ -498,8 +511,66 @@ public class ElevationCanvas extends BaseCanvas {
         this.repaint();
     }
 
+    /**
+     * Calculate the difference between min and max altitude.
+     * Set it to a "reasonable value" stored in altLevels.
+     * By passing an zoomValue value other than zero you can zoom in (<0)
+     * or zoom out (>0)
+     *
+     * @param diffAlt Difference between minimum and maximum altitude
+     * @param zoomValue
+     * @return minimum altitude
+     */
+    private double calculateAltitudeDiff(double diff, int zoomValue)
+    {
+        int index = 0;
+
+        //Get a reasonable value bigger than the difference between
+        //altMin and altMax;
+        for(int i=altLevels.length - 1;i > 0;i--)
+        {
+            if(diff > altLevels[i])
+            {
+                index =  i + 1;
+                break;
+            }
+        }
+
+        //Check lower array boundary
+        if( index + zoomValue < 0)
+        {
+            return altLevels[0];
+        }
+        //Check upper array boundary
+        if( index + zoomValue > altLevels.length - 1)
+        {
+            return altLevels[altLevels.length - 1];
+        }
+        return altLevels[index + zoomValue];
+    }
+
+    /**
+     * Calculate the lower altitude boundary. It is set to
+     * "reasonable value".
+     *
+     * @param curAlt Altitude in current unit
+     * @param diffAlt Difference between minimum and maximum altitude
+     * @return minimum altitude
+     */
+    private double calculateMinAltitude(double curAlt, double diffAlt)
+    {
+        //Devide the altitude difference by the number of lines to draw + 1
+        int altIncrement = (int) (diffAlt/maxPositions);
+        if(altIncrement == 0){
+            return (int)curAlt;
+        }
+        //Get integer devision
+        int intDiv = ((int)curAlt / altIncrement);
+        return intDiv * altIncrement;
+    }
+
     public void setLastPosition(GpsPosition position) {
         this.lastPosition = position;
-        this.setMinMaxValues();
+        this.setMinMaxValues(altitudeZoomValue);
     }
 }

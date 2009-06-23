@@ -196,13 +196,21 @@ public class StringUtil {
         int integerValue = (int) value;
         long decimals = Math.abs((long) ((value - integerValue) * MathUtil.pow(
                 10, decimalCount)));
-
-        String valueString = String.valueOf(decimals);
-        while (valueString.length() < decimalCount) {
-            valueString = "0" + valueString;
+        
+        //Add everything after the decimal point
+        if(decimalCount != 0)
+        {
+            String valueString = String.valueOf(decimals);
+            while (valueString.length() < decimalCount) {
+                valueString = "0" + valueString;
+            }
+            return (value < 0 ? "-" : "") + String.valueOf(Math.abs(integerValue))
+                    + "." + valueString;
         }
-        return (value < 0 ? "-" : "") + String.valueOf(Math.abs(integerValue))
-                + "." + valueString;
+        else //No decimal point ...
+        {
+            return (value < 0 ? "-" : "") + String.valueOf(Math.abs(integerValue));
+        }    
     }
     
     /** Reverse given String */

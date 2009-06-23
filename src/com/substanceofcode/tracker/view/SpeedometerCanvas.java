@@ -40,8 +40,8 @@ public class SpeedometerCanvas extends BaseCanvas {
 
     private NumberArea speedArea;
     private NumberArea distanceArea;
-    private SpeedFormatter formatter;
-    private LengthFormatter distanceFormatter;
+    private SpeedFormatter speedFormatter;
+    private LengthFormatter legthFormatter;
     
     public SpeedometerCanvas() {
         setFullScreenMode(true);
@@ -51,14 +51,14 @@ public class SpeedometerCanvas extends BaseCanvas {
         int titleHeight = titleFont.getHeight();
         speedArea = new NumberArea(4, titleHeight, getWidth()-8, (height/4)*3-titleHeight, 3);
         distanceArea = new NumberArea(4,titleHeight+(height/4)*3, getWidth()-8, (height/4)-titleHeight, 6);
-        
-        /** Initialize formatters */
-        RecorderSettings settings = Controller.getController().getSettings();
-        formatter = new SpeedFormatter( settings );
-        distanceFormatter = new LengthFormatter( settings );
     }
     
     protected void paint(Graphics g) {
+        /** Initialize formatters */
+        RecorderSettings settings = Controller.getController().getSettings();
+        speedFormatter = new SpeedFormatter( settings );
+        legthFormatter = new LengthFormatter( settings );
+
         /** Clear background */
         g.setColor(Theme.getColor(Theme.TYPE_BACKGROUND));
         g.fillRect(0,0,getWidth(),getHeight());
@@ -73,7 +73,7 @@ public class SpeedometerCanvas extends BaseCanvas {
         GpsPosition loc = Controller.getController().getPosition();
         String speed = "0";
         if(loc!=null) {
-            speed = formatter.getSpeedStringWithoutUnits( loc.speed );
+            speed = speedFormatter.getSpeedString( loc.speed,0,false );
         }
         g.setColor(Theme.getColor(Theme.TYPE_SUBTITLE));
         g.drawString(LocaleManager.getMessage("speedometer_canvas_speed"),
@@ -84,7 +84,7 @@ public class SpeedometerCanvas extends BaseCanvas {
         String distance = "0";
         Track track = Controller.getController().getTrack();
         if(track!=null) {
-            distance = distanceFormatter.getLengthString( track.getDistance(), true, false );        
+            distance = legthFormatter.getLengthString( track.getDistance(), false );        
         }
         g.setColor(Theme.getColor(Theme.TYPE_SUBTITLE));
         g.drawString(LocaleManager.getMessage("speedometer_canvas_distance"),

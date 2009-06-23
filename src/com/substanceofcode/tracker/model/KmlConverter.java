@@ -34,6 +34,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.view.Logger;
+import com.substanceofcode.tracker.model.SpeedFormatter;
 import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
@@ -51,13 +52,13 @@ public class KmlConverter extends TrackConverter {
     /**
      * State - true = use Kilometers, false = use Miles
      */
-    private boolean useKilometers;
+    private int distanceUnitType;
 
     /** Creates a new instance of KmlConverter
-     * @param useKilometers Are we using kilometers as units?
+     * @param distanceUnitType Are we using kilometers as units?
      */
-    public KmlConverter(boolean useKilometers) {
-        this.useKilometers = useKilometers;
+    public KmlConverter(int distanceUnitType) {
+        this.distanceUnitType = distanceUnitType;
     }
 
     /** Convert track to Google Eart format (KML)
@@ -201,19 +202,12 @@ public class KmlConverter extends TrackConverter {
             GpsPosition pos = marker.getPosition();
             String units;
             String speed;
-            if (useKilometers == true) {
-                units = " km/h";
-                speed = String.valueOf(pos.speed);
-            } else {
-                double mileSpeed = UnitConverter.convertSpeed(pos.speed,
-                        UnitConverter.UNITS_KPH, UnitConverter.UNITS_MPH);
-                speed = StringUtil.valueOf(mileSpeed, 1);
-                units = " mph";
-            }
+            SpeedFormatter speedFormatter = new SpeedFormatter(distanceUnitType);
+            speed = speedFormatter.getSpeedString(pos.speed,1);
 
             String timeStamp = DateTimeUtil.convertToTimeStamp(pos.date);
             String name = marker.getName();
-            String description = timeStamp + ", " + speed + units;
+            String description = timeStamp + ", " + speed;
             markerString.append("<Placemark>\r\n")
                     .append("<name>" + name + "</name>\r\n")
                     .append("<description>")
@@ -280,17 +274,10 @@ public class KmlConverter extends TrackConverter {
 
             String units;
             String distance;
-            if (useKilometers == true) {
-                units = " km";
-                distance = StringUtil.valueOf(track.getDistance(), 2);
-            } else {
-                double mileDistance = UnitConverter.convertLength(track
-                        .getDistance(), UnitConverter.UNITS_KILOMETERS,
-                        UnitConverter.UNITS_MILES);
-                distance = StringUtil.valueOf(mileDistance, 2);
-                units = " ml";
-            }
-
+            LengthFormatter lengthFormatter = new LengthFormatter(distanceUnitType);
+            distance = lengthFormatter.getLengthString(track.getDistance(), true);
+            units = lengthFormatter.getUnitString(distanceUnitType);
+            
             markerString.append("<Placemark>\r\n");
             markerString.append("<name>").append(timeStamp).append(
                     "</name>\r\n");
@@ -322,18 +309,9 @@ public class KmlConverter extends TrackConverter {
         if (maxSpeedPos != null) {
             String units;
             String speed;
-            if (useKilometers == true) {
-                units = " km/h";
-                speed = String.valueOf(maxSpeedPos.speed);
-            } else {
-                double mileSpeed = UnitConverter.convertSpeed(
-                        maxSpeedPos.speed, UnitConverter.UNITS_KPH,
-                        UnitConverter.UNITS_MPH);
-                speed = StringUtil.valueOf(mileSpeed, 1);
-                units = " mph";
-            }
-            markerString.append(getPlaceMark(maxSpeedPos, "Max speed " + speed
-                    + " " + units));
+            SpeedFormatter speedFormatter = new SpeedFormatter(distanceUnitType);
+            speed = speedFormatter.getSpeedString(distanceUnitType,1);
+            markerString.append(getPlaceMark(maxSpeedPos, "Max speed " + speed));
         }
 
         // Close the start/end folder

@@ -1350,9 +1350,9 @@ public class Controller {
     public void exportTrail(Track recordedTrack, int exportFormat,
             String trackName) {
         try {
-            boolean useKilometers = settings.getUnitsAsKilometers();
+            int distanceUnitType = settings.getDistanceUnitType();
             String exportFolder = settings.getExportFolder();
-            recordedTrack.writeToFile(exportFolder, places, useKilometers,
+            recordedTrack.writeToFile(exportFolder, places, distanceUnitType,
                     exportFormat, trackName, null);
         } catch (Exception ex) {
             Logger.error(ex.toString());

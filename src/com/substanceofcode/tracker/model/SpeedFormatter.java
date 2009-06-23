@@ -33,13 +33,25 @@ import com.substanceofcode.util.StringUtil;
 public class SpeedFormatter {
 
     /**
-     * Settings object reference - this allows us to check what units to use
+     * Remember distanceUnitType - this allows us to check what units to use
      */
-    RecorderSettings settings;
+    int distanceUnitType;
 
-    /** Creates a new instance of SpeedFormatter */
+    /** Creates a new instance of SpeedFormatter, get distanceUnitType
+     * from settings.
+     * @param settings Get distanceUnitType from settings as define in
+     * UnitConverter.UNITS_XXX
+     */
     public SpeedFormatter(RecorderSettings settings) {
-        this.settings = settings;
+        this.distanceUnitType = settings.getDistanceUnitType();
+    }
+   
+    /** Creates a new instance of SpeedFormatter, get distanceUnitType as 
+     * parameter
+     * @param distanceUnitType as define in UnitConverter.UNITS_XXX 
+     */
+    public SpeedFormatter(int distanceUnitType) {
+        this.distanceUnitType = distanceUnitType;
     }
 
     /** 
@@ -49,7 +61,58 @@ public class SpeedFormatter {
      * @return string e.g. 123.3 km/h or 34.2 mph
      */
     public String getSpeedString(double speed) {
-        return getSpeedString(speed, 1);
+        return getSpeedString(speed, 1, true);
+    }
+  
+    /** 
+     * Get speed string.
+     *
+     * @param speed in km/h
+     * @param decimalCount Number of decimals after the "."
+     * @param includeUnits Include unit string?
+     * @return string e.g. 123.3 km/h or 34.2 mph
+     */
+    public String getSpeedString(double speed,
+            int decimalCount, 
+            boolean includeUnits) {
+        String speedString;
+        switch(distanceUnitType)
+        {
+            case UnitConverter.UNITS_KILOMETERS:
+            {
+                speedString = StringUtil.valueOf(speed, decimalCount);
+                break;
+            }
+            case UnitConverter.UNITS_MILES:
+            {
+                double mileSpeed = UnitConverter.convertSpeed(speed,
+                                              UnitConverter.UNITS_KPH,
+                                              UnitConverter.UNITS_MPH);
+                speedString = StringUtil.valueOf(mileSpeed, decimalCount);
+                break;
+            }
+            case UnitConverter.UNITS_NAUTICAL_MILES:
+            {
+                double knoteSpeed = UnitConverter.convertSpeed(speed,
+                                              UnitConverter.UNITS_KPH,
+                                              UnitConverter.UNITS_KN);
+                speedString = StringUtil.valueOf(knoteSpeed, decimalCount);
+                break;
+            }
+            default:
+            {
+                throw new IllegalArgumentException("Cannot return speed for distanceUnitType " + 
+                        distanceUnitType);                               
+            }
+        }
+        if(includeUnits == true)
+        {
+            return speedString + getSpeedStringUnits();
+        }
+        else
+        {
+            return speedString;
+        }
     }
     
     /** 
@@ -60,31 +123,43 @@ public class SpeedFormatter {
      * @return string e.g. 123.3 km/h or 34.2 mph
      */
     public String getSpeedString(double speed, int decimalCount) {
-        String units;
-        String speedString;
-        if (settings.getUnitsAsKilometers() == true) {
-            units = " km/h";
-            speedString = StringUtil.valueOf(speed, decimalCount);
-        } else {
-            double mileSpeed = UnitConverter.convertSpeed(speed,
-                                              UnitConverter.UNITS_KPH,
-                                              UnitConverter.UNITS_MPH);
-            speedString = StringUtil.valueOf(mileSpeed, decimalCount);
-            units = " mph";
-        }
-        return speedString + units;
+        return getSpeedString(speed,decimalCount,true);
     }
     
-    public String getSpeedStringWithoutUnits(double speed) {
-        String speedString;
-        if (settings.getUnitsAsKilometers() == true) {
-            speedString = String.valueOf( (int)speed );
-        } else {
-            double mileSpeed = UnitConverter.convertSpeed(speed,
-                                              UnitConverter.UNITS_KPH,
-                                              UnitConverter.UNITS_MPH);
-            speedString = String.valueOf( (int)mileSpeed );
+    /** 
+     * Get only the unit of the speed string .
+     *
+     * @return string e.g. km/h or mph
+     */
+    public String getSpeedStringUnits() {
+        String units;
+        
+        switch(distanceUnitType)
+        {
+            //Return kilometers per our if using kilometers
+            case UnitConverter.UNITS_KILOMETERS:
+            {
+                units = " km/h";
+                break;
+            }
+            //Return miles per hour if using miles
+            case UnitConverter.UNITS_MILES:
+            {
+                units = " mph";
+                break;
+            }
+            // Return speed as knotes if using nautical miles 
+            case UnitConverter.UNITS_NAUTICAL_MILES:
+            {
+                units = " kn";
+                break;
+            }
+            default:
+            {
+                throw new IllegalArgumentException("Cannot return speed unit for distanceUnitType " + 
+                        distanceUnitType);                             
+            }
         }
-        return speedString;        
+        return units;
     }
 }

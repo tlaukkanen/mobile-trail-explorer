@@ -302,6 +302,7 @@ public class GpsPositionParser {
         }
 
 
+        // if we have a speed value, work out the Miles Per Hour
         // if we have a speed value, work out the Km Per Hour
         if (groundSpeed > 0) {
             // km/h = knots * 1.852

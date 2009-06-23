@@ -522,13 +522,13 @@ public class RecorderSettings {
     /**
      * Do we use kilometers as units? Default is true!
      */
-    public boolean getUnitsAsKilometers() {
-        return settings.getBooleanProperty(UNITS, true);
+    public int getDistanceUnitType() {
+        return settings.getIntProperty(UNITS, UnitConverter.UNITS_KILOMETERS);
     }
 
     /** Set units */
-    public void setUnitsAsKilometers(boolean value) {
-        settings.setBooleanProperty(UNITS, value);
+    public void setDistanceUnitType(int value) {
+        settings.setIntProperty(UNITS, value);
         saveSettings();
     }
 

@@ -107,7 +107,7 @@ public class ImportTrailScreen extends Form implements CommandListener {
                         /* Figure out which TrackConverter to use. */
                         if (fileExtension.equals(".kml")) {
                             converter = new KmlConverter(controller
-                                    .getSettings().getUnitsAsKilometers());
+                                    .getSettings().getDistanceUnitType());
                         } else if (fileExtension.equals(".gpx")) {
                             converter = new GpxConverter();
                         } else {

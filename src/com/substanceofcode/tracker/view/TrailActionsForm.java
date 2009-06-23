@@ -302,10 +302,10 @@ public class TrailActionsForm extends Form implements CommandListener,
             } else {
                 places = null;
             }
-            boolean useKilometers = settings.getUnitsAsKilometers();
+            int distanceUnitType = settings.getDistanceUnitType();
             String exportFolder = settings.getExportFolder();
             String trackName = trailNameField.getString();
-            track.writeToFile(exportFolder, places, useKilometers,
+            track.writeToFile(exportFolder, places,  distanceUnitType,
                     exportFormat, trackName, xiListen);
             if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX
                     && controller.getSettings().getStreamingStarted()) {

@@ -119,7 +119,7 @@ public class Place {
      * @throws java.lang.Exception 
      * @param folder        Folder where file is written.
      * @param places     Vector containing places.
-     * @param useKilometers Use meters as units?
+     * @param distanceUnitType Type of units to use?
      * @param exportFormat  Export format.
      * @param filename      Name of file or null if we should create a timestamp
      * @param listener      Reference to class which wants to be notified of
@@ -127,7 +127,7 @@ public class Place {
      */
     public String writeToFile(String folder,
                             Vector places,
-                            boolean useKilometers, 
+                            int distanceUnitType, 
                             int exportFormat, 
                             String filename, 
                             AlertHandler listener)
@@ -158,7 +158,7 @@ public class Place {
         TrackConverter converter = null;
         String extension = ".xml";
         if (exportFormat == RecorderSettings.EXPORT_FORMAT_KML) {
-            converter = new KmlConverter(useKilometers);
+            converter = new KmlConverter(distanceUnitType);
             extension = ".kml";
         } else if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX) {
             converter = new GpxConverter();

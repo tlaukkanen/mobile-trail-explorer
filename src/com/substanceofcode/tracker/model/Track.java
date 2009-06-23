@@ -113,6 +113,14 @@ public class Track implements Serializable {
         return minLongitude;
     }
 
+    public double getMaxAltitude() {
+        return maxAltitude.altitude;
+    }
+    
+    public double getMinAltitude() {
+        return minAltitude.altitude;
+    }
+
     /** The Tracks name */
     private String name = null;
 
@@ -548,8 +556,8 @@ public class Track implements Serializable {
      *                Folder where file is written.
      * @param places
      *                Vector containing places.
-     * @param useKilometers
-     *                Use meters as units?
+     * @param distanceUnitType
+     *                Type of units to use?
      * @param exportFormat
      *                Export format.
      * @param filename
@@ -558,7 +566,7 @@ public class Track implements Serializable {
      *                Reference to class which wants to be notified of events
      */
     public String writeToFile(String folder, Vector places,
-            boolean useKilometers, int exportFormat, String filename,
+            int distanceUnitType, int exportFormat, String filename,
             AlertHandler listener) throws Exception {
         String fullPath = "";
         // ----------------------------------------------------------------------
@@ -585,7 +593,7 @@ public class Track implements Serializable {
         TrackConverter converter = null;
         String extension = ".xml";
         if (exportFormat == RecorderSettings.EXPORT_FORMAT_KML) {
-            converter = new KmlConverter(useKilometers);
+            converter = new KmlConverter(distanceUnitType);
             extension = ".kml";
         } else if (exportFormat == RecorderSettings.EXPORT_FORMAT_GPX) {
             converter = new GpxConverter();

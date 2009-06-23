@@ -323,7 +323,7 @@ public final class GpsPosition implements Serializable {
      * </p>
      * Using formula from: http://williams.best.vwh.net/avform.htm#Dist
      * @param position
-     * @return
+     * @return distance in kilometers
      */
     public double getDistanceFromPosition(GpsPosition position) {
         return getDistanceFromPosition(position.latitude, position.longitude);
@@ -333,7 +333,7 @@ public final class GpsPosition implements Serializable {
      * Calculate great circle distance from given coordinates
      * @param latitude
      * @param longitude
-     * @return
+     * @return distance in kilometers
      */
     public double getDistanceFromPosition(double latitude, double longitude) {
         double lat1 = (Math.PI / 180.0) * this.latitude;

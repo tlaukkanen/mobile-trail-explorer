@@ -252,7 +252,7 @@ public class PlaceActionsForm extends Form implements CommandListener {
         try {
             RecorderSettings settings = controller.getSettings();
 
-            boolean useKilometers = settings.getUnitsAsKilometers();
+            int distanceUnitType = settings.getDistanceUnitType();
             String exportFolder = settings.getExportFolder();
             String waypointName = placeNameField.getString();
             
@@ -274,7 +274,7 @@ public class PlaceActionsForm extends Form implements CommandListener {
                 waypoints.addElement(selectedWaypoint);
             }
             
-            place.writeToFile(exportFolder, waypoints, useKilometers,
+            place.writeToFile(exportFolder, waypoints, distanceUnitType,
                     exportFormat, waypointName, xiListen);
             
             if (xiListen != null) {

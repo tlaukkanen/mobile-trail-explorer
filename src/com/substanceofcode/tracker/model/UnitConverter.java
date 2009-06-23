@@ -22,9 +22,6 @@
 
 package com.substanceofcode.tracker.model;
 
-import com.substanceofcode.gps.GpsPosition;
-import com.substanceofcode.util.StringUtil;
-
 /**
  * UnitConverter class can convert speed from km/h to mph.
  *
@@ -34,17 +31,29 @@ public class UnitConverter {
 
     /** Constants */
     public static final double MILES_IN_A_KILOMETER = 0.621371192;
+    public static final double METERS_IN_A_KILOMETER = 1000.0;
+    public static final double MILES_IN_A_METER = MILES_IN_A_KILOMETER/METERS_IN_A_KILOMETER;
     public static final double KILOMETERS_IN_A_MILE = 1.609344;
     public static final double FEET_IN_A_METER = 3.2808399;
-    public static final double METERS_IN_A_FOOT = 0.3048;
+    public static final double FEET_IN_A_MILE = 5280.0;
+    public static final double FEET_IN_A_KILOMETER = FEET_IN_A_METER * METERS_IN_A_KILOMETER;
+    public static final double KILOMETERS_IN_A_FOOT = 0.0003048;
+    public static final double METERS_IN_A_FOOT = KILOMETERS_IN_A_FOOT/METERS_IN_A_KILOMETER;
+    public static final double METERS_IN_A_NAUTICAL_MILE = 1852.0;
+    public static final double NAUTICAL_MILES_IN_A_METER = 1.0/METERS_IN_A_NAUTICAL_MILE;
+    public static final double NAUTICAL_MILES_IN_A_KILOMETER = 1.0/METERS_IN_A_NAUTICAL_MILE;
+    public static final double KILOMETERS_IN_A_NAUTICAL_MILE = METERS_IN_A_NAUTICAL_MILE/METERS_IN_A_KILOMETER;
+    public static final double KILOMETERS_IN_A_METER = 1.0/METERS_IN_A_KILOMETER;
 
     /** Units enum */
     public static final int UNITS_KPH = 1;
     public static final int UNITS_MPH = 2;
-    public static final int UNITS_METERS = 3;
-    public static final int UNITS_FEET = 4;
-    public static final int UNITS_KILOMETERS = 5;
-    public static final int UNITS_MILES = 6;
+    public static final int UNITS_KN = 3;   //Knotes = nautical miles/hour
+    public static final int UNITS_METERS = 4;
+    public static final int UNITS_FEET = 5;
+    public static final int UNITS_KILOMETERS = 6;
+    public static final int UNITS_MILES = 7;
+    public static final int UNITS_NAUTICAL_MILES = 8;
 
     /** Private constructor : This is a static class only */
     private UnitConverter() {}
@@ -54,6 +63,7 @@ public class UnitConverter {
      * <ul>
      * <li> KPH -> MPH
      * <li> MPH -> KPH
+     * <li> KPH -> KN
      * </ul>
      */
     public static double convertSpeed(double originalSpeed, 
@@ -73,49 +83,17 @@ public class UnitConverter {
                 && convertedUnits == UNITS_KPH) {
             return originalSpeed * KILOMETERS_IN_A_MILE;
         }
-        throw new IllegalArgumentException("Converting these units not " +
+        /** Check for km/h to KN conversion */
+        if (originalUnits == UNITS_KPH
+                && convertedUnits == UNITS_KN) {
+            return originalSpeed * KILOMETERS_IN_A_NAUTICAL_MILE;
+        }
+
+        throw new IllegalArgumentException("Converting these speed units not " +
                   "supported : ( unit index " + originalUnits + 
-                  " to unit index" + convertedUnits + ")");
+                  " to unit index " + convertedUnits + ")");
     }
-    
-    /** Get speed string in given units (kmh or mph) */
-    public static String getSpeedString(
-        double speed, 
-        boolean useKilometers, 
-        boolean includeUnits) {
-        
-        String units;
-        String speedString;
-        if (useKilometers == true) {
-            units = " km/h";
-            speedString = String.valueOf(speed);
-        } else {
-            double mileSpeed = UnitConverter.convertSpeed(
-                speed,
-                UnitConverter.UNITS_KPH,
-                UnitConverter.UNITS_MPH);
-            speedString = StringUtil.valueOf(mileSpeed, 1);
-            units = " mph";
-        }
-        
-        int dotIndex = speedString.indexOf(".");
-        if(dotIndex>0) {
-            // 12.1234
-            // 7 - (2+1)
-            // 1234.12
-            // 7 - (4+1)
-            int decimalCount = speedString.length() - (dotIndex+1);
-            if(decimalCount>2) {
-                speedString = speedString.substring(0, dotIndex+3);
-            }
-        }
-        
-        String result = speedString;
-        if(includeUnits) {
-            result += units;
-        }
-        return result;
-    }
+ 
     
     /** 
      * Convert lengths. Supported conversions:
@@ -123,6 +101,7 @@ public class UnitConverter {
      * <li> METERS -> FEET
      * <li> FEET -> METERS
      * <li> KILOMETERS -> MILES
+     * <li> KILOMETERS -> NAUTICAL MILES
      * </ul>
      */
     public static double convertLength(double originalLength,
@@ -141,11 +120,45 @@ public class UnitConverter {
             return originalLength * METERS_IN_A_FOOT;
         }
         /** Check for kilometers to meters conversion */
+        if (originalUnits == UNITS_KILOMETERS && convertedUnits == UNITS_METERS) {
+            return originalLength * METERS_IN_A_KILOMETER;
+        }
+        /** Check for kilometers to miles conversion */
         if (originalUnits == UNITS_KILOMETERS && convertedUnits == UNITS_MILES) {
             return originalLength * MILES_IN_A_KILOMETER;
         }
-        throw new IllegalArgumentException("Converting these units not " +
+        /** Check for kilometers to nautical miles conversion */
+        if (originalUnits == UNITS_KILOMETERS 
+                && convertedUnits == UNITS_NAUTICAL_MILES) {
+            return originalLength * NAUTICAL_MILES_IN_A_KILOMETER;
+        }
+        /** Check for kilometers to nautical miles conversion */
+        if (originalUnits == UNITS_KILOMETERS
+                && convertedUnits == UNITS_FEET) {
+            return originalLength * FEET_IN_A_KILOMETER;
+        }
+        /** Check for meters to nautical miles conversion */
+        if (originalUnits == UNITS_METERS 
+                && convertedUnits == UNITS_NAUTICAL_MILES) {
+            return originalLength * NAUTICAL_MILES_IN_A_METER;
+        }
+        /** Check for meters to kilometers conversion */
+        if (originalUnits == UNITS_METERS 
+                && convertedUnits == UNITS_KILOMETERS) {
+            return originalLength * KILOMETERS_IN_A_METER;
+        }
+        /** Check for meters to miles conversion */
+        if (originalUnits == UNITS_METERS
+                && convertedUnits == UNITS_MILES) {
+            return originalLength * MILES_IN_A_METER;
+        }
+        /** Check for miles to feet conversion */
+        if (originalUnits == UNITS_MILES
+                && convertedUnits == UNITS_FEET) {
+            return originalLength * FEET_IN_A_MILE;
+        }        
+        throw new IllegalArgumentException("Converting these lengh units not " +
                 "supported : ( unit index " + originalUnits + 
-                " to unit index" + convertedUnits + ")");
+                " to unit index " + convertedUnits + ")");
     }
 }
