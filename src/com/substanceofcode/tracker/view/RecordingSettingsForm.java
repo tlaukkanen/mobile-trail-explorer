@@ -45,8 +45,8 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     private Command okCommand;
     private Command cancelCommand;
     
-    private TextField intervalField;
-    private TextField markerStepField;
+    private TextField recordingIntervalField;
+    private TextField markerIntervalField;
     private TextField maxSpeedField;
     private TextField maxAccelerationField;
     private TextField minDistanceField;
@@ -71,11 +71,11 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     
     public void commandAction(Command command, Displayable displayable) {
         if(command == okCommand) {
-            // Save new interval
-            String intervalText = intervalField.getString();
-            String markerStepText = markerStepField.getString();
-            int newInterval;
-            int newStep;
+            // Save new recordingInterval
+            String recordingIntervalText = recordingIntervalField.getString();
+            String markerIntervalText = markerIntervalField.getString();
+            int newRecordingInterval;
+            int newMarkerInterval;
             int maxSpeed = 310;
             int maxAcceleration = 50;
             int minDistance = 5;
@@ -83,8 +83,8 @@ public class RecordingSettingsForm extends Form implements CommandListener {
             boolean useFilter = true;
             try{
                 // TODO: Add max speed and acceleration
-                newInterval = Integer.valueOf( intervalText ).intValue();
-                newStep = Integer.valueOf( markerStepText ).intValue();
+                newRecordingInterval = Integer.valueOf( recordingIntervalText ).intValue();
+                newMarkerInterval = Integer.valueOf( markerIntervalText ).intValue();
                 String maxSpeedText = maxSpeedField.getString();
                 maxSpeed = Integer.valueOf( maxSpeedText ).intValue();
                 String maxAccelerationText = maxAccelerationField.getString();
@@ -95,11 +95,11 @@ public class RecordingSettingsForm extends Form implements CommandListener {
                 useFilter = filterGroup.isSelected(0);
             }catch(Exception ex) {
                 ex.printStackTrace();
-                newInterval = 10;
-                newStep = 5;
+                newRecordingInterval = 10;
+                newMarkerInterval = 5;
             }
-            controller.saveRecordingInterval(newInterval);
-            controller.saveRecordingMarkerStep(newStep);
+            controller.saveRecordingInterval(newRecordingInterval);
+            controller.setMarkerInterval(newMarkerInterval);
             controller.saveRecordingFiltering(useFilter);
             
             RecorderSettings settings = controller.getSettings();
@@ -130,22 +130,22 @@ public class RecordingSettingsForm extends Form implements CommandListener {
     /** Initialize form controls */
     private void initializeControls() {
         RecorderSettings settings = controller.getSettings();
-        int interval = settings.getRecordingInterval();
-        String intervalText = String.valueOf(interval);
+        int recordingInterval = settings.getRecordingInterval();
+        String recordingIntervalText = String.valueOf(recordingInterval);
         
-        intervalField = new TextField(
+        recordingIntervalField = new TextField(
                 LocaleManager.getMessage("recording_settings_form_recording_interval"),
-                intervalText,
+                recordingIntervalText,
                 6,
                 TextField.NUMERIC);
-        this.append(intervalField);
+        this.append(recordingIntervalField);
         
-        int markerStep = settings.getRecordingMarkerInterval();
-        markerStepField = new TextField(LocaleManager.getMessage("recording_settings_form_create_marker"),
-                String.valueOf(markerStep),
+        int markerInterval = settings.getMarkerInterval();
+        markerIntervalField = new TextField(LocaleManager.getMessage("recording_settings_form_create_marker"),
+                String.valueOf(markerInterval),
                 6,
                 TextField.NUMERIC);
-        this.append(markerStepField);
+        this.append(markerIntervalField);
         
         int maxSpeed = settings.getMaxRecordedSpeed();
         maxSpeedField = new TextField(

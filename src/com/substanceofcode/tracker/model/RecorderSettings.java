@@ -76,7 +76,7 @@ public class RecorderSettings {
 
     /** Recording setting keys */
     private static final String RECORDING_INTERVAL = "recording-interval";
-    private static final String RECORDING_MARKER_INTERVAL = "recording-marker-interval";
+    private static final String MARKER_INTERVAL = "recording-marker-interval";
     private static final String RECORDING_MAX_SPEED = "recording-max-speed";
     private static final String RECORDING_MAX_ACCELERATION = "recording-max-acceleration";
     private static final String RECORDING_MIN_DISTANCE = "recording-min-distance";
@@ -102,7 +102,7 @@ public class RecorderSettings {
 
     /** Default recording intervals */
     private static final int RECORDING_INTERVAL_DEFAULT = 1;
-    private static final int RECORDING_MARKER_INTERVAL_DEFAULT = 10;
+    private static final int MARKER_INTERVAL_DEFAULT = 10;
     private static final int RECORDING_MAX_SPEED_DEFAULT = 310;
     private static final int RECORDING_MAX_ACCELERATION_DEFAULT = 40;
     private static final int RECORDING_MIN_DISTANCE_DEFAULT = 5;
@@ -479,14 +479,14 @@ public class RecorderSettings {
     }
 
     /** Get recording interval for markers */
-    public int getRecordingMarkerInterval() {
-        return settings.getIntProperty(RECORDING_MARKER_INTERVAL,
-                RECORDING_MARKER_INTERVAL_DEFAULT);
+    public int getMarkerInterval() {
+        return settings.getIntProperty(MARKER_INTERVAL,
+                MARKER_INTERVAL_DEFAULT);
     }
 
     /** Set recording interval for markers */
-    public void setRecordingMarkerInterval(int interval) {
-        settings.setIntProperty(RECORDING_MARKER_INTERVAL, interval);
+    public void setMarkerInterval(int interval) {
+        settings.setIntProperty(MARKER_INTERVAL, interval);
         saveSettings();
     }
 

@@ -61,10 +61,10 @@ public class GpsRecorder {
     private Track recordedTrack = new Track();
 
     /** Interval between recorded positions */
-    private int intervalSeconds;
+    private int recordingInterval;
 
     /** Interval between recorded Markers */
-    private int intervalMarkerStep;
+    private int markerInterval;
 
     /** Url to upload recorded points to */
     private String uploadURL;
@@ -95,8 +95,8 @@ public class GpsRecorder {
     public GpsRecorder(Controller controller) {
         this.controller = controller;
         RecorderSettings settings = controller.getSettings();
-        intervalSeconds = settings.getRecordingInterval();
-        intervalMarkerStep = settings.getRecordingMarkerInterval();
+        recordingInterval = settings.getRecordingInterval();
+        markerInterval = settings.getMarkerInterval();
         uploadURL = settings.getUploadURL();
         useFilter = settings.getFilterTrail();
 
@@ -118,16 +118,16 @@ public class GpsRecorder {
      * Set interval for recording
      * @param seconds 
      */
-    public void setInterval(int seconds) {
-        intervalSeconds = seconds;
+    public void setRecordingInterval(int seconds) {
+        recordingInterval = seconds;
     }
 
     /** 
      * Set interval for marker recording
-     * @param intervalStep 
+     * @param interval
      */
-    public void setIntervalForMarkers(int intervalStep) {
-        intervalMarkerStep = intervalStep;
+    public void setMarkerInterval(int interval) {
+        markerInterval = interval;
     }
 
     /** 
@@ -403,7 +403,7 @@ public class GpsRecorder {
                             lastRecordedPosition);
                 }
                 if (recording == true
-                        && secondsFromLastTrailPoint >= intervalSeconds
+                        && secondsFromLastTrailPoint >= recordingInterval
                         && isValidPosition) {
 
                     secondsFromLastTrailPoint = 0;
@@ -417,7 +417,7 @@ public class GpsRecorder {
                         stopped = currentPosition.equals(lastRecordedPosition);
                     }
                     
-                    //Logger.debug("interval: "+ intervalSeconds +
+                    //Logger.debug("interval: "+ recordingInterval +
                     //" currentPosition is " + (currentPosition==null?"null":"not null"));
                     /**
                      * Record current position if user have moved or this is a
@@ -438,8 +438,8 @@ public class GpsRecorder {
                         }
 
                         recordedTrack.addPosition(currentPosition);
-                        if (intervalMarkerStep > 0 && recordedCount > 0
-                                && recordedCount % intervalMarkerStep == 0) {
+                        if (markerInterval > 0 && recordedCount > 0
+                                && recordedCount % markerInterval == 0) {
                             Marker marker = new Marker(
                                     currentPosition, 
                                     "",

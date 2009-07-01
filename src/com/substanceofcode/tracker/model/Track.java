@@ -479,7 +479,7 @@ public class Track implements Serializable {
                 // ----------------------------------------------------------------
                 int maxNumPos = lSettings.getNumberOfPositionToDraw();
                 // ----------------------------------------------------------------
-                // While we have to0 many points remove the oldest point
+                // While we have too many points remove the oldest point
                 // ----------------------------------------------------------------
                 while (trackPoints.size() > maxNumPos) {
                     trackPoints.removeElementAt(0);
@@ -501,13 +501,13 @@ public class Track implements Serializable {
         // If this is a streaming trail remove old markers from memory
         // ----------------------------------------------------------------------
         if (isStreaming) {
-            Controller lController = Controller.getController();
-            RecorderSettings lSettings = lController.getSettings();
-            int maxNumPos = lSettings.getNumberOfPositionToDraw();
-            int markerInterval = lSettings.getRecordingMarkerInterval();
-            int maxNumMarkers = maxNumPos / markerInterval;
-            while (trackMarkers.size() > maxNumMarkers) {
-                trackMarkers.removeElementAt(0);
+            RecorderSettings lSettings = Controller.getController().getSettings();
+            int markerInterval = lSettings.getMarkerInterval();
+            if (markerInterval > 0) {
+                int maxNumMarkers = lSettings.getNumberOfPositionToDraw() / markerInterval;
+                while (trackMarkers.size() > maxNumMarkers) {
+                    trackMarkers.removeElementAt(0);
+                }
             }
         }
     }

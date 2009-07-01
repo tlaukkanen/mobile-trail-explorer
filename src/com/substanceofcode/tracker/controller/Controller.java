@@ -1194,7 +1194,7 @@ public class Controller {
     /** Set recording interval */
     public void saveRecordingInterval(int interval) {
         settings.setRecordingInterval(interval);
-        recorder.setInterval(interval);
+        recorder.setRecordingInterval(interval);
     }
 
     /** Display display settings form */
@@ -1224,10 +1224,10 @@ public class Controller {
         display.setCurrent(surveyorForm);
     }
 
-    /** Set recording marker step */
-    public void saveRecordingMarkerStep(int newStep) {
-        settings.setRecordingMarkerInterval(newStep);
-        recorder.setIntervalForMarkers(newStep);
+    /** Set marker interval */
+    public void setMarkerInterval(int interval) {
+        settings.setMarkerInterval(interval);
+        recorder.setMarkerInterval(interval);
     }
 
     /** Get recorded track */
