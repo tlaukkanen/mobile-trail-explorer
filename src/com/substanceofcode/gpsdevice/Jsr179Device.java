@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 package com.substanceofcode.gpsdevice;
 
 import java.util.Date;
@@ -50,22 +49,18 @@ public class Jsr179Device extends GpsDeviceImpl {
 
     private static final String JSR179MIMETYPE = "application/X-jsr179-location-nmea";
     private final String logPrefix = "Jsr179: ";
-
     // GPS position variables
-
     private String extraInfo = "";
     //Is this necessary given there is one in GpsDeviceImpl.parser?
-   // GpsPosition gp = null;
+    // GpsPosition gp = null;
     private static Jsr179Device _jsr179Device = null;
-
     private static QualifiedCoordinates qc;
-
     private LocationProvider locationProvider;
-
     private final LocationListener locationListener = new LocationListener() {
+
         public void locationUpdated(LocationProvider provider, Location location) {
 
-            if (location!=null && location.isValid()) {
+            if (location != null && location.isValid()) {
                 extraInfo = location.getExtraInfo(JSR179MIMETYPE);
 
                 float course = location.getCourse();
@@ -78,15 +73,15 @@ public class Jsr179Device extends GpsDeviceImpl {
                 float altitude = qc.getAltitude();
                 float hdop = qc.getHorizontalAccuracy();
 
-                double lat =  qc.getLatitude();
-                double lon =  qc.getLongitude();
+                double lat = qc.getLatitude();
+                double lon = qc.getLongitude();
                 float vdop = qc.getVerticalAccuracy();
 
-             //   Logger.debug("JSR179: Qualified Coordinates are:\nalt="+altitude+
-               //         "\nlat="+lat+
-                 //       "\nlon="+lon+
-                   //     "\nvdop="+vdop+
-                     //   "\nhdop="+hdop);
+                //   Logger.debug("JSR179: Qualified Coordinates are:\nalt="+altitude+
+                //         "\nlat="+lat+
+                //       "\nlon="+lon+
+                //     "\nvdop="+vdop+
+                //   "\nhdop="+hdop);
                 long timestamp = location.getTimestamp();
                 //populate the parser object with the data from the extraInfo string
 
@@ -104,7 +99,10 @@ public class Jsr179Device extends GpsDeviceImpl {
                 //For SE devices we have only got the Satellite Info
                 //We can fix that by adding in a GpsPosition constructed from the API values
                 //Downside for Nokia devices is we are overwriting an existing valid GpsPosition
-                parser.setGpsPosition(new GpsPosition(extraInfo,(short)course,lon,lat,(double)speedkmh,(double)altitude,new Date(timestamp),new GpsGPGSA(0.0f,hdop,vdop,0)));
+                //so we only do this if we don't have a Gpgsa (GPS Dilution of Precision and active satellites) yet
+                if (parser.getGpsPosition().getGpgsa() == null) {
+                    parser.setGpsPosition(new GpsPosition(extraInfo, (short) course, lon, lat, (double) speedkmh, (double) altitude, new Date(timestamp), new GpsGPGSA(0.0f, hdop, vdop, 0)));
+                }
 
             }
         }
@@ -127,7 +125,6 @@ public class Jsr179Device extends GpsDeviceImpl {
     };
 
     public Jsr179Device() {
-
     }
 
     protected Jsr179Device(String address, String alias) {
@@ -151,8 +148,7 @@ public class Jsr179Device extends GpsDeviceImpl {
                 Logger.debug(logPrefix + "Initializing location provider");
                 locationProvider = LocationProvider.getInstance(criteria);
             }
-            Logger.debug(logPrefix + "LocationProvider state: "
-                    + locationProvider.getState());
+            Logger.debug(logPrefix + "LocationProvider state: " + locationProvider.getState());
 
             try {
                 locationProvider.setLocationListener(locationListener, -1, -1, -1);
@@ -161,13 +157,11 @@ public class Jsr179Device extends GpsDeviceImpl {
                 Logger.warn("LocationListener uses 1s update interval");
             }
         } catch (LocationException e) {
-            Logger.fatal(logPrefix + "Device failed to initialise:"
-                    + e.getMessage());
+            Logger.fatal(logPrefix + "Device failed to initialise:" + e.getMessage());
         } catch (SecurityException e) {
             Logger.fatal(logPrefix + "init failed due to permission restriction.");
         } catch (Exception e) {
-            Logger.fatal(logPrefix + "init failed due to " + e.toString()
-                    + " " + e.getMessage());
+            Logger.fatal(logPrefix + "init failed due to " + e.toString() + " " + e.getMessage());
         }
     }
 
@@ -175,53 +169,53 @@ public class Jsr179Device extends GpsDeviceImpl {
      * Destroy the jsr179Device object. Required if the user changes from
      * jsr179 to an external gps via settings
      */
-    public void disconnect(){
-        _jsr179Device=null;
+    public void disconnect() {
+        _jsr179Device = null;
     }
-    private void parseExtraInfo(){
+
+    private void parseExtraInfo() {
         Vector nmeaStrings = new Vector();
-         if (extraInfo != null) {
+        if (extraInfo != null) {
             // Logger.debug("parseExtraInfo ["+extraInfo+"]");
-                    StringBuffer output = new StringBuffer();
+            StringBuffer output = new StringBuffer();
 
-                        if (nmeaStrings.size() == 0 && extraInfo != null
-                                && extraInfo.length() > 0) {
+            if (nmeaStrings.size() == 0 && extraInfo != null && extraInfo.length() > 0) {
 
-                            nmeaStrings = StringUtil.splitToNMEAVector(extraInfo);
-                        }
-                        // Only continue if we have some strings to parseNMEA
-                        while (nmeaStrings.size() > 0) {
-                            output.delete(0, output.capacity());
-                            //Logger.debug("VectorSize=" + nmeaStrings.size());
-                            // pop the first element off the stack (there is no
-                            // 'remove' in j2me)
-                            output.append((String) nmeaStrings.firstElement());
-                            nmeaStrings.removeElementAt(0);
+                nmeaStrings = StringUtil.splitToNMEAVector(extraInfo);
+            }
+            // Only continue if we have some strings to parseNMEA
+            while (nmeaStrings.size() > 0) {
+                output.delete(0, output.capacity());
+                //Logger.debug("VectorSize=" + nmeaStrings.size());
+                // pop the first element off the stack (there is no
+                // 'remove' in j2me)
+                output.append((String) nmeaStrings.firstElement());
+                nmeaStrings.removeElementAt(0);
 
-                            try {
-                                // Trim start and end of any undesirable
-                                // characters.
-                                deleteInvalidChars(output, 0);
-                                deleteInvalidChars(output, output.length() - 1);
-                            } catch (IndexOutOfBoundsException e) {
-                                // Ignore but don't bother trying to parseNMEA, just
-                                // loop
-                                // around to the next iteration;
-                                continue;
-                            }
-                            // only parseNMEA items beginning with '$', such as
-                            // "$GPRMC,..."
-                            // and "$GPGSA,..." etc...
-                            String nmeaString = output.toString();
-                            if (parser.isValidNMEASentence(nmeaString)) {
-                            //    Logger.debug("String is ok, parsing");
-                                parser.parse(nmeaString);
-
-                            } else {
-                                Logger.error("JSR179:String was NOT ok:" + nmeaString);
-                            }
-                    }
+                try {
+                    // Trim start and end of any undesirable
+                    // characters.
+                    deleteInvalidChars(output, 0);
+                    deleteInvalidChars(output, output.length() - 1);
+                } catch (IndexOutOfBoundsException e) {
+                    // Ignore but don't bother trying to parseNMEA, just
+                    // loop
+                    // around to the next iteration;
+                    continue;
                 }
+                // only parseNMEA items beginning with '$', such as
+                // "$GPRMC,..."
+                // and "$GPGSA,..." etc...
+                String nmeaString = output.toString();
+                if (parser.isValidNMEASentence(nmeaString)) {
+                    //    Logger.debug("String is ok, parsing");
+                    parser.parse(nmeaString);
+
+                } else {
+                    Logger.error("JSR179:String was NOT ok:" + nmeaString);
+                }
+            }
+        }
     }
 
     public String getAddress() {
@@ -237,11 +231,11 @@ public class Jsr179Device extends GpsDeviceImpl {
     }
 
     public GpsPosition getPosition() {
-            return getJsr179Position();
+        return getJsr179Position();
     }
 
     public GpsPosition getParserPosition() {
-    //    Logger.debug("getParserPosition called");
+        //    Logger.debug("getParserPosition called");
         return parser.getGpsPosition();
     }
 
@@ -265,11 +259,11 @@ public class Jsr179Device extends GpsDeviceImpl {
 
     public static Device getDevice(String address, String alias) {
         try {
-        Logger.debug("getDevice called");
-            if(_jsr179Device == null) {
+            Logger.debug("getDevice called");
+            if (_jsr179Device == null) {
                 _jsr179Device = new Jsr179Device(address, alias);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Logger.fatal("Exception in Jsr179Device.getDevice(): " +
                     ex.toString() + ": " + ex.getMessage());
         }
@@ -280,18 +274,18 @@ public class Jsr179Device extends GpsDeviceImpl {
     //This relies on qc, which is not initialised until locationUpdated is called
     public static double getCourse(double lat, double lon) {
         Coordinates a = new Coordinates(lat, lon, Float.NaN);
-        if (qc!=null)
+        if (qc != null) {
             return qc.azimuthTo(a);
-        else
+        } else {
             return 0.0;
+        }
     }
 
     /*
      * Delete any characters that are not expected to be in an NMEA sentence.
      */
-    private void deleteInvalidChars(StringBuffer output, int idx){
-         while (output.charAt(idx) < '!'
-                || output.charAt(idx) > '~') {
+    private void deleteInvalidChars(StringBuffer output, int idx) {
+        while (output.charAt(idx) < '!' || output.charAt(idx) > '~') {
             output.deleteCharAt(idx);
         }
     }

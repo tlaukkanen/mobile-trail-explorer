@@ -18,7 +18,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 package com.substanceofcode.gps;
 
 import java.util.Enumeration;
@@ -37,19 +36,14 @@ import com.substanceofcode.localization.LocaleManager;
 public class GpsPositionParser {
 
     private static final String DELIMITER = ",";
-
     private static GpsPositionParser gpsPositionParser;
-
-   private final Logger logger = Logger.getLogger();
-
+    private final Logger logger = Logger.getLogger();
     private GpsPosition currentPosition;
     private GpsGPGSA currentDilutionOfPrecision;
-
     private double lastAltitude;
     private short satelliteCount;
     private double maxSpeed;
     private final Vector satellites;
-
     /**
      * A temporary Vector of GpsSatellites which gets copied over to the variable 'satellites' every
      * time all the GPGSV strings in the sequence has finished.
@@ -59,8 +53,8 @@ public class GpsPositionParser {
      */
     final private Vector tempSatellites = new Vector();
 
-    public static GpsPositionParser getPositionParser(){
-        if (gpsPositionParser == null){
+    public static GpsPositionParser getPositionParser() {
+        if (gpsPositionParser == null) {
             gpsPositionParser = new GpsPositionParser();
         }
         return gpsPositionParser;
@@ -94,13 +88,12 @@ public class GpsPositionParser {
     public synchronized Vector getSatellites() {
         return satellites;
     }
-
     private final Hashtable metricstable = new Hashtable();
     private String lastParsedString =
             LocaleManager.getMessage("gps_position_parser_no_last_parsed_string");
 
-    private void recordMetrics(String record){
-        try{
+    private void recordMetrics(String record) {
+        try {
             lastParsedString = record;
             final String start = record.substring(0, 6);
             int i;
@@ -111,7 +104,7 @@ public class GpsPositionParser {
                 i = 1;
             }
             metricstable.put(start, new Integer(i));
-        }catch(IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             //Ignore.
         }
     }
@@ -128,59 +121,58 @@ public class GpsPositionParser {
             result[i + 1] = value;
             i += 2;
         }
-        result[i] = LocaleManager.getMessage("gps_position_parser_last_parsed_string")
-                + ":";
+        result[i] = LocaleManager.getMessage("gps_position_parser_last_parsed_string") + ":";
         result[i + 1] = this.lastParsedString;
         // i+=2;
         return result;
     }
 
     /** Parse GPS position */
-    public synchronized void parse(String record){
-      //  Logger.debug("Parsing: "+record);
+    public synchronized void parse(String record) {
+        //  Logger.debug("Parsing: "+record);
         recordMetrics(record);
         //Chop the checksum off, we don't want to parse it
-        record=record.substring(0,record.indexOf('*'));
+        record = record.substring(0, record.indexOf('*'));
         if (record.startsWith("$GPRMC")) {
-            try{
-    //            Logger.debug("5");
+            try {
+                //            Logger.debug("5");
                 parseGPRMC(record);
-            }catch(IndexOutOfBoundsException e){
+            } catch (IndexOutOfBoundsException e) {
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPRMC()");
             }
-        }else if(record.startsWith("$GPGSA")){
-            try{
-      //          Logger.debug("6");
+        } else if (record.startsWith("$GPGSA")) {
+            try {
+                //          Logger.debug("6");
                 parseGPGSA(record);
-            }catch(IndexOutOfBoundsException e){
+            } catch (IndexOutOfBoundsException e) {
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSA()");
             }
         } else if (record.startsWith("$GPGGA")) {
-            try{
-        //        Logger.debug("7");
+            try {
+                //        Logger.debug("7");
                 parseGPGGA(record);
-            }catch(IndexOutOfBoundsException e){
+            } catch (IndexOutOfBoundsException e) {
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGGA()");
             }
         } else if (record.startsWith("$GPGSV")) {
-            try{
-          //      Logger.debug("8");
+            try {
+                //      Logger.debug("8");
                 parseGPGSV(record);
-            }catch(IndexOutOfBoundsException e){
+            } catch (IndexOutOfBoundsException e) {
                 Logger.info("Caught IndexOutOfBoundsException in GpsPositionParser.parseGPGSV()");
             }
         }
         // Don't know the type, ignore and don't bother trying to parse, it'll still be logged in the Metrics,
         // so we can know if there's a type that is being recieved but not parsed.
         /*else {
-            try{
-                final String type = record.substring(0, 6);
-                logger.log("Parse Error: Unknowen Type: (" + type + ")");
-            }catch(IndexOutOfBoundsException e){
-                logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parse(){...else...}: " + record);
-            }
+        try{
+        final String type = record.substring(0, 6);
+        logger.log("Parse Error: Unknowen Type: (" + type + ")");
+        }catch(IndexOutOfBoundsException e){
+        logger.log("Caught IndexOutOfBoundsException in GpsPositionParser.parse(){...else...}: " + record);
         }
-        */
+        }
+         */
 
         /**
          * RMC 15 GGA 5 GSA 5
@@ -288,8 +280,8 @@ public class GpsPositionParser {
             if (latitudeDirection.equals("N") == false) {
                 latitudeDouble = -latitudeDouble;
             }
-        }else{
-           Logger.info("Error with lat or long");
+        } else {
+            Logger.info("Error with lat or long");
         }
 
         int course = 0;
@@ -308,8 +300,8 @@ public class GpsPositionParser {
             // km/h = knots * 1.852
             speed = ((groundSpeed) * 1.852);
 
-            if (speed > maxSpeed){
-            	maxSpeed=speed;
+            if (speed > maxSpeed) {
+                maxSpeed = speed;
             }
         }
         // A negative speed doesn't make sense.
@@ -456,7 +448,7 @@ public class GpsPositionParser {
         satelliteCount = StringUtil.parseShort(values[7], (short) 0);
 
         if (isFixed > 0) {
-            lastAltitude = StringUtil.parseDouble( values[9], 0d );
+            lastAltitude = StringUtil.parseDouble(values[9], 0d);
         }
 
     }
@@ -504,14 +496,14 @@ public class GpsPositionParser {
         }
 
         int index = 4;
-        while(index+3 < values.length){
+        while (index + 3 < values.length) {
             short satelliteNumber = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
             short elevation = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
             short azimuth = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
             short satelliteSnr = StringUtil.parseShort(values[index++], GpsSatellite.UNKNOWN);
-            if(satelliteNumber != GpsSatellite.UNKNOWN){
+            if (satelliteNumber != GpsSatellite.UNKNOWN) {
                 final GpsSatellite sat = new GpsSatellite(satelliteNumber, satelliteSnr, elevation,
-                    azimuth);
+                        azimuth);
                 this.tempSatellites.addElement(sat);
             }
         }
@@ -536,9 +528,9 @@ public class GpsPositionParser {
      *       2=2D
      *       3=3D
      *      3-14 = IDs of SVs used in position fix (null for unused fields)
-     *      15   = PDOP
-     *      16   = HDOP
-     *      17   = VDOP
+     *      15   = Position Dilution of Precision (PDOP)
+     *      16   = Horizontal Dilution of Precision (HDOP)
+     *      17   = Vertical Dilution of Precision (VDOP)
      * </pre>
      *
      * @param record
@@ -547,28 +539,26 @@ public class GpsPositionParser {
     private synchronized void parseGPGSA(String record) {
         String[] values = StringUtil.split(record, DELIMITER);
         //String mode=values[1];
-          int fixtype=StringUtil.parseShort(values[2], (short) 0);
-          if (fixtype>1){
-          	int [] svid =new int[13];
-          	for(int i = 2;i<15;i++){
-          		try{
-          		svid[i-2]=StringUtil.parseShort(values[i], (short) 0);
-          		}
-          		catch (NumberFormatException nfe){
-          			svid[i-2]=0;
-          		}
-          	}
-          	GpsGPGSA oi = new GpsGPGSA();
-          	oi.setFixtype(fixtype);
-          	oi.setPdop(values[15]);
-          	oi.setHdop(values[16]);
-          	oi.setVdop(values[17]);
+        int fixtype = StringUtil.parseShort(values[2], (short) 0);
+        if (fixtype > 1) {
+            int[] svid = new int[13];
+            for (int i = 2; i < 15; i++) {
+                try {
+                    svid[i - 2] = StringUtil.parseShort(values[i], (short) 0);
+                } catch (NumberFormatException nfe) {
+                    svid[i - 2] = 0;
+                }
+            }
+            GpsGPGSA oi = new GpsGPGSA();
+            oi.setFixtype(fixtype);
+            oi.setPdop(values[15]);
+            oi.setHdop(values[16]);
+            oi.setVdop(values[17]);
 
             currentDilutionOfPrecision = oi;
-          }
+        }
 
     }
-
 
     /**
      * Track Made Good and Ground Speed.
@@ -597,7 +587,7 @@ public class GpsPositionParser {
      */
     private synchronized void parseGPVTG(String record) {
         String[] values = StringUtil.split(record, DELIMITER);
-        String trackMadeGood= values[1];
+        String trackMadeGood = values[1];
         boolean relTrueNorth = (values[2] == "t");
         String notUsed1 = values[3];
         String notUsed2 = values[4];
@@ -608,7 +598,7 @@ public class GpsPositionParser {
     }
 
     private void copyLastCycleSatellitesAndClear() {
-        if(this.tempSatellites == null){
+        if (this.tempSatellites == null) {
             return;
         }
         Enumeration e = tempSatellites.elements();
@@ -637,6 +627,7 @@ public class GpsPositionParser {
         double degrees = degreeInteger + degreeDecimals;
         return degrees;
     }
+
     /**
      * Calculates the checksum for an NMEA sentence
      *
@@ -648,8 +639,7 @@ public class GpsPositionParser {
         boolean result = false;
         byte[] bs = n.getBytes();
 
-        if (n != null && n.length() > 0 && n.charAt(0) == '$'
-                && n.charAt(n.length() - 3) == '*') {
+        if (n != null && n.length() > 0 && n.charAt(0) == '$' && n.charAt(n.length() - 3) == '*') {
             String checksum = n.substring(n.indexOf('*') + 1, n.length());
             byte cb = Byte.parseByte(checksum, 16);
             byte c = 0;

@@ -178,7 +178,7 @@ public class GpxConverter extends TrackConverter {
         gpx.append("<time>").append(universalDateStamp).append("</time>\r\n");
         
         if (gpgsa != null) {
-            gpx.append("<fix>").append(String.valueOf(gpgsa.getFixtype()))
+            gpx.append("<fix>").append(String.valueOf(gpgsa.getFixtype().toLowerCase()))
                     .append("</fix>\r\n");
             gpx.append("<hdop>").append(String.valueOf(gpgsa.getHdop()))
                     .append("</hdop>\r\n");
