@@ -203,7 +203,7 @@ public class Settings {
 
 	/** Set a boolean property */
 	public void setBooleanProperty(String name, boolean value) {
-		setStringProperty(name, value ? "true" : "false");
+		setStringProperty(name, String.valueOf(value));
 	}
 
 	/** Set an integer property */

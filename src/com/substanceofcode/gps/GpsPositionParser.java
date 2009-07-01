@@ -598,13 +598,13 @@ public class GpsPositionParser {
     private synchronized void parseGPVTG(String record) {
         String[] values = StringUtil.split(record, DELIMITER);
         String trackMadeGood= values[1];
-        boolean relTrueNorth = values[2]=="t"?true:false;
-        String notUsed1=values[3];
-        String notUsed2=values[4];
-        String groundSpeedKnots=values[5];
-        boolean speedinKnots=values[6]=="N"?true:false;
-        String groundSpeedKmph=values[7];
-        boolean speedinKmph=values[8]=="K"?true:false;
+        boolean relTrueNorth = (values[2] == "t");
+        String notUsed1 = values[3];
+        String notUsed2 = values[4];
+        String groundSpeedKnots = values[5];
+        boolean speedinKnots = (values[6] == "N");
+        String groundSpeedKmph = values[7];
+        boolean speedinKmph = (values[8] == "K");
     }
 
     private void copyLastCycleSatellitesAndClear() {
