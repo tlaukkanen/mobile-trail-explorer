@@ -19,7 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-
 package com.substanceofcode.tracker.view;
 
 import java.util.*;
@@ -39,12 +38,11 @@ import com.substanceofcode.localization.LocaleManager;
  * @author pat
  */
 public class MultimediaSettingsForm extends Form implements CommandListener {
+
     private String audio;
     private String[] audioText;
     private int audioIndex;
-
     private Controller controller;
-
     private Command okCommand;
     private Command cancelCommand;
     private ChoiceGroup audioChoiceGroup;
@@ -59,25 +57,24 @@ public class MultimediaSettingsForm extends Form implements CommandListener {
             inString = inString.substring(pos + separator.length());
             pos = inString.indexOf(separator);
         }
-        if (inString.length()>0) {
+        if (inString.length() > 0) {
             nodes.addElement(inString);
         }
         String[] outString = new String[nodes.size()];
-        for (int i=0;i<nodes.size();i++) {
-            outString[i]=(String)nodes.elementAt(i);
+        for (int i = 0; i < nodes.size(); i++) {
+            outString[i] = (String) nodes.elementAt(i);
         }
         return outString;
     }
 
-
-    public MultimediaSettingsForm (Controller controller) {
+    public MultimediaSettingsForm(Controller controller) {
         super(LocaleManager.getMessage("multimedia_form_title"));
         this.controller = controller;
 
         initializeControls();
         initializeCommands();
 
-        this.setCommandListener( this );
+        this.setCommandListener(this);
 
     }
 
@@ -86,22 +83,22 @@ public class MultimediaSettingsForm extends Form implements CommandListener {
         audioIndex = settings.getAudioIndex();
 
         audio = System.getProperty("audio.encodings");
-        audioChoiceGroup = new ChoiceGroup(LocaleManager.getMessage("multimedia_form_audio"),ChoiceGroup.EXCLUSIVE);
-        if (audio!=null) {
-            audioText = splitString(audio," ");
-            for (int i=0; i<audioText.length; i++) {
+        audioChoiceGroup = new ChoiceGroup(LocaleManager.getMessage("multimedia_form_audio"), ChoiceGroup.EXCLUSIVE);
+        if (audio != null) {
+            audioText = splitString(audio, " ");
+            for (int i = 0; i < audioText.length; i++) {
                 String codec = null;
-                String[] audioTemp1 = splitString(audioText[i],"&");
-                for (int j=0;j<audioTemp1.length;j++) {
-                    String[] audioTemp2 = splitString(audioTemp1[j],"=");
-                    if ((audioTemp2.length==2) && (audioTemp2[0].equalsIgnoreCase("encoding"))) {
+                String[] audioTemp1 = splitString(audioText[i], "&");
+                for (int j = 0; j < audioTemp1.length; j++) {
+                    String[] audioTemp2 = splitString(audioTemp1[j], "=");
+                    if ((audioTemp2.length == 2) && (audioTemp2[0].equalsIgnoreCase("encoding"))) {
                         codec = audioTemp2[1];
                     }
                 }
-                if ((audioTemp1.length==1)&&(codec!=null)) {
-                    audioChoiceGroup.append(codec,null);//found codec without options
+                if ((audioTemp1.length == 1) && (codec != null)) {
+                    audioChoiceGroup.append(codec, null);//found codec without options
                 } else {
-                    audioChoiceGroup.append(audioText[i],null);
+                    audioChoiceGroup.append(audioText[i], null);
                 }
             }
         }
@@ -114,43 +111,45 @@ public class MultimediaSettingsForm extends Form implements CommandListener {
 
     private void initializeCommands() {
         okCommand = new Command(LocaleManager.getMessage("menu_ok"), Command.OK, 1);
-       this.addCommand(okCommand);
+        this.addCommand(okCommand);
         cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"), Command.CANCEL, 2);
         this.addCommand(cancelCommand);
     }
 
-    public void commandAction (Command command, Displayable displayable) {
-        if (command==okCommand) {
-            RecorderSettings settings=controller.getSettings();
+    public void commandAction(Command command, Displayable displayable) {
+        if (command == okCommand) {
+            RecorderSettings settings = controller.getSettings();
             /** save audio index */
-            audioIndex=audioChoiceGroup.getSelectedIndex();
+            audioIndex = audioChoiceGroup.getSelectedIndex();
             settings.setAudioIndex(audioIndex);
             /** save audio encoding and suffix */
             String audioSuffix = "wav"; // Standard audio suffix
-            if ((audioText!=null) && (audioIndex < audioText.length)) {
+            if ((audioText != null) && (audioIndex < audioText.length)) {
                 /** get encoding string */
                 String audioEncoding = audioText[audioIndex];
                 String codec = null;
-                String[] audioTemp1 = splitString(audioEncoding,"&");
-                for (int j=0;j<audioTemp1.length;j++) {
-                    String[] audioTemp2 = splitString(audioTemp1[j],"=");
-                    if ((audioTemp2.length==2) && (audioTemp2[0].equalsIgnoreCase("encoding"))) {
+                String[] audioTemp1 = splitString(audioEncoding, "&");
+                for (int j = 0; j < audioTemp1.length; j++) {
+                    String[] audioTemp2 = splitString(audioTemp1[j], "=");
+                    if ((audioTemp2.length == 2) && (audioTemp2[0].equalsIgnoreCase("encoding"))) {
                         codec = audioTemp2[1];
                     }
                 }
-                if ((audioTemp1.length==1)&&(codec!=null)) {
-                   /** codec found */
-                    if ((codec.equalsIgnoreCase("amr")) ||
-                            codec.equalsIgnoreCase("amr-nb")
-                            ) {
+                if ((audioTemp1.length == 1) && (codec != null)) {
+                    /** codec found */
+                    if (codec.equalsIgnoreCase("amr")
+                        || codec.equalsIgnoreCase("amr-nb")
+                        || codec.equalsIgnoreCase("audio/amr")
+                        || codec.equalsIgnoreCase("audio/amr-wb")
+                       ) {
                         audioSuffix = "amr";
-                    } else if ((codec.equalsIgnoreCase("audio/wave")) ||
-                           codec.equalsIgnoreCase("audio/wav") ||
-                            codec.equalsIgnoreCase("audio/pcm") ||
-                            codec.equalsIgnoreCase("wave") ||
-                            codec.equalsIgnoreCase("wav") ||
-                            codec.equalsIgnoreCase("pcm")
-                            ) {
+                    } else if (codec.equalsIgnoreCase("audio/wave")
+                               || codec.equalsIgnoreCase("audio/wav")
+                               || codec.equalsIgnoreCase("audio/pcm")
+                               || codec.equalsIgnoreCase("wave")
+                               || codec.equalsIgnoreCase("wav")
+                               || codec.equalsIgnoreCase("pcm")
+                              ) {
                         audioSuffix = "wav";
                     }
                 }
