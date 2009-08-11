@@ -227,7 +227,7 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw current location with red dot */
             // Logger.debug("c: "+lastPosition + " lastPos: " + lastPosition.getWGS84Position());
             try {
-                if (getMapCenter() != null) {
+                if (getMapCenter() != null && lastPosition != null) {
                     CanvasPoint currLocPoint = mapProvider.convertPositionToScreen(mdc, lastPosition.getWGS84Position());
                     g.drawImage(redDotImage, currLocPoint.X, currLocPoint.Y, Graphics.VCENTER | Graphics.HCENTER);
                 }
@@ -374,7 +374,7 @@ public class TrailCanvas extends BaseCanvas {
         // left margin of the complete zoom scale bar
         final int MARGIN_LEFT = 2;
         // bottom margin of the complete zoom scale bar
-        final int MARGIN_BOTTOM = 3; 
+        final int MARGIN_BOTTOM = 3;
 
         //Start value for scalebar length calculation in pixel
         maxScaleLength = getWidth() / 2;
@@ -412,7 +412,7 @@ public class TrailCanvas extends BaseCanvas {
                 }
                 break;
             }
-            case UnitConverter.UNITS_KILOMETERS: 
+            case UnitConverter.UNITS_KILOMETERS:
             {
                 if (barDist > 1) {
                     unit = lengthFormatter.getUnitString(UnitConverter.UNITS_KILOMETERS);
@@ -424,7 +424,7 @@ public class TrailCanvas extends BaseCanvas {
                 }
                 break;
             }
-            case UnitConverter.UNITS_NAUTICAL_MILES: 
+            case UnitConverter.UNITS_NAUTICAL_MILES:
             {
                 if(barDist > 1) {
                     unit = lengthFormatter.getUnitString(UnitConverter.UNITS_NAUTICAL_MILES);
@@ -653,14 +653,14 @@ public class TrailCanvas extends BaseCanvas {
                 g.drawString(heading, positionAdd, fontHeight * displayRow,
                         Graphics.TOP | Graphics.LEFT);
                 displayRow++;
-            } 
+            }
 
             /** Draw distance information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_DISTANCE) == true) {
                 String distance;
-                
+
                 LengthFormatter lengthFormatter = new LengthFormatter(controller.getSettings());
-                
+
                 Track track = controller.getTrack();
                 distance = lengthFormatter.getLengthString(track.getDistance(),true);
                 g.drawString(LocaleManager.getMessage("trail_canvas_distance") + ": ", 1, fontHeight * displayRow, Graphics.TOP | Graphics.LEFT);
@@ -671,7 +671,7 @@ public class TrailCanvas extends BaseCanvas {
             /** Draw heading information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_ALTITUDE) == true) {
                 String altitude;
-                
+
                 double altitudeInMeters = lastPosition.altitude;
                 LengthFormatter lengthFormatter = new LengthFormatter(controller.getSettings());
                 altitude = lengthFormatter.getAltitudeString(altitudeInMeters,true, 2);
