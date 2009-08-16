@@ -62,7 +62,8 @@ public class Tile implements Serializable {
     private byte[] imageByteArray = null;
 
     public long offset=0;
-    private static long lastTileOffset=0;//
+    private static long lastTileOffset=0;
+    private static long newTileOffset=0;  //AT
     public static long totalOffset=0;
     
     private Image image = null; // the actual tile image png data
@@ -170,6 +171,7 @@ public class Tile implements Serializable {
      * @throws IOException
      */
     public void serialize(DataOutputStream dos,long offset) throws IOException {
+        Logger.debug("Tile.serialize() with offset="+offset);
         lastTileOffset=offset;
         serialize(dos);
     }
@@ -210,30 +212,49 @@ public class Tile implements Serializable {
         x = dis.readInt();
         y = dis.readInt();
         z = dis.readInt();
+        //Logger.debug("Tile: unserialize().x=" + x + " y=" + y + " z=" + z);  //AT
         	
         	// Read strings. First the length and then the data
-        	short len = dis.readShort();
-	        byte[] bytes = new byte[len];
-	        dis.read(bytes, 0, len);
+            short urlLen = dis.readShort();
+            //int len = dis.readInt();
+            //int len = dis.readShort();  //AT
+            //Logger.debug("Tile: unserialize() url_len="+urlLen);  //AT
+	        byte[] bytes = new byte[urlLen];
+	        dis.read(bytes, 0, urlLen);
 	        url = new String(bytes);
 	        
-	        len = dis.readShort();
-	        bytes = new byte[len];
-	        dis.read(bytes, 0, len);
+	        short keyLen = dis.readShort();
+            //Logger.debug("Tile: unserialize() key_len="+keyLen);  //AT
+	        bytes = new byte[keyLen];
+	        dis.read(bytes, 0, keyLen);
 	        cacheKey = new String(bytes);
 	        
-        offset=dis.readLong();
+        offset=dis.readLong();  //AT corr. offset will be assigned later
+        offset=newTileOffset;  //AT assign correct offset, MTEfileCache doesn't provide it
         
         int arrayLength = dis.readInt();
         imageByteArray = new byte[arrayLength];
         dis.read(imageByteArray, 0, arrayLength);
-        }catch(NegativeArraySizeException nase){ 
+
+        // calc correct tileOffset
+        newTileOffset += 12 +      // x, y and z
+        2 + urlLen +       // strings and their lengths
+        2 + keyLen +
+        8 +                         // tile offset (long)
+        4 +                         // image byte array length (int)
+        arrayLength;
+
+        }catch(NegativeArraySizeException nase){
             //Caused by a cockup in the serialized file
             // if we get one of these the best we can do is 
             //discard this tile and nullify the rest of the stream
          
                  nase.printStackTrace();
-        }     
+             
+        }catch (OutOfMemoryError mem) {
+            //discard this tile and nullify the rest of the stream
+                 mem.printStackTrace();
+        }
         catch(UTFDataFormatException udfe){
          Logger.error("Caught UTFDataFormatException:"+
                 "Error was "+udfe.getMessage());
