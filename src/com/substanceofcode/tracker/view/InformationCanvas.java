@@ -36,6 +36,9 @@ import com.substanceofcode.util.DateTimeUtil;
 import com.substanceofcode.util.StringUtil;
 import com.substanceofcode.localization.LocaleManager;
 
+import java.util.Date;
+import java.util.Calendar;
+
 /**
  * Information canvas is used to display textual information about the current
  * location.
@@ -99,6 +102,7 @@ public class InformationCanvas extends BaseCanvas{
         String averageSpeed = "";
         String distanceRemaining = "";
         String etaRemains = "";
+        String etaTime = "";
         lineRow = titleHeight - firstRow;
         
         Track currentTrack = controller.getTrack();
@@ -138,12 +142,27 @@ public class InformationCanvas extends BaseCanvas{
                 }
                 else
                 {
+                    Date nowDate = new Date();
+                    
                     double secsR=3600 * distanceR/currentTrack.getAverageSpeed();
+                    
+                    /*TODO: all numbers should get prefix of 0 when <10 */
+                    
+                    /* 200908161610:thevikas:now also calculate the proximate watch time of reaching the point (not countdown) */
+                    Calendar c = Calendar.getInstance();
+                    Date newDate = new Date((long)(nowDate.getTime() + secsR*1000));
+                    c.setTime(newDate);
+                    etaTime = c.get(Calendar.HOUR_OF_DAY) + ":" +c.get(Calendar.MINUTE)
+                            + ":" + c.get(Calendar.SECOND);
+                    
+                    Logger.debug("secsR:" + Double.toString(secsR) + "," + etaTime + ", " + Long.toString(nowDate.getTime()));
+                    /* calculate countdown h,m,s */
                     double minsR = secsR/60;
                     secsR = secsR % 60;
                     double hoursR = minsR/60;
                     minsR = minsR % 60;
-
+                    
+                    
                     etaRemains = StringUtil.integerToString((int)hoursR) + ":" 
                                     + StringUtil.integerToString((int)minsR) + ":" 
                                     + StringUtil.integerToString((int)secsR);
@@ -186,6 +205,7 @@ public class InformationCanvas extends BaseCanvas{
         drawNextString(g, LocaleManager.getMessage("information_canvas_duration"), durationTime);
         drawNextString(g, LocaleManager.getMessage("information_canvas_distance_remains"), distanceRemaining);
         drawNextString(g, LocaleManager.getMessage("information_canvas_distance_eta"), etaRemains);
+        drawNextString(g, LocaleManager.getMessage("information_canvas_distance_time"), etaTime);
         if(currentTrack!=null) {
             if(currentTrack.getMinAltitudePosition()!=null) {
                 double minAltitude = currentTrack.getMinAltitude();

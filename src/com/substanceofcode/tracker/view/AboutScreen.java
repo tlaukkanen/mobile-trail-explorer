@@ -109,7 +109,22 @@ public final class AboutScreen extends Canvas {
             "",
             "Press 5 for automatic SNR range selection" };
     
-    
+    private static final String[] surveyorHelpText = {
+        "Mobile Trail Explorer can also assist an OpenStreetMap Surveyor. The Surveyor mode can be activated from the Keys section of the setting.",
+        "",
+        "Once activated, the appropirate keypress and respective Points-Of-Interest options are shown on screen.",
+        "",
+        "Pressing the suggested keys will create a waypoint with the POI text. This text gets exported along with GPX files for further use by the surveyor.",
+        };
+
+    private static final String[] calculateHelpText = {
+        "CalculateTime feature can suggest the time remaining to reach a distance while recording. Provide a distance that still remains in the journey/trail and it can start suggesting time.",
+        "",
+        "After the distance is given, the Information Screen shows the calculated information. DSTR - Distance Remaining. TLEFT - Time left, counting down. ATIME - Expected watch time of arrival.",
+        "",
+        "CalculateTime uses average speed to do its calculation and therefore provides an approximate sugestion.",
+        };
+
     private static final String[] helpText = {
             "Mobile Trail Explorer not quite perfect?",
             "",
@@ -130,6 +145,8 @@ public final class AboutScreen extends Canvas {
                                              LocaleManager.getMessage("about_screen_trail_screen"),
                                              LocaleManager.getMessage("about_screen_elevation_screen"),
                                              LocaleManager.getMessage("about_screen_sky_view_screen"),
+                                             LocaleManager.getMessage("about_screen_surveyor_screen"),
+                                             LocaleManager.getMessage("about_screen_calcutate_time"),
                                              LocaleManager.getMessage("about_screen_help") };
     /**
      * <p>
@@ -141,7 +158,7 @@ public final class AboutScreen extends Canvas {
      * be null, and must have the same number of elements.
      */
     private static final String[][] MESSAGES = { aboutText,
-            trailScreenHelpText, elevationScreenHelpText,skyViewScreenHelpText, helpText };
+            trailScreenHelpText, elevationScreenHelpText,skyViewScreenHelpText, surveyorHelpText, calculateHelpText, helpText };
 
     static {
         if (TITLES == null || MESSAGES == null

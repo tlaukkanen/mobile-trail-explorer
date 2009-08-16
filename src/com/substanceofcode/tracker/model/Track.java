@@ -146,6 +146,11 @@ public class Track implements Serializable {
     private long id;
     
     /**
+     * the datetime of starting the trail
+     */
+    private long trailStartTime = 0;
+    
+    /**
      * Creates a new instance of Track which will be saved at the end
      */
     public Track() {
@@ -157,6 +162,8 @@ public class Track implements Serializable {
         String dateStamp = DateTimeUtil.getCurrentDateStamp();
         dateStamp = StringUtil.replace(dateStamp, "_", "");
         id = Long.parseLong(dateStamp);
+        
+        trailStartTime = System.currentTimeMillis();
     }
 
     /**
@@ -172,6 +179,9 @@ public class Track implements Serializable {
     public Track(String fullPath, boolean newStream) throws IOException {
         this();
         isStreaming = true;
+        
+        trailStartTime = System.currentTimeMillis();
+        
         try {
             // ------------------------------------------------------------------
             // Create a FileConnection and if this is a new stream create the
@@ -350,11 +360,26 @@ public class Track implements Serializable {
             return 0;
         }
     }
-
+    
+    public long getFullTrailDurationMilliSeconds() {
+         return System.currentTimeMillis() - trailStartTime;
+    }
+    
     /** @return the average speed (kmh) */
     public double getAverageSpeed() {
+        
+        //this is good and accurate all along the trail
         double distanceKm = getDistance();
-        double durationMilliSeconds = getDurationMilliSeconds();
+        
+        //200908142033:thevikas:average speed goes inaccurate
+        //this goes wrong after the default trail length is reached (e.g. 150)
+        //after crossing, the time is calculated using just last 150 points while distance is for entire trail.
+        //therefore, average inaccurately goes more than max speed
+        
+        //double durationMilliSeconds = getDurationMilliSeconds();
+        double durationMilliSeconds = getFullTrailDurationMilliSeconds();
+        
+        
         if (durationMilliSeconds == 0) { return 0; }
         double hours = durationMilliSeconds / 3600000.0;
         if (distanceKm > 0.01) {
