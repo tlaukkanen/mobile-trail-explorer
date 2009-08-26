@@ -25,8 +25,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.substanceofcode.localization.LocaleManager;
-
 /**
  * <p>This class encompasses all the information needed to 
  * recover a 'File' blob from the underlying RMS. </p>
@@ -57,10 +55,10 @@ public class FileLocator {
          */
         
         if(stores == null || numbers == null){
-            throw new IllegalArgumentException(LocaleManager.getMessage("file_locator_store_null"));
+            throw new IllegalArgumentException("file_locator_store_null");
         }
         if( stores.length != numbers.length ){
-            throw new IllegalArgumentException(LocaleManager.getMessage("file_locator_require_elements")
+            throw new IllegalArgumentException("file_locator_require_elements"
                     + "(" + stores.length + ") _ (" + numbers.length + ")");
         }
 		
