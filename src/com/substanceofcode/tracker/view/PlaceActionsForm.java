@@ -39,9 +39,13 @@ import com.substanceofcode.localization.LocaleManager;
 
 public class PlaceActionsForm extends Form implements CommandListener {
     
+    /*
+     * The captions of checkboxes shown in the form
+     */
     private static final String[] ALL_ACTIONS = {
                         LocaleManager.getMessage("places_actions_export_kml"),
-                        LocaleManager.getMessage("places_actions_export_gpx") };
+                        LocaleManager.getMessage("places_actions_export_gpx"),
+                        LocaleManager.getMessage("places_actions_export_and_cleanup") };
     
     private Controller controller;
     
@@ -62,10 +66,12 @@ public class PlaceActionsForm extends Form implements CommandListener {
      * 0 = export selected place
      * 1 = export all places
      * 2 = remove all places
+     * 3 = remove all after export all
      */
     public final static int EXPORT_SELECTED = 0;
     public final static int EXPORT_ALL = 1;
     public final static int REMOVE_ALL = 2;
+    public final static int REMOVE_ALL_AND_RETURN = 3;
     
     /**
      * State for whether there were any errors during the save
@@ -143,7 +149,17 @@ public class PlaceActionsForm extends Form implements CommandListener {
         
             this.append(infoStringItem);
         } else {
+            
             int numActions = 2;
+            /*
+             * To prevent accidental cleanup, 
+             * show cleanup after export option only when export all is asked 
+             */
+            if(actionType == EXPORT_ALL)
+            {
+                Logger.info("tis EXPORT_ALL mode");
+                numActions = 3;
+            }
         
             //------------------------------------------------------------------
             // Construct default checked array
@@ -152,7 +168,9 @@ public class PlaceActionsForm extends Form implements CommandListener {
                 .getExportToKML();
             final boolean gpx = Controller.getController().getSettings()
                 .getExportToGPX();
-            final boolean[] allSelectedFlags = { kml, gpx, true };
+            final boolean cleanup = Controller.getController().getSettings()
+                .getExportAndCleanup();
+            final boolean[] allSelectedFlags = { kml, gpx, cleanup, true };
             //------------------------------------------------------------------
             // Copy values into correct sized arrays for this form
             //------------------------------------------------------------------
@@ -185,7 +203,7 @@ public class PlaceActionsForm extends Form implements CommandListener {
             final Displayable lThis = this;
             // do IO operations in another thread to prevent UI freezing.
             
-            if(actionType == REMOVE_ALL) {
+            if(actionType == REMOVE_ALL || actionType == REMOVE_ALL_AND_RETURN) {
                 new Thread(new Runnable() {
                     public void run() {
                         noRemoveErrors = true;
@@ -198,7 +216,10 @@ public class PlaceActionsForm extends Form implements CommandListener {
                         if (noRemoveErrors) {
                             Logger.info("goBack()");
                             lListen.join();
-                            PlaceActionsForm.this.goBack();
+                            if(actionType == REMOVE_ALL_AND_RETURN)
+                                controller.showTrail();
+                            else
+                                PlaceActionsForm.this.goBack();
                         }
                     }
                 }).start();
@@ -209,13 +230,31 @@ public class PlaceActionsForm extends Form implements CommandListener {
                         // Do specified actions for this trail:
                         // 0 = Export place to KML file
                         // 1 = Export place to GPX file
+                        // 2 = Export and cleanup
+                        
+                        boolean export_was_good=false;
+                        
                         AlertHandler lListen = new AlertHandler(controller, lThis);
                         if (actionsGroup.isSelected(0)) {
                             exportWaypoint(RecorderSettings.EXPORT_FORMAT_KML, lListen);
+                            export_was_good = true;
                         }
                         if (actionsGroup.isSelected(1)) {
                             exportWaypoint(RecorderSettings.EXPORT_FORMAT_GPX, lListen);
+                            export_was_good = true;
                         }
+                        
+                        //we delete all places and return to main canvas
+                        //it only cleans up if there was a successfull export
+                        if (export_was_good 
+                                && noSaveErrors 
+                                && actionType == EXPORT_ALL 
+                                && actionsGroup.isSelected(2) ) {
+                            actionType = REMOVE_ALL_AND_RETURN;
+                            commandAction(okCommand,null);
+                        }
+                        
+                        Controller.getController().getSettings().setExportAndCleanup(actionsGroup.isSelected(2));
 
                         Logger.info("Finished save process");
                         Logger.info("No Errors : " + noSaveErrors);
@@ -286,6 +325,7 @@ public class PlaceActionsForm extends Form implements CommandListener {
             Logger.error(
                     "Exception caught when trying to export trail: "
                             + ex.toString());
+            notifyError();
             if (xiListen != null) {
                 xiListen.notifyError(lType +
                         " : " +

@@ -191,7 +191,7 @@ public class InformationCanvas extends BaseCanvas{
 
         drawNextString(g, LocaleManager.getMessage("information_canvas_altitude"), alt);
         //Distance between the strings
-        int distance = 30;
+        int distance = 45;
         drawNextStrings(g, LocaleManager.getMessage(
                 "information_canvas_heading"), hea, course, distance);
         

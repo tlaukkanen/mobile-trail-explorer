@@ -97,6 +97,7 @@ public class RecorderSettings {
     /** Trail Saving Keys */
     public static final String EXPORT_TO_KML = "export-to-kml";
     public static final String EXPORT_TO_GPX = "export-to-gpx";
+    public static final String EXPORT_AND_CLEANUP = "export-and-cleanup";
     public static final String EXPORT_TO_SAVE = "export-to-save";
     public static final String EXPORT_TO_GPXSTREAM = "export-to-gpxstream";
 
@@ -619,6 +620,21 @@ public class RecorderSettings {
         saveSettings();
     }
     
+    /**
+     * Should we default the save screen to check the export and remove all places
+     */
+    public boolean getExportAndCleanup() {
+        return settings.getBooleanProperty(EXPORT_AND_CLEANUP, false);
+    }
+
+    /**
+     * Set whether we default the save screen to check the export and remove all places
+     */
+    public void setExportAndCleanup(boolean value) {
+        settings.setBooleanProperty(EXPORT_AND_CLEANUP, value);
+        saveSettings();
+    }
+
     /**
      * Flag to set gpxstream as default recording setting
      */
