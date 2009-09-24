@@ -20,7 +20,7 @@
  */
 package com.substanceofcode.data;
 
-import com.substanceofcode.utils.Log;
+import com.substanceofcode.tracker.view.Logger;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -102,7 +102,7 @@ public class FileSystem {
         } catch (RecordStoreException e) {
             //either of these exceptions will mean the fileTable
             //is not initialized, causing problems later
-            Log.debug("FileSystem construction error " + e.getMessage());
+            Logger.debug("FileSystem construction error " + e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -166,7 +166,7 @@ public class FileSystem {
         //If data is empty, numRecords is 0, then recordStores is 0 which
         //creates an  ArrayOutOfBounds error when reading or deleting the file...
         if (data.length == 0) {
-            Log.debug("FileSystem: attempting to write a zero length file");
+            Logger.debug("FileSystem: attempting to write a zero length file");
             return;
         }
         int numRecords = data.length / RMS_RECORD_SIZE + (data.length % RMS_RECORD_SIZE == 0 ? 0 : 1);
@@ -195,7 +195,7 @@ public class FileSystem {
             fileTable.put(filename, fl);
             this.writeFileTableToRMS();
         } catch (RecordStoreException e) {
-            Log.debug("FileSystem saveFile error " + e.getMessage());
+            Logger.debug("FileSystem saveFile error " + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
@@ -236,7 +236,7 @@ public class FileSystem {
             resultArray = baos.toByteArray();
             baos.close();
         } catch (RecordStoreException e) {
-            Log.debug("FileSystem getFile (" + filename + ") error " + e.getMessage());
+            Logger.debug("FileSystem getFile (" + filename + ") error " + e.getMessage());
             e.printStackTrace();
             throw new FileIOException("file_system_recordstoreexception" + ": " + e.getMessage());
         } catch (IOException e) {
@@ -253,7 +253,7 @@ public class FileSystem {
      * @return a Vector of Strings corrosponding to the filenames stored in this FileSystem.
      */
     public Vector /*String*/ listFiles() {
-        Log.debug("fileTable is " + fileTable);
+        Logger.debug("fileTable is " + fileTable);
         Enumeration keysEnumeration = fileTable.keys();
         Vector keysVector = new Vector();
         while (keysEnumeration.hasMoreElements()) {
@@ -289,7 +289,7 @@ public class FileSystem {
         if (fileTable != null) {
             return fileTable.containsKey(filename);
         } else {
-            Log.error("fileTable was null!!");
+            Logger.error("fileTable was null!!");
             return false;
         }
     }
@@ -325,7 +325,7 @@ public class FileSystem {
         }
         try {
             FileLocator fl = (FileLocator) (fileTable.get(filename));
-            Log.debug("FileSystem: fl="+fl +"\n filename="+filename+"\n fl.recordStores.length="+fl.recordStores.length );
+            Logger.debug("FileSystem: fl="+fl +"\n filename="+filename+"\n fl.recordStores.length="+fl.recordStores.length );
             if (fl.recordStores.length > 0) {
                 String recordStoreName = fl.recordStores[0];
                 RecordStore recordStore = RecordStore.openRecordStore(recordStoreName, false);
@@ -348,7 +348,7 @@ public class FileSystem {
             writeFileTableToRMS();
         } catch (RecordStoreException e) {
             e.printStackTrace();
-            Log.debug("FileSystem deleteFile (" + filename + ") error " + e.getMessage());
+            Logger.debug("FileSystem deleteFile (" + filename + ") error " + e.getMessage());
             throw new FileIOException(e.getMessage());
         }
     }
@@ -365,7 +365,7 @@ public class FileSystem {
             try {
                 deleteFile(fileToDelete);
             } catch (FileIOException e) {
-                Log.error("Could not delete file " + fileToDelete);
+                Logger.error("Could not delete file " + fileToDelete);
                 e.printStackTrace();
             }
 
@@ -390,7 +390,7 @@ public class FileSystem {
             recordsInCurrentRecordStore = 0;
             this.writeFileTableToRMS();
         } catch (RecordStoreException e) {
-            Log.error("formatFileSystem()" + e.getMessage());
+            Logger.error("formatFileSystem()" + e.getMessage());
             throw new FileIOException(e.getMessage());
         }
     }
@@ -426,7 +426,7 @@ public class FileSystem {
             dos.close();
             baos.close();
         } catch (RecordStoreException e) {
-            Log.error("writeFileTableToRMS()" + e.getMessage());
+            Logger.error("writeFileTableToRMS()" + e.getMessage());
             e.printStackTrace();
             throw new FileIOException("file_system_error_rms");
         } catch (IOException e) {

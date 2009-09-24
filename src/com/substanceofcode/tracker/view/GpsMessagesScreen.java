@@ -315,7 +315,7 @@ class MessageEditor extends Form implements CommandListener {
 class GPSMessages extends Hashtable implements Serializable {
 
     public String getMimeType() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return "";//throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void serialize(DataOutputStream dos) throws IOException {
