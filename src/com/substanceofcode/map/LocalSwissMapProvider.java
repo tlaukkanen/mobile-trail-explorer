@@ -322,28 +322,39 @@ public class LocalSwissMapProvider extends AbstractMapProvider {
         }
     }
 
-    public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels) {
+
+     public GridPosition getCenterPositionWhenMovingEx(MapDrawContext mdc, int dx, int dy) {
         //convert the center
         CH1903Position centerPos = (CH1903Position) mdc.getMapCenter().convertToGridPosition(CH1903Position.GRID_CH1903);
         int x = centerPos.getX();
         int y = centerPos.getY();
 
-        switch (direction) {
-            case (NORTH):
-                y += dPixels * getPixelSize(mdc);
-                break;
-            case (SOUTH):
-                y -= dPixels * getPixelSize(mdc);
-                break;
-            case (EAST):
-                x += dPixels * getPixelSize(mdc);
-                break;
-            case (WEST):
-                x -= dPixels * getPixelSize(mdc);
-                break;
-        }
+        x += dx * getPixelSize(mdc);
+        y += dy * getPixelSize(mdc);
 
         return new CH1903Position(x, y);
+    }
+
+    public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels) {
+
+        int dx = 0;
+        int dy = 0;
+
+        switch (direction) {
+            case (NORTH):
+                dy = dPixels;
+                break;
+            case (SOUTH):
+                dy = -dPixels;
+                break;
+            case (EAST):
+                dx = dPixels;
+                break;
+            case (WEST):
+                dx = -dPixels;
+                break;
+        }
+        return getCenterPositionWhenMovingEx(mdc, dx, dy);
     }
 
     public double getPixelSize(MapDrawContext mdc) {

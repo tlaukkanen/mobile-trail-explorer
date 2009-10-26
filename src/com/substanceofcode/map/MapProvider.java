@@ -88,6 +88,7 @@ public interface MapProvider
     public void drawTrail(MapDrawContext mdc, Track trail, int color, boolean drawWholeTrail, int numPositionsToDraw);
     public void drawPlaces(MapDrawContext mdc, Vector places);
     public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels);
+    public GridPosition getCenterPositionWhenMovingEx(MapDrawContext mdc, int dx, int dy);
     public double getPixelSize(MapDrawContext mdc);
     
     

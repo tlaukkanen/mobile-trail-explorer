@@ -126,36 +126,44 @@ import javax.microedition.lcdui.Image;
         }
     }
 
-
-    public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels)
-    {
+     public GridPosition getCenterPositionWhenMovingEx(MapDrawContext mdc, int dx, int dy) {
         GridPosition result=null;
         //convert the center
 
         if (mdc.getMapCenter()!=null){
             WGS84Position centerPos = mdc.getMapCenter().getAsWGS84Position();
 
-        CanvasPoint centerPoint = ProjectionUtil.toCanvasPoint(centerPos.getLatitude()
-                , centerPos.getLongitude(), mdc.getZoomLevel());
+             CanvasPoint centerPoint = ProjectionUtil.toCanvasPoint(centerPos.getLatitude(), centerPos.getLongitude(), mdc.getZoomLevel());
 
-        switch(direction)
-        {
+             centerPoint.X += dx;
+             centerPoint.Y += dy;
+
+             result = ProjectionUtil.toGridPosition(centerPoint, mdc.getZoomLevel());
+         }
+         return result;
+     }
+
+     public GridPosition getCenterPositionWhenMoving(MapDrawContext mdc, int direction, int dPixels) {
+
+         int dx = 0;
+         int dy = 0;
+
+         switch (direction) {
             case(NORTH):
-                centerPoint.Y -= dPixels;
+                 dy = -dPixels;
                 break;
             case(SOUTH):
-                centerPoint.Y += dPixels;
+                 dy = +dPixels;
                 break;
             case(EAST):
-                centerPoint.X += dPixels;
+                 dx = +dPixels;
                 break;
             case(WEST):
-                centerPoint.X -= dPixels;
+                 dx = -dPixels;
                 break;
         }
-            result=ProjectionUtil.toGridPosition(centerPoint, mdc.getZoomLevel());
-        }
-        return result;
+
+         return getCenterPositionWhenMovingEx(mdc, dx, dy);
     }
 
 
