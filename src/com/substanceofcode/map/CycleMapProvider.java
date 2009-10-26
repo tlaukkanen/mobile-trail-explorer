@@ -40,12 +40,12 @@ public class CycleMapProvider extends  MercatorMapProvider
         
         switch(counter) {
             case 0:
-                return "http://a.andy.sandbox.cloudmade.com/tiles/cycle/X/X/X.png";
+                return "http://a.andy.sandbox.cloudmade.com/tiles/cycle/@Z@/@X@/@Y@.png";
             case 1:
-                return "http://b.andy.sandbox.cloudmade.com/tiles/cycle/X/X/X.png";
+                return "http://b.andy.sandbox.cloudmade.com/tiles/cycle/@Z@/@X@/@Y@.png";
             case 2:
             default:
-                return "http://c.andy.sandbox.cloudmade.com/tiles/cycle/X/X/X.png";
+                return "http://c.andy.sandbox.cloudmade.com/tiles/cycle/@Z@/@X@/@Y@.png";
         }
     }
 

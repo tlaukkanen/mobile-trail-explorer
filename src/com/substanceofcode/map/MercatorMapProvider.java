@@ -214,27 +214,13 @@ import javax.microedition.lcdui.Image;
 
     public String makeurl(int x, int y, int z)
     {
-        int coords[] =  configureCoords(x,y,z);
-        StringBuffer output=null;
-        String[] bits = StringUtil.split(getUrlFormat(), "X");
-        try{
-         output= new StringBuffer(bits[0]);
+        String url = getUrlFormat();
 
-            output.append(coords[2]);
-            output.append(bits[1]);
-            output.append(coords[0]);
-            output.append(bits[2]);
-            output.append(coords[1]);
-            output.append(bits[3]);
-        }catch(ArrayIndexOutOfBoundsException aioobe){
-            Logger.error("makeurl: x="+x+",y="+y+",z="+z+"\nUrl="+getUrlFormat());
-        }
-        return output.toString();
-    }
+        url = StringUtil.replace(url, "@X@", String.valueOf( setX(x) ));
+        url = StringUtil.replace(url, "@Y@", String.valueOf( setY(y) ));
+        url = StringUtil.replace(url, "@Z@", String.valueOf( setY(z) ));
 
-    private final int[] configureCoords(int x , int y, int z){
-        int[] a = { setX(x),setY(y),setZ(z)};
-        return a;
+        return url;
     }
 
     /**

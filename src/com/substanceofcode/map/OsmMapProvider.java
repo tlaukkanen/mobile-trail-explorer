@@ -17,7 +17,7 @@ public class OsmMapProvider extends MercatorMapProvider
     
     public String getUrlFormat() 
     {
-    return "http://tile.openstreetmap.org/X/X/X.png";
+        return "http://tile.openstreetmap.org/@Z@/@X@/@Y@.png";
     }
     
     public String getIdentifier() 

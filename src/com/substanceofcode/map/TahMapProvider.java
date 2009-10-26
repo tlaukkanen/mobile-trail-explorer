@@ -35,7 +35,7 @@ public class TahMapProvider extends MercatorMapProvider
     
     public String getUrlFormat() 
     {
-        return "http://tah.openstreetmap.org/Tiles/tile/X/X/X.png";
+        return "http://tah.openstreetmap.org/Tiles/tile/@Z@/@X@/@Y@.png";
     }
     
     public String getIdentifier() 
