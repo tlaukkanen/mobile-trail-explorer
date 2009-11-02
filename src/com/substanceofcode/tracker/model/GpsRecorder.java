@@ -74,13 +74,14 @@ public class GpsRecorder {
     
     /** Timer for worker */
     private Timer recorderTimer;
-    private HttpConnection conn;
+//    private HttpConnection conn;
     
     /** Recorder helpers */
     final GpsRmsRecorder rmsRecorder = new GpsRmsRecorder();
     GpsPosition lastRecordedPosition = null;
     GpsPosition lastPosition = null;
     int secondsFromLastTrailPoint = 0;
+    int secondsFromLastWebRecording = 0;
     int recordedCount = 0;
     boolean isValidPosition = false;
     GpsPosition currentPosition = null;
@@ -394,6 +395,7 @@ public class GpsRecorder {
         
         public void run() {
             try {
+                secondsFromLastTrailPoint++;
 
                 if (recording==true){
                     currentPosition = controller.getPosition();
@@ -402,11 +404,8 @@ public class GpsRecorder {
                             lastPosition, 
                             lastRecordedPosition);
                 }
-                if (recording == true
-                        && secondsFromLastTrailPoint >= recordingInterval
-                        && isValidPosition) {
 
-                    secondsFromLastTrailPoint = 0;
+                if (recording == true && isValidPosition) {
 
                     /**
                      * Check if user haven't moved -> don't record the same
@@ -423,98 +422,59 @@ public class GpsRecorder {
                      * Record current position if user have moved or this is a
                      * first recorded position.
                      */
-                    if (currentPosition != null && !stopped) {
+                    if ( currentPosition != null && !stopped ) {
 
-                        rmsRecorder.setGpsPosition(currentPosition);
+                        if( secondsFromLastTrailPoint >= recordingInterval ) {
 
-                        /** Apply the filtering before the new position is added */
-                        int posCount = recordedTrack.getPositionCount();
-                        if(useFilter && posCount>2) {
-                            GpsPosition lastPos = recordedTrack.getPosition(posCount-1);
-                            GpsPosition oneFromLastPos = recordedTrack.getPosition(posCount-2);
-                            if(RecorderFilter.canRemovePreviousPosition(oneFromLastPos, lastPos, currentPosition)){
-                                recordedTrack.removeLastPosition();
+                            secondsFromLastTrailPoint = 0;
+
+                            rmsRecorder.setGpsPosition(currentPosition);
+
+                            /** Apply the filtering before the new position is added */
+                            int posCount = recordedTrack.getPositionCount();
+                            if(useFilter && posCount>2) {
+                                GpsPosition lastPos = recordedTrack.getPosition(posCount-1);
+                                GpsPosition oneFromLastPos = recordedTrack.getPosition(posCount-2);
+                                if(RecorderFilter.canRemovePreviousPosition(oneFromLastPos, lastPos, currentPosition)){
+                                    recordedTrack.removeLastPosition();
+                                }
                             }
+
+                            recordedTrack.addPosition(currentPosition);
+
+                            if (markerInterval > 0 && recordedCount > 0
+                                    && recordedCount % markerInterval == 0) {
+                                Marker marker = new Marker(
+                                        currentPosition,
+                                        "",
+                                        "");
+                                recordedTrack.addMarker( marker );
+                            }
+
+                            lastRecordedPosition = currentPosition;
+                            recordedCount++;
                         }
 
-                        recordedTrack.addPosition(currentPosition);
-                        if (markerInterval > 0 && recordedCount > 0
-                                && recordedCount % markerInterval == 0) {
-                            Marker marker = new Marker(
-                                    currentPosition, 
-                                    "",
-                                    "");
-                            recordedTrack.addMarker( marker );
-                        }
-                        lastRecordedPosition = currentPosition;
-                        recordedCount++;
-                        
                         //If the uploadURL is set (not "") then try to upload the
                         //GpsPosition too.
                         RecorderSettings settings = controller.getSettings();
                         boolean uploadToWeb = settings.getWebRecordingUsage();
+                        int webRecordingInterval = settings.getWebRecordingInterval();
                         uploadURL = controller.getSettings().getUploadURL();
+
                         if(uploadToWeb && !uploadURL.equals("")){
-                            DataOutputStream dos = null;
-                            try{
-                                boolean serialize = true;
-                                GpsGPGSA gpgsa = currentPosition.getGpgsa();
-                                if(uploadURL.indexOf("@LAT@")>0) {
-                                    String lat = String.valueOf(currentPosition.latitude);
-                                    uploadURL = StringUtil.replace(uploadURL, "@LAT@", lat);
-                                    String lon = String.valueOf(currentPosition.longitude);
-                                    uploadURL = StringUtil.replace(uploadURL, "@LON@", lon);
-                                    String alt = String.valueOf(currentPosition.altitude);
-                                    uploadURL = StringUtil.replace(uploadURL, "@ALT@", alt);
-                                    String id = String.valueOf(recordedTrack.getId());
-                                    uploadURL = StringUtil.replace(uploadURL, "@TRAILID@", id);
-                                    String hea = String.valueOf(currentPosition.course);
-                                    uploadURL = StringUtil.replace(uploadURL, "@HEA@", hea);
-                                    String spd = String.valueOf(currentPosition.speed);
-                                    uploadURL = StringUtil.replace(uploadURL, "@SPD@", spd);
-                                    String fix = String.valueOf(gpgsa.getFixtype());
-                                    uploadURL = StringUtil.replace(uploadURL, "@FIX@", fix);
-                                    String hdop = String.valueOf(gpgsa.getHdop());
-                                    uploadURL = StringUtil.replace(uploadURL, "@HDOP@", hdop);
-                                    String pdop = String.valueOf(gpgsa.getPdop());
-                                    uploadURL = StringUtil.replace(uploadURL, "@PDOP@", pdop);
-                                    String sat = String.valueOf(controller.getSatelliteCount());
-                                    uploadURL = StringUtil.replace(uploadURL, "@SAT@", sat);
-                                    String time = DateTimeUtil.getUniversalDateStamp(currentPosition.date);
-                                    uploadURL = StringUtil.replace(uploadURL, "@TIME@", time);
-                                    serialize = false;
-                                }
-                                conn = (HttpConnection) Connector.open(uploadURL);
-                                conn.setRequestMethod(HttpConnection.POST);
-                                conn.setRequestProperty("Content-Type","text/plain");
-                                if(serialize) {
-                                    dos= conn.openDataOutputStream();
-                                    currentPosition.serialize(dos);
-                                    dos.write("\r\n".getBytes());
-                                    dos.flush();
-                                } else {
-                                    conn.setRequestProperty("Content-Length", "0");
-                                }
-                                InputStream dis = conn.openInputStream();
-                                int ch;
-                                StringBuffer b = new StringBuffer();
-                                while ( ( ch = dis.read() ) != -1 ) {
-                                    b= b.append( ( char ) ch );
-                                }
-                                Logger.debug(b.toString());
-                            }catch(Exception e){
-                                e.printStackTrace();
-                            }finally{
-                                
-                                if(dos!=null)dos.close();
-                                if(conn!=null)conn.close();
-                                
+
+                            secondsFromLastWebRecording++;
+
+                            if(webRecordingInterval>0 && secondsFromLastWebRecording>=webRecordingInterval)
+                            {
+                                secondsFromLastWebRecording=0;
+                                WebUpload();
                             }
                         }
                     }
                     lastPosition = currentPosition;
                 } else {
-                    secondsFromLastTrailPoint++;
                    // Logger.debug("GpsRecorder getPosition called 2");
                    lastPosition = controller.getPosition();
                 }
@@ -524,5 +484,82 @@ public class GpsRecorder {
                         new Object[] {ex.toString(), controller, controller.getPosition()}));
             }     
         }
+
     }
+
+
+    //TODO handle http return value
+    
+    private void WebUpload() {
+        HttpConnection conn = null;
+        DataOutputStream dos = null;
+
+        Logger.debug("GpsRecorder WebUpload");
+
+        try {
+            boolean serialize = true;
+            GpsGPGSA gpgsa = currentPosition.getGpgsa();
+            if (uploadURL.indexOf("@LAT@") > 0) {
+                String lat = String.valueOf(currentPosition.latitude);
+                uploadURL = StringUtil.replace(uploadURL, "@LAT@", lat);
+                String lon = String.valueOf(currentPosition.longitude);
+                uploadURL = StringUtil.replace(uploadURL, "@LON@", lon);
+                String alt = String.valueOf(currentPosition.altitude);
+                uploadURL = StringUtil.replace(uploadURL, "@ALT@", alt);
+                String id = String.valueOf(recordedTrack.getId());
+                uploadURL = StringUtil.replace(uploadURL, "@TRAILID@", id);
+                String hea = String.valueOf(currentPosition.course);
+                uploadURL = StringUtil.replace(uploadURL, "@HEA@", hea);
+                String spd = String.valueOf(currentPosition.speed);
+                uploadURL = StringUtil.replace(uploadURL, "@SPD@", spd);
+                if (gpgsa != null) {
+                    String fix = String.valueOf(gpgsa.getFixtype());
+                    uploadURL = StringUtil.replace(uploadURL, "@FIX@", fix);
+                    String hdop = String.valueOf(gpgsa.getHdop());
+                    uploadURL = StringUtil.replace(uploadURL, "@HDOP@", hdop);
+                    String pdop = String.valueOf(gpgsa.getPdop());
+                    uploadURL = StringUtil.replace(uploadURL, "@PDOP@", pdop);
+                }
+                String sat = String.valueOf(controller.getSatelliteCount());
+                uploadURL = StringUtil.replace(uploadURL, "@SAT@", sat);
+                String time = DateTimeUtil.getUniversalDateStamp(currentPosition.date);
+                uploadURL = StringUtil.replace(uploadURL, "@TIME@", time);
+                serialize = false;
+            }
+            conn = (HttpConnection) Connector.open(uploadURL);
+            conn.setRequestMethod(HttpConnection.POST);
+            conn.setRequestProperty("Content-Type", "text/plain");
+            if (serialize) {
+                dos = conn.openDataOutputStream();
+                currentPosition.serialize(dos);
+                dos.write("\r\n".getBytes());
+                dos.flush();
+            } else {
+                conn.setRequestProperty("Content-Length", "0");
+            }
+            InputStream dis = conn.openInputStream();
+            int ch;
+            StringBuffer b = new StringBuffer();
+            while ((ch = dis.read()) != -1) {
+                b = b.append((char) ch);
+            }
+            Logger.debug(b.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+
+            try {
+                if (dos != null) {
+                    dos.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
 }
