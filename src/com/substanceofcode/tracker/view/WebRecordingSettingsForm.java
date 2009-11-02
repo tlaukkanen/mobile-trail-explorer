@@ -46,6 +46,7 @@ public class WebRecordingSettingsForm extends Form implements CommandListener {
     private Command cancelCommand = new Command(LocaleManager.getMessage("menu_cancel"),
             Command.CANCEL, 2);
     private TextField uploadUrlField;
+    private TextField uploadIntervalField;
     private ChoiceGroup useUploadGroup;
     
     /** 
@@ -79,6 +80,11 @@ public class WebRecordingSettingsForm extends Form implements CommandListener {
             settings.setUploadURL(url);
             boolean useUpload = useUploadGroup.isSelected(0);
             settings.setWebRecordingUsage( useUpload );
+
+            String uploadIntervalText = uploadIntervalField.getString();
+            int interval = Integer.valueOf( uploadIntervalText ).intValue();
+            settings.setWebRecordingInterval( interval );
+            
             controller.showSettings();
         }
         if(cmd==cancelCommand) {
@@ -99,5 +105,15 @@ public class WebRecordingSettingsForm extends Form implements CommandListener {
         uploadUrlField = new TextField(LocaleManager.getMessage("web_recording_settings_form_upload_url"),
                 url, 256, TextField.URL);
         this.append(uploadUrlField);
+
+        int interval = settings.getWebRecordingInterval();
+        uploadIntervalField = new TextField(LocaleManager.getMessage("recording_settings_form_recording_interval"),
+                String.valueOf(interval),
+                6,
+                TextField.NUMERIC);
+        this.append(uploadIntervalField);
+
+
+
     }
 }

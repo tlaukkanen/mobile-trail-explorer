@@ -83,6 +83,7 @@ public class RecorderSettings {
     private static final String FILTER_TRAIL = "filter-trail";
     private static final String UPLOAD_URL = "upload-url";
     private static final String UPLOAD_USE = "upload-use";
+    private static final String UPLOAD_INTERVAL = "upload-interval";
 
     /** Display setting keys */
     public static final String DISPLAY_COORDINATES = "display-coordinates";
@@ -107,6 +108,7 @@ public class RecorderSettings {
     private static final int RECORDING_MAX_SPEED_DEFAULT = 310;
     private static final int RECORDING_MAX_ACCELERATION_DEFAULT = 40;
     private static final int RECORDING_MIN_DISTANCE_DEFAULT = 5;
+    private static final int UPLOAD_INTERVAL_DEFAULT = 10;
     
     /** Streaming options */
     private static final String STREAMING_FILE = "streaming-file";
@@ -257,6 +259,21 @@ public class RecorderSettings {
         settings.setBooleanProperty(UPLOAD_USE, useWebRecording);
         saveSettings();
     }
+
+    /** Get web recording interval */
+    public int getWebRecordingInterval() {
+        int defaultInterval = UPLOAD_INTERVAL_DEFAULT;
+        int recordingInterval = settings.getIntProperty(UPLOAD_INTERVAL,
+                defaultInterval);
+        return recordingInterval;
+    }
+
+    /** Set web recording interval in seconds */
+    public void setWebRecordingInterval(int interval) {
+        settings.setIntProperty(UPLOAD_INTERVAL, interval);
+        saveSettings();
+    }
+
     
     public void setMaxAcceleration(int maxAcceleration) {
         settings.setIntProperty(RECORDING_MAX_ACCELERATION, maxAcceleration);
