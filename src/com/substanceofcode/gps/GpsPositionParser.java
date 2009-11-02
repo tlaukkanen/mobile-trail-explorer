@@ -313,6 +313,7 @@ public class GpsPositionParser {
             GpsPosition pos = new GpsPosition(record, (short) course,
                     longitudeDouble, latitudeDouble, speed, getLastAltitude());
             pos.setGpgsa(currentDilutionOfPrecision);
+            pos.setSatcount(satelliteCount);
             this.setGpsPosition(pos);
         } else {
             Logger.debug("$GPRMC: Warning NOT A, so no position written: (" + warning + ")");

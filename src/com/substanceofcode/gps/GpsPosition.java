@@ -84,6 +84,10 @@ public final class GpsPosition implements Serializable {
     /** GpsGPGSA (pdop,hdop etc) data should also be stored here */
     private GpsGPGSA gpgsa;
 
+    /** GpsGPGGA satcount data */
+    boolean satcountvalid;
+    int     satcount;
+
     public String MIMETYPE = "gpsposition";
 
     public GpsPosition(String rawData, short course, double longitudeDouple,
@@ -175,6 +179,13 @@ public final class GpsPosition implements Serializable {
         this.date = date;
         this.gpgsa = gpgsa;
     }
+
+    public GpsPosition( double latitudeDouble, double longitudeDouble ) {
+        this.latitude = latitudeDouble;
+        this.longitude = longitudeDouble;
+    }
+
+
     /**
      * <p>
      * Reads 'All' the informatino about this GpsPosition from the
@@ -453,6 +464,20 @@ public final class GpsPosition implements Serializable {
     public GpsGPGSA getGpgsa(){
         return gpgsa;
     }
+    
+    public void setSatcount(short satcount){
+        this.satcount=satcount;
+        this.satcountvalid=true;
+    }
+
+    public int getSatcount(){
+         return satcount;
+    }
+
+    public boolean getSatcountvalid(){
+         return satcountvalid;
+    }
+
     public void unserialize(DataInputStream dis) throws IOException {
         try {
             if (dis.readBoolean()) {
@@ -483,5 +508,29 @@ public final class GpsPosition implements Serializable {
             wgs84Position = new WGS84Position(this);
     }
         return wgs84Position;
-}
+    }
+
+    public double distanceSquared(GpsPosition other) {
+        return (this.latitude - other.latitude) * (this.latitude - other.latitude) + (this.longitude - other.longitude) * (this.longitude - other.longitude);
+    }
+
+    public GpsPosition minus(GpsPosition a) {
+        return new GpsPosition(this.latitude - a.latitude, this.longitude - a.longitude);
+    }
+
+    /**
+     * Returns the dot product of two Positions. Generally, this can be interpreted as the
+     * angle between them.
+     * @param a compare to this Tuple
+     * @return the dot product
+     */
+    public double dot(GpsPosition a) {
+        return (this.latitude * a.latitude) + (this.longitude * a.longitude);
+    }
+
+    public GpsPosition times(double a) {
+        return new GpsPosition(this.latitude * a, this.longitude * a);
+    }
+
+
 }
