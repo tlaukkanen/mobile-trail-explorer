@@ -29,7 +29,6 @@ import com.substanceofcode.tracker.view.Logger;
 import com.substanceofcode.util.ProjectionUtil;
 import com.substanceofcode.util.StringUtil;
 import javax.microedition.lcdui.Graphics;
-import javax.microedition.lcdui.Image;
 
 /**
  * this class is kind of the old MapProvider. just overwrite all abstract methods in your subclass
@@ -42,18 +41,7 @@ import javax.microedition.lcdui.Image;
  public abstract class MercatorMapProvider extends AbstractMapProvider {
 
 
-    // Variables needed by the map generator
-    // Order of map tile indexes:
-    // 0 1 2
-    // 3 4 5
-    // 6 7 8
-    private Image mapTiles[] = new Image[9];
-    // Offsets for the map tile indexes in the horizontal direction
-    static private final int m[] = new int[] { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
-    // Offsets for the map tile indexes in the vertical direction
-    static private final int n[] = new int[] { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
-    // The priority order of downloading the tiles. These are the indexes as depicted above
-    static private final int tilePriorities[] = new int[] { 4, 1, 3, 5, 7, 0, 2, 6, 8 };
+    private TileGrid tileGrid;
 
     private TileDownloader tileDownloader = null;
     /**
@@ -72,16 +60,24 @@ import javax.microedition.lcdui.Image;
                 tileDownloader = new TileDownloader(this);
                 tileDownloader.start();
             }
+            if (tileGrid == null) {
+                tileGrid = new TileGrid(mdc.getScreenWidth(), mdc.getScreenHeight());
+            }
+            if (tileGrid.width!=mdc.getScreenWidth() || tileGrid.height != mdc.getScreenHeight() ) {
+                /* Grid size changed */
+                tileGrid.sizeChanged(mdc.getScreenWidth(), mdc.getScreenHeight());
+            }
+            
             WGS84Position center = mdc.getMapCenter().getAsWGS84Position();
             if (center != null) {
                 if (tileDownloader != null && tileDownloader.isStarted() == true) {
                     int[] pt = MapLocator.conv(center.getLatitude(), center.getLongitude(), mdc.getZoomLevel());
 
                     // Get the tile images in the priority order. Unavailable images are returned as null
-                    for (int i = 0; i < tilePriorities.length; i++) {
+                    for (int i = 0; i < tileGrid.tilePriorities.length; i++) {
                         try {
-                            int imageIndex = tilePriorities[i];
-                            mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + m[imageIndex], pt[1] + n[imageIndex], mdc.getZoomLevel(), false);
+                            int imageIndex = tileGrid.tilePriorities[i];
+                             tileGrid.mapTiles[imageIndex] = tileDownloader.fetchTile(pt[0] + tileGrid.m[imageIndex], pt[1] + tileGrid.n[imageIndex], mdc.getZoomLevel(), false);
                         } catch (Exception e) {
                             Logger.error("MMP:"+e.getMessage());
                         }
@@ -101,9 +97,9 @@ import javax.microedition.lcdui.Image;
                     int x = mdc.getScreenWidth()/2 - pt[2]; // The top left corner
                     int y = mdc.getScreenHeight()/2 - pt[3];  // of the middle tile
                     int anchor = Graphics.TOP | Graphics.LEFT;
-                    for (int i = 0; i < 9; i++) {
-                        if (mapTiles[i] != null) {
-                            mdc.getGraphics().drawImage(mapTiles[i], x + (m[i] * TileDownloader.TILE_SIZE), y + (n[i] * TileDownloader.TILE_SIZE), anchor);
+                    for (int i = 0; i < tileGrid.mapTiles.length; i++) {
+                        if (tileGrid.mapTiles[i] != null) {
+                            mdc.getGraphics().drawImage(tileGrid.mapTiles[i], x + (tileGrid.m[i] * TileDownloader.TILE_SIZE), y + (tileGrid.n[i] * TileDownloader.TILE_SIZE), anchor);
                         }
                     }
                 }
@@ -122,6 +118,9 @@ import javax.microedition.lcdui.Image;
             {
                 tileDownloader.stop();
                 tileDownloader = null;
+            }
+            if (tileGrid != null ) {
+                tileGrid = null;
             }
         }
     }
