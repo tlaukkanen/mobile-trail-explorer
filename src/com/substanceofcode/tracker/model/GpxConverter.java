@@ -151,6 +151,24 @@ public class GpxConverter extends TrackConverter {
         gpx.append("</trkseg>\r\n</trk>\r\n");
     }
 
+    /**
+     * TODO
+     *
+     * @param gpx
+     */
+    public static void addTrackSegmentStart(StringBuffer gpx) {
+        gpx.append("<trkseg>\r\n");
+    }
+
+    /**
+     * TODO
+     *
+     * @param gpx
+     */
+    public static void addTrackSegmentEnd(StringBuffer gpx) {
+        gpx.append("</trkseg>\r\n");
+    }
+
     public static void addFooter(StringBuffer gpx) {
         gpx.append("</gpx>\r\n");
     }
@@ -176,6 +194,11 @@ public class GpxConverter extends TrackConverter {
         Date date = pos.date;
         String universalDateStamp = DateTimeUtil.getUniversalDateStamp(date);
         gpx.append("<time>").append(universalDateStamp).append("</time>\r\n");
+
+        if( pos.getSatcountvalid() ) {
+             gpx.append("<sat>").append(String.valueOf(pos.getSatcount()))
+                    .append("</sat>\r\n");
+        }
         
         if (gpgsa != null) {
             gpx.append("<fix>").append(String.valueOf(gpgsa.getFixtype().toLowerCase()))
@@ -199,7 +222,7 @@ public class GpxConverter extends TrackConverter {
     }
 
     /** Export markers to GPX format */
-    private String createMarkers(Track track) {
+    public static String createMarkers(Track track) {
         StringBuffer gpx = new StringBuffer();
 
         int markerCount = track.getMarkerCount();
