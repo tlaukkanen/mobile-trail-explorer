@@ -62,6 +62,12 @@ public class LocaleManager  {
 
     private static Controller controller;
 
+    private static String locale=null;
+
+    public static String getLocale() {
+        return locale;
+    }
+
     /**
      * Initializes localization support based on currently set locale (obtained
      * from "microedition.locale" system property). The initialization method is called
@@ -93,6 +99,8 @@ public class LocaleManager  {
             }
 
             System.out.println("Localization language: " + mteLocale);
+
+            locale=mteLocale;
 
             return initLocalizationSupport(mteLocale);     // NOI18N
         } catch(Exception ex) {
