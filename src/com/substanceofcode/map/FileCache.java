@@ -63,6 +63,7 @@ public class FileCache implements TileCache, Runnable {
     private String exportFolder = "";
     private long maxOffset=0;
     private String maxKey="";
+    private long cachesize=0;
     // Default scope so it can be seen by the RMSCache
     Hashtable availableTileList = new Hashtable();
 
@@ -106,25 +107,42 @@ public class FileCache implements TileCache, Runnable {
         Logger.info("Initializing FileCache");
         start=System.currentTimeMillis();
         try {
+            boolean rmsok = false;
+            boolean reinit = true;
             try {
                 Conn = (FileConnection) Connector.open(fullPath);
             } catch (IOException ex) {
                 Logger.debug("File: failed to open " + fullPath);
             }
 
-            if(readTileListFromRms()){
-                end=System.currentTimeMillis();
-                Logger.debug("Finished Initialisation in "+(end-start) +"ms");
-                Logger.debug("File: read tilelist from RMS OK");
-            } else{
+            if (Conn != null && !Conn.exists()) {
+                // The file doesn't exist, we are done initializing
+                Logger.debug("File: file does not exist");
+                //create the file so we can start writing to it
+                Conn.create();
                 try {
+                    FileSystem.getFileSystem().deleteFile("TileList");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                rmsok = readTileListFromRms();
+                if (rmsok){
+                    end=System.currentTimeMillis();
+                    Logger.debug("Finished Initialisation in "+(end-start) +"ms");
+                    Logger.debug("File: read tilelist from RMS OK");
+                    Logger.warn("File: cachesize "+cachesize+" filesize "+Conn.fileSize());
+                    if (cachesize == Conn.fileSize()) {
+                        reinit = false;
+                    }
+                }
+            }
 
-                    if (Conn != null && !Conn.exists()) {
-                        // The file doesn't exist, we are done initializing
-                        Logger.debug("File: file does not exist");
-                        //create the file so we can start writing to it
-                        Conn.create();
-                    } else {
+            if (reinit) {
+                availableTileList.clear();
+                try {
+                    Logger.info("Constructing FileCache from scratch");
+                    {
                         streamIn = Conn.openDataInputStream();
 
                  //       Logger.debug("Conn.availableSize()=" + Conn.availableSize());
@@ -196,8 +214,12 @@ public class FileCache implements TileCache, Runnable {
                                 maxOffset=offset;
                                 maxKey=key;
                             }
-                            count++;
-                            availableTileList.put(key, new Long(offset));
+                            if (key.equals("CACHESIZE")) {
+                                cachesize = offset;
+                            } else {
+                                count++;
+                                availableTileList.put(key, new Long(offset));
+                            }
                         }catch(IOException io){
                             reading=false;
                         }
@@ -208,7 +230,7 @@ public class FileCache implements TileCache, Runnable {
         try {
             if(FileSystem.getFileSystem().containsFile("TileList")){
                 x.unserialize(FileSystem.getFileSystem().getFile("TileList"));
-                result=checkCache(maxKey);
+                result = true;
             }else{
                 Logger.debug("TileList not found, will create");
             }
@@ -230,6 +252,8 @@ public class FileCache implements TileCache, Runnable {
                     String key;
                      byte[] keyBytes;
                      long offset;
+                     // store size to detect external changes
+                     availableTileList.put("CACHESIZE", new Long(Conn.fileSize()));
                      Enumeration e =availableTileList.keys();
                      while(e.hasMoreElements()){
                       //   Logger.debug("serializing a tile");
