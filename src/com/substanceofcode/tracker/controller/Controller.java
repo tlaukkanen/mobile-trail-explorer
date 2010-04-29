@@ -44,6 +44,7 @@ import com.substanceofcode.gpsdevice.GpsDevice;
 import com.substanceofcode.gpsdevice.GpsDeviceFactory;
 import com.substanceofcode.gpsdevice.GpsUtilities;
 import com.substanceofcode.gpsdevice.MockGpsDevice;
+import com.substanceofcode.gpsdevice.Jsr179Device;
 import com.substanceofcode.tracker.grid.GridPosition;
 import com.substanceofcode.tracker.model.AlertHandler;
 import com.substanceofcode.tracker.model.AudioShortcutAction;
@@ -578,6 +579,8 @@ public class Controller {
         if(gpsDevice==null) {
             return;
         }
+        // FIXME: dirty hack. device should use a connect thread
+        // itself and report back when done.
         if (gpsDevice instanceof BluetoothDevice) {
             new Thread("ConnectToGPS") {
                 public void run() {
@@ -592,6 +595,8 @@ public class Controller {
                     }
                 }
             }.start();
+        } else {
+            status = STATUS_STOPPED;
         }
     }
 
@@ -665,6 +670,8 @@ public class Controller {
             // Disconnect from bluetooth GPS
             if (gpsDevice instanceof BluetoothDevice) {
                 ((BluetoothDevice) gpsDevice).disconnect();
+            } else if (gpsDevice instanceof Jsr179Device) {
+                ((Jsr179Device) gpsDevice).disconnect();
             }
         } catch (Exception e) {
             showError(LocaleManager.getMessage("controller_disconnect_error")
