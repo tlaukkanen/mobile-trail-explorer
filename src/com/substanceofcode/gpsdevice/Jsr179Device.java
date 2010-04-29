@@ -100,10 +100,18 @@ public class Jsr179Device extends GpsDeviceImpl {
                 //We can fix that by adding in a GpsPosition constructed from the API values
                 //Downside for Nokia devices is we are overwriting an existing valid GpsPosition
                 //so we only do this if we don't have a Gpgsa (GPS Dilution of Precision and active satellites) yet
-                if (parser.getGpsPosition() != null && parser.getGpsPosition().getGpgsa() == null) {
-                    parser.setGpsPosition(new GpsPosition(extraInfo, (short) course, lon, lat, (double) speedkmh, (double) altitude, new Date(timestamp), new GpsGPGSA(0.0f, hdop, vdop, 0)));
-                }
-
+                parser.setGpsPosition(
+                    new GpsPosition(
+                        extraInfo,
+                        (short) course,
+                        lon,
+                        lat,
+                        (double) speedkmh,
+                        (double) altitude,
+                        new Date(timestamp),
+                        new GpsGPGSA(0.0f, hdop, vdop, 0)
+                    )
+                );
             }
         }
 
@@ -141,12 +149,12 @@ public class Jsr179Device extends GpsDeviceImpl {
         try {
             Logger.debug("Initializing JSR179");
             if (locationProvider == null) {
-                Logger.debug("Initializing criteria");
-                Criteria criteria = new Criteria();
-                criteria.setSpeedAndCourseRequired(true);
-                criteria.setAltitudeRequired(true);
                 Logger.debug(logPrefix + "Initializing location provider");
-                locationProvider = LocationProvider.getInstance(criteria);
+                locationProvider = LocationProvider.getInstance(null);
+                if (locationProvider == null) {
+                    Logger.error("can't get jsr179 location provider");
+                    return;
+                }
             }
             Logger.debug(logPrefix + "LocationProvider state: " + locationProvider.getState());
 
