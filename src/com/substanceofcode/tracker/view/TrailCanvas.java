@@ -597,14 +597,15 @@ public class TrailCanvas extends BaseCanvas {
 
         /** Draw status */
         g.setColor(Theme.getColor(Theme.TYPE_TEXT));
+
+        Date now = Calendar.getInstance().getTime();
+        int displayRow = 1;
+
         if (lastPosition != null) {
 
             int positionAdd = currentFont.stringWidth("LAN:O");
-            int displayRow = 1;
 
             RecorderSettings settings = controller.getSettings();
-
-            Date now = Calendar.getInstance().getTime();
 
             /** Draw coordinates information */
             if (settings.getDisplayValue(RecorderSettings.DISPLAY_COORDINATES) == true) {
@@ -693,6 +694,7 @@ public class TrailCanvas extends BaseCanvas {
                     displayRow++;
                 }
             }
+        }
 
             /**
              * Draw the last logged message. Split the string on a word boundary
@@ -713,6 +715,7 @@ public class TrailCanvas extends BaseCanvas {
                 }
             }
 
+        if (lastPosition != null) {
             long secondsSinceLastPosition = -1;
             if (lastPosition.date != null) {
                 secondsSinceLastPosition = (now.getTime() - lastPosition.date.getTime()) / 1000;
@@ -768,7 +771,7 @@ public class TrailCanvas extends BaseCanvas {
             }
 
         } else if (controller.getStatusCode() != Controller.STATUS_NOTCONNECTED) {
-            g.drawString(LocaleManager.getMessage("trail_canvas_no_gps_fix") + " " + counter, 1, fontHeight, Graphics.TOP | Graphics.LEFT);
+            g.drawString(LocaleManager.getMessage("trail_canvas_no_gps_fix") + " " + counter, 1, fontHeight*displayRow++, Graphics.TOP | Graphics.LEFT);
         }
 
         /** Draw error texts */
