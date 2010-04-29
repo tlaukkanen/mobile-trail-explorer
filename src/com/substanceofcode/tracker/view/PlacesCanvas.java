@@ -33,6 +33,7 @@ import com.substanceofcode.gps.GpsPosition;
 import com.substanceofcode.tracker.model.LengthFormatter;
 import com.substanceofcode.tracker.model.Place;
 import com.substanceofcode.localization.LocaleManager;
+import com.substanceofcode.util.StringUtil;
 
 /**
  *
@@ -104,6 +105,8 @@ public class PlacesCanvas extends BaseCanvas {
         int rowHeight = rowFont.getHeight() + 1;
         int currentLine = y;
         GpsPosition currentPosition = controller.getPosition();
+
+        int rightmargin = rowFont.stringWidth("1234.45 km");
                
         allowScrollingDown = false;
         Enumeration placeEnum = places.elements();
@@ -116,8 +119,14 @@ public class PlacesCanvas extends BaseCanvas {
             Place wp = (Place)placeEnum.nextElement();
             if(waypointIndex>=firstRowIndex) {
 
-                g.drawString(wp.getName(),1,currentLine,Graphics.TOP|Graphics.LEFT);
                 if(currentPosition!=null) {
+                    String[] lines =
+                        StringUtil.chopStrings(wp.getName(), " ",
+                                rowFont, getWidth()-rightmargin);
+                    for (int i = 0; i < lines.length; i++) {
+                        if (i != 0) currentLine += rowHeight;
+                        g.drawString(lines[i],1,currentLine,Graphics.TOP|Graphics.LEFT);
+                    }
                     double distance = currentPosition.getDistanceFromPosition(
                         wp.getLatitude(),
                         wp.getLongitude());
@@ -128,6 +137,8 @@ public class PlacesCanvas extends BaseCanvas {
                         getWidth()-1, 
                         currentLine, 
                         Graphics.TOP|Graphics.RIGHT);
+                } else {
+                    g.drawString(wp.getName(),1,currentLine,Graphics.TOP|Graphics.LEFT);
                 }
                 currentLine += rowHeight;
             }
