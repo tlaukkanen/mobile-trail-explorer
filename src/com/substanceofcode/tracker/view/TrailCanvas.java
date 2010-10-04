@@ -79,6 +79,7 @@ public class TrailCanvas extends BaseCanvas {
     private long oldTime;
     private boolean showAudioRecStatus;
     private int scaleParts = 0;
+    private int lastPointerX, lastPointerY;
 
     /**
      * Creates a new instance of TrailCanvas
@@ -863,5 +864,20 @@ public class TrailCanvas extends BaseCanvas {
         }
 
         this.repaint();
+    }
+
+    public void pointerPressed(int x, int y) {
+        lastPointerX=x;
+        lastPointerY=y;
+    }
+
+    public void pointerDragged(int x, int y) {
+        int dx=lastPointerX-x;
+        int dy=lastPointerY-y;
+        MapDrawContext mdc = new MapDrawContext(null, getMapCenter(), MapProviderManager.manager().getSelectedMapProvider().getZoomLevel(), getWidth(), getHeight());
+        setMapCenter(MapProviderManager.manager().getSelectedMapProvider().getCenterPositionWhenMovingEx(mdc, dx, dy));
+        this.repaint();
+        lastPointerX=x;
+        lastPointerY=y;
     }
 }
