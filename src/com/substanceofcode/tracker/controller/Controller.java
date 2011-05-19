@@ -395,7 +395,7 @@ public class Controller {
     public void searchDevices() {
 		//Search first for  jsr179 device, then add in any bluetooth devices
         Logger.debug("Checking JSR179 for Location services");
-        searchDevicesByJsr();
+        searchDevicesByJsr179();
 
         Logger.debug("Searching bluetooth for Location services");
         searchBTDevices();
@@ -404,7 +404,7 @@ public class Controller {
     /**
      * See if there are any supported JSRs that provide a location api ie Jsr179
      */
-    public void searchDevicesByJsr() {
+    public void searchDevicesByJsr179() {
         try {
             if (devices == null) {
                 devices = new Vector();
