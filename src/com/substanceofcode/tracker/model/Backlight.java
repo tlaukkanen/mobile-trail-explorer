@@ -29,7 +29,6 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 
 import com.nokia.mid.ui.DeviceControl;
-
 import com.substanceofcode.tracker.view.Logger;
 
 /**
@@ -92,19 +91,28 @@ public final class Backlight extends TimerTask {
         this.midlet = midlet; // is needed by MIDP2.0 flashBacklight()
         try {
             Class.forName("com.nokia.mid.ui.DeviceControl");
-            if (System.getProperty("com.sonyericsson.imei") == null) {
-                phoneVendor = VENDOR_NOKIA;
-            } else {
+            
+            //Ideally it can detect all Nokia midp2.x devices
+            //but at least it should work for all S60 3rd Ed FP1+/S40 3rd.Ed+ platforms
+            if (System.getProperty("com.nokia.mid.dateformat") != null) 
+            	phoneVendor = VENDOR_NOKIA;
+            
+            else
+            if (System.getProperty("com.sonyericsson.imei") != null) 
                 phoneVendor = VENDOR_SONY_ERICSSON;
-            }
-        } catch (Exception ex) {
-        }
+            else {
 
-        /* Default case: Sony Ericsson backlight solution will be used */
-        if (phoneVendor == VENDOR_UNKNOWN) {
+            /* Default case: Sony Ericsson backlight solution will be used */
+            /* phoneVendor == VENDOR_UNKNOWN; */      	
             phoneVendor = VENDOR_SONY_ERICSSON;
         }
+            Logger.info("Phone Vendor = " + phoneVendor);
+            
+        } catch (Exception ex) {
+        	Logger.info(ex.getMessage());
+        }
     }
+    
 
     /**
      * Switches on the backlight and keeps it on
@@ -113,11 +121,11 @@ public final class Backlight extends TimerTask {
 
         switch (phoneVendor) {
             case VENDOR_NOKIA:
-                switchBacklightNokia(BACKLIGHT_ON);
+                switchPeriodicBacklightRefreshing(BACKLIGHT_ON);
                 return;
 
             case VENDOR_SONY_ERICSSON:
-                switchBacklightSonyEricsson(BACKLIGHT_ON);
+            	switchPeriodicBacklightRefreshing(BACKLIGHT_ON);
                 return;
         }
     }
@@ -129,37 +137,20 @@ public final class Backlight extends TimerTask {
     public void backlightOff() {
         switch (phoneVendor) {
             case VENDOR_NOKIA:
-                switchBacklightNokia(BACKLIGHT_OFF);
+                switchPeriodicBacklightRefreshing(BACKLIGHT_OFF);
                 return;
 
             case VENDOR_SONY_ERICSSON:
-                switchBacklightSonyEricsson(BACKLIGHT_OFF);
+            	switchPeriodicBacklightRefreshing(BACKLIGHT_OFF);
                 return;
         }
     }
 
     /**
-     * Nokia specific backlight control
+     * In fact Nokia and SonyEricsson use the same approach to keep backlight on
+     * Only the called methods are different.
      */
-    private void switchBacklightNokia(int backlightOnOff) {
-        try {
-            if (backlightOnOff == BACKLIGHT_OFF) {
-                DeviceControl.setLights(0, 0);
-            } else {
-                DeviceControl.setLights(0, 100);
-            }
-            Logger.info("Backlight "
-                    + (backlightOnOff != 0 ? "on" : "off"));
-        } catch (Throwable ex) {
-            // XXX : mchr : log/notify lights failure?
-        }
-    }
-
-
-    /**
-     * Sony Ericsson specific backlight control
-     */
-    private void switchBacklightSonyEricsson(int backlightOnOff) {
+    private void switchPeriodicBacklightRefreshing(int backlightOnOff) {    
         try {
             if (backlightOnOff == BACKLIGHT_OFF) {
                 cancelTimer();
@@ -183,6 +174,7 @@ public final class Backlight extends TimerTask {
         } catch (Throwable ex) {
             // XXX : mchr : log/notify lights failure?
         }
+        
     }
 
     /**
@@ -204,8 +196,16 @@ public final class Backlight extends TimerTask {
      * This method will be called when backgroundTimerTask is scheduled
      */
     public final void run() {
+    	
+    	//Do not keep the backlight on while running in a background
+    	if (Display.getDisplay(midlet).getCurrent().isShown()) 
         if (phoneVendor == VENDOR_SONY_ERICSSON) {
             Display.getDisplay(midlet).flashBacklight(1);
         }
+	        else if (phoneVendor == VENDOR_NOKIA) {
+	        	DeviceControl.setLights(0, 75);
+        }
+        
+        
     }
 }
