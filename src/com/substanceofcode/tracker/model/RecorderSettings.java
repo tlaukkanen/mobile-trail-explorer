@@ -23,6 +23,8 @@ package com.substanceofcode.tracker.model;
 
 import java.util.Enumeration;
 import java.util.Vector;
+
+import javax.microedition.io.file.FileSystemRegistry;
 import javax.microedition.midlet.MIDlet;
 
 import com.substanceofcode.tracker.grid.GridPosition;
@@ -356,9 +358,9 @@ public class RecorderSettings {
         saveSettings();
     }
     
-    /** Get export folder. Default is E:/ */
+    /** Get export folder. Default is <first available root>*/
     public String getExportFolder() {
-        return settings.getStringProperty(EXPORT_FOLDER, "E:/");
+        return settings.getStringProperty(EXPORT_FOLDER, (String) FileSystemRegistry.listRoots().nextElement());
     }
 
     /** Set export folder. */
@@ -378,9 +380,9 @@ public class RecorderSettings {
         saveSettings();
     }
 
-    /** Get import file. Default is C:/import.gpx */
+    /** Get import file. Default is <first available root>/import.gpx */
     public String getImportFile() {
-        return settings.getStringProperty(IMPORT_FILE, "C:/import.gpx");
+        return settings.getStringProperty(IMPORT_FILE, (String) FileSystemRegistry.listRoots().nextElement() + "import.gpx");
     }
 
     public void setImportFile(String value) {
